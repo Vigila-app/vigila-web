@@ -1,0 +1,20 @@
+{
+    "form": {
+        "title": "Sign up",
+        "text": "Insert the requested data to create a new account",
+        "fields": [
+            {
+                "id": "marketing-1",
+                "label": "I agree to receive notification about events, product updates and company announcements.",
+                "required": true,
+                "type": "term"
+            },
+            {
+                "id": "marketing-2",
+                "label": "I agree to share my data with 3rd parties partners to gain more advantages.",
+                "required": false,
+                "type": "term"
+            }
+        ]
+    }
+}

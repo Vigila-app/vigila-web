@@ -1,0 +1,62 @@
+import { GenderEnum } from "@/src/enums/common.enums";
+import { AccessLevelsEnum, RolesEnum } from "@/src/enums/roles.enums";
+
+export type UserDetailsType = {
+  displayName?: string;
+  photoURL?: string;
+  name?: string;
+  surname?: string;
+  email?: string;
+  email_verified?: boolean;
+  host_id?: string;
+  username?: string;
+  birthday?: string;
+  gender?: GenderEnum;
+  other?: { [key: string]: string | number };
+};
+
+export type UserDevicesType = {
+  [key: string]: {
+    active: boolean;
+    deviceId: string;
+    lastUpdate?: Date | string;
+    name?: string;
+    platform?: string;
+  };
+};
+
+export type UserTermsType = {
+  [term: string]: boolean;
+};
+
+export type UserClaimsType = {
+  role: RolesEnum;
+  level: AccessLevelsEnum;
+};
+
+export type UserType =
+  | { email: string; id: string; displayName?: string; photoURL?: string }
+  | undefined;
+
+export type UserStoreType = {
+  onLogout: () => void;
+  lastUpdate?: Date;
+  user: UserType;
+  userDetails?: UserDetailsType;
+  userDevices?: UserDevicesType;
+  userTerms?: UserTermsType;
+  setUser: ({
+    user,
+    userDetails,
+    userTerms,
+    userDevices,
+  }: {
+    user?: UserType;
+    userDetails?: UserDetailsType;
+    userTerms?: UserTermsType;
+    userDevices?: UserDevicesType;
+  }) => void;
+  getUserDetails: (force?: boolean) => Promise<UserDetailsType>;
+  getUserTerms: (force?: boolean) => Promise<UserTermsType>;
+  getUserDevices: (force?: boolean) => Promise<UserDevicesType>;
+};

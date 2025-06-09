@@ -1,0 +1,13 @@
+# Block all crawlers for /api
+User-agent: *
+Disallow: /api
+
+# Block all crawlers for /user
+User-agent: *
+Disallow: /user
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+Sitemap: https://starter-nextjs-tailwind-firebase.vercel.app/sitemap.xml

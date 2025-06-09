@@ -1,0 +1,154 @@
+/* eslint-disable @next/next/no-img-element */
+import clsx from "clsx";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { InputFile } from "@/components/form";
+import { randomNumber } from "@/src/utils/common.utils";
+
+const BACKGROUND_COLORS = [
+  "EBF3FF",
+  "EEEDFD",
+  "FFEBEE",
+  "FDEFE2",
+  "E7F9F3",
+  "EDEEFD",
+  "ECFAFE",
+  "F2FFD1",
+  "FFF7E0",
+  "FDF1F7",
+  "EAEFE6",
+  "E0E6EB",
+  "E4E2F3",
+  "E6DFEC",
+  "E2F4E8",
+  "E6EBEF",
+  "EBE6EF",
+  "E8DEF6",
+  "D8E8F3",
+  "ECE1FE",
+];
+
+const TEXT_COLORS = [
+  "060A23",
+  "4409B9",
+  "BD0F2C",
+  "C56511",
+  "216E55",
+  "05128A",
+  "1F84A3",
+  "526E0C",
+  "935F10",
+  "973562",
+  "69785E",
+  "2D3A46",
+  "280F6D",
+  "37364F",
+  "363548",
+  "4D176E",
+  "AB133E",
+  "420790",
+  "222A54",
+  "192251",
+];
+
+type AvatarI = {
+  imgUrl?: string | null;
+  size?: "small" | "standard" | "medium" | "big";
+  label?: string;
+  inline?: boolean;
+  withUpload?: boolean;
+  onFileUpload?: (
+    file: string | ArrayBuffer | File,
+    metadata: { contentType: string }
+  ) => void;
+  value?: string;
+};
+
+const AvatarSize = {
+  small: "size-4 text-xs",
+  standard: "size-8 text-sm",
+  medium: "size-12 text-md",
+  big: "size-16 text-lg",
+};
+
+const Avatar = (props: AvatarI) => {
+  const {
+    imgUrl,
+    size = "standard",
+    inline = false,
+    label,
+    withUpload = false,
+    onFileUpload,
+    value,
+  } = props;
+
+  const imgStyle = clsx(
+    "rounded-full object-cover font-normal",
+    AvatarSize[size]
+  );
+
+  const randomKey = randomNumber(0, 19);
+
+  return (
+    <div
+      className={clsx(
+        "relative items-center",
+        inline ? "inline-flex gap-1" : "flex flex-col gap-1"
+      )}
+    >
+      {imgUrl ? (
+        <img alt="avatar" src={imgUrl} className={imgStyle} />
+      ) : value ? (
+        <div
+          className={clsx(
+            "inline-flex items-center justify-center rounded-full select-none",
+            AvatarSize[size],
+            size === "big" && "shadow"
+          )}
+          style={{
+            backgroundColor: `#${BACKGROUND_COLORS[randomKey]}`,
+          }}
+        >
+          <span className="sr-only">{value}</span>
+          <span
+            className="uppercase !no-underline"
+            style={{ color: `#${TEXT_COLORS[randomKey]}` }}
+          >
+            {String(
+              value.includes(" ")
+                ? value
+                    .split(" ")
+                    .map((s) => s.substring(0, 1))
+                    .join("")
+                : value
+            ).substring(0, 2)}
+          </span>
+        </div>
+      ) : (
+        <UserCircleIcon className={imgStyle} />
+      )}
+      {label ? (
+        <p
+          className={clsx(
+            "text-left text-ellipsis overflow-hidden text-nowrap select-all",
+            inline ? "max-w-40" : "max-w-60"
+          )}
+        >
+          {label}
+        </p>
+      ) : null}
+
+      {withUpload ? (
+        <div className="absolute">
+          <InputFile
+            hidden
+            label="profile pic"
+            type="image"
+            onFileUpload={onFileUpload}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default Avatar;

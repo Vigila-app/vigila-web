@@ -1,0 +1,11 @@
+{
+    "main-hero": {
+        "title": "This is the main title",
+        "subtitle": "Fabolous subtitle here",
+        "payoff": "This is really incredible, join us now!",
+        "cta": [{
+            "label": "Get Started",
+            "url": "/wall"
+        }]
+    }
+}

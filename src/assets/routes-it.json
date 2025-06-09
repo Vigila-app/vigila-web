@@ -1,0 +1,297 @@
+{
+  "home": {
+    "url": "/",
+    "label": "Home",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "login": {
+    "url": "/auth/login",
+    "label": "Login",
+    "title": "Login",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "registration": {
+    "url": "/auth/registration",
+    "label": "Sign up",
+    "title": "Sign up",
+    "menu": {
+      "mobile": false,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "resetPassword": {
+    "url": "/auth/reset-password",
+    "label": "Reset password",
+    "title": "Reset Password",
+    "private": false,
+    "roles": []
+  },
+  "updatePassword": {
+    "url": "/auth/update-password",
+    "label": "Aggiorna password",
+    "title": "Aggiorna Password",
+    "private": false,
+    "roles": []
+  },
+  "confirmEmail": {
+    "url": "/auth/confirm-email",
+    "label": "Conferma email",
+    "title": "Conferma email",
+    "private": false,
+    "roles": []
+  },
+  "dashboard": {
+    "url": "/dashboard",
+    "label": "Dashboard",
+    "title": "Dashboard",
+    "menu": {
+      "mobile": false,
+      "desktop": true,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "crm": {
+    "url": "/dashboard/crm",
+    "label": "CRM",
+    "title": "CRM",
+    "menu": {
+      "mobile": true,
+      "desktop": false,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "guests": {
+    "url": "/dashboard/crm/guests",
+    "label": "Guests",
+    "title": "Guests",
+    "parents": ["crm"],
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "guestDetails": {
+    "url": "/dashboard/crm/guests/:guestId",
+    "matchingUrl": "/crm/guests/",
+    "label": "Guest Details",
+    "title": "Guest Details",
+    "parents": ["crm", "guests"],
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "user": {
+    "url": "/dashboard/user",
+    "label": "Utente",
+    "title": "Utente",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "profile": {
+    "url": "/dashboard/user/profile",
+    "label": "Profilo",
+    "title": "Profilo",
+    "private": true,
+    "roles": []
+  },
+  "account": {
+    "url": "/dashboard/user/account",
+    "label": "Account",
+    "title": "Account",
+    "private": true,
+    "roles": []
+  },
+  "accountDetails": {
+    "url": "/dashboard/user/account/details",
+    "label": "Details",
+    "title": "Account Details",
+    "parents": ["account"],
+    "private": true,
+    "roles": []
+  },
+  "accountSecurity": {
+    "url": "/dashboard/user/account/security",
+    "label": "Sicurezza",
+    "title": "Sicurezza Account",
+    "parents": ["account"],
+    "private": true,
+    "roles": []
+  },
+  "sales": {
+    "url": "/dashboard/sales",
+    "label": "Sales",
+    "title": "Sales",
+    "menu": {
+      "mobile": true,
+      "desktop": false,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "saleDetails": {
+    "url": "/dashboard/sales/:saleId",
+    "matchingUrl": "/dashboard/sales",
+    "label": "Sale Details",
+    "title": "Sale Details",
+    "parents": ["sales"],
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "services": {
+    "url": "/dashboard/services",
+    "label": "Servizi",
+    "title": "Servizi",
+    "menu": {
+      "mobile": true,
+      "desktop": false,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "serviceDetails": {
+    "url": "/dashboard/services/:serviceId",
+    "matchingUrl": "/dashboard/services",
+    "label": "Service Details",
+    "title": "Service Details",
+    "parents": ["services"],
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "notifications": {
+    "url": "/dashboard/notifications",
+    "label": "Notifiche",
+    "title": "Notifiche",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "about": {
+    "url": "/about",
+    "label": "About",
+    "title": "About",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": true,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
+  "contacts": {
+    "url": "/contacts",
+    "label": "Contatti",
+    "title": "Contatti",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
+  "termsConditions": {
+    "url": "/terms-and-conditions",
+    "label": "Termini & Condizioni",
+    "title": "Termini & Condizioni",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
+  "privacyPolicy": {
+    "url": "/privacy-policy",
+    "label": "Privacy Policy",
+    "title": "Privacy Policy",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
+  "cookiePolicy": {
+    "url": "/cookie-policy",
+    "label": "Cookie Policy",
+    "title": "Cookie Policy",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": [],
+    "seo": {
+      "changeFrequency": "monthly",
+      "priority": 0.8
+    }
+  }
+}

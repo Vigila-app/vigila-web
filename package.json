@@ -1,0 +1,41 @@
+{
+  "name": "vigila-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "preview": "next start"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.1.1",
+    "@onesignal/node-onesignal": "^5.0.0-alpha-01",
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^3.3.0",
+    "@supabase/supabase-js": "^2.48.1",
+    "@tailwindcss/postcss": "^4.0.12",
+    "clsx": "^2.1.0",
+    "leaflet": "^1.9.4",
+    "next": "^15.3.3",
+    "postcss": "^8.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.49.2",
+    "react-leaflet": "^5.0.0",
+    "stripe": "^15.5.0",
+    "tailwindcss": "^4.0.12",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
+    "@types/leaflet": "^1.9.8",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.3",
+    "supabase": "^2.9.6",
+    "typescript": "^5"
+  }
+}
