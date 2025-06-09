@@ -4,7 +4,6 @@ import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
-import { CheckinI } from "@/src/types/checkin.types";
 import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
 
