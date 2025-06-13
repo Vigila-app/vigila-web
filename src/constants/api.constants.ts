@@ -79,6 +79,11 @@ const apiControllers = {
   // region USER
   USER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/user`,
   // endregion USER
+
+
+  //region Prova
+ Prova: (isMock?: boolean): string =>`${apiBase.V1(isMock)}/prova`,
+  //endregion Prova
 };
 
 export const apiUser = {
@@ -138,4 +143,7 @@ export const apiMaps = {
 export const apiCheckout = {
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     apiControllers.INTENT(paymentIntentId, isMock),
+};
+export const apiProva={
+  PROVA: (isMock?: boolean): string => apiControllers.Prova(isMock)
 };

@@ -293,5 +293,19 @@
       "changeFrequency": "monthly",
       "priority": 0.8
     }
-  }
+  },
+  "prova":{
+    "url": "/prova",
+    "label": "prova",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+
+    }
+  
 }
