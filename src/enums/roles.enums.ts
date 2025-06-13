@@ -2,8 +2,7 @@ export enum RolesEnum {
     ADMIN = "ADMIN",
     EDITOR = "EDITOR",
     CONSUMER = "CONSUMER",
-
-    HOST = "HOST",
+    VIGIL = "VIGIL",
     MERCHANT = "MERCHANT",
     GUEST = "GUEST",
     

@@ -42,24 +42,12 @@ const DashboardShoulderComponent = () => {
         <ul className="text-gray-700">
           <h6 className="text-xs font-medium">MANAGE</h6>
           <ShoulderMenuItem
-            {...Routes.checkins}
-            active={pathname.includes(Routes.checkins.url)}
-          />
-          <ShoulderMenuItem
             {...Routes.sales}
             active={pathname.includes(Routes.sales.url)}
           />
           <ShoulderMenuItem
             {...Routes.services}
             active={pathname.includes(Routes.services.url)}
-          />
-          <ShoulderMenuItem
-            {...Routes.tickets}
-            active={pathname.includes(Routes.tickets.url)}
-          />
-          <ShoulderMenuItem
-            {...Routes.units}
-            active={pathname.includes(Routes.units.url)}
           />
         </ul>
         <ul className="text-gray-700">

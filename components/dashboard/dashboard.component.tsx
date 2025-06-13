@@ -2,9 +2,7 @@
 import { DashboardCard } from "@/components/dashboard";
 import { Avatar, ButtonLink, Tooltip, Undraw } from "@/components";
 import { Routes } from "@/src/routes";
-import { useTicketsStore } from "@/src/store/tickets/tickets.store";
 import { useEffect } from "react";
-import { useCheckinStore } from "@/src/store/checkin/checkin.store";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import {
@@ -17,11 +15,8 @@ import {
   isDateInRange,
   timestampToDate,
 } from "@/src/utils/date.utils";
-import { TicketStatusEnum } from "@/src/enums/tickets.enums";
-import { useUnitsStore } from "@/src/store/units/units.store";
 import { HorizontalStats } from "@/components/stats";
 import clsx from "clsx";
-import { TicketUtils } from "@/src/utils/ticket.utils";
 import { useSalesStore } from "@/src/store/sales/sales.store";
 import { useTabActive } from "@/src/hooks";
 
@@ -30,17 +25,11 @@ type DashboardComponentI = {
 };
 
 const DashboardComponent = (props: DashboardComponentI) => {
-  const { checkins, getCheckins } = useCheckinStore();
   const { sales, getSales } = useSalesStore();
-  const { tickets, getTickets } = useTicketsStore();
-  const { userUnits, getUserUnits } = useUnitsStore();
   const isTabActive = useTabActive();
 
   const getUpdatedData = (force = false) => {
-    getCheckins(force);
     getSales(force);
-    getTickets(force);
-    getUserUnits(force);
   };
 
   useEffect(() => {
@@ -79,7 +68,7 @@ const DashboardComponent = (props: DashboardComponentI) => {
 
   return (
     <div>
-      <HorizontalStats
+      {/* <HorizontalStats
         stats={[
           { label: "Monthly sales", value: calcMonthlySales() },
           {
@@ -88,9 +77,9 @@ const DashboardComponent = (props: DashboardComponentI) => {
           },
           { label: "Monthly views", value: `-` },
         ]}
-      />
+      /> */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-4 lg:mt-6 xl:mt-8 gap-4 lg:gap-6 xl:gap-8">
-        <DashboardCard
+        {/* <DashboardCard
           title="Check-in"
           headerAction={
             <ButtonLink
@@ -161,7 +150,7 @@ const DashboardComponent = (props: DashboardComponentI) => {
               </div>
             )}
           </div>
-        </DashboardCard>
+        </DashboardCard> */}
         <DashboardCard
           title="Sales"
           headerAction={
@@ -227,7 +216,7 @@ const DashboardComponent = (props: DashboardComponentI) => {
             )}
           </div>
         </DashboardCard>
-        <DashboardCard
+        {/* <DashboardCard
           title="Tickets"
           headerAction={
             <ButtonLink
@@ -309,7 +298,7 @@ const DashboardComponent = (props: DashboardComponentI) => {
               </div>
             )}
           </div>
-        </DashboardCard>
+        </DashboardCard> */}
       </div>
       <Undraw graphic="data" className="my-8" />
     </div>

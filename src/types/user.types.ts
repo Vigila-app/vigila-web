@@ -38,6 +38,16 @@ export type UserType =
   | { email: string; id: string; displayName?: string; photoURL?: string }
   | undefined;
 
+  export type UserSignupType = UserType & {
+    id?: string;
+    name: string;
+    surname: string;
+    password: string;
+    terms: UserTermsType;
+    role: RolesEnum;
+    level: AccessLevelsEnum;
+  }
+
 export type UserStoreType = {
   onLogout: () => void;
   lastUpdate?: Date;

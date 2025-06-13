@@ -1,139 +1,139 @@
+import { jsonErrorResponse } from "@/server/api.utils.server";
 import { initAdmin } from "@/server/supabaseAdmin";
-import { AppConstants, ResponseCodesConstants } from "@/src/constants";
+import { ResponseCodesConstants } from "@/src/constants";
+import { AccessLevelsEnum, RolesEnum } from "@/src/enums/roles.enums";
 import { AuthService } from "@/src/services";
-import { NextResponse } from "next/server";
+import { UserSignupType, UserType } from "@/src/types/user.types";
+import { NextRequest, NextResponse } from "next/server";
 
-const requestHandler = async (req: Request) => {
-  const { method } = req;
+const genericError = (error: any = undefined) =>
+  jsonErrorResponse(500, {
+    code: ResponseCodesConstants.USER_SIGNUP_ERROR.code,
+    success: false,
+    error,
+  });
 
-  console.log(`API ${method} user/signup`);
+export async function POST(req: NextRequest) {
+  // return requestHandler(req);
+  try {
+    const body: UserSignupType = await req.json();
+    console.log(`API POST user/signup`, {...body, password: "******"});
 
-  const { authToken, user } = AuthService.getAuthHeaders(req.headers);
-
-  if (user || authToken) {
-    return NextResponse.json(
-      {
-        code: ResponseCodesConstants.USER_SIGNUP_FORBIDDEN.code,
-        success: false,
-      },
-      { status: 403 }
+    const { authToken, user: authUser } = AuthService.getAuthHeaders(
+      req.headers
     );
-  }
 
-  switch (method) {
-    case "POST": {
-      const genericError = (error: any = undefined) =>
-        NextResponse.json(
-          {
-            code: ResponseCodesConstants.USER_SIGNUP_ERROR.code,
-            error,
-            success: false,
-          },
-          { status: 500 }
-        );
-
-      try {
-        const { email, password, name, surname, terms } = await req.json();
-        if (!(email && password && name && surname && terms)) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.USER_SIGNUP_BAD_REQUEST.code,
-              success: false,
-            },
-            { status: 400 }
-          );
-        }
-
-        const _admin = initAdmin();
-
-        if (!_admin) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.USER_SIGNUP_SERVICE_UNAVAILABLE.code,
-              success: false,
-            },
-            { status: 503 }
-          );
-        }
-
-        const { data, error } = await _admin.auth.admin.createUser({
-          email,
-          password,
-
-          // TODO review this part
-          email_confirm: true,
-
-          user_metadata: {
-            name,
-            surname,
-            displayName: `${name} ${surname}`,
-            terms,
-            role: AppConstants.defaultUserRole,
-            level: AppConstants.defaultUserLevel,
-          },
-        });
-
-        if (error) {
-          return genericError(error);
-        }
-
-        if (data?.user?.id) {
-          const { data: host, error: error_db } = await _admin
-            .from("hosts")
-            .insert({
-              user_id: data.user.id,
-              id: data.user.id,
-              status: "active",
-            })
-            .select()
-            .maybeSingle();
-
-          if (error_db) {
-            return genericError(error_db);
-          }
-
-          const { data: user, error } = await _admin.auth.admin.updateUserById(
-            data?.user?.id,
-            {
-              user_metadata: {
-                host_id: host?.id,
-              },
-            }
-          );
-
-          if (error) {
-            return genericError(error);
-          }
-
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.USER_SIGNUP_SUCCESS.code,
-              data: user,
-              success: true,
-            },
-            { status: 200 }
-          );
-        } else {
-          return genericError();
-        }
-      } catch (error) {
-        return genericError(error);
-      }
-      break;
-    }
-    default: {
+    if (authUser || authToken) {
       return NextResponse.json(
         {
-          code: ResponseCodesConstants.USER_SIGNUP_METHOD_NOT_ALLOWED.code,
+          code: ResponseCodesConstants.USER_SIGNUP_FORBIDDEN.code,
           success: false,
         },
-        { status: 405 }
+        { status: 403 }
       );
-      break;
     }
-  }
-};
 
-export async function POST(req: Request) {
-  return requestHandler(req);
+    const {
+      email,
+      password,
+      name,
+      surname,
+      terms,
+      role = RolesEnum.CONSUMER,
+      level = AccessLevelsEnum.BASE,
+    } = body;
+    if (
+      !(email && password && name && surname && terms) ||
+      (role !== RolesEnum.CONSUMER && role !== RolesEnum.VIGIL)
+    ) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.USER_SIGNUP_BAD_REQUEST.code,
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    const _admin = initAdmin();
+
+    if (!_admin) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.USER_SIGNUP_SERVICE_UNAVAILABLE.code,
+          success: false,
+        },
+        { status: 503 }
+      );
+    }
+
+    const { data, error } = await _admin.auth.admin.createUser({
+      email,
+      password,
+
+      // TODO review this part
+      email_confirm: true,
+
+      user_metadata: {
+        name,
+        surname,
+        displayName: `${name} ${surname}`,
+        terms,
+        role,
+        level,
+      },
+    });
+
+    if (error) {
+      return genericError(error);
+    }
+
+    if (data?.user?.id) {
+      const { data: userData, error: error_db } = await _admin
+        .from(
+          role === RolesEnum.CONSUMER
+            ? "consumers"
+            : role === RolesEnum.VIGIL
+            ? "vigils"
+            : ""
+        )
+        .insert({
+          id: data.user.id,
+          displayName: `${name} ${surname}`,
+          status: "active",
+        })
+        .select()
+        .maybeSingle();
+
+      if (error_db) {
+        return genericError(error_db);
+      }
+
+      const { data: user, error } = await _admin.auth.admin.updateUserById(
+        data?.user?.id,
+        {
+          user_metadata: {
+            user_id: userData?.id,
+          },
+        }
+      );
+
+      if (error) {
+        return genericError(error);
+      }
+
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.USER_SIGNUP_SUCCESS.code,
+          data: user,
+          success: true,
+        },
+        { status: 200 }
+      );
+    } else {
+      return genericError();
+    }
+  } catch (error) {
+    return genericError(error);
+  }
 }

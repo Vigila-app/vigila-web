@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Routes } from "@/src/routes";
 import { DropdownFilter } from "@/components/filters";
 import { dateDisplay } from "@/src/utils/date.utils";
-import { useUnitsStore } from "@/src/store/units/units.store";
 import { useSalesStore } from "@/src/store/sales/sales.store";
 import { useTabActive } from "@/src/hooks";
 import { useCrmStore } from "@/src/store/crm/crm.store";
@@ -15,7 +14,6 @@ import { SaleI } from "@/src/types/sales.types";
 
 const SaleListComponent = () => {
   const { getSales, sales: salesStore = [], lastUpdate } = useSalesStore();
-  const { userUnits, getUserUnits } = useUnitsStore();
   const { customers, getCustomers } = useCrmStore();
   const isTabActive = useTabActive();
 
@@ -33,7 +31,6 @@ const SaleListComponent = () => {
 
   const getUpdatedData = (force = false) => {
     updateSaleList(force);
-    getUserUnits(force);
     getCustomers(force);
   };
 
@@ -98,10 +95,10 @@ const SaleListComponent = () => {
             <DropdownFilter
               label="Unit"
               type="checkbox"
-              options={userUnits.map((unit) => ({
-                label: unit.name,
-                value: unit.id,
-              }))}
+              // options={userUnits.map((unit) => ({
+              //   label: unit.name,
+              //   value: unit.id,
+              // }))}
               placeholder="Search sale by Unit"
               onChange={(v) => {
                 (v && v.length >= 3) || v === ""
@@ -119,7 +116,7 @@ const SaleListComponent = () => {
                   label={`Search: ${(filters.sale as string).toUpperCase()}`}
                 />
               ) : null}
-              {filters.unit?.length
+              {/* {filters.unit?.length
                 ? (filters.unit as string[]).map((u) => (
                     <Badge
                       key={u}
@@ -129,7 +126,7 @@ const SaleListComponent = () => {
                       }`}
                     />
                   ))
-                : null}
+                : null} */}
             </div>
           ) : null}
         </div>
@@ -191,8 +188,8 @@ const SaleListComponent = () => {
                 sale.id
               ),
             amount: `${sale.currency}${amountDisplay(Number(sale.amount))}`,
-            unit:
-              userUnits.find((unit) => unit.id === sale.unitId)?.name || "-",
+            // unit:
+            //   userUnits.find((unit) => unit.id === sale.unitId)?.name || "-",
             guest: getCustomerAvatar(sale) || "-",
 
             action: (
