@@ -8,21 +8,21 @@ import {
 import { useUserStore } from "@/src/store/user/user.store";
 import { ApiService, RecaptchaService } from "@/src/services";
 import { RecaptchaActionEnum } from "@/src/enums/common.enums";
-import { isServer } from "@/src/utils/common.utils";
 import { apiUser } from "@/src/constants/api.constants";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
+import { RolesEnum } from "../enums/roles.enums";
 
 export const UserService = {
-  getUser: async (force = false, id = "") =>
+  getUser: async (force = false, id = "", role = "") =>
     new Promise<UserType | null>(async (resolve, reject) => {
       try {
         //if (isServer) resolve(AuthInstance?.currentUser);
 
         if (force) {
-          if (id) {
+          if (id && role) {
             const { data } = (await ApiService.get(
-              apiUser.DETAILS(id as string)
+              apiUser.DETAILS(id as string, role as RolesEnum)
             )) as { data: UserType };
             resolve(data);
           } else {
@@ -42,9 +42,9 @@ export const UserService = {
     new Promise<UserDetailsType>(async (resolve, reject) => {
       try {
         const user = await UserService.getUser();
-        if (user?.id) {
+        if (user?.id && user?.user_metadata?.role) {
           const { data: response } = (await ApiService.get(
-            apiUser.DETAILS(user?.id)
+            apiUser.DETAILS(user?.id, user?.user_metadata?.role as RolesEnum)
           )) as { data: UserDetailsType };
           resolve(response);
         } else {
@@ -100,9 +100,9 @@ export const UserService = {
     }>(async (resolve, reject) => {
       try {
         const user = await UserService.getUser();
-        if (user?.id) {
+        if (user?.id && user?.user_metadata?.role) {
           const { data: response } = (await ApiService.put(
-            apiUser.DETAILS(user.id),
+            apiUser.DETAILS(user.id, user.user_metadata?.role as RolesEnum),
             {
               data: { ...userData, ...userDetails },
             }

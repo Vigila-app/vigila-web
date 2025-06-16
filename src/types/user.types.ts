@@ -1,5 +1,6 @@
 import { GenderEnum } from "@/src/enums/common.enums";
 import { AccessLevelsEnum, RolesEnum } from "@/src/enums/roles.enums";
+import { UserMetadata } from "@supabase/supabase-js";
 
 export type UserDetailsType = {
   displayName?: string;
@@ -35,18 +36,24 @@ export type UserClaimsType = {
 };
 
 export type UserType =
-  | { email: string; id: string; displayName?: string; photoURL?: string }
+  | {
+      email: string;
+      id: string;
+      displayName?: string;
+      photoURL?: string;
+      user_metadata?: UserMetadata;
+    }
   | undefined;
 
-  export type UserSignupType = UserType & {
-    id?: string;
-    name: string;
-    surname: string;
-    password: string;
-    terms: UserTermsType;
-    role: RolesEnum;
-    level: AccessLevelsEnum;
-  }
+export type UserSignupType = UserType & {
+  id?: string;
+  name: string;
+  surname: string;
+  password: string;
+  terms: UserTermsType;
+  role: RolesEnum;
+  level: AccessLevelsEnum;
+};
 
 export type UserStoreType = {
   onLogout: () => void;

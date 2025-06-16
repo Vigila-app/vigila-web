@@ -6,6 +6,7 @@ import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
 import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
+import { RolesEnum } from "../enums/roles.enums";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -83,14 +84,14 @@ const apiControllers = {
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
-  DETAILS: (id: string, isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/${isMock ? "user" : id}`,
+  DETAILS: (id: string, role: RolesEnum, isMock?: boolean): string =>
+    `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${isMock ? "user" : id}`,
   DELETE: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${isMock ? "user" : id}`,
   DEVICES: (id: string, isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/${id}/devices`,
+    `${apiControllers.USER(isMock)}/devices/${id}`,
   TERMS: (id: string, isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/${id}/terms`,
+    `${apiControllers.USER(isMock)}/terms/${id}`,
 };
 
 export const apiServices = {
