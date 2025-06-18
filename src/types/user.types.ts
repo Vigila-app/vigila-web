@@ -46,7 +46,7 @@ export type UserType =
   | undefined;
 
 export type UserSignupType = UserType & {
-  id?: string;
+  id?: string;// chiedere perchè se è già presente in usertype
   name: string;
   surname: string;
   password: string;
