@@ -28,8 +28,8 @@ const LoginComponent = () => {
     setError,
   } = useForm<LoginFormI>();
 
-  const redirectDashboard = () => {
-    router.replace(Routes.dashboard.url);
+  const redirectHome = () => {
+    router.replace(Routes.home.url);
   };
 
   const onSubmit = async (formData: LoginFormI) => {
@@ -38,7 +38,7 @@ const LoginComponent = () => {
       try {
         showLoader();
         await AuthService.login(email, password);
-        redirectDashboard();
+        redirectHome();
       } catch (error) {
         console.error("Error authenticating user", error);
         setError("email", { type: "validate" });

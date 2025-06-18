@@ -50,8 +50,8 @@ const SignupComponent = (props: SignupComponentI) => {
     setError,
   } = useForm<RegistrationFormI>();
 
-  const redirectDashboard = () => {
-    router.replace(Routes.dashboard.url);
+  const redirectHome = () => {
+    router.replace(Routes.home.url);
   };
 
   const manageSignupError = (error: { code?: string }) => {
@@ -91,7 +91,7 @@ const SignupComponent = (props: SignupComponentI) => {
             });
         }
         await AuthService.signup({ email, password, name, surname, role}, terms);
-        redirectDashboard();
+        redirectHome();
       } catch (error: any) {
         console.error("Error registering user", error);
         if (error) {
