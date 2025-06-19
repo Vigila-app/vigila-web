@@ -6,6 +6,7 @@ import { isServer } from "@/src/utils/common.utils";
 import Link from "next/link";
 import { Avatar } from "@/components";
 import { StorageUtils } from "@/src/utils/storage.utils";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const HeaderProfile = () => {
   const { user, userDetails } = useUserStore();
@@ -16,9 +17,9 @@ const HeaderProfile = () => {
   //region Url
   const UrlByRole = () => {
     switch (role) {
-      case "VIGIL":
+      case RolesEnum.VIGIL:
         return Routes.profileVigil.url;
-      case "CONSUMER":
+      case RolesEnum.CONSUMER:
         return Routes.profileConsumer.url;
       default:
         return Routes.home.url;

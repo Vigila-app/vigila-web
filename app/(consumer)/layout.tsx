@@ -60,8 +60,7 @@ export default function RootLayout({
         </>
       }
       footer={<Footer />}
-      header={<Header />}
-    >
+      header={<Header />}>
       {children}
     </HtmlDocument>
   );
