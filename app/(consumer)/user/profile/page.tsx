@@ -2,15 +2,15 @@
 
 import dynamic from "next/dynamic";
 
-const UpdateProfileComponent = dynamic(
-  () => import("@/components/user/profile/updateProfile.component"),
+const ProfileComponent = dynamic(
+  () => import("@/components/profile/profileComponent"),
   { ssr: !!false }
 );
 
 export default function Profile() {
   return (
     <section id="user-profile">
-      <UpdateProfileComponent />
+      <ProfileComponent />
     </section>
   );
 }
