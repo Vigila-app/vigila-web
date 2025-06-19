@@ -31,23 +31,23 @@
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": false,
+      "header": true,
       "footer": false
     },
     "private": false,
-    "roles": []
-  },"registration-vigil": {
+    "roles": ["CONSUMER"]
+  },"registrationVigil": {
     "url": "/auth/registration/vigil",
     "label": "Sign up",
     "title": "Sign up",
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": false,
+      "header": true,
       "footer": false
     },
     "private": false,
-    "roles": []
+    "roles": ["VIGIL"]
   },
   "resetPassword": {
     "url": "/auth/reset-password",

@@ -22,7 +22,7 @@ const LocalLoaderId = "signup-progress";
 
 type SignupComponentI = {
   staticData?: CmsPageFormI;
-  role:RolesEnum;
+  role: RolesEnum;
 };
 
 type RegistrationFormI = {
@@ -79,7 +79,7 @@ const SignupComponent = (props: SignupComponentI) => {
       try {
         showLocalLoader(LocalLoaderId);
         const { email, password, name, surname } = formData;
-        
+
         const terms: UserTermsType = {
           "terms-and-conditions-1": true,
         };
@@ -90,7 +90,10 @@ const SignupComponent = (props: SignupComponentI) => {
               terms[term.id] = Boolean(formData[term.id]);
             });
         }
-        await AuthService.signup({ email, password, name, surname, role}, terms);
+        await AuthService.signup(
+          { email, password, name, surname, role },
+          terms
+        );
         redirectHome();
       } catch (error: any) {
         console.error("Error registering user", error);
@@ -237,7 +240,10 @@ const SignupComponent = (props: SignupComponentI) => {
                   )}
                 />
 
-                <span className="text-sm text-gray-700">{field.label}{field.required && "*"}</span>
+                <span className="text-sm text-gray-700">
+                  {field.label}
+                  {field.required && "*"}
+                </span>
               </label>
             </div>
           ) : null
@@ -249,16 +255,14 @@ const SignupComponent = (props: SignupComponentI) => {
             <Link
               href={Routes.termsConditions.url}
               target="blank"
-              className="text-gray-700 underline"
-            >
+              className="text-gray-700 underline">
               termini & condizioni
             </Link>
             &nbsp;e la&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
-              className="text-gray-700 underline"
-            >
+              className="text-gray-700 underline">
               privacy policy
             </Link>
             .
