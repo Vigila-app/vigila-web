@@ -19,13 +19,13 @@ type ProfileFormI = {
 const ProfileComponent = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
-  
-  const role:string= user?.user_metadata?.role;
-  
-  const formatRole= (role:string) => {
-  if (!role) return "";
-  return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-};
+
+  const role: string = user?.user_metadata?.role;
+
+  const formatRole = (role: string) => {
+    if (!role) return "";
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  };
 
   const {
     control,
@@ -86,11 +86,11 @@ const ProfileComponent = () => {
 
   const uploadProfilePic = async (
     file: string | ArrayBuffer | File,
-    metadata?: { contentType?: string, name?: string }
+    metadata?: { contentType?: string; name?: string }
   ) => {
     try {
       if (file) {
-/*         const resizedImg = (await resizeImage(
+        /*         const resizedImg = (await resizeImage(
           base64ProfilePic,
           150,
           150
@@ -101,8 +101,7 @@ const ProfileComponent = () => {
           `${user?.id}/${user?.id}`,
           metadata
         );
-        if (response?.path)
-          UserService.updateUser({ photoURL: response.path });
+        if (response?.path) UserService.updateUser({ photoURL: response.path });
         showToast({
           message: "Profile updated successfully",
           type: ToastStatusEnum.SUCCESS,
@@ -115,7 +114,6 @@ const ProfileComponent = () => {
   };
 
   return (
-  
     <section id="update-profile" aria-label="update profile">
       <h1 className="text-lg font-medium mb-2 leading-none sticky top-0 p-4 pb-2 z-40">
         Update profile
@@ -124,15 +122,17 @@ const ProfileComponent = () => {
       <div className="p-4">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full mx-auto max-w-lg space-y-8 p-4"
-        >
+          className="w-full mx-auto max-w-lg space-y-8 p-4">
           <div className="inline-flex justify-center w-full text-gray-500 mb-2">
             <Avatar
               label={`${userDetails?.displayName || "-"}-${formatRole(role)}`}
               size="big"
               withUpload
               onFileUpload={uploadProfilePic}
-              imgUrl={StorageUtils.getURL("profile_pics", userDetails?.photoURL as string)}
+              imgUrl={StorageUtils.getURL(
+                "profile_pics",
+                userDetails?.photoURL as string
+              )}
               value={userDetails?.displayName || ""}
             />
           </div>
