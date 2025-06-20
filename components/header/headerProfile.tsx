@@ -17,10 +17,12 @@ const HeaderProfile = () => {
       <div
         aria-label="user"
         id="User"
-        className="hidden md:inline-flex items-center border-gray-200 md:border-l pl-4 text-gray-500 transition hover:text-gray-700">
+        className="hidden md:inline-flex items-center border-gray-200 md:border-l pl-4 text-gray-500 transition hover:text-gray-700"
+      >
         <Link
           href={Routes.profile.url}
-          className="inline-flex items-center text-sm font-medium">
+          className="inline-flex items-center text-sm font-medium"
+        >
           <span className="sr-only">User</span>
           <Avatar
             inline
@@ -41,14 +43,16 @@ const HeaderProfile = () => {
       <div className="sm:flex sm:gap-4">
         <Link
           className="rounded bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-primary-700"
-          href={Routes.login.url}>
+          href={Routes.login.url}
+        >
           {Routes.login.label}
         </Link>
 
         <div className="hidden sm:flex">
           <Link
             className="rounded bg-secondary-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-secondary-700"
-            href={Routes.registration.url}>
+            href={Routes.registration.url}
+          >
             {Routes.registration.label}
           </Link>
         </div>

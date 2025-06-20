@@ -255,14 +255,16 @@ const SignupComponent = (props: SignupComponentI) => {
             <Link
               href={Routes.termsConditions.url}
               target="blank"
-              className="text-gray-700 underline">
+              className="text-gray-700 underline"
+            >
               termini & condizioni
             </Link>
             &nbsp;e la&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
-              className="text-gray-700 underline">
+              className="text-gray-700 underline"
+            >
               privacy policy
             </Link>
             .

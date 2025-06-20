@@ -1,5 +1,5 @@
 import { CmsService } from "@/src/services/cms.service";
-import SignupComponent from "../../../../../components/signUp/signup.component";
+import SignupComponent from "@/components/signUp/signup.component";
 import { CmsPageI } from "@/src/types/cms.types";
 import { SimplePage } from "@/components";
 import { cache } from "react";
