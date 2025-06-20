@@ -27,7 +27,10 @@ const HeaderProfile = () => {
           <Avatar
             inline
             label={userDetails?.displayName || Routes.profile.label}
-            imgUrl={StorageUtils.getURL("profile_pics", userDetails?.photoURL as string)}
+            imgUrl={StorageUtils.getURL(
+              "profile_pics",
+              userDetails?.photoURL as string
+            )}
             value={userDetails?.displayName || ""}
           />
         </Link>

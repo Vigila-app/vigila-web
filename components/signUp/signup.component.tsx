@@ -16,11 +16,13 @@ import { AtSymbolIcon, EyeIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const LocalLoaderId = "signup-progress";
 
 type SignupComponentI = {
   staticData?: CmsPageFormI;
+  role: RolesEnum;
 };
 
 type RegistrationFormI = {
@@ -33,7 +35,7 @@ type RegistrationFormI = {
 };
 
 const SignupComponent = (props: SignupComponentI) => {
-  const { staticData: { title, text, fields = [] } = {} } = props;
+  const { staticData: { title, text, fields = [] } = {}, role } = props;
   const {
     localLoaders: { [LocalLoaderId]: { isLoading = false } = {} } = {},
     showLocalLoader,
@@ -48,8 +50,8 @@ const SignupComponent = (props: SignupComponentI) => {
     setError,
   } = useForm<RegistrationFormI>();
 
-  const redirectDashboard = () => {
-    router.replace(Routes.dashboard.url);
+  const redirectHome = () => {
+    router.replace(Routes.home.url);
   };
 
   const manageSignupError = (error: { code?: string }) => {
@@ -77,6 +79,7 @@ const SignupComponent = (props: SignupComponentI) => {
       try {
         showLocalLoader(LocalLoaderId);
         const { email, password, name, surname } = formData;
+
         const terms: UserTermsType = {
           "terms-and-conditions-1": true,
         };
@@ -87,8 +90,11 @@ const SignupComponent = (props: SignupComponentI) => {
               terms[term.id] = Boolean(formData[term.id]);
             });
         }
-        await AuthService.signup({ email, password, name, surname }, terms);
-        redirectDashboard();
+        await AuthService.signup(
+          { email, password, name, surname, role },
+          terms
+        );
+        redirectHome();
       } catch (error: any) {
         console.error("Error registering user", error);
         if (error) {
@@ -234,7 +240,10 @@ const SignupComponent = (props: SignupComponentI) => {
                   )}
                 />
 
-                <span className="text-sm text-gray-700">{field.label}{field.required && "*"}</span>
+                <span className="text-sm text-gray-700">
+                  {field.label}
+                  {field.required && "*"}
+                </span>
               </label>
             </div>
           ) : null
