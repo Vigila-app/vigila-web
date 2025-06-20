@@ -20,14 +20,14 @@ const errorHanlder = (error: any) => {
 };
 
 export const StorageUtils = {
-  getURL: (bucket: string, pathToFile: string) => {
+  getURL: async (bucket: string, pathToFile: string) => {
     try {
       if (!(bucket && pathToFile)) return pathToFile;
-      const { data } = AppInstance.storage
+      const { data } = await AppInstance.storage
         .from(bucket)
-        .getPublicUrl(pathToFile);
+        .createSignedUrl(pathToFile, 60 * 60); // 1 hour
 
-      return data.publicUrl;
+      return data?.signedUrl;
     } catch (error) {
       errorHanlder(error);
     }

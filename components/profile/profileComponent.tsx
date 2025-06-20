@@ -17,7 +17,7 @@ type ProfileFormI = {
 };
 
 const ProfileComponent = () => {
-  const { user, userDetails } = useUserStore();
+  const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
   const { showToast } = useAppStore();
 
   const role: string = user?.user_metadata?.role;
@@ -89,21 +89,21 @@ const ProfileComponent = () => {
     metadata?: { contentType?: string; name?: string }
   ) => {
     try {
-      if (file) {
+      if (file && user?.id) {
         /*         const resizedImg = (await resizeImage(
           base64ProfilePic,
           150,
           150
         )) as string; */
-        const response = await StorageUtils.uploadFile(
-          "profile_pics",
+        await StorageUtils.uploadFile(
+          "profile-pics",
           file,
-          `${user?.id}/${user?.id}`,
+          user.id,
           metadata
         );
-        if (response?.path) UserService.updateUser({ photoURL: response.path });
+        forceUserUpdate();
         showToast({
-          message: "Profile updated successfully",
+          message: "Profilo aggiornato",
           type: ToastStatusEnum.SUCCESS,
         });
       }
@@ -129,10 +129,6 @@ const ProfileComponent = () => {
               size="big"
               withUpload
               onFileUpload={uploadProfilePic}
-              imgUrl={StorageUtils.getURL(
-                "profile_pics",
-                userDetails?.photoURL as string
-              )}
               value={userDetails?.displayName || ""}
             />
           </div>
