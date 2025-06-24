@@ -47,6 +47,7 @@ const PermitGuardComponent = () => {
     } else {
       hideLoader();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hide]);
 
   if (hide) {

@@ -128,7 +128,7 @@ const CookieBannerComponent = () => {
                         <ul className="p-2 pt-0 w-full flex flex-wrap gap-2 divide-y divide-gray-200/50">
                           {cmsData.form.fields.map((field) => (
                             <li key={field.id} className="w-full pt-2">
-                              <div className="w-full w-full inline-flex items-center justify-between">
+                              <div className="w-full inline-flex items-center justify-between">
                                 <label className="font-medium">
                                   {field.label}
                                 </label>
