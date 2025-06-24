@@ -13,6 +13,7 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { isServer } from "@/src/utils/common.utils";
 import { useSalesStore } from "@/src/store/sales/sales.store";
 import { Session, User } from "@supabase/supabase-js";
+import { RolesEnum } from "../enums/roles.enums";
 
 export const AuthInstance = AppInstance;
 
@@ -23,19 +24,21 @@ export const AuthService = {
       password: string;
       name: string;
       surname: string;
+      role: RolesEnum;
     },
     terms: UserTermsType
   ) =>
     new Promise(async (resolve, reject) => {
       try {
         await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
-        const { email, password, name, surname } = formData;
+        const { email, password, name, surname, role } = formData;
         const response = (await ApiService.post(apiUser.SIGNUP(), {
           email,
           password,
           name,
           surname,
           terms,
+          role,
         })) as { data: { user: User } };
         if (response?.data?.user?.id) {
           // TODO redirect to landing page to confirm mail

@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Vigila Web
 
-## Getting Started
+Vigila Web è una moderna applicazione web sviluppata con [Next.js](https://nextjs.org/) e bootstrappata tramite [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). Il progetto utilizza TypeScript, React 19, Tailwind CSS 4 e una ricca collezione di componenti UI e utility per la gestione di utenti, servizi, CRM, mappe e pagamenti.
 
-First, run the development server:
+## Caratteristiche principali
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js 15**: Rendering SSR/SSG, API routes, routing avanzato.
+- **React 19**: Componenti funzionali, hooks, suspense.
+- **Tailwind CSS 4**: Styling utility-first e personalizzazione tramite [app/tailwind.config.css](app/tailwind.config.css).
+- **Gestione stato**: [Zustand](https://github.com/pmndrs/zustand) per uno stato globale semplice e performante.
+- **Autenticazione & Storage**: [Supabase](https://supabase.com/) per autenticazione, database e storage file.
+- **Pagamenti**: Integrazione con [Stripe](https://stripe.com/) tramite `@stripe/stripe-js` e `@stripe/react-stripe-js`.
+- **Mappe**: Visualizzazione e gestione POI con [Leaflet](https://leafletjs.com/) e [react-leaflet](https://react-leaflet.js.org/).
+- **Notifiche Push**: Supporto a OneSignal per notifiche web push.
+- **Componenti UI**: Ampia libreria di componenti riutilizzabili (Accordion, Avatar, Badge, Button, Table, Toast, ecc.).
+- **Testing & Linting**: ESLint, TypeScript, e configurazione PostCSS.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Struttura del progetto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `/app`: Routing Next.js, pagine, layout, API routes.
+- `/components`: Componenti UI riutilizzabili e core.
+- `/mock`: Dati di esempio/mock.
+- `/public`: Asset statici (icone, immagini, manifest, worker push).
+- `/src`: Store Zustand, servizi, utility, costanti, tipi.
+- `/server`: Funzioni server-side e admin.
+- Configurazioni: `next.config.js`, `postcss.config.js`, `tailwind.config.css`, `tsconfig.json`, `.env*`.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Come iniziare
 
-## Learn More
+1. Installa le dipendenze:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Crea un file `.env.local` con le variabili ambiente richieste (vedi esempio `.env`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+3. Avvia il server di sviluppo:
 
-## Deploy on Vercel
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. Apri [http://localhost:3000](http://localhost:3000) nel browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Script disponibili
+
+- `dev`: Avvia il server di sviluppo Next.js.
+- `build`: Compila l'applicazione per la produzione.
+- `preview`: Avvia l'applicazione in modalità produzione.
+
+## Personalizzazione
+
+- Modifica la pagina principale in `app/page.tsx`.
+- Personalizza i componenti UI in `components/`.
+- Configura Tailwind in `app/tailwind.config.css`.
+- Gestisci variabili ambiente in `.env.local`.
+
+## Deploy
+
+Il modo più semplice per pubblicare l'app è tramite [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+
+Consulta la [documentazione Next.js sul deploy](https://nextjs.org/docs/deployment) per maggiori dettagli.
+
+## Risorse utili
+
+- [Documentazione Next.js](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
+- [Repository GitHub Next.js](https://github.com/vercel/next.js/)
+- [Documentazione Supabase](https://supabase.com/docs)
+- [Documentazione Stripe](https://stripe.com/docs)
+- [Documentazione Tailwind CSS](https://tailwindcss.com/docs)
+
+---

@@ -5,7 +5,6 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { isServer } from "@/src/utils/common.utils";
 import Link from "next/link";
 import { Avatar } from "@/components";
-import { StorageUtils } from "@/src/utils/storage.utils";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 const HeaderProfile = () => {

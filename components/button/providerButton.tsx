@@ -2,10 +2,8 @@
 
 import { LoaderSpinner } from "@/components";
 import clsx from "clsx";
-import GoogleLogo from "@/src/assets/img/google-logo.svg";
-import AppleLogo from "@/src/assets/img/apple-logo.svg";
-import Image from "next/image";
 import { ProviderEnum } from "@/src/enums/common.enums";
+import { lazy, Suspense } from "react";
 
 const baseBtnStyle =
   "inline-flex items-center rounded bg-white border border-gray-300 text-black hover:text-black/75 hover:border-gray-500 px-12 py-3 text-sm font-medium focus:outline-none focus:ring transition";
@@ -22,17 +20,6 @@ type ProviderButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   provider: ProviderEnum;
 };
 
-const getProviderLogo = (provider: ProviderEnum) => {
-  switch (provider) {
-    case ProviderEnum.GOOGLE:
-      return GoogleLogo;
-    case ProviderEnum.APPLE:
-      return AppleLogo;
-    default:
-      return;
-  }
-};
-
 const ProviderButton = (props: ProviderButtonI) => {
   const {
     action = () => ({}),
@@ -43,6 +30,10 @@ const ProviderButton = (props: ProviderButtonI) => {
   } = props;
 
   const isDisabled = isLoading || props.disabled;
+
+  const ProviderIcon = lazy(() => {
+    return import(`@/src/assets/img/${provider}-logo.svg`);
+  });
 
   return (
     <button
@@ -65,12 +56,11 @@ const ProviderButton = (props: ProviderButtonI) => {
         {isLoading ? (
           <LoaderSpinner size="small" />
         ) : (
-          <Image
-            alt={provider}
-            src={getProviderLogo(provider)}
-            height={20}
-            width={20}
-          />
+          <>
+            <Suspense>
+              <ProviderIcon className="h-[20px] w-[20px]" />
+            </Suspense>
+          </>
         )}
       </span>
       {label}

@@ -11,7 +11,7 @@ import { RecaptchaActionEnum } from "@/src/enums/common.enums";
 import { apiUser } from "@/src/constants/api.constants";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
-import { RolesEnum } from "../enums/roles.enums";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const UserService = {
   getUser: async (force = false, id = "", role = "") =>
