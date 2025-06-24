@@ -6,17 +6,22 @@ export const PermitGuardUtils = {
   isAuthorized: async (route: RouteI, user?: UserType) =>
     new Promise(async (resolve) => {
       try {
-        const { private: isPrivate } = route;
-        let { id } = user || {};
+        const { private: isPrivate, roles = [] } = route;
+        let sessionUser = user;
         let valid = true;
+      
 
         if (isPrivate) {
-          // checking private routes & authentication
-          if (!id) {
-            const user = await UserService.getUser();
-            id = user?.id;
+          if (!sessionUser?.id) {
+            sessionUser = await UserService.getUser() as UserType;
           }
-          valid = valid && !!id;
+          valid = valid && !!sessionUser?.id;
+
+          if (roles.length && sessionUser?.user_metadata?.role) {
+            valid = valid && roles.includes(sessionUser?.user_metadata?.role);
+          } else if (roles.length) {
+            valid = false;
+          }
         }
 
         // TODO other check
