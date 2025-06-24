@@ -1,9 +1,9 @@
 "use client";
-import { PoiI, PoiPositionI } from "@/src/types/maps.types";
 import { MapsUtils } from "@/src/utils/maps.utils";
 import clsx from "clsx";
 import { DivIcon, LatLngExpression } from "leaflet";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
 type MapsComponentI = {
   center: LatLngExpression;
@@ -13,12 +13,6 @@ type MapsComponentI = {
   markerIcon?: DivIcon;
   zoomable?: boolean;
   zoom?: number;
-  places?: {
-    id: PoiI["id"];
-    icon: DivIcon;
-    name?: string;
-    position: PoiPositionI;
-  }[];
   className?: string;
 };
 
@@ -32,6 +26,22 @@ function MapPlaceholder() {
 
 const defaultMarker = MapsUtils.createMarkerIcon();
 
+const MapInstance = (props: MapsComponentI) => {
+  const map = useMap();
+  const { center, zoom } = props;
+  const updateMap = (coordinates: LatLngExpression) => {
+    if (coordinates) {
+      map.setView(coordinates, zoom);
+    }
+  };
+
+  useEffect(() => {
+    if (center) updateMap(center);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center]);
+  return null;
+};
+
 const MapsComponent = (props: MapsComponentI) => {
   const {
     center,
@@ -40,10 +50,10 @@ const MapsComponent = (props: MapsComponentI) => {
     marker,
     markerName,
     markerIcon = defaultMarker,
-    places = [],
     zoom = 15,
     zoomable = true,
   } = props;
+
   return (
     <>
       <MapContainer
@@ -58,44 +68,13 @@ const MapsComponent = (props: MapsComponentI) => {
         touchZoom={zoomable}
         placeholder={<MapPlaceholder />}
       >
+        <MapInstance {...props} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {marker ? (
           <Marker position={marker} icon={markerIcon}>
             {markerName ? <Popup offset={[0, -25]}>{markerName}</Popup> : null}
           </Marker>
         ) : null}
-        {places?.length
-          ? places.map((place) => (
-              <Marker
-                key={place.id}
-                position={[
-                  Number(place?.position.lat),
-                  Number(place?.position.lng),
-                ]}
-                icon={place.icon}
-              >
-                {place.name ? (
-                  <Popup offset={[0, -25]}>
-                    <div className="space-y-2 flex flex-wrap">
-                      <strong>{place.name}</strong>
-                      <div className="w-full inline-flex justify-end">
-                        <a
-                          href={MapsUtils.openDeviceMap(
-                            place?.position.lat,
-                            place?.position.lng,
-                            true
-                          )}
-                          target="_blank"
-                        >
-                          Get me here
-                        </a>
-                      </div>
-                    </div>
-                  </Popup>
-                ) : null}
-              </Marker>
-            ))
-          : null}
       </MapContainer>
     </>
   );

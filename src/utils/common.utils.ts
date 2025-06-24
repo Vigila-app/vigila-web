@@ -207,3 +207,11 @@ export const deepMerge = (target: any, source: any) => {
 
   return merged;
 };
+
+let timeout: NodeJS.Timeout;
+export const debounce = (callback: (...args: any) => void, delay = 500) => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    callback();
+  }, delay);
+};
