@@ -31,23 +31,23 @@
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["CONSUMER"]
-  },"registrationVigil": {
-    "url": "/auth/registration/vigil",
-    "label": "Sign up",
-    "title": "Sign up",
+    "roles": []
+  },"onBoard": {
+    "url": "/onboarding",
+    "label": "onboard",
+    "title": "onboard",
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["VIGIL"]
+    "roles": []
   },
   "resetPassword": {
     "url": "/auth/reset-password",
