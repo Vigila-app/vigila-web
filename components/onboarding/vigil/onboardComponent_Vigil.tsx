@@ -8,23 +8,34 @@ import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
+import Checkbox from "@/components/form/checkbox";
 
 type OnboardFormI = {
   birthdate: string;
   city: string;
   CAP: string;
+  occupation: string;
+  transportation: string;
   // TODO add other detail fields
 };
 
+const transportationOptions = [
+  { label: "Auto", value: "auto" },
+  { label: "Moto", value: "moto" },
+  { label: "Bicicletta", value: "bike" },
+  { label: "Trasporto pubblico", value: "public" },
+];
+
 const OnboardComponent = () => {
+  
   const { showLoader, hideLoader, showToast } = useAppStore();
   const { user } = useUserStore();
- const router = useRouter();
+  const router = useRouter();
   const {
     control,
     formState: { errors, isValid },
@@ -38,7 +49,7 @@ const OnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
-      const { birthdate, city, CAP } = formData;
+      const { birthdate, city, CAP, occupation, transportation } = formData;
       {
         const role = user?.user_metadata?.role as RolesEnum;
 
@@ -51,14 +62,17 @@ const OnboardComponent = () => {
           });
           return;
         }
-        await OnboardService.update(userId, role, { birthdate, city, CAP });
+        await OnboardService.update(userId, {
+          role: RolesEnum.VIGIL,
+          data: { birthdate, city, CAP, occupation, transportation },
+        });
         //TODO {qui aggiungi i campi modificati } );
         showToast({
           message: "Informazioni registrate con successo",
           type: ToastStatusEnum.SUCCESS,
         });
-        //TODO reindirizzamento
-        router.replace(Routes.home.url);
+
+        // router.replace(Routes.home.url);
       }
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
@@ -82,7 +96,7 @@ const OnboardComponent = () => {
           <Controller
             name="birthdate"
             control={control}
-            rules={{ required: true, minLength: 6, maxLength: 10 }}//TODO controllo migliore 
+            rules={{ required: true, minLength: 6, maxLength: 10 }} //TODO controllo migliore
             render={({ field }) => (
               <Input
                 {...field}
@@ -126,6 +140,47 @@ const OnboardComponent = () => {
             )}
           />
 
+          <Controller
+            name="occupation"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="Occupazione"
+                placeholder="Es. Studente, Impiegato..."
+                required
+                error={errors.occupation}
+              />
+            )}
+          />
+
+          {/* Trasporti: solo uno selezionabile */}
+          <Controller
+            name="transportation"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <div>
+                <label className="block font-medium mb-1">
+                  Mezzo di trasporto
+                </label>
+                <div className="space-y-2">
+                  {transportationOptions.map((option) => (
+                    <Checkbox
+                      key={option.value}
+                      label={option.label}
+                      checked={field.value === option.value}
+                      onChange={() => field.onChange(option.value)}
+                    />
+                  ))}
+                  {errors.transportation && (
+                    <p className="text-red-500 text-sm">Seleziona un'opzione</p>
+                  )}
+                </div>
+              </div>
+            )}
+          />
           <div className="flex items-center justify-end">
             <Button type="submit" primary label="Update profile" />
           </div>

@@ -127,7 +127,6 @@ export class ApiService {
         optInit,
         time: new Date().toISOString(),
         error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
       });
     }
   };

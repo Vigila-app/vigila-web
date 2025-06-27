@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 const OnboardComponent = dynamic(
-  () => import("@/components/onboarding/consumer/onboardComponent_Consumer"),
+  () => import("@/components/onboarding/vigil/onboardComponent_Vigil"),
   { ssr: !!false }
 );
 

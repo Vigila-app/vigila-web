@@ -50,8 +50,8 @@ const SignupComponent = (props: SignupComponentI) => {
     setError,
   } = useForm<RegistrationFormI>();
 
-  const redirectHome = () => {
-    router.replace(Routes.home.url);
+  const redirectOnboard = () => {
+    router.replace(Routes.onboard.url);
   };
 
   const manageSignupError = (error: { code?: string }) => {
@@ -94,7 +94,7 @@ const SignupComponent = (props: SignupComponentI) => {
           { email, password, name, surname, role },
           terms
         );
-        redirectHome();
+        redirectOnboard();
       } catch (error: any) {
         console.error("Error registering user", error);
         if (error) {

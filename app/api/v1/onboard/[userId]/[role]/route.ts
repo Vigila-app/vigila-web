@@ -6,9 +6,6 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
-import { SupabaseConstants } from "@/src/constants/supabase.constants";
-import { HeadersEnum } from "@/src/enums/headers.enums";
-import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -48,9 +45,10 @@ const verifyUserAccess = async (userId: string, role: RolesEnum) => {
     });
   return data;
 };
-
-// GET handler (già funzionante)
-// POST handler (nuovo)
+export async function GET() {
+  console.log("ok get");
+  return NextResponse.json({ message: "ok get" });
+}
 
 export async function POST(
   req: Request,

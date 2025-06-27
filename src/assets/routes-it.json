@@ -35,19 +35,46 @@
       "footer": false
     },
     "private": false,
-    "roles": []
-  },"onBoard": {
-    "url": "/onboard",
-    "label": "onboard",
-    "title": "onboard",
+    "roles": ["CONSUMER"]
+  },
+  "registration/vigil": {
+    "url": "/auth/vigil/registration",
+    "label": "Sign up",
+    "title": "Sign up",
     "menu": {
-      "mobile": false,
+      "mobile": true,
       "desktop": true,
       "header": false,
       "footer": false
     },
-    "private": false,
-    "roles": []
+    "private": true,
+    "roles": ["VIGIL"]
+  },
+  "onBoard": {
+    "url": "/onboard",
+    "label": "onboard",
+    "title": "onboard",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "onBoard-vigil": {
+    "url": "/vigil/onboard",
+    "label": "onboard",
+    "title": "onboard",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["VIGIL"]
   },
   "resetPassword": {
     "url": "/auth/reset-password",
