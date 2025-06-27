@@ -305,5 +305,18 @@
       "changeFrequency": "monthly",
       "priority": 0.8
     }
+  },
+  "playground": {
+    "url": "/playground",
+    "label": "Playground",
+    "title": "Playground",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
   }
 }

@@ -47,8 +47,13 @@ export const FormFieldType: FormFieldRegex = {
     pattern: RegexType.PASSWORD,
   },
   PRICE: {
-    min: 0.00,
+    min: 0.0,
     max: 9999.99,
     pattern: RegexType.NUMBER,
+  },
+  ADDRESS: {
+    minLength: 2,
+    maxLength: 100,
+    pattern: RegexType.ANAGRAPHIC_ALPHANUMERIC,
   },
 };
