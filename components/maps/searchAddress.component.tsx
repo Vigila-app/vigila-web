@@ -16,8 +16,13 @@ type SearchMapFormI = {
 const SearchAddress = (props: {
   onSubmit: (address: AddressI) => void;
   minLength?: number;
+  label?: string;
 }) => {
-  const { onSubmit: eOnSubmit, minLength = 3 } = props;
+  const {
+    onSubmit: eOnSubmit,
+    minLength = 3,
+    label = "Search Address",
+  } = props;
   const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
@@ -77,7 +82,7 @@ const SearchAddress = (props: {
             <Input
               {...field}
               autoFocus
-              label="Search Address"
+              label={label}
               placeholder="Inserisci città"
               type="text"
               required

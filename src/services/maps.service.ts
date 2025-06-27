@@ -46,7 +46,9 @@ export const MapsService = {
               result?.lat &&
               result?.lon &&
               (result.addresstype === "road" ||
-                result.addresstype === "village") &&
+                result.addresstype === "village" ||
+                result.addresstype === "town" ||
+                result.addresstype === "quarter") &&
               result.importance > 0.03 &&
               result.address?.country_code === "it"
           );

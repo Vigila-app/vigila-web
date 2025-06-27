@@ -43,9 +43,10 @@ const PlaygroundComponent = (props: { data?: any }) => {
       <div className="my-8">
         <h4>Map Integration</h4>
         <SearchAddress
-          onSubmit={(coords) => {
-            if (coords?.lat && coords?.lon)
-              setMapPosition([Number(coords.lat), Number(coords.lon)]);
+          onSubmit={(address) => {
+            console.log("Address selected:", address);
+            if (address?.lat && address?.lon)
+              setMapPosition([Number(address.lat), Number(address.lon)]);
           }}
         />
         {mapPosition ? <MapsComponent center={mapPosition} /> : null}
