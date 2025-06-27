@@ -2,15 +2,15 @@
 
 import dynamic from "next/dynamic";
 
-const OnboardingComponent = dynamic(
-  () => import("@/components/onboarding/onboardingComponent"),
+const OnboardComponent = dynamic(
+  () => import("@/components/onboarding/onboardComponent"),
   { ssr: !!false }
 );
 
 export default function Profile() {
   return (
     <section id="user-profile">
-      <OnboardingComponent />
+      <OnboardComponent />
     </section>
   );
 }

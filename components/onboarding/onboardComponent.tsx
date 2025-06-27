@@ -10,6 +10,9 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { useRouter } from "next/navigation";
+import { Routes } from "@/src/routes";
 
 type OnboardFormI = {
   birthdate: string;
@@ -20,7 +23,8 @@ type OnboardFormI = {
 
 const OnboardComponent = () => {
   const { showLoader, hideLoader, showToast } = useAppStore();
-
+  const { user } = useUserStore();
+ const router = useRouter();
   const {
     control,
     formState: { errors, isValid },
@@ -28,20 +32,33 @@ const OnboardComponent = () => {
     setError,
     reset,
   } = useForm<OnboardFormI>();
-
+  const redirectHome = () => {
+    router.replace(Routes.home.url);
+  };
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
       const { birthdate, city, CAP } = formData;
       {
-        await OnboardService.update({ birthdate, city, CAP });
+        const role = user?.user_metadata?.role as RolesEnum;
+
+        const userId = user?.id;
+
+        if (!userId || !role) {
+          showToast({
+            message: "Utente non identificato. Fai login e riprova.",
+            type: ToastStatusEnum.ERROR,
+          });
+          return;
+        }
+        await OnboardService.update(userId, role, { birthdate, city, CAP });
         //TODO {qui aggiungi i campi modificati } );
         showToast({
           message: "Informazioni registrate con successo",
           type: ToastStatusEnum.SUCCESS,
         });
         //TODO reindirizzamento
-        // router.push(Routes.profileConsumer.url)
+        router.replace(Routes.home.url);
       }
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
@@ -65,7 +82,7 @@ const OnboardComponent = () => {
           <Controller
             name="birthdate"
             control={control}
-            rules={{ required: true, minLength: 6, maxLength: 10 }}
+            rules={{ required: true, minLength: 6, maxLength: 10 }}//TODO controllo migliore 
             render={({ field }) => (
               <Input
                 {...field}
@@ -96,7 +113,7 @@ const OnboardComponent = () => {
           <Controller
             name="CAP"
             control={control}
-            rules={{ required: true }}
+            rules={{ required: true, minLength: 5, maxLength: 5 }}
             render={({ field }) => (
               <Input
                 {...field}

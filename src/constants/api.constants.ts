@@ -80,6 +80,10 @@ const apiControllers = {
   // region USER
   USER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/user`,
   // endregion USER
+
+// region ONBOARD
+  ONBOARD: (isMock?: boolean): string => `${apiBase.V1(isMock)}/onboard`,
+  // endregion ONBOARD
 };
 
 export const apiUser = {
@@ -93,7 +97,9 @@ export const apiUser = {
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
 };
-
+export const apiOnboard={
+  ONBOARD:(userId:string, role:RolesEnum,isMock?:boolean): string=>`${apiControllers.ONBOARD(isMock)}/${userId}/${role}`
+}
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
   LIST: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
