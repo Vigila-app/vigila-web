@@ -1,4 +1,4 @@
-import BookingFormComponent from "./bookingForm/bookingForm.component";
+import BookingFormComponent from "./bookingForm.component";
 import BookingListComponent from "./bookingList.component";
 import BookingDetailsComponent from "./bookingDetails.component";
 
