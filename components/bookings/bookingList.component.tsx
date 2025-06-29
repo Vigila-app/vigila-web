@@ -165,7 +165,7 @@ const BookingListComponent = () => {
             <Button
               primary
               label="New Booking"
-              action={() => openModal("booking-form")}
+              action={() => openModal("booking-form", { vigilId: "b21de488-b143-443d-920f-a8668d895162" })}
             />
           )}
         </div>

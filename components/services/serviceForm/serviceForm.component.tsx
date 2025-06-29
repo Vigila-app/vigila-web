@@ -1,17 +1,18 @@
 import { Controller, useForm } from "react-hook-form";
-import { getUUID } from "@/src/utils/common.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import clsx from "clsx";
 import { FormFieldType } from "@/src/constants/form.constants";
-import { Input, TextArea, Toggle } from "@/components/form";
+import { Input, Select, TextArea, Toggle } from "@/components/form";
 import { Button, Tooltip } from "@/components";
 import { CurrencyEnum } from "@/src/enums/common.enums";
 import { ServiceI } from "@/src/types/services.types";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { ServicesService } from "@/src/services";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useUserStore } from "@/src/store/user/user.store";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export type ServiceFormI = {
   isModal?: boolean;
@@ -35,6 +36,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
     showLoader,
     showToast,
   } = useAppStore();
+  const { user } = useUserStore();
   const { closeModal } = useModalStore();
   const {
     control,
@@ -44,10 +46,9 @@ const ServiceFormComponent = (props: ServiceFormI) => {
   } = useForm<ServiceI & {}>({
     defaultValues: {
       active: true,
-      id: getUUID("SERVICE"),
+      id: service?.id,
       name: "",
       description: "",
-      price: 0,
       currency: CurrencyEnum.EURO,
       ...(service || {}),
     },
@@ -69,9 +70,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
         if (result) {
           onSubmit?.(result);
           showToast({
-            message: `Service succesfully ${
-              service?.id ? "updated" : "created"
-            }!`,
+            message: `Servizio ${service?.id ? "aggiornato" : "creato"}!`,
             type: ToastStatusEnum.SUCCESS,
           });
           reset();
@@ -84,6 +83,10 @@ const ServiceFormComponent = (props: ServiceFormI) => {
       hideLoader();
     }
   };
+
+  if (user?.user_metadata?.role !== RolesEnum.VIGIL) return null;
+
+  console.log("errors", errors);
 
   return (
     <div
@@ -110,12 +113,12 @@ const ServiceFormComponent = (props: ServiceFormI) => {
         <Controller
           name="name"
           control={control}
-          rules={{ required: true, ...FormFieldType.UNIT_NAME }}
+          rules={{ required: true, ...FormFieldType.NAME }}
           render={({ field }) => (
             <Input
               {...field}
-              label="Name"
-              placeholder="Insert the service name"
+              label="Nome"
+              placeholder="Nome del servizio"
               type="text"
               required
               aria-invalid={!!errors.name}
@@ -127,13 +130,12 @@ const ServiceFormComponent = (props: ServiceFormI) => {
         <Controller
           name="description"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: false, ...FormFieldType.NOTE }}
           render={({ field }) => (
             <TextArea
               {...field}
-              label="Description"
-              placeholder="Describe the service you want to offer"
-              required
+              label="Descrizione"
+              placeholder="Descrivi il servizio che vuoi offrire"
               aria-invalid={!!errors.description}
               error={errors.description}
             />
@@ -141,21 +143,41 @@ const ServiceFormComponent = (props: ServiceFormI) => {
         />
 
         <Controller
-          name="price"
+          name="unit_price"
           control={control}
-          rules={{ required: true, ...FormFieldType.UNIT_SERVICE_PRICE }}
+          rules={{ required: true, ...FormFieldType.PRICE }}
           render={({ field }) => (
             <Input
               {...field}
               {...{ ...FormFieldType.PRICE, pattern: undefined }}
-              label="Price"
-              placeholder="Insert the service unit price"
+              label="Prezzo unitario"
+              placeholder="Inserisci il prezzo unitario"
               type="number"
               required
               step=".01"
-              aria-invalid={!!errors.price}
-              error={errors.price}
+              aria-invalid={!!errors.unit_price}
+              error={errors.unit_price}
               onChange={(v) => field.onChange(Number(v))}
+            />
+          )}
+        />
+
+        <Controller
+          name="unit_type"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              label="Unità"
+              placeholder="Seleziona unità"
+              required
+              error={errors.unit_type}
+              options={[
+                { label: "Minuti", value: "minutes" },
+                { label: "Ore", value: "hours" },
+                { label: "Giorni", value: "days" },
+              ]}
             />
           )}
         />
@@ -163,7 +185,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
         {service?.id ? (
           <div className="w-full inline-flex justify-between">
             <label className="inline-flex items-center gap-2">
-              <span>Active</span>
+              <span>Attivo</span>
               <Tooltip content="When a service is not active, it can't be sold">
                 <InformationCircleIcon className="size-4 cursor-pointer" />
               </Tooltip>
@@ -190,7 +212,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
             full
             type="submit"
             primary
-            label={`${service?.id ? "Edit" : "Create"} service`}
+            label={`${service?.id ? "Aggiorna" : "Crea"} servizio`}
             isLoading={isLoading}
           />
         </div>

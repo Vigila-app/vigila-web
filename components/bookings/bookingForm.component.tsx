@@ -9,19 +9,20 @@ import { Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
-import { useCrmStore } from "@/src/store/crm/crm.store";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
-import { GuestI } from "@/src/types/crm.types";
 import { amountDisplay } from "@/src/utils/common.utils";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { useUserStore } from "@/src/store/user/user.store";
 
-export type BookingFormComponentI = {
+type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
   booking?: BookingI;
   text?: string;
   title?: string;
   serviceId?: ServiceI["id"];
+  vigilId?: ServiceI["vigil_id"];
 };
 
 const BookingFormComponent = (props: BookingFormComponentI) => {
@@ -32,6 +33,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     text,
     title,
     serviceId,
+    vigilId,
   } = props;
 
   const {
@@ -42,8 +44,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   } = useAppStore();
 
   const { closeModal } = useModalStore();
-  const { services, getServices } = useServicesStore();
-  const { customers, getCustomers } = useCrmStore();
+  const { services, getServiceDetails, getServices } = useServicesStore();
+  const { user } = useUserStore();
 
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -56,41 +58,61 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     setValue,
   } = useForm<BookingFormI>({
     defaultValues: {
-      service_id: serviceId || booking?.service_id || "",
-      guest_id: booking?.guest_id || "",
-      service_date: booking?.service_date || new Date(),
-      duration_hours: booking?.duration_hours || 1,
-      notes: booking?.notes || "",
+      ...booking,
+      service_id: booking?.service_id || serviceId,
+      consumer_id: booking?.consumer_id || user?.id,
+      quantity: booking?.quantity || 1,
     },
   });
 
   const watchedServiceId = watch("service_id");
-  const watchedDuration = watch("duration_hours");
+  const watchedDuration = watch("quantity");
 
   useEffect(() => {
-    getServices();
-    getCustomers();
+    if (serviceId) getServiceDetails(serviceId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [serviceId]);
 
   useEffect(() => {
-    if (serviceId && services.length) {
-      setValue("service_id", serviceId);
+    if (vigilId) getServices(true, vigilId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vigilId]);
+
+  useEffect(() => {
+    if (serviceId) {
+      setValue("service_id", serviceId as never);
     }
-  }, [serviceId, services, setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceId]);
 
   useEffect(() => {
     if (watchedServiceId && services.length) {
       const service = services.find((s) => s.id === watchedServiceId);
-      setSelectedService(service || null);
+      if (!service) {
+        getServiceDetails(watchedServiceId as string);
+      } else {
+        setSelectedService(service || null);
+      }
     }
-  }, [watchedServiceId, services]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedServiceId, services?.length]);
 
   useEffect(() => {
     if (selectedService && watchedDuration) {
-      setTotalAmount(selectedService.price * watchedDuration);
+      setTotalAmount(selectedService.unit_price * watchedDuration);
     }
   }, [selectedService, watchedDuration]);
+
+  useEffect(() => {
+    if (services?.length === 1) {
+      setSelectedService(services[0]);
+    }
+  }, [services]);
+
+  useEffect(() => {
+    setValue("service_id", selectedService?.id as never);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedService]);
 
   const submitForm = async (formData: BookingFormI) => {
     if (isValid) {
@@ -120,20 +142,17 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
   };
 
-  const serviceOptions = services.map((service) => ({
-    label: `${service.name} - ${service.currency} ${amountDisplay(
-      service.price
-    )}/hour`,
-    value: service.id,
-  }));
-
-  const guestOptions = [
-    { label: "No guest", value: "" },
-    ...customers.map((guest) => ({
-      label: `${guest.name} ${guest.surname}`,
-      value: guest.id,
-    })),
-  ];
+  const serviceOptions = useMemo(
+    () =>
+      services.map((service) => ({
+        label: `${service.name} - ${service.currency} ${amountDisplay(
+          service.unit_price
+        )}/${service.unit_type}`,
+        value: service.id,
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [services, serviceId]
+  );
 
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
@@ -153,44 +172,42 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           name="service_id"
           control={control}
           rules={{ required: true }}
-          render={({ field }) => (
-            <Select
-              {...field}
-              label="Service"
-              placeholder="Select a service"
-              required
-              error={errors.service_id}
-              options={serviceOptions}
-              disabled={!!serviceId}
-            />
-          )}
+          render={({ field }) =>
+            serviceOptions.length > 1 ? (
+              <Select
+                {...field}
+                label="Servizio"
+                placeholder="Seleziona un servizio"
+                required
+                error={errors.service_id}
+                options={serviceOptions}
+                disabled={!!serviceId}
+              />
+            ) : (
+              <Input
+                {...field}
+                label="Servizio"
+                type="text"
+                disabled
+                required
+                error={errors.service_id}
+                value={selectedService?.name || ""}
+              />
+            )
+          }
         />
 
         <Controller
-          name="guest_id"
-          control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              label="Guest (Optional)"
-              placeholder="Select a guest"
-              error={errors.guest_id}
-              options={guestOptions}
-            />
-          )}
-        />
-
-        <Controller
-          name="service_date"
+          name="startDate"
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
             <Input
               {...field}
-              label="Service Date"
+              label="Data"
               type="datetime-local"
               required
-              error={errors.service_date}
+              error={errors.startDate}
               value={
                 field.value
                   ? new Date(field.value).toISOString().slice(0, 16)
@@ -202,17 +219,21 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         />
 
         <Controller
-          name="duration_hours"
+          name="quantity"
           control={control}
-          rules={{ required: true, min: 1 }}
+          rules={{
+            required: true,
+            min: selectedService?.min_unit || 1,
+            max: selectedService?.max_unit,
+          }}
           render={({ field }) => (
             <InputQuantity
               {...field}
-              label="Duration (Hours)"
-              min={1}
-              max={24}
+              label="Quantità"
+              min={selectedService?.min_unit || 1}
+              max={selectedService?.max_unit || undefined}
               required
-              error={errors.duration_hours}
+              error={errors.quantity}
             />
           )}
         />
@@ -223,27 +244,30 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             <div className="mt-2 space-y-1 text-sm text-gray-600">
               <p>Service: {selectedService.name}</p>
               <p>
-                Price per hour: {selectedService.currency}{" "}
-                {amountDisplay(selectedService.price)}
+                Prezzo per {selectedService.unit_type}:{" "}
+                {selectedService.currency}{" "}
+                {amountDisplay(selectedService.unit_price)}
               </p>
-              <p>Duration: {watchedDuration} hour(s)</p>
+              <p>
+                Quantità: {watchedDuration} {selectedService.unit_type}
+              </p>
               <p className="font-medium text-gray-900">
-                Total: {selectedService.currency} {amountDisplay(totalAmount)}
+                Totale: {selectedService.currency} {amountDisplay(totalAmount)}
               </p>
             </div>
           </div>
         )}
 
         <Controller
-          name="notes"
+          name="note"
           control={control}
           render={({ field }) => (
             <TextArea
               {...field}
-              label="Notes (Optional)"
-              placeholder="Add any special requirements or notes"
+              label="Note"
+              placeholder="Aggiungi eventuali note per il Vigil"
               rows={3}
-              error={errors.notes}
+              error={errors.note}
             />
           )}
         />
@@ -254,7 +278,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               type="button"
               secondary
               full
-              label="Cancel"
+              label="Annulla"
               action={closeModal}
             />
           )}
@@ -262,7 +286,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             type="submit"
             primary
             full
-            label={booking ? "Update Booking" : "Create Booking"}
+            label={booking ? "Aggiorna Prenotazione" : "Prenota"}
             isLoading={isLoading}
           />
         </div>

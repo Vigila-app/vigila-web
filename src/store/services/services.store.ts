@@ -19,7 +19,7 @@ export const useServicesStore = create<ServicesStoreType>()(
     persist(
       (set, get) => ({
         ...initServicesStore,
-        getServices: async (force: boolean = false) => {
+        getServices: async (force: boolean = false, vigil_id?: ServiceI["vigil_id"]) => {
           try {
             const lastUpdate = get().lastUpdate;
             if (
@@ -27,7 +27,7 @@ export const useServicesStore = create<ServicesStoreType>()(
               !lastUpdate ||
               dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
             ) {
-              const response = await ServicesService.getServices();
+              const response = await ServicesService.getServices(vigil_id);
               if (response) {
                 set(
                   () => ({

@@ -85,12 +85,12 @@
     "roles": []
   },
   "bookings": {
-    "url": "/dashboard/bookings",
-    "label": "Bookings",
-    "title": "Bookings",
+    "url": "/booking",
+    "label": "Prenotazioni",
+    "title": "Prenotazioni",
     "menu": {
       "mobile": true,
-      "desktop": false,
+      "desktop": true,
       "header": true,
       "footer": false
     },

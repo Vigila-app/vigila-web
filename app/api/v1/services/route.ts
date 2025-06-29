@@ -1,180 +1,143 @@
-import { NextResponse } from "next/server";
+import {
+  authenticateUser,
+  getAdminClient,
+  getPagination,
+  getQueryParams,
+  jsonErrorResponse,
+} from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
-import { AuthService } from "@/src/services";
-import { initAdmin, validateAuth } from "@/server/supabaseAdmin";
-import { getUUID } from "@/src/utils/common.utils";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+import { NextRequest, NextResponse } from "next/server";
 import { ServiceI } from "@/src/types/services.types";
-import { ServicesUtils } from "@/src/utils/services.utils";
 
-const unauthorizedError = () =>
-  NextResponse.json(
-    {
-      code: ResponseCodesConstants.SERVICES_CREATE_UNAUTHORIZED.code,
-      success: false,
-    },
-    { status: 401 }
-  );
+export async function GET(req: NextRequest) {
+  try {
+    const { nextUrl, url } = req;
 
-const requestHandler = async (req: Request) => {
-  const { method } = req;
+    const pagination = getPagination(nextUrl);
+    const { from, to, page, itemPerPage } = pagination;
+    const filters = getQueryParams(url, ["page", "pageSize", "vigil_id"]);
+    const { orderBy = "created_at", orderDirection = "DESC" } = filters;
 
-  console.log(`API ${method} services`);
+    console.log(`API GET services`, filters, pagination);
 
-  const { authToken, user } = AuthService.getAuthHeaders(req.headers);
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id)
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.SERVICES_CREATE_UNAUTHORIZED.code,
+        success: false,
+      });
 
-  if (!(user && authToken)) {
-    return unauthorizedError();
-  }
+    const _admin = getAdminClient();
+    let db_query = _admin.from("services").select("*", { count: "exact" });
 
-  /*if (// TODO check roles) {
+    if (Object.keys(filters).length) {
+      Object.keys(filters).forEach((key) => {
+        if (key !== "orderBy" && key !== "orderDirection") {
+          db_query = db_query.eq(key, filters[key]);
+        }
+      });
+    }
+
+    if (
+      userObject.user_metadata?.role === RolesEnum.VIGIL &&
+      !filters.vigil_id
+    ) {
+      db_query = db_query.eq("vigil_id", userObject.id);
+    }
+
+    if (orderBy) {
+      db_query = db_query.order(orderBy, {
+        ascending: orderDirection === "ASC" ? true : false,
+      });
+    }
+
+    if (from !== undefined && to !== undefined) {
+      db_query = db_query.range(from, to);
+    }
+
+    const {
+      data = [],
+      error,
+      count = 0,
+    } = await db_query.returns<ServiceI[]>();
+
+    if (error || !data) throw error;
+
     return NextResponse.json(
       {
-        code: ResponseCodesConstants.SERVICES_CREATE_FORBIDDEN.code,
-        success: false,
-      },
-      { status: 403 }
-    );
-  }*/
-
-  try {
-    await validateAuth(user, authToken);
-  } catch (error) {
-    return unauthorizedError();
-  }
-
-  switch (method) {
-    case "GET": {
-      try {
-        await initAdmin();
-        const firestore = getFirestore();
-
-        const collection = await firestore
-          .collection(`users-services`)
-          .where(FieldPath.documentId(), "==", user)
-          .limit(1)
-          .get();
-        const results: { [key: string]: ServiceI }[] = [];
-        collection.forEach((doc) => results.push(doc.data()));
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_CREATE_SUCCESS.code,
-            data: results?.length
-              ? Object.values(results[0]).filter(
-                  (service) => service?.creationDate
-                )
-              : [],
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_CREATE_ERROR.code,
-            success: false,
-            show: true,
-            error,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
-    case "POST": {
-      try {
-        const body: ServiceI = await req.json();
-
-        const newService = await ServicesUtils.createNewService(body);
-
-        if (!(newService.ownerId && newService.name && newService.price)) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
-              success: false,
-            },
-            { status: 400 }
-          );
-        }
-        if (newService.ownerId !== user) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_CREATE_FORBIDDEN.code,
-              success: false,
-            },
-            { status: 403 }
-          );
-        }
-
-        await initAdmin();
-        const firestore = getFirestore();
-
-        const newServiceId = newService.id || getUUID("SERVICE");
-
-        const batch = firestore.batch();
-        const ownerRef = firestore.doc(`users-services/${newService.ownerId}`);
-        const serviceRef = firestore.doc(`services/${newServiceId}`);
-
-        batch.set(
-          ownerRef,
-          {
-            [newServiceId]: {
-              ...newService,
-              id: newServiceId,
-              serviceRef: `services/${newServiceId}`,
-            },
-          },
-          { merge: true }
-        );
-
-        batch.set(
-          serviceRef,
-          {
-            ...newService,
-            id: newServiceId,
-          },
-          { merge: true }
-        );
-
-        await batch.commit();
-
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_CREATE_SUCCESS.code,
-            data: { ...newService, id: newServiceId },
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_CREATE_ERROR.code,
-            success: false,
-            show: true,
-            error,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
-    default: {
-      return NextResponse.json(
-        {
-          code: ResponseCodesConstants.SERVICES_CREATE_METHOD_NOT_ALLOWED.code,
-          success: false,
+        code: ResponseCodesConstants.SERVICES_CREATE_SUCCESS.code,
+        data,
+        success: true,
+        pagination: {
+          page,
+          pages: Math.ceil((count || 0) / itemPerPage),
+          itemPerPage,
+          count,
         },
-        { status: 405 }
-      );
-      break;
-    }
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.SERVICES_CREATE_ERROR.code,
+      success: false,
+      error,
+    });
   }
-};
-
-export async function GET(req: Request) {
-  return requestHandler(req);
 }
 
-export async function POST(req: Request) {
-  return requestHandler(req);
+export async function POST(req: NextRequest) {
+  try {
+    const body: ServiceI = await req.json();
+    console.log(`API POST services`, body);
+
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.VIGIL)
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.SERVICES_CREATE_UNAUTHORIZED.code,
+        success: false,
+      });
+
+    if (!(body?.name && body?.unit_price && body?.unit_type)) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    const _admin = getAdminClient();
+
+    const newService = {
+      ...body,
+      vigil_id: userObject.id,
+    };
+
+    const { data, error } = await _admin
+      .from("services")
+      .insert(newService)
+      .select()
+      .maybeSingle<ServiceI>();
+
+    if (error || !data) throw error;
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.SERVICES_CREATE_SUCCESS.code,
+        data,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.SERVICES_CREATE_ERROR.code,
+      success: false,
+      error,
+    });
+  }
 }

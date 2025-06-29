@@ -1,281 +1,252 @@
-import { initAdmin, validateAuth } from "@/server/supabaseAdmin";
-import { ResponseCodesConstants } from "@/src/constants";
-import { AuthService } from "@/src/services";
-import { ServiceI } from "@/src/types/services.types";
-import { getFirestore } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
+import {
+  jsonErrorResponse,
+  authenticateUser,
+  getAdminClient,
+} from "@/server/api.utils.server";
+import { ResponseCodesConstants } from "@/src/constants";
+import { deepMerge } from "@/src/utils/common.utils";
+import { getPostgresTimestamp } from "@/src/utils/date.utils";
+import { BookingI } from "@/src/types/booking.types";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
 
-const unauthorizedError = () =>
-  NextResponse.json(
-    {
-      code: ResponseCodesConstants.SERVICES_DETAILS_UNAUTHORIZED.code,
+const verifyBookingAccess = async (bookingId: string, userId: string, userRole: string) => {
+  const _admin = getAdminClient();
+  const { data, error } = await _admin
+    .from("bookings")
+    .select("*")
+    .eq("id", bookingId)
+    .single();
+    
+  if (error)
+    throw jsonErrorResponse(500, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
       success: false,
-    },
-    { status: 401 }
-  );
+      error,
+    });
+    
+  if (!data) 
+    throw jsonErrorResponse(404, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_NOT_FOUND.code,
+      success: false,
+    });
 
-const requestHandler = async (
-  req: Request,
-  context: { params: { serviceId: ServiceI["id"] } }
-) => {
-  const { method } = req;
-  const {
-    params: { serviceId },
-  } = context;
-
-  if (!serviceId) {
-    return NextResponse.json(
-      {
-        code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
-        success: false,
-      },
-      { status: 400 }
-    );
+  // Check access based on role
+  if (userRole === RolesEnum.CONSUMER && data.consumer_id !== userId) {
+    throw jsonErrorResponse(403, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+      success: false,
+    });
   }
-
-  console.log(`API ${method} services/${serviceId}`);
-
-  const { authToken, user } = AuthService.getAuthHeaders(req.headers);
-
-  if (!(user && authToken)) {
-    return unauthorizedError();
+  
+  if (userRole === RolesEnum.VIGIL && data.vigil_id !== userId) {
+    throw jsonErrorResponse(403, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+      success: false,
+    });
   }
-
-  /*if (// TODO check roles) {
-    return NextResponse.json(
-      {
-        code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
-        success: false,
-      },
-      { status: 403 }
-    );
-  }*/
-
-  try {
-    await validateAuth(user, authToken);
-  } catch (error) {
-    return unauthorizedError();
-  }
-
-  switch (method) {
-    case "DELETE": {
-      try {
-        await initAdmin();
-        const firestore = getFirestore();
-
-        const serviceBE = await firestore.doc(`services/${serviceId}`).get();
-        const { ownerId: userIdBE } = serviceBE.data() || {};
-
-        if (userIdBE !== user) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
-              success: false,
-            },
-            { status: 403 }
-          );
-        }
-
-        const batch = firestore.batch();
-        const ownerRef = firestore.doc(`users-services/${user}`);
-        const serviceRef = firestore.doc(`services/${serviceId}`);
-
-        batch.set(
-          ownerRef,
-          {
-            [serviceId]: null,
-          },
-          { merge: true }
-        );
-
-        batch.delete(serviceRef);
-
-        await batch.commit();
-
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
-            data: serviceId,
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
-            success: false,
-            show: true,
-            error,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
-    case "GET": {
-      try {
-        await initAdmin();
-        const firestore = getFirestore();
-
-        const response = await firestore.doc(`services/${serviceId}`).get();
-        if (response) {
-          const service = response.data();
-          if (service) {
-            if (service?.ownerId !== user) {
-              return NextResponse.json(
-                {
-                  code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
-                  success: false,
-                },
-                { status: 403 }
-              );
-            }
-            return NextResponse.json(
-              {
-                code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
-                data: response.data(),
-                success: true,
-              },
-              { status: 200 }
-            );
-          } else {
-            return NextResponse.json(
-              {
-                code: ResponseCodesConstants.SERVICES_DETAILS_NOT_FOUND.code,
-                success: false,
-              },
-              { status: 404 }
-            );
-          }
-        } else {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
-              success: false,
-              show: true,
-            },
-            { status: 500 }
-          );
-        }
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
-            success: false,
-            show: true,
-            error,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
-    case "PUT": {
-      try {
-        const newService: ServiceI = await req.json();
-
-        if (
-          !(
-            newService.id &&
-            newService.ownerId &&
-            newService.name &&
-            newService.price
-          ) ||
-          serviceId !== newService.id
-        ) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
-              success: false,
-            },
-            { status: 400 }
-          );
-        }
-
-        await initAdmin();
-        const firestore = getFirestore();
-
-        const serviceBE = await firestore.doc(`services/${serviceId}`).get();
-        const { ownerId: userIdBE } = serviceBE.data() || {};
-
-        if (userIdBE !== user) {
-          return NextResponse.json(
-            {
-              code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
-              success: false,
-            },
-            { status: 403 }
-          );
-        }
-
-        const batch = firestore.batch();
-        const ownerRef = firestore.doc(`users-services/${newService.ownerId}`);
-        const serviceRef = firestore.doc(`services/${serviceId}`);
-
-        batch.set(
-          ownerRef,
-          {
-            [serviceId]: newService,
-          },
-          { merge: true }
-        );
-
-        batch.set(serviceRef, newService, { merge: true });
-
-        await batch.commit();
-
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
-            data: newService,
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
-            success: false,
-            show: true,
-            error,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
-    default: {
-      return NextResponse.json(
-        {
-          code: ResponseCodesConstants.SERVICES_DETAILS_METHOD_NOT_ALLOWED.code,
-          success: false,
-        },
-        { status: 405 }
-      );
-      break;
-    }
-  }
+  
+  return data;
 };
 
 export async function DELETE(
   req: Request,
-  context: { params: { serviceId: ServiceI["id"] } }
+  context: { params: { bookingId: string } }
 ) {
-  return requestHandler(req, context);
+  try {
+    console.log(`API DELETE bookings/${context?.params?.bookingId}`);
+
+    if (!context?.params?.bookingId) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+    
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER)
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_UNAUTHORIZED.code,
+        success: false,
+      });
+
+    await verifyBookingAccess(context.params.bookingId, userObject.id, userObject.user_metadata?.role);
+    const _admin = getAdminClient();
+
+    const { error } = await _admin
+      .from("bookings")
+      .delete()
+      .eq("id", context.params.bookingId);
+      
+    if (error) throw error;
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
+        data: context.params.bookingId,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      success: false,
+      error,
+    });
+  }
 }
 
 export async function GET(
   req: Request,
-  context: { params: { serviceId: ServiceI["id"] } }
+  context: { params: { bookingId: string } }
 ) {
-  return requestHandler(req, context);
+  try {
+    console.log(`API GET bookings/${context?.params?.bookingId}`);
+
+    if (!context?.params?.bookingId) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+    
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id)
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+        success: false,
+      });
+
+    await verifyBookingAccess(
+      context.params.bookingId,
+      userObject.id,
+      userObject.user_metadata?.role
+    );
+
+    const _admin = getAdminClient();
+    const { data: booking, error } = await _admin
+      .from("bookings")
+      .select(`
+        *,
+        service:services(*),
+        consumer:auth.users!bookings_consumer_id_fkey(*),
+        vigil:auth.users!bookings_vigil_id_fkey(*),
+        guest:guests(*)
+      `)
+      .eq("id", context.params.bookingId)
+      .single<BookingI>();
+
+    if (error || !booking) throw error;
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
+        data: booking,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      success: false,
+      error,
+    });
+  }
 }
 
 export async function PUT(
   req: Request,
-  context: { params: { serviceId: ServiceI["id"] } }
+  context: { params: { bookingId: string } }
 ) {
-  return requestHandler(req, context);
+  try {
+    const { data: updatedBooking } = await req.json();
+    console.log(`API PUT bookings/${context?.params?.bookingId}`, updatedBooking);
+
+    if (!context?.params?.bookingId) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+    
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id)
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_UNAUTHORIZED.code,
+        success: false,
+      });
+
+    if (
+      !updatedBooking?.id ||
+      updatedBooking?.id !== context.params.bookingId
+    ) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    const booking = await verifyBookingAccess(
+      context.params.bookingId,
+      userObject.id,
+      userObject.user_metadata?.role
+    ) as BookingI;
+
+    const _admin = getAdminClient();
+
+    // Only allow certain fields to be updated based on user role
+    let allowedUpdates = {};
+    if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
+      // Consumers can only update certain fields and only if booking is pending
+      if (booking.status === BookingStatusEnum.PENDING) {
+        allowedUpdates = {
+          service_date: updatedBooking.service_date,
+          duration_hours: updatedBooking.duration_hours,
+          notes: updatedBooking.notes,
+        };
+      }
+    } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
+      // Vigils can update status and notes
+      allowedUpdates = {
+        status: updatedBooking.status,
+        notes: updatedBooking.notes,
+      };
+    }
+
+    const { data, error } = await _admin
+      .from("bookings")
+      .update({
+        ...deepMerge(booking, allowedUpdates),
+        updated_at: getPostgresTimestamp(),
+      })
+      .eq("id", updatedBooking.id)
+      .select(`
+        *,
+        service:services(*),
+        consumer:auth.users!bookings_consumer_id_fkey(*),
+        vigil:auth.users!bookings_vigil_id_fkey(*),
+        guest:guests(*)
+      `)
+      .single<BookingI>();
+
+    if (error || !data) throw error;
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
+        data,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      success: false,
+      error,
+    });
+  }
 }

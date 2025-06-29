@@ -15,7 +15,7 @@ const ServiceFormModal = (props: ServiceFormModalI) => {
   const { onSubmit, service, text, title } = props;
 
   return (
-    <ModalBase modalId={ServiceFormModalId} closable title="Service">
+    <ModalBase modalId={ServiceFormModalId} closable title="Servizio">
       <ServiceFormComponent
         isModal
         onSubmit={onSubmit}

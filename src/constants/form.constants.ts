@@ -2,7 +2,7 @@ import { FormFieldRegex } from "@/src/types/form.types";
 
 export const RegexType = {
   ANAGRAPHIC_STRING: new RegExp(/^[a-zA-Zàéèìòù\ \-\'\.\,]{2,30}$/g),
-  ANAGRAPHIC_ALPHANUMERIC: new RegExp(/^[0-9a-zA-Zàéèìòù\ \-\']{2,30}$/g),
+  ANAGRAPHIC_ALPHANUMERIC: new RegExp(/^[0-9a-zA-Zàéèìòù\ \-\']$/g),
   ANAGRAPHIC_USERNAME: new RegExp(/^[a-zA-Z0-9\_\-]{4,30}$/g),
   NUMBER: new RegExp(/^[0-9\.]$/g),
   CODE: new RegExp(/^[a-zA-Z0-9\!\_\-]{3,30}$/g),
@@ -27,6 +27,11 @@ const FormAnagraphicBase: FormFieldRegex[string] = {
 export const FormFieldType: FormFieldRegex = {
   NAME: FormAnagraphicBase,
   SURNAME: FormAnagraphicBase,
+  NOTE: {
+    minLength: 2,
+    maxLength: 200,
+    // pattern: RegexType.ANAGRAPHIC_ALPHANUMERIC,
+  },
   USERNAME: {
     minLength: 4,
     maxLength: 30,
@@ -47,11 +52,11 @@ export const FormFieldType: FormFieldRegex = {
     pattern: RegexType.PASSWORD,
   },
   PRICE: {
-    min: 0.00,
+    min: 0.0,
     max: 9999.99,
     pattern: RegexType.NUMBER,
   },
-    ADDRESS: {
+  ADDRESS: {
     minLength: 2,
     maxLength: 100,
     pattern: RegexType.ANAGRAPHIC_ALPHANUMERIC,

@@ -8,8 +8,10 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
-import { getPostgresTimestamp } from "@/src/utils/date.utils";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -31,15 +33,7 @@ export async function GET(req: NextRequest) {
       });
 
     const _admin = getAdminClient();
-    let db_query = _admin
-      .from("bookings")
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `, { count: "exact" });
+    let db_query = _admin.from("bookings").select("*", { count: "exact" });
 
     // Filter based on user role
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
@@ -66,7 +60,11 @@ export async function GET(req: NextRequest) {
       db_query = db_query.range(from, to);
     }
 
-    const { data = [], error, count = 0 } = await db_query.returns<BookingI[]>();
+    const {
+      data = [],
+      error,
+      count = 0,
+    } = await db_query.returns<BookingI[]>();
 
     if (error || !data) throw error;
 
@@ -99,13 +97,16 @@ export async function POST(req: NextRequest) {
     console.log(`API POST bookings`, body);
 
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER)
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    )
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
         success: false,
       });
 
-    if (!(body?.service_id && body?.service_date && body?.duration_hours)) {
+    if (!(body?.service_id && body?.startDate && body?.quantity)) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_CREATE_BAD_REQUEST.code,
         success: false,
@@ -128,35 +129,32 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const totalAmount = service.price * body.duration_hours;
+    const price = service.unit_price * body.quantity;
 
     const newBooking = {
-      service_id: body.service_id,
+      ...body,
+      endDate:
+        body.endDate ||
+        new Date(
+          new Date(body.startDate).getTime() +
+            (service.unit_type === "hours"
+              ? body.quantity * (60000 * 60)
+              : service.unit_type === "days"
+              ? body.quantity * (60000 * 60 * 60)
+              : body.quantity * 60000)
+        ),
       consumer_id: userObject.id,
-      vigil_id: service.ownerId,
-      guest_id: body.guest_id || null,
-      service_date: body.service_date,
-      duration_hours: body.duration_hours,
-      total_amount: totalAmount,
-      currency: service.currency,
+      vigil_id: service.vigil_id,
       status: BookingStatusEnum.PENDING,
       payment_status: PaymentStatusEnum.PENDING,
-      notes: body.notes || null,
-      created_at: getPostgresTimestamp(),
-      updated_at: getPostgresTimestamp(),
+      price,
     };
 
     const { data, error } = await _admin
       .from("bookings")
       .insert(newBooking)
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
-      .single<BookingI>();
+      .select()
+      .maybeSingle<BookingI>();
 
     if (error || !data) throw error;
 
