@@ -106,6 +106,55 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   // endregion CRM
 
+  // region BOOKINGS
+  BOOKINGS_CREATE_SUCCESS: {
+    code: 9501,
+  },
+  BOOKINGS_CREATE_ERROR: {
+    code: 9502,
+  },
+  BOOKINGS_CREATE_BAD_REQUEST: {
+    code: 9503,
+  },
+  BOOKINGS_CREATE_UNAUTHORIZED: {
+    code: 9504,
+  },
+  BOOKINGS_CREATE_FORBIDDEN: {
+    code: 9505,
+  },
+  BOOKINGS_CREATE_METHOD_NOT_ALLOWED: {
+    code: 9506,
+  },
+  BOOKINGS_CREATE_SERVICE_UNAVAILABLE: {
+    code: 9507,
+  },
+
+  BOOKINGS_DETAILS_SUCCESS: {
+    code: 9601,
+  },
+  BOOKINGS_DETAILS_ERROR: {
+    code: 9602,
+  },
+  BOOKINGS_DETAILS_BAD_REQUEST: {
+    code: 9603,
+  },
+  BOOKINGS_DETAILS_UNAUTHORIZED: {
+    code: 9604,
+  },
+  BOOKINGS_DETAILS_FORBIDDEN: {
+    code: 9605,
+  },
+  BOOKINGS_DETAILS_METHOD_NOT_ALLOWED: {
+    code: 9606,
+  },
+  BOOKINGS_DETAILS_NOT_FOUND: {
+    code: 9607,
+  },
+  BOOKINGS_DETAILS_SERVICE_UNAVAILABLE: {
+    code: 9608,
+  },
+  // endregion BOOKINGS
+
   // region MAPS
   MAPS_ADDRESS_SUCCESS: {
     code: 4001,
