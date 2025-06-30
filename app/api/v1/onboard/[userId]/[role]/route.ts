@@ -89,7 +89,7 @@ export async function POST(
       .update({
         ...onBoardUser,
         updated_at: getPostgresTimestamp(),
-        id: userId,
+        id: userIn.id,
       })
       .eq("id", userId)
       .select()
@@ -103,8 +103,9 @@ export async function POST(
       data,
       success: true,
     });
-  } catch (error) {
+  } catch (error) {console.error(error)
     return jsonErrorResponse(500, {
+      
       code: ResponseCodesConstants.USER_DETAILS_ERROR.code,
       success: false,
       error: error instanceof Error ? error.message : String(error),

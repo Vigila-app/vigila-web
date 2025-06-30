@@ -18,7 +18,7 @@ type OnboardFormI = {
   lovedOneAge: string;
   relationship: string;
   city: string;
-  CAP: string;
+  cap: string;
 };
 
 const relationships = ["Figlio/a", "Nipote", "Parente", "Amico/a", "Badante"];
@@ -37,7 +37,7 @@ const OnboardComponent = () => {
   const onSubmit = async (formdata: OnboardFormI) => {
     try {
       debugger;
-      const { yourName, lovedOneName, lovedOneAge, relationship, city, CAP } =
+      const { yourName, lovedOneName, lovedOneAge, relationship, city, cap } =
         formdata;
       const role = user?.user_metadata?.role as RolesEnum;
       const userId = user?.id;
@@ -58,7 +58,7 @@ console.log(formdata);
           lovedOneAge,
           relationship,
           city,
-          CAP,
+          cap,
         },
       });
 
@@ -173,7 +173,7 @@ console.log(formdata);
           />
 
           <Controller
-            name="CAP"
+            name="cap"
             control={control}
             rules={{ required: true, minLength: 5, maxLength: 5 }}
             render={({ field }) => (
@@ -182,7 +182,7 @@ console.log(formdata);
                 label="CAP della città"
                 placeholder="Es. 20100"
                 required
-                error={errors.CAP}
+                error={errors.cap}
               />
             )}
           />

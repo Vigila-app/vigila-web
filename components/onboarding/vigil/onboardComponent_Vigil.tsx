@@ -18,7 +18,7 @@ import Checkbox from "@/components/form/checkbox";
 type OnboardFormI = {
   birthdate: string;
   city: string;
-  CAP: string;
+  cap: string;
   occupation: string;
   transportation: string;
   // TODO add other detail fields
@@ -49,7 +49,7 @@ const OnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
-      const { birthdate, city, CAP, occupation, transportation } = formData;
+      const { birthdate, city, cap, occupation, transportation } = formData;
       {
         const role = user?.user_metadata?.role as RolesEnum;
 
@@ -64,7 +64,7 @@ const OnboardComponent = () => {
         }
         await OnboardService.update(userId, {
           role: RolesEnum.VIGIL,
-          data: { birthdate, city, CAP, occupation, transportation },
+          data: { birthdate, city, cap, occupation, transportation },
         });
         //TODO {qui aggiungi i campi modificati } );
         showToast({
@@ -125,7 +125,7 @@ const OnboardComponent = () => {
             )}
           />
           <Controller
-            name="CAP"
+            name="cap"
             control={control}
             rules={{ required: true, minLength: 5, maxLength: 5 }}
             render={({ field }) => (
@@ -135,7 +135,7 @@ const OnboardComponent = () => {
                 placeholder="Inserisci il CAP della tua città"
                 type="text"
                 required
-                error={errors.CAP}
+                error={errors.cap}
               />
             )}
           />
