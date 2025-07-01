@@ -23,6 +23,7 @@ const LocalLoaderId = "signup-progress";
 type SignupComponentI = {
   staticData?: CmsPageFormI;
   role: RolesEnum;
+  
 };
 
 type RegistrationFormI = {
@@ -139,9 +140,11 @@ const SignupComponent = (props: SignupComponentI) => {
               {...field}
               autoFocus
               label="Nome"
+              role={role}
               placeholder="Inserisci nome"
               type="text"
               required
+              
               autoComplete="given-name"
               aria-invalid={!!errors.name}
               error={errors.name}
@@ -159,6 +162,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci cognome"
               type="text"
               required
+               role={role}
               autoComplete="family-name"
               aria-invalid={!!errors.surname}
               error={errors.surname}
@@ -176,6 +180,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci email"
               type="email"
               required
+               role={role}
               autoComplete="email"
               aria-invalid={!!errors.email}
               error={errors.email}
@@ -194,6 +199,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci password"
               type="password"
               required
+               role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.password}
               error={errors.password}
@@ -212,6 +218,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Re-inserisci password"
               type="password"
               required
+               role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.confirmPassword}
               error={errors.confirmPassword}

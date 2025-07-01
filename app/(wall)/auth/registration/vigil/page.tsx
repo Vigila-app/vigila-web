@@ -26,7 +26,7 @@ export default async function Registration() {
     <section className="py-4">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between">
         <SimplePage title={title} text={text} />
-        <SignupComponent staticData={staticData} role={RolesEnum.VIGIL} />
+        <SignupComponent staticData={staticData} role={RolesEnum.VIGIL}  />
       </div>
     </section>
   );
