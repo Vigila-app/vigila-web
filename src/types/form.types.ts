@@ -9,17 +9,7 @@ export type FormFieldRegex = {
     pattern?: RegExp;
   };
 };
-// export type FormData = {
-//   birthdate: string;
-//   city: string;
-//   CAP: string;
-//   yourName: string;
-//   lovedOneName: string;
-//   lovedOneAge: string;
-//   relationship: string;
-//   occupation: string;
-//   transportation: string;
-// };
+
 export interface ConsumerFormData {
   lovedOneName: string;
   lovedOneAge: string;
@@ -28,13 +18,23 @@ export interface ConsumerFormData {
   cap: string;
   yourName: string;
 }
+export type AddressData={
+ label:string;
+  city:string;
+  region?:string;
+  province?:string;
+  quarter?:string;
+  cap:string;
+  lat:number;
+  lng:number;
+}
 
 export interface VigilFormData {
   birthdate: string;
   occupation?: string;
   transportation?: string;
-  city: string;
-  cap: string;
+  addresses:AddressData[];
+  // cap: string;
 }
 export type RoleBasedFormData =
   | { role: RolesEnum.VIGIL; data: VigilFormData }

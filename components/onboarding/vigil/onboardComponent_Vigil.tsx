@@ -14,11 +14,12 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
+import { AddressData } from "@/src/types/form.types";
 
 type OnboardFormI = {
   birthdate: string;
   city: string;
-  cap: string;
+  addresses: AddressData[];
   occupation: string;
   transportation: string;
   // TODO add other detail fields
@@ -32,7 +33,6 @@ const transportationOptions = [
 ];
 
 const OnboardComponent = () => {
-  
   const { showLoader, hideLoader, showToast } = useAppStore();
   const { user } = useUserStore();
   const router = useRouter();
@@ -49,7 +49,7 @@ const OnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
-      const { birthdate, city, cap, occupation, transportation } = formData;
+      const { birthdate, addresses, occupation, transportation } = formData;
       {
         const role = user?.user_metadata?.role as RolesEnum;
 
@@ -64,7 +64,7 @@ const OnboardComponent = () => {
         }
         await OnboardService.update(userId, {
           role: RolesEnum.VIGIL,
-          data: { birthdate, city, cap, occupation, transportation },
+          data: { birthdate, addresses, occupation, transportation },
         });
         //TODO {qui aggiungi i campi modificati } );
         showToast({
@@ -110,33 +110,51 @@ const OnboardComponent = () => {
             )}
           />
           <Controller
-            name="city"
+            name="addresses"
             control={control}
-            rules={{ required: true }}
+            rules={{
+              required: "Inserisci almeno un indirizzo",
+              validate: (value) => {
+                if (!Array.isArray(value) || value.length === 0) {
+                  return "Inserisci almeno un indirizzo";
+                }
+                for (const addr of value) {
+                  if (
+                    !addr?.label ||
+                    addr.lat === undefined ||
+                    addr.lng === undefined ||
+                    !addr?.cap ||
+                    !addr?.city
+                  ) {
+                    return "Ogni indirizzo deve contenere label, lat, lng, cap e city";
+                  }
+                }
+                return true;
+              },
+            }}
             render={({ field }) => (
-              <Input
-                {...field}
-                label="City"
-                placeholder="Inserisci la tua città"
-                type="text"
-                required
-                error={errors.city}
-              />
-            )}
-          />
-          <Controller
-            name="cap"
-            control={control}
-            rules={{ required: true, minLength: 5, maxLength: 5 }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                label="CAP"
-                placeholder="Inserisci il CAP della tua città"
-                type="text"
-                required
-                error={errors.cap}
-              />
+              <div>
+                <label className="block font-medium mb-1">Indirizzi</label>
+                <textarea
+                  value={JSON.stringify(field.value ?? [], null, 2)}
+                  rows={6}
+                  placeholder='[{"label":"Via Roma 10", "lat":41.9, "lng":12.5, "cap":"00100", "city":"Roma"}]'
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      field.onChange(parsed);
+                    } catch {
+                      // optional: puoi gestire errore qui
+                    }
+                  }}
+                  className="w-full border rounded p-2"
+                />
+                {errors.addresses && (
+                  <p className="text-red-500 text-sm">
+                    {errors.addresses.message}
+                  </p>
+                )}
+              </div>
             )}
           />
 
