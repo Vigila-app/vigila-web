@@ -39,8 +39,8 @@
   },
   "registrationVigil": {
     "url": "/auth/registration/vigil",
-    "label": "Sign up",
-    "title": "Sign up",
+    "label": "Sign up vigil",
+    "title": "Sign up vigil",
     "menu": {
       "mobile": false,
       "desktop": true,

@@ -31,10 +31,11 @@ const Input = (props: InputI) => {
     <div>
       <span
         className={clsx(
-          "pointer-events-none start-2.5 rounded bg-white p-0.5 text-xs text-gray-200   ",
+          "pointer-events-none start-2.5 rounded bg-white p-0.5 text-xs ",
+
+          role === RolesEnum.CONSUMER && "text-consumer-blue",
+          role === RolesEnum.VIGIL && " text-vigil-orange",
           error && "text-red-500",
-          role === "VIGIL" && " text-vigil-orange",
-          role==="CONSUMER" && "text-consumer-blue",
           disabled && "!bg-gray-100"
         )}>
         {label}
@@ -50,12 +51,12 @@ const Input = (props: InputI) => {
       <label
         htmlFor={name || label}
         className={clsx(
-          "relative w-full block p-3 rounded-4xl border-1 border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          "relative w-full block p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           icon && "pr-10",
-          role === "VIGIL" &&
+          role === RolesEnum.CONSUMER &&
+            "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",
+          role === RolesEnum.VIGIL &&
             " text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
-          role==="CONSUMER" &&
-            "text-consumer-blue  focus-within:border-consumer-blue focus-within:ring-consumer-blue border-consumer-blue",
           error && "border-red-500",
           disabled && "!bg-gray-100 cursor-not-allowed"
         )}>
