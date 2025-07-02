@@ -1,12 +1,16 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { ButtonStyle } from "./button.style";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   customClass?: string;
+
   label: string;
   primary?: boolean;
   secondary?: boolean;
+  full?: boolean;
+  role?: RolesEnum;
   text?: boolean;
   inline?: boolean;
   icon?: React.ReactNode;
@@ -15,24 +19,32 @@ type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 const ButtonLink = (props: ButtonLinkI) => {
   const {
     customClass,
+
     label,
     href = "/",
     primary = true,
     secondary = false,
     text = false,
+    role,
+    full = false,
     inline = false,
     icon,
   } = props;
 
-  const btnClass = `${ButtonStyle.baseBtnStyle} ${
+  const btnClass = clsx(
+    ButtonStyle.baseBtnStyle,
+
     text
       ? ButtonStyle.textBtnStyle
       : secondary
       ? ButtonStyle.secondaryBtnStyle
       : primary
       ? ButtonStyle.primaryBtnStyle
-      : ""
-  }`;
+      : "",
+    role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
+    role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle,
+    full && ButtonStyle.fullBtnStyle
+  );
 
   return (
     <Link
@@ -42,14 +54,17 @@ const ButtonLink = (props: ButtonLinkI) => {
         ...props,
         action: undefined,
         customClass: undefined,
+
         primary: undefined,
         secondary: undefined,
         text: undefined,
+        vigil: undefined,
+        consumer: undefined,
+        full: undefined,
         inline: undefined,
         icon: undefined,
       }}
-      href={href}
-    >
+      href={href}>
       {icon ? <span className="mr-2">{icon}</span> : null}
       {label}
     </Link>

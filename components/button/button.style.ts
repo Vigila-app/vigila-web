@@ -15,9 +15,9 @@ const loadingBtnStyle = "cursor-wait";
 const fullBtnStyle = "w-full justify-center";
 
 const vigilBtnStyle =
-  "shadow border-vigil-orange rounded-4xl bg-vigil-orange text-white hover:bg-white hover:text-vigil-orange ";
+  "shadow border-vigil-orange rounded-4xl bg-vigil-orange text-white hover:text-vigil-orange hover:bg-vigil-light-orange";
 const consumerBtnStyle =
-  "shadow border-consumer-blue rounded-4xl bg-consumer-blue text-white hover:bg-white hover:text-consumer-blue";
+  "shadow border-consumer-blue rounded-4xl bg-consumer-blue text-white hover:text-consumer-blue hover:bg-consumer-light-blue";
 
 export const ButtonStyle = {
   baseBtnStyle,
