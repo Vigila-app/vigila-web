@@ -82,6 +82,7 @@ const OnboardComponent = () => {
       });
     }
   };
+  
 
   return (
     <section id="update-profile" aria-label="update profile">
@@ -109,55 +110,7 @@ const OnboardComponent = () => {
               />
             )}
           />
-          <Controller
-            name="addresses"
-            control={control}
-            rules={{
-              required: "Inserisci almeno un indirizzo",
-              validate: (value) => {
-                if (!Array.isArray(value) || value.length === 0) {
-                  return "Inserisci almeno un indirizzo";
-                }
-                for (const addr of value) {
-                  if (
-                    !addr?.label ||
-                    addr.lat === undefined ||
-                    addr.lng === undefined ||
-                    !addr?.cap ||
-                    !addr?.city
-                  ) {
-                    return "Ogni indirizzo deve contenere label, lat, lng, cap e city";
-                  }
-                }
-                return true;
-              },
-            }}
-            render={({ field }) => (
-              <div>
-                <label className="block font-medium mb-1">Indirizzi</label>
-                <textarea
-                  value={JSON.stringify(field.value ?? [], null, 2)}
-                  rows={6}
-                  placeholder='[{"label":"Via Roma 10", "lat":41.9, "lng":12.5, "cap":"00100", "city":"Roma"}]'
-                  onChange={(e) => {
-                    try {
-                      const parsed = JSON.parse(e.target.value);
-                      field.onChange(parsed);
-                    } catch {
-                      // optional: puoi gestire errore qui
-                    }
-                  }}
-                  className="w-full border rounded p-2"
-                />
-                {errors.addresses && (
-                  <p className="text-red-500 text-sm">
-                    {errors.addresses.message}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
+          
           <Controller
             name="occupation"
             control={control}
@@ -172,8 +125,8 @@ const OnboardComponent = () => {
               />
             )}
           />
-
-          {/* Trasporti: solo uno selezionabile */}
+{/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
+         
           <Controller
             name="transportation"
             control={control}
