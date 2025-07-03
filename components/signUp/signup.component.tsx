@@ -139,6 +139,7 @@ const SignupComponent = (props: SignupComponentI) => {
               {...field}
               autoFocus
               label="Nome"
+              role={role}
               placeholder="Inserisci nome"
               type="text"
               required
@@ -159,6 +160,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci cognome"
               type="text"
               required
+              role={role}
               autoComplete="family-name"
               aria-invalid={!!errors.surname}
               error={errors.surname}
@@ -176,6 +178,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci email"
               type="email"
               required
+              role={role}
               autoComplete="email"
               aria-invalid={!!errors.email}
               error={errors.email}
@@ -194,6 +197,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Inserisci password"
               type="password"
               required
+              role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.password}
               error={errors.password}
@@ -212,6 +216,7 @@ const SignupComponent = (props: SignupComponentI) => {
               placeholder="Re-inserisci password"
               type="password"
               required
+              role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.confirmPassword}
               error={errors.confirmPassword}
@@ -255,16 +260,14 @@ const SignupComponent = (props: SignupComponentI) => {
             <Link
               href={Routes.termsConditions.url}
               target="blank"
-              className="text-gray-700 underline"
-            >
+              className="text-gray-700 underline">
               termini & condizioni
             </Link>
             &nbsp;e la&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
-              className="text-gray-700 underline"
-            >
+              className="text-gray-700 underline">
               privacy policy
             </Link>
             .
@@ -275,7 +278,7 @@ const SignupComponent = (props: SignupComponentI) => {
           <Button
             full
             type="submit"
-            primary
+            role={role}
             label="Crea un account"
             isLoading={isLoading}
           />
