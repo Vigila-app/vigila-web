@@ -10,7 +10,7 @@ type TextAreaI = React.InputHTMLAttributes<HTMLTextAreaElement> & {
   error?: FieldError;
   resize?: boolean;
   rows?: number;
-  role?:RolesEnum;
+  role?: RolesEnum;
 };
 
 const TextArea = (props: TextAreaI) => {
@@ -33,8 +33,7 @@ const TextArea = (props: TextAreaI) => {
         "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600",
         error && "border-red-500",
         disabled && "!bg-gray-100 cursor-not-allowed"
-      )}
-    >
+      )}>
       <textarea
         {...{
           ...props,
@@ -49,7 +48,7 @@ const TextArea = (props: TextAreaI) => {
           "w-full peer border-none bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
           disabled && "cursor-not-allowed",
           role === RolesEnum.CONSUMER && " border-consumer-blue",
-          role === RolesEnum.VIGIL && " border-vigil-orange",
+          role === RolesEnum.VIGIL && " border-vigil-orange"
         )}
         style={{ resize: resize ? "block" : "none" }}
       />
@@ -60,9 +59,8 @@ const TextArea = (props: TextAreaI) => {
           error && "text-red-500",
           disabled && "!bg-gray-100",
           role === RolesEnum.CONSUMER && " text-consumer-blue",
-          role === RolesEnum.VIGIL && " text-vigil-orange",
-        )}
-      >
+          role === RolesEnum.VIGIL && " text-vigil-orange"
+        )}>
         {label}
         {required && <>*</>}
       </span>
@@ -70,8 +68,7 @@ const TextArea = (props: TextAreaI) => {
       {error ? (
         <p
           role="alert"
-          className="absolute start-2.5 -bottom-4 text-xs text-red-500"
-        >
+          className="absolute start-2.5 -bottom-4 text-xs text-red-500">
           {FormUtils.getErrorByType(error)}
         </p>
       ) : null}

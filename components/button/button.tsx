@@ -18,7 +18,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
   primary?: boolean;
   secondary?: boolean;
- 
+
   text?: boolean;
   isLoading?: boolean;
   full?: boolean;
