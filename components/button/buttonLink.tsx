@@ -58,8 +58,6 @@ const ButtonLink = (props: ButtonLinkI) => {
         primary: undefined,
         secondary: undefined,
         text: undefined,
-        vigil: undefined,
-        consumer: undefined,
         full: undefined,
         inline: undefined,
         icon: undefined,

@@ -18,8 +18,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
   primary?: boolean;
   secondary?: boolean;
-  vigil?: boolean;
-  consumer?: boolean;
+ 
   text?: boolean;
   isLoading?: boolean;
   full?: boolean;
@@ -89,8 +88,6 @@ const Button = (props: ButtonI) => {
         customClass: undefined,
         primary: undefined,
         secondary: undefined,
-        vigil: undefined,
-        consumer: undefined,
         danger: undefined,
         text: undefined,
         icon: undefined,
