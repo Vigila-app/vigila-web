@@ -31,23 +31,49 @@
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": false,
     "roles": ["CONSUMER"]
   },
-  "registrationVigil": {
+  "registration/vigil": {
     "url": "/auth/registration/vigil",
     "label": "Sign up vigil",
     "title": "Sign up vigil",
     "menu": {
-      "mobile": false,
+      "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": false,
+    "roles": ["VIGIL"]
+  },
+  "onBoard": {
+    "url": "/onboard",
+    "label": "onboard",
+    "title": "onboard",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "onBoardVigil": {
+    "url": "/vigil/onboard",
+    "label": "onboard",
+    "title": "onboard",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
     "roles": ["VIGIL"]
   },
   "resetPassword": {
@@ -158,6 +184,20 @@
     "title": "Profilo",
     "private": true,
     "roles": []
+  },
+  "profileConsumer": {
+    "url": "/user/profile",
+    "label": "Profilo",
+    "title": "Profilo",
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "profileVigil": {
+    "url": "/vigil/user/profile",
+    "label": "Profilo",
+    "title": "Profilo",
+    "private": true,
+    "roles": ["VIGIL"]
   },
   "account": {
     "url": "/dashboard/user/account",

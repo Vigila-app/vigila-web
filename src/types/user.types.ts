@@ -76,4 +76,5 @@ export type UserStoreType = {
   getUserDetails: (force?: boolean) => Promise<UserDetailsType>;
   getUserTerms: (force?: boolean) => Promise<UserTermsType>;
   getUserDevices: (force?: boolean) => Promise<UserDevicesType>;
+  forceUpdate: () => void;
 };

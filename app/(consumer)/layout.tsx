@@ -24,10 +24,6 @@ const ToastManagerComponent = dynamic(
   () => import("@/components/@core/toastManager/toastManager.component"),
   { ssr: !!false }
 );
-const ModalManagerComponent = dynamic(
-  () => import("@/components/@core/modalManager/modalManager.component"),
-  { ssr: !!false }
-);
 
 export const metadata: Metadata = {
   title: {
@@ -60,7 +56,6 @@ export default function RootLayout({
           <SessionManagerComponent />
           <GlobalLoaderManager />
           <ToastManagerComponent />
-          <ModalManagerComponent />
           <CookieBannerComponent />
         </>
       }

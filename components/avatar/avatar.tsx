@@ -1,8 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
 import clsx from "clsx";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { InputFile } from "@/components/form";
 import { randomNumber } from "@/src/utils/common.utils";
+import { useUserStore } from "@/src/store/user/user.store";
+import { useEffect, useMemo, useState } from "react";
+import { StorageUtils } from "@/src/utils/storage.utils";
 
 const BACKGROUND_COLORS = [
   "EBF3FF",
@@ -80,13 +84,29 @@ const Avatar = (props: AvatarI) => {
     onFileUpload,
     value,
   } = props;
+  const { user, lastUpdate: lastUserUpdate } = useUserStore();
+  const [profilePic, setProfilePic] = useState<string | undefined>();
+
+  const getProfilePic = async () => {
+    if (user?.id) {
+      const profilePicUrl = await StorageUtils.getURL("profile-pics", user.id);
+      if (profilePicUrl) {
+        setProfilePic(profilePicUrl);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!imgUrl) getProfilePic();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imgUrl, user?.id, lastUserUpdate]);
 
   const imgStyle = clsx(
     "rounded-full object-cover font-normal",
     AvatarSize[size]
   );
 
-  const randomKey = randomNumber(0, 19);
+  const randomKey = useMemo(() => randomNumber(0, 19), []);
 
   return (
     <div
@@ -95,8 +115,8 @@ const Avatar = (props: AvatarI) => {
         inline ? "inline-flex gap-1" : "flex flex-col gap-1"
       )}
     >
-      {imgUrl ? (
-        <img alt="avatar" src={imgUrl} className={imgStyle} />
+      {imgUrl || profilePic ? (
+        <img alt="avatar" src={imgUrl || profilePic} className={imgStyle} />
       ) : value ? (
         <div
           className={clsx(

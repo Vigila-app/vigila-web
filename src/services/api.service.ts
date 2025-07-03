@@ -110,6 +110,7 @@ export class ApiService {
 
       if (body) {
         optInit.body = JSON.stringify(body);
+        console.log("[API POST BODY]", JSON.stringify(body, null, 2));
       }
 
       return ApiService.responseMiddlewares<T>(
@@ -120,8 +121,13 @@ export class ApiService {
         })
       );
     } catch (error) {
-      // TODO: add logger
-      console.error(error);
+      console.error("[API POST ERROR]", {
+        url,
+        body,
+        optInit,
+        time: new Date().toISOString(),
+        error: error instanceof Error ? error.message : error,
+      });
     }
   };
 
@@ -135,9 +141,7 @@ export class ApiService {
 
     if (user) {
       // region AUTH HEADERS
-      const results = await Promise.allSettled([
-        AuthService.getAuthToken(),
-      ]);
+      const results = await Promise.allSettled([AuthService.getAuthToken()]);
       const fulfilledValues = results
         .filter(
           <T>(p: PromiseSettledResult<T>): p is PromiseFulfilledResult<T> =>

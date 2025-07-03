@@ -205,7 +205,11 @@ export const useUserStore = create<UserStoreType>()(
               reject(error);
             }
           }),
-
+        forceUpdate: () => {
+          set({ ...get(), lastUpdate: undefined }, false, {
+            type: "forceUpdate",
+          });
+        },
         onLogout: () => {
           set(initUserStore, false, { type: "onLogout" });
         },
