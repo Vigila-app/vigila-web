@@ -38,7 +38,7 @@
     "roles": ["CONSUMER"]
   },
   "registration/vigil": {
-    "url": "/auth/vigil/registration",
+    "url": "/auth/registration/vigil",
     "label": "Sign up vigil",
     "title": "Sign up vigil",
     "menu": {
@@ -47,7 +47,7 @@
       "header": false,
       "footer": false
     },
-    "private": true,
+    "private": false,
     "roles": ["VIGIL"]
   },
   "onBoard": {
@@ -63,7 +63,7 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
-  "onBoard-vigil": {
+  "onBoardVigil": {
     "url": "/vigil/onboard",
     "label": "onboard",
     "title": "onboard",

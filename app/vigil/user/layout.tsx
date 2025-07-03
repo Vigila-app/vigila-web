@@ -5,12 +5,12 @@ import { isServer } from "@/src/utils/common.utils";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 
-const VerifyEmailComponent = dynamic(
-  () => import("@/components/user/verifyEmail.component"),
-  {
-    ssr: !!false,
-  }
-);
+// const VerifyEmailComponent = dynamic(
+//   // () => import("@/components/user/verifyEmail.component"),
+//   {
+//     ssr: !!false,
+//   }
+// );
 
 export default function UserLayout({
   children,
@@ -31,7 +31,9 @@ export default function UserLayout({
   return (
     <section id="user">
       {children}
-      <div className="w-50"><VerifyEmailComponent position="bottom" /></div>
+      <div className="w-50">
+        {/* <VerifyEmailComponent position="bottom" /> */}
+        </div>
     </section>
   );
 }

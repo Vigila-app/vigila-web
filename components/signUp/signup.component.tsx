@@ -51,7 +51,9 @@ const SignupComponent = (props: SignupComponentI) => {
   } = useForm<RegistrationFormI>();
 
   const redirectOnboard = () => {
-    router.replace(Routes.onboard.url);
+    router.replace(
+      role === RolesEnum.CONSUMER ? Routes.onBoard.url : Routes.onBoardVigil.url
+    );
   };
 
   const manageSignupError = (error: { code?: string }) => {

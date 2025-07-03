@@ -41,7 +41,7 @@ const OnboardComponent = () => {
         formdata;
       const role = user?.user_metadata?.role as RolesEnum;
       const userId = user?.id;
-console.log(formdata);
+      console.log(formdata);
       if (!userId || !role) {
         showToast({
           message: "Utente non identificato. Fai login e riprova.",

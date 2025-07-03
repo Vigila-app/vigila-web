@@ -1,17 +1,16 @@
 "use client";
 
-import { Avatar, Button, Undraw } from "@/components";
+import { Button, Undraw } from "@/components";
 import { Input } from "@/components/form";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
-import { UserService } from "@/src/services";
+
 import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
-import { StorageUtils } from "@/src/utils/storage.utils";
-import { useEffect, useState } from "react";
+
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
 import { AddressData } from "@/src/types/form.types";
@@ -22,6 +21,7 @@ type OnboardFormI = {
   addresses: AddressData[];
   occupation: string;
   transportation: string;
+  cap: string;
   // TODO add other detail fields
 };
 
@@ -49,7 +49,8 @@ const OnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
-      const { birthdate, addresses, occupation, transportation } = formData;
+      const { birthdate, addresses, occupation, transportation, cap } =
+        formData;
       {
         const role = user?.user_metadata?.role as RolesEnum;
 
@@ -64,7 +65,13 @@ const OnboardComponent = () => {
         }
         await OnboardService.update(userId, {
           role: RolesEnum.VIGIL,
-          data: { birthdate, addresses, occupation, transportation },
+          data: {
+            birthdate,
+            addresses,
+            cap: [cap],
+            occupation,
+            transportation,
+          },
         });
         //TODO {qui aggiungi i campi modificati } );
         showToast({
@@ -72,7 +79,7 @@ const OnboardComponent = () => {
           type: ToastStatusEnum.SUCCESS,
         });
 
-        // router.replace(Routes.home.url);
+        redirectHome();
       }
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
@@ -82,7 +89,6 @@ const OnboardComponent = () => {
       });
     }
   };
-  
 
   return (
     <section id="update-profile" aria-label="update profile">
@@ -110,7 +116,7 @@ const OnboardComponent = () => {
               />
             )}
           />
-          
+
           <Controller
             name="occupation"
             control={control}
@@ -125,8 +131,22 @@ const OnboardComponent = () => {
               />
             )}
           />
-{/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
-         
+          <Controller
+            name="cap"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="cap"
+                placeholder="00000"
+                required
+                error={errors.cap}
+              />
+            )}
+          />
+          {/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
+
           <Controller
             name="transportation"
             control={control}

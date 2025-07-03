@@ -1,6 +1,6 @@
-import { ApiService } from ".";
-import { apiOnboard } from "../constants/api.constants";
-import { RolesEnum } from "../enums/roles.enums";
+import { ApiService } from "@/src/services/api.service";
+import { apiOnboard } from "@/src/constants/api.constants";
+
 import type {
   VigilFormData,
   ConsumerFormData,
@@ -25,25 +25,4 @@ export const OnboardService = {
       }
     }),
 };
-// export const OnboardService = {
-//   update: async (
-//     userID: string,
-//     role: RolesEnum,
-//     formData:Partial< FormData>
 
-//   ) =>
-//     new Promise(async (res, rej) => {
-//       try {
-
-//         const response = await ApiService.post(
-//           apiOnboard.ONBOARD(userID, role),
-//           formData
-//         );
-
-//         res(response);
-//       } catch (error) {
-//         console.error("Update of profile error", error);
-//         rej(error);
-//       }
-//     }),
-// };

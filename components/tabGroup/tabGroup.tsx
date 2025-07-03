@@ -1,4 +1,5 @@
 "use client";
+import { RolesEnum } from "@/src/enums/roles.enums";
 import clsx from "clsx";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -12,10 +13,11 @@ type TabGroupI = {
   align?: "left" | "center" | "right";
   onTabChange?: (tab: TabI) => void;
   tabs: TabI[];
+  role?: RolesEnum;
 };
 
 const TabGroup = (props: TabGroupI) => {
-  const { align = "left", tabs = [], onTabChange = () => ({}) } = props;
+  const { align = "left", tabs = [], onTabChange = () => ({}), role } = props;
 
   const [activeTab, setActiveTab] = useState(
     tabs.find((tab) => tab.active) || tabs[0]
@@ -32,8 +34,8 @@ const TabGroup = (props: TabGroupI) => {
         <label htmlFor="Tab" className="sr-only">
           Nav Tab
         </label>
-
-        <select
+        {/* TODO possibilità di scelta del tipo di menu per le tabs */}
+        {/* <select
           id="Tab"
           className="w-full p-3 rounded-md border border-gray-200"
           value={activeTab.label}
@@ -50,7 +52,25 @@ const TabGroup = (props: TabGroupI) => {
               {tab.label}
             </option>
           ))}
-        </select>
+        </select> */}
+        <div className="flex space-x-2 border-b border-gray-200 mb-4">
+          {tabs.map((tab) => (
+            <button
+              key={tab.label}
+              role={role}
+              onClick={() => setActiveTab(tab)}
+              className={clsx(
+                "px-4 py-2 text-sm font-medium transition-colors border-b-2",
+                activeTab.label === tab.label
+                  ? role === RolesEnum.CONSUMER
+                    ? "border-consumer-blue text-consumer-blue"
+                    : "border-vigil-orange text-vigil-orange"
+                  : "border-transparent text-gray-500 hover:text-black hover:border-white"
+              )}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="hidden sm:block">
@@ -63,8 +83,7 @@ const TabGroup = (props: TabGroupI) => {
                 : align === "left"
                 ? "justify-start"
                 : "justify-end"
-            )}
-          >
+            )}>
             {tabs.map((tab) =>
               tab.url ? (
                 <Link
@@ -79,8 +98,7 @@ const TabGroup = (props: TabGroupI) => {
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}
-                >
+                  }}>
                   {tab.label}
                 </Link>
               ) : (
@@ -94,8 +112,7 @@ const TabGroup = (props: TabGroupI) => {
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}
-                >
+                  }}>
                   {tab.label}
                 </span>
               )

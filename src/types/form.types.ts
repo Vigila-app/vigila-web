@@ -18,23 +18,23 @@ export interface ConsumerFormData {
   cap: string;
   yourName: string;
 }
-export type AddressData={
- label:string;
-  city:string;
-  region?:string;
-  province?:string;
-  quarter?:string;
-  cap:string;
-  lat:number;
-  lng:number;
-}
+export type AddressData = {
+  label: string;
+  city: string;
+  region?: string;
+  province?: string;
+  quarter?: string;
+  cap: string;
+  lat: number;
+  lng: number;
+};
 
 export interface VigilFormData {
   birthdate: string;
   occupation?: string;
   transportation?: string;
-  addresses:AddressData[];
-  // cap: string;
+  addresses: AddressData[];
+  cap: string[];
 }
 export type RoleBasedFormData =
   | { role: RolesEnum.VIGIL; data: VigilFormData }
