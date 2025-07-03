@@ -1,6 +1,6 @@
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { CrmService } from "@/src/services";
-import { CrmStoreType, GuestI } from "@/src/types/crm.types";
+import { GuestI, CrmStoreType } from "@/src/types/crm.types";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
 import { create } from "zustand";
@@ -19,6 +19,7 @@ export const useCrmStore = create<CrmStoreType>()(
     persist(
       (set, get) => ({
         ...initCrmStore,
+        
         getCustomers: async (force: boolean = false) => {
           try {
             const lastUpdate = get().lastUpdate;
@@ -31,7 +32,7 @@ export const useCrmStore = create<CrmStoreType>()(
               if (response) {
                 set(
                   () => ({
-                    customers: Object.values(response),
+                    customers: response,
                     lastUpdate: new Date(),
                   }),
                   false,
@@ -43,16 +44,12 @@ export const useCrmStore = create<CrmStoreType>()(
             console.error("useCrmStore getCustomers error:", error);
           }
         },
-        getCustomerDetails: async (
-          guestId: GuestI["id"],
-          force = false
-        ) => {
+
+        getCustomerDetails: async (guestId: GuestI["id"], force = false) => {
           try {
             const getCustomerDetailsBE = async () => {
               try {
-                const customerStoreBE = await CrmService.getCustomerDetails(
-                  guestId
-                );
+                const customerStoreBE = await CrmService.getCustomerDetails(guestId);
                 if (get().customers?.length) {
                   set(
                     () => ({
@@ -88,7 +85,6 @@ export const useCrmStore = create<CrmStoreType>()(
               !get().lastUpdate ||
               dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
             ) {
-              // TODO retrieve customer details from BE
               const customerStoreBE = await getCustomerDetailsBE();
               if (customerStoreBE?.id) {
                 return customerStoreBE;
@@ -101,7 +97,6 @@ export const useCrmStore = create<CrmStoreType>()(
               if (customerStore?.id) {
                 return customerStore;
               } else {
-                // TODO retrieve customer details from BE
                 const customerStoreBE = await getCustomerDetailsBE();
                 if (customerStoreBE?.id) {
                   return customerStoreBE;
@@ -113,14 +108,23 @@ export const useCrmStore = create<CrmStoreType>()(
             console.error("useCrmStore getCustomerDetails error:", error);
           }
         },
+
         deleteCustomer: async (guestId: GuestI["id"]) => {
           try {
             await CrmService.deleteCustomer(guestId);
-            get().getCustomers(true);
+            set(
+              () => ({
+                customers: get().customers.filter((customer) => customer.id !== guestId),
+                lastUpdate: new Date(),
+              }),
+              false,
+              { type: "deleteCustomer", guestId }
+            );
           } catch (error) {
             console.error("useCrmStore deleteCustomer error:", error);
           }
         },
+
         resetLastUpdate: async () => {
           try {
             set({ lastUpdate: undefined }, false, { type: "resetLastUpdate" });
@@ -128,6 +132,7 @@ export const useCrmStore = create<CrmStoreType>()(
             console.error("useCrmStore resetLastUpdate error:", error);
           }
         },
+
         onLogout: () => {
           set(initCrmStore, false, { type: "onLogout" });
         },

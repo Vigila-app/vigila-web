@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components";
-import { ModalPortalComponent } from "@/components/@core/modal";
+import ModalPortalComponent from "@/components/@core/modal/modalPortal.component";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { ModalI } from "@/src/types/modal.types";
 import { XMarkIcon } from "@heroicons/react/24/outline";

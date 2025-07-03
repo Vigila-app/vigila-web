@@ -5,12 +5,28 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { isServer } from "@/src/utils/common.utils";
 import Link from "next/link";
 import { Avatar } from "@/components";
-import { StorageUtils } from "@/src/utils/storage.utils";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const HeaderProfile = () => {
   const { user, userDetails } = useUserStore();
+  const role = user?.user_metadata?.role;
 
   if (isServer) return;
+
+  //region Url
+  const UrlByRole = () => {
+    switch (role) {
+      case RolesEnum.VIGIL:
+        return Routes.profileVigil.url;
+      case RolesEnum.CONSUMER:
+        return Routes.profileConsumer.url;
+      default:
+        return Routes.home.url;
+
+      //TODO aggiungere altri ruoli nel caso
+    }
+  };
+  //endregion Url
 
   if (user?.id) {
     return (
@@ -20,17 +36,13 @@ const HeaderProfile = () => {
         className="hidden md:inline-flex items-center border-gray-200 md:border-l pl-4 text-gray-500 transition hover:text-gray-700"
       >
         <Link
-          href={Routes.profile.url}
+          href={UrlByRole()}
           className="inline-flex items-center text-sm font-medium"
         >
           <span className="sr-only">User</span>
           <Avatar
             inline
             label={userDetails?.displayName || Routes.profile.label}
-            imgUrl={StorageUtils.getURL(
-              "profile_pics",
-              userDetails?.photoURL as string
-            )}
             value={userDetails?.displayName || ""}
           />
         </Link>

@@ -7,10 +7,6 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import {
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
 import { ServiceI } from "@/src/types/services.types";
 
