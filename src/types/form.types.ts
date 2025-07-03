@@ -1,4 +1,4 @@
-import { RolesEnum } from "../enums/roles.enums";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export type FormFieldRegex = {
   [fieldName: string]: {

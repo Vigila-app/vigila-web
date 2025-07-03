@@ -7,7 +7,7 @@ import { ServiceI } from "@/src/types/services.types";
 import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
-import { RolesEnum } from "../enums/roles.enums";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
