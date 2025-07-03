@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import dynamic from "next/dynamic";
 import { ButtonStyle } from "./button.style";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const LoaderSpinner = dynamic(
   () => import("@/components/loaderSpinner/loaderSpinner"),
@@ -17,9 +18,11 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
   primary?: boolean;
   secondary?: boolean;
+
   text?: boolean;
   isLoading?: boolean;
   full?: boolean;
+  role?: RolesEnum;
 };
 
 const Button = (props: ButtonI) => {
@@ -30,13 +33,31 @@ const Button = (props: ButtonI) => {
     icon,
     primary = true,
     secondary = false,
+    role,
     text = false,
     danger = false,
     isLoading = false,
     full = false,
   } = props;
 
-  const btnClass = `${ButtonStyle.baseBtnStyle} ${
+  // const btnClass = `${ButtonStyle.baseBtnStyle} ${
+  //   danger
+  //     ? ButtonStyle.dangerBtnStyle
+  //     : vigil
+  //     ? ButtonStyle.vigilBtnStyle
+  //     : consumer
+  //     ? ButtonStyle.consumerBtnStyle
+  //     : text
+  //     ? ButtonStyle.textBtnStyle
+  //     : secondary
+  //     ? ButtonStyle.secondaryBtnStyle
+  //     : primary
+  //     ? ButtonStyle.primaryBtnStyle
+  //     : ""
+  // }`;
+
+  const btnClass = clsx(
+    ButtonStyle.baseBtnStyle,
     danger
       ? ButtonStyle.dangerBtnStyle
       : text
@@ -45,9 +66,10 @@ const Button = (props: ButtonI) => {
       ? ButtonStyle.secondaryBtnStyle
       : primary
       ? ButtonStyle.primaryBtnStyle
-      : ""
-  }`;
-
+      : "",
+    role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
+    role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle
+  );
   const isDisabled = isLoading || props.disabled;
 
   return (
@@ -73,15 +95,14 @@ const Button = (props: ButtonI) => {
         full: undefined,
       }}
       disabled={isDisabled}
-      onClick={action}
-    >
+      onClick={action}>
       {isLoading ? (
         <span className="mr-2">
           <LoaderSpinner size="small" />
         </span>
-      ) : icon ? <span className="mr-2">
-      {icon}
-    </span> : null}
+      ) : icon ? (
+        <span className="mr-2">{icon}</span>
+      ) : null}
       {label}
     </button>
   );

@@ -21,7 +21,7 @@ const MenuMobile = () => {
     setIsOpen(false);
   }, [pathname]);
 
-  const isUserLogged = !!user?.uid;
+  const isUserLogged = !!user?.id;
 
   const MenuLinkItem = (route: RouteI) => (
     <Link
@@ -30,7 +30,7 @@ const MenuMobile = () => {
         pathname === route?.url &&
           "active bg-gray-100 text-primary-500 hover:text-primary-600"
       )}
-      href={route?.url}
+      href={route?.url || ""}
     >
       {route?.label}
     </Link>

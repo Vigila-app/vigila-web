@@ -1,6 +1,6 @@
 import { ApiService } from "@/src/services";
 import { apiCostumers } from "@/src/constants/api.constants";
-import { getUUID } from "@/src/utils/common.utils";
+
 import { GuestI } from "@/src/types/crm.types";
 
 export const CrmService = {
