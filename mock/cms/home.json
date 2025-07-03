@@ -1,8 +1,8 @@
 {
     "main-hero": {
-        "title": "This is the main title",
-        "subtitle": "Fabolous subtitle here",
-        "payoff": "This is really incredible, join us now!",
+        "title": "Un ponte tra generazioni",
+        "subtitle": "L'assistenza del tuo quartiere a portata di click ",
+        "payoff": "Con Vigila trovi in pochi secondi un Vigil di fiducia, proprio nella tua zona",
         "cta": [{
             "label": "Get Started",
             "url": "/wall"

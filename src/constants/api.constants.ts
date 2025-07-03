@@ -6,6 +6,7 @@ import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
 import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
+import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "../enums/roles.enums";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
@@ -55,6 +56,11 @@ const apiControllers = {
   GUESTS: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/crm/guests`,
   // endregion CRM
+
+  // region BOOKINGS
+  BOOKINGS: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/bookings`,
+  // endregion BOOKINGS
 
   // region MAPS
   POI: (isMock?: boolean): string => `${apiBase.V1(isMock)}/maps/poi/browse`,
@@ -118,6 +124,13 @@ export const apiSales = {
   LIST: (isMock?: boolean): string => apiControllers.SALES(isMock),
   DETAILS: (saleId: SaleI["id"], isMock?: boolean): string =>
     `${apiControllers.SALES(isMock)}/${isMock ? "sale" : saleId}`,
+};
+
+export const apiBookings = {
+  CREATE: (isMock?: boolean): string => apiControllers.BOOKINGS(isMock),
+  LIST: (isMock?: boolean): string => apiControllers.BOOKINGS(isMock),
+  DETAILS: (bookingId: BookingI["id"], isMock?: boolean): string =>
+    `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}`,
 };
 
 export const apiRecaptcha = {

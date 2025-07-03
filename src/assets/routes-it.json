@@ -39,8 +39,8 @@
   },
   "registration/vigil": {
     "url": "/auth/vigil/registration",
-    "label": "Sign up",
-    "title": "Sign up",
+    "label": "Sign up vigil",
+    "title": "Sign up vigil",
     "menu": {
       "mobile": true,
       "desktop": true,
@@ -104,6 +104,19 @@
     "menu": {
       "mobile": false,
       "desktop": true,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": []
+  },
+  "bookings": {
+    "url": "/dashboard/bookings",
+    "label": "Bookings",
+    "title": "Bookings",
+    "menu": {
+      "mobile": true,
+      "desktop": false,
       "header": true,
       "footer": false
     },
