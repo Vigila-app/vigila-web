@@ -7,7 +7,7 @@ import { ServiceI } from "@/src/types/services.types";
 import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
-import { RolesEnum } from "../enums/roles.enums";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -86,6 +86,10 @@ const apiControllers = {
   // region USER
   USER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/user`,
   // endregion USER
+
+// region ONBOARD
+  ONBOARD: (isMock?: boolean): string => `${apiBase.V1(isMock)}/onboard`,
+  // endregion ONBOARD
 };
 
 export const apiUser = {
@@ -99,7 +103,9 @@ export const apiUser = {
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
 };
-
+export const apiOnboard={
+  ONBOARD:(userId:string, role:RolesEnum,isMock?:boolean): string=>`${apiControllers.ONBOARD(isMock)}/${userId}/${role}`
+}
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
   LIST: (isMock?: boolean): string => apiControllers.SERVICES(isMock),

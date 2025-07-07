@@ -13,7 +13,7 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { isServer } from "@/src/utils/common.utils";
 import { useSalesStore } from "@/src/store/sales/sales.store";
 import { Session, User } from "@supabase/supabase-js";
-import { RolesEnum } from "../enums/roles.enums";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const AuthInstance = AppInstance;
 
