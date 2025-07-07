@@ -1,0 +1,27 @@
+const baseCardStyle =
+  "mb-4 p-5 shadow-sm rounded-2xl bg-white";
+
+const borderedCardStyle = "border border-gray-200";
+const shadowCardStyle = "shadow-md";
+const hoverableCardStyle = "hover:shadow-lg hover:scale-[1.01]";
+const fullStyle = "w-full";
+
+const titleStyle = "text-lg font-semibold text-gray-800 mb-2";
+const subtitleStyle = "text-sm text-gray-500 mb-4";
+
+const vigilCardStyle =
+  "border-vigil-orange bg-vigil-light-orange text-vigil-orange";
+const consumerCardStyle =
+  "border-consumer-blue bg-consumer-light-blue text-consumer-blue";
+
+export const CardStyle = {
+  baseCardStyle,
+  borderedCardStyle,
+  shadowCardStyle,
+  hoverableCardStyle,
+  fullStyle,
+  titleStyle,
+  subtitleStyle,
+  vigilCardStyle,
+  consumerCardStyle,
+};

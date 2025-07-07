@@ -1,6 +1,6 @@
 "use client";
 
-import {  Button, TabGroup,  } from "@/components";
+import { Button, TabGroup } from "@/components";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { UserService } from "@/src/services";
@@ -10,7 +10,12 @@ import { StorageUtils } from "@/src/utils/storage.utils";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TabI } from "@/components/tabGroup/tabGroup";
-import PrenotazioniTab from "@/app/vigil/tabs/prenotazioni";
+import PanoramicaTab from "@/app/vigil/tabs/panoramica";
+import Profile from "@/public/svg/Profile";
+import Prenotazioni from "@/public/svg/prenotazioni";
+import Documenti from "@/public/svg/Informazioni";
+import Disponbilità from "@/public/svg/Disponibilità";
+import Recensioni from "@/public/svg/Recensioni";
 
 type ProfileFormI = {
   name: string;
@@ -20,11 +25,25 @@ type ProfileFormI = {
 
 const tabs: TabI[] = [
   {
-    label: "Informazioni Personali",
+    label: <Profile />,
+    id: "panoramica",
     active: true,
   },
   {
-    label: "Impostazioni",
+    label: <Prenotazioni />,
+    id: "prenotazioni",
+  },
+  {
+    label: <Documenti />,
+    id: "informazioni",
+  },
+  {
+    label: <Disponbilità />,
+    id: "disponibilità",
+  },
+  {
+    label: <Recensioni />,
+    id: "recensioni",
   },
 ];
 
@@ -183,20 +202,21 @@ const ProfileComponent = () => {
         </div>
       </section> */}
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-6">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-                {/* svg <User className="w-12 h-12 text-gray-400" /> */}
-              </div>
-              <div className="flex-1">
-                <h1 className="text-3xl font-boldmb-2">
+        <div className=" rounded-lg  bg-gray-500 shadow-sm py-6 px-12 mb-6">
+          {/*fondo di tutto forse eliminabile */}
+          <div className="flex  flex-col items-center justify-between pt-5 bg-white rounded-2xl">
+            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center ">
+              {/*immagine persona className="w-12 h-12 text-gray-400" /> */}
+            </div>
+            <div className="flex-1  ">
+              <section className="flex flex-col items-center">
+                <h1 className="text-3xl font-bold mb-2 text-center">
                   {userDetails?.displayName}
                 </h1>
-                <span className="text-gray-500 font-medium">
+                <span className="text-gray-500 font-medium flex items-center text-center">
                   {formatRole(role)}
                 </span>
-                <div className="flex items-center space-x-4  mb-3">
+                <div className="flex items-center gap-2  mb-3">
                   <span>📍 TODO localizzazione</span>
                   <span>🗓️ Su Vigil da: TODO </span>
                 </div>
@@ -209,18 +229,17 @@ const ProfileComponent = () => {
                     Modifica
                   </Button>
                 </div>
-                <TabGroup
-                  role={role}
-                  tabs={tabs}
-                  onTabChange={(tab) => setSelectedTab(tab)}
-                />
-
-                {selectedTab.label === "Informazioni Personali" && (
-                  <PrenotazioniTab />
-                )}
-
-                {selectedTab.label === "Impostazioni" && <PrenotazioniTab />}
-              </div>
+              </section>
+              <TabGroup
+                role={role}
+                tabs={tabs}
+                onTabChange={(tab) => setSelectedTab(tab)}
+              />
+              {selectedTab.id === "panoramica" && <PanoramicaTab />}
+              {selectedTab.id === "prenotazioni" && <PanoramicaTab />}
+              {selectedTab.id === "informazioni" && <PanoramicaTab />}
+              {selectedTab.id === "disponibilità" && <PanoramicaTab />}
+              {selectedTab.id === "recensioni" && <PanoramicaTab />}
             </div>
           </div>
         </div>

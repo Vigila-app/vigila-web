@@ -33,7 +33,7 @@ const BaseHero = (props: BaseHeroI) => {
     <div className={bgColor}>
       <div className="flex flex-col items-center bg-gray-50 min-h-screen pb-10">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-lg font-bold italic text-gray-700">
+          <p className="text-lg font-bold in ">
             Un <span className="text-consumer-blue">ponte</span> tra{" "}
             <span className="text-vigil-orange">generazioni</span>
           </p>
@@ -63,7 +63,7 @@ const BaseHero = (props: BaseHeroI) => {
           </section>
 
           <section className="w-full max-w-md mx-auto -mt-8 px-4">
-            <div className="p-6 shadow-lg rounded-lg bg-white">
+            <div className="p-6 shadow-lg rounded-2xl bg-white">
               <h2 className="text-3xl font-bold text-center mb-6 ">
                 Come vuoi iniziare?
               </h2>
