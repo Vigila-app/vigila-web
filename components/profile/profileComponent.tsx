@@ -12,7 +12,7 @@ import { Controller, useForm } from "react-hook-form";
 import { TabI } from "@/components/tabGroup/tabGroup";
 import PanoramicaTab from "@/app/vigil/tabs/panoramica";
 import Profile from "@/public/svg/Profile";
-import Prenotazioni from "@/public/svg/prenotazioni";
+import Prenotazioni from "@/public/svg/Prenotazioni";
 import Documenti from "@/public/svg/Informazioni";
 import Disponbilità from "@/public/svg/Disponibilità";
 import Recensioni from "@/public/svg/Recensioni";
