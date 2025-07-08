@@ -13,6 +13,7 @@ export type UserDetailsType = {
   username?: string;
   birthday?: string;
   gender?: GenderEnum;
+  phone?:string;
   other?: { [key: string]: string | number };
 };
 
@@ -42,6 +43,7 @@ export type UserType =
       id: string;
       displayName?: string;
       photoURL?: string;
+      phone:string;
       user_metadata?: UserMetadata;
     }
   | undefined;

@@ -185,6 +185,7 @@ export async function PUT(
 
     const { data: updatedUser } = await req.json();
     console.log(`API PUT user/${role}/${userId}`, updatedUser);
+     console.log("PUT called with:", { userId, role, updatedUser });
 
     if (!userId || !role || !updatedUser) {
       return jsonErrorResponse(400, {
@@ -236,6 +237,9 @@ export async function PUT(
         ...deepMerge(originalUser, updatedUser),
         name: undefined,
         surname: undefined,
+        email:undefined,
+        birthdate:undefined,
+        cellulare:undefined,
         created_at: originalUser.created_at,
         updated_at: getPostgresTimestamp(),
         id: userObject.id,

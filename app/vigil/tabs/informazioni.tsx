@@ -14,13 +14,15 @@ const informazioniTab = () => {
   const { showToast } = useAppStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const email: string = user?.email || "";
+  const birthday: string = user?.user_metadata?.birthday;
+  const phone: string = user?.user_metadata?.phone;
 
   type ProfileFormI = {
     name: string;
     surname: string;
-    birthdate: string;
+    birthday: string;
     email: string;
-    cellulare: string;
+    phone: string;
     // TODO add other detail fields
   };
   const {
@@ -34,6 +36,8 @@ const informazioniTab = () => {
       name: userDetails?.name || "",
       surname: userDetails?.surname || "",
       email: email || "",
+      phone: phone || "",
+      birthday: birthday || "",
     },
   });
   useEffect(() => {
@@ -49,12 +53,18 @@ const informazioniTab = () => {
   const onSubmit = async (formData: ProfileFormI) => {
     if (isValid) {
       try {
-        const { name, surname } = formData;
-        if (name !== userDetails?.name || surname !== userDetails?.surname) {
+        const { name, surname, birthday, email, phone } = formData;
+        if (
+          name !== userDetails?.name ||
+          surname !== userDetails?.surname ||
+          email !== user?.email ||
+          phone !== user?.phone
+        ) {
           await UserService.updateUser(
             { displayName: `${name} ${surname}` },
-            { name, surname }
+            { name, surname, birthday, email, phone }
           );
+          console.log();
           showToast({
             message: "Profile updated successfully",
             type: ToastStatusEnum.SUCCESS,
@@ -68,6 +78,16 @@ const informazioniTab = () => {
           setError("surname", {
             type: "custom",
             message: "Must insert different Last Name to update profile",
+          });
+        } else if (email === user?.email) {
+          setError("email", {
+            type: "custom",
+            message: "Must insert different email to update profile",
+          });
+        } else if (phone === user?.phone) {
+          setError("phone", {
+            type: "custom",
+            message: "Must insert different phone to update profile",
           });
         }
       } catch (err) {
@@ -118,7 +138,7 @@ const informazioniTab = () => {
           )}
         />
         <Controller
-          name="birthdate"
+          name="birthday"
           control={control}
           rules={{ required: true, minLength: 2, maxLength: 30 }}
           render={({ field }) => (
@@ -128,8 +148,8 @@ const informazioniTab = () => {
               placeholder="La tua data di nascita"
               type="text"
               required
-              aria-invalid={!!errors.birthdate}
-              error={errors.birthdate}
+              aria-invalid={!!errors.birthday}
+              error={errors.birthday}
             />
           )}
         />
@@ -151,7 +171,7 @@ const informazioniTab = () => {
           )}
         />
         <Controller
-          name="cellulare"
+          name="phone"
           control={control}
           rules={{ required: true, minLength: 2, maxLength: 30 }}
           render={({ field }) => (
@@ -161,15 +181,15 @@ const informazioniTab = () => {
               placeholder="cellulare"
               type="text"
               required
-              aria-invalid={!!errors.birthdate}
-              error={errors.birthdate}
+              aria-invalid={!!errors.phone}
+              error={errors.phone}
             />
           )}
         />
+        <div className="flex items-center justify-end pt-4">
+          <Button type="submit" primary role={role} label="Update profile" />
+        </div>
       </form>
-      <div className="flex items-center justify-end pt-4">
-        <Button type="submit" primary role={role} label="Update profile" />
-      </div>
     </Card>
   );
 };
