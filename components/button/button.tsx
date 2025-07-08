@@ -18,7 +18,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
   primary?: boolean;
   secondary?: boolean;
-
+  tab?: boolean;
   text?: boolean;
   isLoading?: boolean;
   full?: boolean;
@@ -34,27 +34,12 @@ const Button = (props: ButtonI) => {
     primary = true,
     secondary = false,
     role,
+    tab = false,
     text = false,
     danger = false,
     isLoading = false,
     full = false,
   } = props;
-
-  // const btnClass = `${ButtonStyle.baseBtnStyle} ${
-  //   danger
-  //     ? ButtonStyle.dangerBtnStyle
-  //     : vigil
-  //     ? ButtonStyle.vigilBtnStyle
-  //     : consumer
-  //     ? ButtonStyle.consumerBtnStyle
-  //     : text
-  //     ? ButtonStyle.textBtnStyle
-  //     : secondary
-  //     ? ButtonStyle.secondaryBtnStyle
-  //     : primary
-  //     ? ButtonStyle.primaryBtnStyle
-  //     : ""
-  // }`;
 
   const btnClass = clsx(
     ButtonStyle.baseBtnStyle,
@@ -64,6 +49,8 @@ const Button = (props: ButtonI) => {
       ? ButtonStyle.textBtnStyle
       : secondary
       ? ButtonStyle.secondaryBtnStyle
+      : tab
+      ? ButtonStyle.tabBtnStyle
       : primary
       ? ButtonStyle.primaryBtnStyle
       : "",
@@ -90,6 +77,7 @@ const Button = (props: ButtonI) => {
         secondary: undefined,
         danger: undefined,
         text: undefined,
+        tab: undefined,
         icon: undefined,
         isLoading: undefined,
         full: undefined,

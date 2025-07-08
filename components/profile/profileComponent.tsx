@@ -16,6 +16,9 @@ import Prenotazioni from "@/public/svg/Prenotazioni";
 import Documenti from "@/public/svg/Informazioni";
 import Disponbilità from "@/public/svg/Disponibilità";
 import Recensioni from "@/public/svg/Recensioni";
+import PrenotationTabs from "@/app/vigil/tabs/prenotazioni";
+import InformazioniTab from "@/app/vigil/tabs/informazioni";
+import DisponibilitàTab from "@/app/vigil/tabs/disponibilità";
 
 type ProfileFormI = {
   name: string;
@@ -52,6 +55,7 @@ const ProfileComponent = () => {
   const { showToast } = useAppStore();
   const [selectedTab, setSelectedTab] = useState<TabI>(tabs[0]); //per avere tab attive
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
+  const created_at= user?.created_at;
 
   const formatRole = (role: string) => {
     if (!role) return "";
@@ -141,9 +145,9 @@ const ProfileComponent = () => {
 
   return (
     <div>
-      {/*TODO eliminare qeusta versione e riadattare l'update del profilo 
-       <section id="update-profile" aria-label="update profile">
-        <h1 className="text-lg font-medium mb-2 leading-none sticky top-0 p-4 pb-2 z-40">
+      {/*TODO eliminare qeusta versione e riadattare l'update del profilo */}
+      <section id="update-profile" aria-label="update profile">
+        {/*<h1 className="text-lg font-medium mb-2 leading-none sticky top-0 p-4 pb-2 z-40">
           Update profile
         </h1>
         <Undraw graphic="profile" />
@@ -199,50 +203,52 @@ const ProfileComponent = () => {
               <Button type="submit" primary label="Update profile" />
             </div>
           </form>
-        </div>
-      </section> */}
+        </div>*/}
+      </section>
       <div className="max-w-7xl mx-auto">
         <div className=" rounded-lg  bg-gray-500 shadow-sm py-6 px-12 mb-6">
-          {/*fondo di tutto forse eliminabile */}
-          <div className="flex  flex-col items-center justify-between pt-5 bg-white rounded-2xl">
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center ">
-              {/*immagine persona className="w-12 h-12 text-gray-400" /> */}
-            </div>
-            <div className="flex-1  ">
-              <section className="flex flex-col items-center">
-                <h1 className="text-3xl font-bold mb-2 text-center">
-                  {userDetails?.displayName}
-                </h1>
-                <span className="text-gray-500 font-medium flex items-center text-center">
-                  {formatRole(role)}
-                </span>
-                <div className="flex items-center gap-2  mb-3">
-                  <span>📍 TODO localizzazione</span>
-                  <span>🗓️ Su Vigil da: TODO </span>
-                </div>
-                <div className="flex items-center justify-end">
-                  <Button
-                    label="Modifica profilo"
-                    type="submit"
-                    primary
-                    role={role}>
-                    Modifica
-                  </Button>
-                </div>
-              </section>
+          <div className="flex  flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
+            <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center border-4">
+                {/*immagine persona className="w-12 h-12 " /> */}
+              </div>
+              <div className="flex-1  ">
+                <section className="flex flex-col items-center ">
+                  <h1 className="text-3xl font-bold mb-2 text-center">
+                    {userDetails?.displayName}
+                  </h1>
+                  <span className="text-gray-500 font-medium flex items-center text-center">
+                    {formatRole(role)}
+                  </span>
+                  <div className="flex items-center gap-2  mb-3">
+                    <span>📍 TODO localizzazione</span>
+                    <span>🗓️ Su Vigil da: {created_at}</span>
+                  </div>
+                  {/* <div className="flex items-center justify-end">
+                    <Button
+                      label="Modifica profilo"
+                      type="submit"
+                      primary
+                      role={role}>
+                      Modifica
+                    </Button>
+                  </div> */}
+                </section>
+              </div>
+              </div>
               <TabGroup
                 role={role}
                 tabs={tabs}
                 onTabChange={(tab) => setSelectedTab(tab)}
               />
               {selectedTab.id === "panoramica" && <PanoramicaTab />}
-              {selectedTab.id === "prenotazioni" && <PanoramicaTab />}
-              {selectedTab.id === "informazioni" && <PanoramicaTab />}
-              {selectedTab.id === "disponibilità" && <PanoramicaTab />}
+              {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
+              {selectedTab.id === "informazioni" && <InformazioniTab/>}
+              {selectedTab.id === "disponibilità" && <DisponibilitàTab />}
               {selectedTab.id === "recensioni" && <PanoramicaTab />}
             </div>
           </div>
-        </div>
+        
       </div>
     </div>
   );
