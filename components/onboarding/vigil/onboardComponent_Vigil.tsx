@@ -7,18 +7,20 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
-
+import SearchAddress from "@/components/maps/searchAddress.component";
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { redirect, useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
-import { AddressData } from "@/src/types/form.types";
+import { useEffect, useState } from "react";
+import { AddressI } from "@/src/types/maps.types";
+import MapsComponent from "@/components/maps/maps.component";
 
 type OnboardFormI = {
-  birthdate: string;
+  birthday: string;
   city: string;
-  addresses: AddressData[];
+  addresses: AddressI[];
   occupation: string;
   transportation: string;
   cap: string;
@@ -35,6 +37,8 @@ const transportationOptions = [
 const OnboardComponent = () => {
   const { showLoader, hideLoader, showToast } = useAppStore();
   const { user } = useUserStore();
+
+  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const router = useRouter();
   const {
     control,
@@ -42,15 +46,23 @@ const OnboardComponent = () => {
     handleSubmit,
     setError,
     reset,
+    setValue,
   } = useForm<OnboardFormI>();
   const redirectHome = () => {
     router.replace(Routes.home.url);
   };
+
+  const [addresses, setAddresses] = useState<AddressI[]>([]);
+
+  useEffect(() => {
+    setValue("addresses", addresses);
+  }, [addresses]);
+
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
-      const { birthdate, addresses, occupation, transportation, cap } =
-        formData;
+      const { birthday, addresses, occupation, transportation, cap } = formData;
+
       {
         const role = user?.user_metadata?.role as RolesEnum;
 
@@ -66,7 +78,7 @@ const OnboardComponent = () => {
         await OnboardService.update(userId, {
           role: RolesEnum.VIGIL,
           data: {
-            birthdate,
+            birthday,
             addresses,
             cap: [cap],
             occupation,
@@ -101,7 +113,7 @@ const OnboardComponent = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="w-full mx-auto max-w-lg space-y-8 p-4">
           <Controller
-            name="birthdate"
+            name="birthday"
             control={control}
             rules={{ required: true, minLength: 6, maxLength: 10 }} //TODO controllo migliore
             render={({ field }) => (
@@ -111,8 +123,9 @@ const OnboardComponent = () => {
                 placeholder="15/06/2000"
                 type="date"
                 required
+                role={role}
                 autoComplete="given-date" //chiedere
-                error={errors.birthdate}
+                error={errors.birthday}
               />
             )}
           />
@@ -124,6 +137,7 @@ const OnboardComponent = () => {
             render={({ field }) => (
               <Input
                 {...field}
+                role={role}
                 label="Occupazione"
                 placeholder="Es. Studente, Impiegato..."
                 required
@@ -139,6 +153,7 @@ const OnboardComponent = () => {
               <Input
                 {...field}
                 label="cap"
+                role={role}
                 placeholder="00000"
                 required
                 error={errors.cap}
@@ -146,10 +161,63 @@ const OnboardComponent = () => {
             )}
           />
           {/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
+          <Controller
+            name="addresses"
+            control={control}
+            defaultValue={[]}
+            
+            render={() => (
+              <div>
+                <label className="block font-medium mb-1">Indirizzi</label>
+                <SearchAddress
+                  onSubmit={(address) => {
+                    setAddresses((prev) => [...prev, address]);
+                  }}
+                  label="Cerca un indirizzo"
+                />
+                {addresses.length > 0 && (
+                  <ul className="mt-2 list-disc pl-5 text-sm text-gray-700">
+                    {addresses.map((addr, i) => (
+                      <li key={i} className="text-black text-xs">
+                        {`${addr.display_name} `}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {addresses.length > 0 &&
+                  addresses[addresses.length - 1]?.lat &&
+                  addresses[addresses.length - 1]?.lon && (
+                    <div className="mt-4">
+                      <MapsComponent
+                        center={[
+                          +addresses[addresses.length - 1].lat!,
+                          +addresses[addresses.length - 1].lon!,
+                        ]}
+                        marker={[
+                          +addresses[addresses.length - 1].lat!,
+                          +addresses[addresses.length - 1].lon!,
+                        ]}
+                        markerName={
+                          addresses[addresses.length - 1]?.extended ||
+                          addresses[addresses.length - 1]?.city
+                        }
+                      />
+                    </div>
+                  )}
+
+                {errors.addresses && (
+                  <p className="text-red-500 text-sm">
+                    Seleziona almeno un indirizzo
+                  </p>
+                )}
+              </div>
+            )}
+          />
 
           <Controller
             name="transportation"
             control={control}
+            
             rules={{ required: true }}
             render={({ field }) => (
               <div>
@@ -160,6 +228,7 @@ const OnboardComponent = () => {
                   {transportationOptions.map((option) => (
                     <Checkbox
                       key={option.value}
+                      role={role}
                       label={option.label}
                       checked={field.value === option.value}
                       onChange={() => field.onChange(option.value)}

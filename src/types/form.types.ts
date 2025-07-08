@@ -1,4 +1,5 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { AddressI } from "./maps.types";
 
 export type FormFieldRegex = {
   [fieldName: string]: {
@@ -19,21 +20,25 @@ export interface ConsumerFormData {
   yourName: string;
 }
 export type AddressData = {
-  label: string;
+  label?: string;
   city: string;
+  state?:string;
   region?: string;
   province?: string;
   quarter?: string;
-  cap: string;
-  lat: number;
-  lng: number;
+  street?: string;
+  cap?: string;
+  lat?: number;
+  lon?: number;
 };
 
+
+
 export interface VigilFormData {
-  birthdate: string;
+  birthday: string;
   occupation?: string;
   transportation?: string;
-  addresses: AddressData[];
+  addresses: AddressI[];
   cap: string[];
 }
 export type RoleBasedFormData =

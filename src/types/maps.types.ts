@@ -2,8 +2,9 @@ export type AddressI = {
   city?: string;
   street?: string;
   state?: string;
+  quarter?:string;
   country?: string;
-  postalCode?: string;
+  cap?: string;
   intercom?: string;
   note?: string;
   lat?: string | number;

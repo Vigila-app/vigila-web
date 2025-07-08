@@ -58,6 +58,7 @@ const SearchAddress = (props: {
       if (watch().search?.length >= minLength && !submitted) {
         const results = await MapsService.autocompleteAddress(watch().search);
         setAutocompleteResults(results);
+        console.log(results);
       }
     } catch (error) {
       console.error("Error during address autocomplete", error);
@@ -103,8 +104,7 @@ const SearchAddress = (props: {
                     setValue("search", result.name || result.display_name);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline"
-                >
+                  className="text-blue-600 hover:underline">
                   {result.display_name}
                 </button>
               </li>
