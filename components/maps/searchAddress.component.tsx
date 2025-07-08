@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
+import { useUserStore } from "@/src/store/user/user.store";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type SearchMapFormI = {
   search: string;
@@ -25,7 +27,9 @@ const SearchAddress = (props: {
   } = props;
   const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
   const [submitted, setSubmitted] = useState(false);
+const { user } = useUserStore();
 
+  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const {
     control,
     formState: { errors, isValid },
@@ -87,6 +91,7 @@ const SearchAddress = (props: {
               placeholder="Inserisci città"
               type="text"
               required
+              role={role}
               aria-invalid={!!errors.search}
               error={errors.search}
               icon={<MagnifyingGlassIcon className="size-4 text-gray-500" />}

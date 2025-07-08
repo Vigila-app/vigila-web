@@ -26,7 +26,7 @@ const PanoramicaTab = () => {
 
         <div>
           <p className="font-medium leading-relaxed text-[13px]">
-            Ciao! Sono Marco, uno studente di Psicologia appassionato di scienze
+           Ciao! Sono Marco, uno studente di Psicologia appassionato di scienze
             e sport. Mi piace socializzare e stare delle persone e imparare
             dalle loro esperienze. Sono disponibile per accompagnamento,
             commissioni e piccole commissioni.

@@ -224,15 +224,7 @@ const ProfileComponent = () => {
                     <span>📍 TODO localizzazione</span>
                     <span>🗓️ Su Vigil da: {created_at}</span>
                   </div>
-                  {/* <div className="flex items-center justify-end">
-                    <Button
-                      label="Modifica profilo"
-                      type="submit"
-                      primary
-                      role={role}>
-                      Modifica
-                    </Button>
-                  </div> */}
+                  
                 </section>
               </div>
               </div>

@@ -22,7 +22,7 @@ export interface ConsumerFormData {
 export type AddressData = {
   label?: string;
   city: string;
-  state?:string;
+  state?: string;
   region?: string;
   province?: string;
   quarter?: string;
@@ -32,12 +32,12 @@ export type AddressData = {
   lon?: number;
 };
 
-
-
 export interface VigilFormData {
   birthday: string;
   occupation?: string;
   transportation?: string;
+  phone?: string;
+  information?: string;
   addresses: AddressI[];
   cap: string[];
 }

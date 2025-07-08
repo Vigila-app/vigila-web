@@ -31,7 +31,7 @@ const Input = (props: InputI) => {
     <div>
       <span
         className={clsx(
-          "pointer-events-none start-2.5 rounded bg-white p-0.5 text-xs ",
+          "pointer-events-none start-2.5 rounded bg-white p-0.5 ",
 
           role === RolesEnum.CONSUMER && "text-consumer-blue",
           role === RolesEnum.VIGIL && " text-vigil-orange",
@@ -51,7 +51,7 @@ const Input = (props: InputI) => {
       <label
         htmlFor={name || label}
         className={clsx(
-          "relative w-full block p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          "relative w-full block p-3 rounded-4xl border bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           icon && "pr-10",
           role === RolesEnum.CONSUMER &&
             "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",

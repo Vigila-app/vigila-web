@@ -12,6 +12,7 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ProviderEnum } from "@/src/enums/common.enums";
 import ProviderButton from "@/components/button/providerButton";
 import { FormFieldType } from "@/src/constants/form.constants";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type LoginFormI = {
   email: string;
@@ -75,6 +76,7 @@ const LoginComponent = () => {
               placeholder="Inserisci email"
               type="email"
               required
+              role={RolesEnum.CONSUMER}
               autoComplete="email"
               aria-invalid={!!errors.email}
               error={errors.email}
@@ -97,6 +99,7 @@ const LoginComponent = () => {
               placeholder="Inserisci password"
               type="password"
               required
+              role={RolesEnum.CONSUMER}
               autoComplete="current-password"
               aria-invalid={!!errors.password}
               error={errors.password}
@@ -104,7 +107,7 @@ const LoginComponent = () => {
             />
           )}
         />
-        <Button type="submit" primary full label={Routes.login.label} />
+        <Button type="submit" primary full role={RolesEnum.CONSUMER} label={Routes.login.label} />
       </form>
 
       <div className="login-methods">

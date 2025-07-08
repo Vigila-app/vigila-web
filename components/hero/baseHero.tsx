@@ -2,6 +2,7 @@ import React from "react";
 import ButtonLink from "@/components/button/buttonLink";
 import Button from "../button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import Card from "../card/card";
 
 type HeroActionI = {
   label: string;
@@ -33,7 +34,7 @@ const BaseHero = (props: BaseHeroI) => {
     <div className={bgColor}>
       <div className="flex flex-col items-center bg-gray-50 min-h-screen pb-10">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-lg font-bold in ">
+          <p className="text-3xl font-bold in ">
             Un <span className="text-consumer-blue">ponte</span> tra{" "}
             <span className="text-vigil-orange">generazioni</span>
           </p>
@@ -63,14 +64,14 @@ const BaseHero = (props: BaseHeroI) => {
           </section>
 
           <section className="w-full max-w-md mx-auto -mt-8 px-4">
-            <div className="p-6 shadow-lg rounded-2xl bg-white">
+            <Card >
               <h2 className="text-3xl font-bold text-center mb-6 ">
                 Come vuoi iniziare?
               </h2>
 
               <div className="grid gap-4">
                 <div className="p-4 border-2 border-consumer-blue rounded-3xl flex flex-col items-center text-center bg-consumer-light-blue">
-                  {/*  className="w-8 h-8 text-secondary mb-2"  */}
+                  {/* svg  className="w-8 h-8 text-secondary mb-2"  */}
                   <h3 className="font-semibold text-lg text-consumer-blue">
                     Hai bisogno di aiuto?
                   </h3>
@@ -108,7 +109,7 @@ const BaseHero = (props: BaseHeroI) => {
                   Diventa un Vigil!
                 </ButtonLink>
               </div>
-            </div>
+            </Card>
           </section>
 
           <section className="w-full max-w-md mx-auto mt-8 px-4">
@@ -136,40 +137,40 @@ const BaseHero = (props: BaseHeroI) => {
             </p>
             <div className="grid gap-4 mt-6">
               {/* card1 */}
-              <div className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
+              <Card className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
                 {/* svg e prova per tailwind className="w-8 h-8 text-primary mb-2"  */}
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-sm mt-1">
                   Trova un vigil di fiducia nella tua zona
                 </p>
-              </div>
+              </Card>
 
               {/* card2 */}
-              <div className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
+              <Card className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
                 {/* svg */}
                 <h3 className="font-semibold text-lg">Spesa insieme</h3>
                 <p className="text-sm  mt-1">
                   Condividere il tempo facendo commissioni quotidiane
                 </p>
-              </div>
+              </Card>
 
               {/* card 3 */}
-              <div className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
+              <Card className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
                 {/* svg */}
                 <h3 className="font-semibold text-lg">Viaggi condivisi</h3>
                 <p className="text-sm  mt-1">
                   Accompagnamento sicuro per uscite e appuntamenti
                 </p>
-              </div>
+              </Card>
 
               {/* card 4 */}
-              <div className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
+              <Card className="p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center">
                 {/* svg /> */}
                 <h3 className="font-semibold text-lg">Compagnia sincera</h3>
                 <p className="text-sm mt-1">
                   Conversazioni, risate e momenti di vera connessione
                 </p>
-              </div>
+              </Card>
             </div>
           </section>
           <section className="bg-[#f5f5f5] py-12 md:py-24 lg:py-32">
@@ -206,8 +207,8 @@ const BaseHero = (props: BaseHeroI) => {
                   <p className="text-sm text-gray-500">(Fonte Eurostat)</p>
                 </div>
               </div>
-              {/* Opportunities Card */}
-              <div className="mx-auto max-w-2xl p-6 mt-12 shadow-lg rounded-xl">
+            
+              <Card className="mx-auto max-w-2xl p-6 mt-12 shadow-lg rounded-xl">
                 <div className="p-0">
                   <h3 className="text-xl font-bold mb-4">
                     Con Vigila trasformiamo questi numeri in opportunità:
@@ -227,7 +228,7 @@ const BaseHero = (props: BaseHeroI) => {
                     </li>
                   </ul>
                 </div>
-              </div>
+              </Card>
             </div>
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
