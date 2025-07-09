@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { BookingI } from "@/src/types/booking.types";
-import { Table, TableColsI, Button, Badge, LastUpdate } from "@/components";
+import { Table, Button, Badge, LastUpdate } from "@/components";
+import { TableColsI } from "@/components/table/table.components";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { amountDisplay, capitalize } from "@/src/utils/common.utils";

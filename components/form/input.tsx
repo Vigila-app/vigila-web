@@ -2,6 +2,7 @@
 
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { FormUtils } from "@/src/utils/form.utils";
+import { CogIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { FieldError } from "react-hook-form";
 
@@ -11,6 +12,7 @@ type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: FieldError;
   onChange?: (value: string | number) => void;
   role?: RolesEnum;
+  isLoading?: boolean;
 };
 
 const Input = (props: InputI) => {
@@ -25,6 +27,7 @@ const Input = (props: InputI) => {
     onChange,
     required = false,
     type = "text",
+    isLoading = false,
   } = props;
 
   return (
@@ -65,9 +68,13 @@ const Input = (props: InputI) => {
           onChange={({ currentTarget: { value } }) => onChange?.(value)}
         />
 
-        {icon ? (
+        {icon && !isLoading ? (
           <span className="min-w-10 inline-flex items-center justify-end text-gray-500">
             {icon}
+          </span>
+        ) : isLoading ? (
+          <span className="min-w-10 inline-flex items-center justify-end text-gray-500">
+            <CogIcon className="size-4 animate-spin text-gray-500" />
           </span>
         ) : null}
 

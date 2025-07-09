@@ -16,7 +16,11 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, ["page", "pageSize", "vigil_id"]);
+    const filters = getQueryParams(url, [
+      "page",
+      "pageSize",
+      "vigil_id",
+    ]);
     const { orderBy = "created_at", orderDirection = "DESC" } = filters;
 
     console.log(`API GET services`, filters, pagination);
@@ -28,12 +32,26 @@ export async function GET(req: NextRequest) {
         success: false,
       });
 
+    if (
+      userObject.user_metadata?.role === RolesEnum.CONSUMER &&
+      !filters.postalCode
+    ) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
     const _admin = getAdminClient();
     let db_query = _admin.from("services").select("*", { count: "exact" });
 
     if (Object.keys(filters).length) {
       Object.keys(filters).forEach((key) => {
-        if (key !== "orderBy" && key !== "orderDirection") {
+        if (
+          key !== "orderBy" &&
+          key !== "orderDirection" &&
+          key !== "postalCode"
+        ) {
           db_query = db_query.eq(key, filters[key]);
         }
       });
@@ -44,6 +62,10 @@ export async function GET(req: NextRequest) {
       !filters.vigil_id
     ) {
       db_query = db_query.eq("vigil_id", userObject.id);
+    }
+
+    if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
+      db_query = db_query.contains("postalCode", [filters.postalCode]);
     }
 
     if (orderBy) {

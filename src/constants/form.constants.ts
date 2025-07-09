@@ -2,7 +2,7 @@ import { FormFieldRegex } from "@/src/types/form.types";
 
 export const RegexType = {
   ANAGRAPHIC_STRING: new RegExp(/^[a-zA-Zàéèìòù\ \-\'\.\,]{2,30}$/g),
-  ANAGRAPHIC_ALPHANUMERIC: new RegExp(/^[0-9a-zA-Zàéèìòù\ \-\']$/g),
+  ANAGRAPHIC_ALPHANUMERIC: new RegExp(/^[0-9a-zA-Zàéèìòù \-',]+$/g),
   ANAGRAPHIC_USERNAME: new RegExp(/^[a-zA-Z0-9\_\-]{4,30}$/g),
   NUMBER: new RegExp(/^[0-9\.]$/g),
   CODE: new RegExp(/^[a-zA-Z0-9\!\_\-]{3,30}$/g),

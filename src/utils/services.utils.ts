@@ -12,4 +12,14 @@ export const ServicesUtils = {
         reject(error);
       }
     }),
+  getServiceUnitType: (unitType: string) => {
+    switch (unitType) {
+      case "hours":
+        return "ora";
+      case "days":
+        return "giorno";
+      default:
+        return unitType;
+    }
+  },
 };

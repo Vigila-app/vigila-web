@@ -43,6 +43,7 @@ const PlaygroundComponent = (props: { data?: any }) => {
       <div className="my-8">
         <h4>Map Integration</h4>
         <SearchAddress
+          location
           onSubmit={(address) => {
             console.log("Address selected:", address);
             if (address?.lat && address?.lon)

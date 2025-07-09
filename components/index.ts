@@ -17,7 +17,7 @@ import TabGroup from "./tabGroup/tabGroup";
 import Table from "./table/table.components";
 import Toast from "./toast/toast";
 import Tooltip from "./tooltip/tooltip";
-import Undraw from "./undraw/undraw.tsx";
+import Undraw from "./undraw/undraw";
 
 export {
   Accordion,
