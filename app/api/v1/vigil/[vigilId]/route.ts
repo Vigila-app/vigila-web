@@ -6,8 +6,6 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { SupabaseConstants } from "@/src/constants/supabase.constants";
-import { HeadersEnum } from "@/src/enums/headers.enums";
 
 export async function GET(
   req: Request,

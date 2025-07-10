@@ -55,9 +55,10 @@ export async function DELETE(
   context: { params: { bookingId: string } }
 ) {
   try {
-    console.log(`API DELETE bookings/${context?.params?.bookingId}`);
+    const { bookingId } = await context?.params;
+    console.log(`API DELETE bookings/${bookingId}`);
 
-    if (!context?.params?.bookingId) {
+    if (!bookingId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -71,20 +72,20 @@ export async function DELETE(
         success: false,
       });
 
-    await verifyBookingAccess(context.params.bookingId, userObject.id, userObject.user_metadata?.role);
+    await verifyBookingAccess(bookingId, userObject.id, userObject.user_metadata?.role);
     const _admin = getAdminClient();
 
     const { error } = await _admin
       .from("bookings")
       .delete()
-      .eq("id", context.params.bookingId);
+      .eq("id", bookingId);
       
     if (error) throw error;
 
     return NextResponse.json(
       {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
-        data: context.params.bookingId,
+        data: bookingId,
         success: true,
       },
       { status: 200 }
@@ -103,9 +104,12 @@ export async function GET(
   context: { params: { bookingId: string } }
 ) {
   try {
-    console.log(`API GET bookings/${context?.params?.bookingId}`);
+    const { bookingId } = await context?.params;
+    console.log(`API GET bookings/${bookingId}`);
 
-    if (!context?.params?.bookingId) {
+    // TODO fix params with async
+
+    if (!bookingId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -120,7 +124,7 @@ export async function GET(
       });
 
     await verifyBookingAccess(
-      context.params.bookingId,
+      bookingId,
       userObject.id,
       userObject.user_metadata?.role
     );
@@ -129,7 +133,7 @@ export async function GET(
     const { data: booking, error } = await _admin
       .from("bookings")
       .select("*")
-      .eq("id", context.params.bookingId)
+      .eq("id", bookingId)
       .single<BookingI>();
 
     if (error || !booking) throw error;
@@ -157,9 +161,10 @@ export async function PUT(
 ) {
   try {
     const { data: updatedBooking } = await req.json();
-    console.log(`API PUT bookings/${context?.params?.bookingId}`, updatedBooking);
+    const { bookingId } = await context?.params;
+    console.log(`API PUT bookings/${bookingId}`, updatedBooking);
 
-    if (!context?.params?.bookingId) {
+    if (!bookingId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -175,7 +180,7 @@ export async function PUT(
 
     if (
       !updatedBooking?.id ||
-      updatedBooking?.id !== context.params.bookingId
+      updatedBooking?.id !== bookingId
     ) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
@@ -184,7 +189,7 @@ export async function PUT(
     }
 
     const booking = await verifyBookingAccess(
-      context.params.bookingId,
+      bookingId,
       userObject.id,
       userObject.user_metadata?.role
     ) as BookingI;
