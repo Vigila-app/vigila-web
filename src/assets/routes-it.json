@@ -123,6 +123,32 @@
     "private": true,
     "roles": []
   },
+  "createBooking": {
+    "url": "/booking/create",
+    "label": "Nuova Prenotazione",
+    "title": "Nuova Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "paymentBooking": {
+    "url": "/booking/payment",
+    "label": "Paga Prenotazione",
+    "title": "Pagamento Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "crm": {
     "url": "/dashboard/crm",
     "label": "CRM",

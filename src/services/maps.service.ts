@@ -46,11 +46,12 @@ export const MapsService = {
               (result) =>
                 result?.lat &&
                 result?.lon &&
-                (result.addresstype === "road" ||
+                (((result.addresstype === "road" ||
                   result.addresstype === "village" ||
                   result.addresstype === "town" ||
                   result.addresstype === "suburb") &&
-                result.importance > 0.03 &&
+                  result.importance > 0.03) ||
+                  result.addresstype === "place") &&
                 result.address?.country_code === "it"
             )
             .sort((a, b) => {

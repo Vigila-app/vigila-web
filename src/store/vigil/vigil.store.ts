@@ -26,9 +26,10 @@ export const useVigilStore = create<ViglStoreType>()(
               const getVigilsDetailsBE = async () => {
                 try {
                   const promises = vigils
-                    .filter(
-                      (vigilId) =>
-                        !get().vigils.find((vigil) => vigil.id === vigilId)
+                    .filter((vigilId) =>
+                      !force
+                        ? vigilId
+                        : !get().vigils.find((vigil) => vigil.id === vigilId)
                     )
                     .map((vigilId) =>
                       ApiService.get<{ data: VigilDetailsType }>(

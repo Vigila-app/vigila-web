@@ -21,6 +21,7 @@ export type BookingI = {
   note?: string;
   created_at: Date;
   updated_at?: Date;
+  address: string;
 };
 
 export type BookingFormI = BookingI & {};

@@ -14,7 +14,7 @@ export default function AuthLayout({
 }) {
   const { user } = useUserStore();
 
-  if (user?.uid) redirect(Routes.home.url);
+  if (!(user?.id || user?.uid)) redirect(Routes.home.url);
 
   return (
     <>

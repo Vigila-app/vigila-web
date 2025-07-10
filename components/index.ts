@@ -12,6 +12,7 @@ import HeaderLight from "./header/headerLight";
 import LastUpdate from './lastUpdate/lastUpdate.component';
 import LoaderSpinner from "./loaderSpinner/loaderSpinner";
 import Logo from "./logo/logo";
+import ProgressBar from "./progressBar/progressBar.component";
 import SimplePage from "./simplePage/simplePage";
 import TabGroup from "./tabGroup/tabGroup";
 import Table from "./table/table.components";
@@ -34,6 +35,7 @@ export {
   LastUpdate,
   LoaderSpinner,
   Logo,
+  ProgressBar,
   SimplePage,
   TabGroup,
   Table,

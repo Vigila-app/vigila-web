@@ -1,19 +1,24 @@
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
+import { Controller, Form, useForm } from "react-hook-form";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { Input, Select, TextArea, InputQuantity } from "@/components/form";
-import { Button } from "@/components";
+import { Avatar, Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useEffect, useMemo, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
 import { amountDisplay } from "@/src/utils/common.utils";
-import { CurrencyEnum } from "@/src/enums/common.enums";
 import { useUserStore } from "@/src/store/user/user.store";
+import { ServicesUtils } from "@/src/utils/services.utils";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { FormFieldType } from "@/src/constants/form.constants";
+import { SearchAddress } from "../maps";
+import { useRouter } from "next/navigation";
+import { Routes } from "@/src/routes";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -36,16 +41,19 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     vigilId,
   } = props;
 
+  const router = useRouter();
+
   const {
     loader: { isLoading },
     hideLoader,
     showLoader,
     showToast,
   } = useAppStore();
-
   const { closeModal } = useModalStore();
-  const { services, getServiceDetails, getServices } = useServicesStore();
+  const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
 
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -59,6 +67,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   } = useForm<BookingFormI>({
     defaultValues: {
       ...booking,
+      address: booking?.address || user?.user_metadata?.address || "",
       service_id: booking?.service_id || serviceId,
       consumer_id: booking?.consumer_id || user?.id,
       quantity: booking?.quantity || 1,
@@ -67,23 +76,20 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
   const watchedServiceId = watch("service_id");
   const watchedDuration = watch("quantity");
-
-  useEffect(() => {
-    if (serviceId) getServiceDetails(serviceId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId]);
-
-  useEffect(() => {
-    if (vigilId) getServices(true, vigilId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vigilId]);
+  const watchedAddress = watch("address");
 
   useEffect(() => {
     if (serviceId) {
+      getServiceDetails(serviceId);
       setValue("service_id", serviceId as never);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId]);
+
+  useEffect(() => {
+    if (vigilId) getVigilsDetails([vigilId], true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vigilId]);
 
   useEffect(() => {
     if (watchedServiceId && services.length) {
@@ -120,20 +126,23 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         showLoader();
         const newBooking = await BookingsService.createBooking(formData);
 
-        showToast({
-          message: "Booking created successfully!",
-          type: ToastStatusEnum.SUCCESS,
-        });
+        // showToast({
+        //   message: "Prenotazione creata!",
+        //   type: ToastStatusEnum.SUCCESS,
+        // });
 
         onSubmit(newBooking);
 
         if (isModal) {
           closeModal();
+        } else {
+          router.push(`${Routes.paymentBooking.url}?bookingId=${newBooking.id}`);
         }
       } catch (error) {
         console.error("Error creating booking", error);
         showToast({
-          message: "Error creating booking. Please try again.",
+          message:
+            "Si è verificato un errore durante la creazione della prenotazione.",
           type: ToastStatusEnum.ERROR,
         });
       } finally {
@@ -157,16 +166,25 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
-        {title || text ? (
-          <div>
-            {title ? (
-              <h2 className="text-center font-medium text-xl">{title}</h2>
-            ) : null}
-            {text ? (
-              <p className="text-center text-sm text-gray-500 mt-2">{text}</p>
-            ) : null}
+        <div className="mb-4">
+          <h2 className="text-center font-medium text-xl">
+            {title || `Prenota con ${vigilDetails?.displayName}`}
+          </h2>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            {text || "Compila i dettagli per la tua prenotazione"}
+          </p>
+        </div>
+
+        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-blue-100 border border-blue-400 p-3">
+          <Avatar
+            size="big"
+            userId={vigilDetails?.id}
+            value={vigilDetails?.displayName}
+          />
+          <div className="flex-1">
+            <span>{vigilDetails?.displayName}</span>
           </div>
-        ) : null}
+        </div>
 
         <Controller
           name="service_id"
@@ -176,12 +194,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             serviceOptions.length > 1 ? (
               <Select
                 {...field}
-                label="Servizio"
+                label="Servizio richiesto"
                 placeholder="Seleziona un servizio"
                 required
                 error={errors.service_id}
                 options={serviceOptions}
-                disabled={!!serviceId}
+                disabled={!!selectedService?.id}
               />
             ) : (
               <Input
@@ -213,6 +231,18 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   ? new Date(field.value).toISOString().slice(0, 16)
                   : ""
               }
+              // set min to today and max to 3 months from today
+              min={new Date(
+                new Date(
+                  new Date().setHours(new Date().getHours() + 1)
+                ).setMinutes(0)
+              )
+                .toISOString()
+                .slice(0, 16)}
+              max={new Date(new Date().setMonth(new Date().getMonth() + 3))
+                .toISOString()
+                .slice(0, 16)}
+              step={1800} // 30 minutes
               onChange={(value) => field.onChange(new Date(value as string))}
             />
           )}
@@ -229,7 +259,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           render={({ field }) => (
             <InputQuantity
               {...field}
-              label="Quantità"
+              label={`Durata (${ServicesUtils.getServiceUnitType(
+                selectedService?.unit_type as string
+              )})`}
               min={selectedService?.min_unit || 1}
               max={selectedService?.max_unit || undefined}
               required
@@ -238,24 +270,33 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
         />
 
-        {selectedService && (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-900">Booking Summary</h3>
-            <div className="mt-2 space-y-1 text-sm text-gray-600">
-              <p>Service: {selectedService.name}</p>
-              <p>
-                Prezzo per {selectedService.unit_type}:{" "}
-                {selectedService.currency}{" "}
-                {amountDisplay(selectedService.unit_price)}
-              </p>
-              <p>
-                Quantità: {watchedDuration} {selectedService.unit_type}
-              </p>
-              <p className="font-medium text-gray-900">
-                Totale: {selectedService.currency} {amountDisplay(totalAmount)}
-              </p>
-            </div>
-          </div>
+        {watchedAddress ? (
+          <Controller
+            name="address"
+            control={control}
+            rules={{ required: true, ...FormFieldType.ADDRESS }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="Indirizzo"
+                placeholder="Inserisci l'indirizzo per il Vigil"
+                type="text"
+                disabled={!!watchedAddress}
+                required
+                error={errors.address}
+              />
+            )}
+          />
+        ) : (
+          <SearchAddress
+            onSubmit={(address) =>
+              address?.display_name
+                ? setValue("address", address.display_name)
+                : ""
+            }
+            label="Indirizzo"
+            placeholder="Inserisci l'indirizzo per il Vigil"
+          />
         )}
 
         <Controller
@@ -272,6 +313,34 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
         />
 
+        {selectedService && (
+          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <h3 className="font-medium text-gray-900">
+              Riepilogo Prenotazione
+            </h3>
+            <div className="mt-2 space-y-1 text-sm text-gray-600">
+              <p>
+                Servizio: {selectedService.name}
+                {watchedAddress && ` presso ${watchedAddress}`}
+              </p>
+              <p>
+                Prezzo per&nbsp;
+                {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+                :&nbsp;
+                {selectedService.currency}
+                {amountDisplay(selectedService.unit_price)}
+              </p>
+              <p>
+                Quantità: {watchedDuration}&nbsp;
+                {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+              </p>
+              <p className="font-medium text-gray-900">
+                Totale: {selectedService.currency} {amountDisplay(totalAmount)}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-4">
           {isModal && (
             <Button
@@ -286,7 +355,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             type="submit"
             primary
             full
-            label={booking ? "Aggiorna Prenotazione" : "Prenota"}
+            label={
+              booking ? "Aggiorna Prenotazione" : "Conferma e vai al pagamento"
+            }
             isLoading={isLoading}
           />
         </div>

@@ -78,6 +78,7 @@ const SearchAddress = (props: {
           submit(address);
         }
       } else {
+        console.error(isValid, formData, errors);
         throw new Error("Form is not valid");
       }
     } catch (error) {
@@ -183,7 +184,11 @@ const SearchAddress = (props: {
           </ul>
         </div>
       ) : null}
-      {submitted && !autocompleteResults.length ? <div>Perfavore perfeziona la ricerca</div>: null}
+      {submitted && !autocompleteResults.length ? (
+        <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
+      ) : !autocompleteResults.length && !isLoading ? (
+        <div className="text-gray-500">Nessun risultato trovato</div>
+      ) : null}
     </>
   );
 };

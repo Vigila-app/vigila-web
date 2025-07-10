@@ -7,91 +7,83 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
-import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import { ServiceI } from "@/src/types/services.types";
 
-const verifyBookingAccess = async (bookingId: string, userId: string, userRole: string) => {
+const verifyServiceAccess = async (serviceId: string) => {
   const _admin = getAdminClient();
   const { data, error } = await _admin
-    .from("bookings")
+    .from("services")
     .select("*")
-    .eq("id", bookingId)
+    .eq("id", serviceId)
     .single();
-    
+
   if (error)
     throw jsonErrorResponse(500, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
       success: false,
       error,
     });
-    
-  if (!data) 
+
+  if (!data)
     throw jsonErrorResponse(404, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_NOT_FOUND.code,
+      code: ResponseCodesConstants.SERVICES_DETAILS_NOT_FOUND.code,
       success: false,
     });
 
-  // Check access based on role
-  if (userRole === RolesEnum.CONSUMER && data.consumer_id !== userId) {
-    throw jsonErrorResponse(403, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
-      success: false,
-    });
-  }
-  
-  if (userRole === RolesEnum.VIGIL && data.vigil_id !== userId) {
-    throw jsonErrorResponse(403, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
-      success: false,
-    });
-  }
-  
   return data;
 };
 
 export async function DELETE(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: { serviceId: string } }
 ) {
   try {
-    console.log(`API DELETE bookings/${context?.params?.bookingId}`);
+    console.log(`API DELETE services/${context?.params?.serviceId}`);
 
-    if (!context?.params?.bookingId) {
+    if (!context?.params?.serviceId) {
       return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
       });
     }
-    
+
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER)
+    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.VIGIL)
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_UNAUTHORIZED.code,
         success: false,
       });
 
-    await verifyBookingAccess(context.params.bookingId, userObject.id, userObject.user_metadata?.role);
+    const service = await verifyServiceAccess(context.params.serviceId);
+
+    if (service.vigil_id !== userObject.id) {
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
+        success: false,
+      });
+    }
+
     const _admin = getAdminClient();
 
     const { error } = await _admin
-      .from("bookings")
+      .from("services")
       .delete()
-      .eq("id", context.params.bookingId);
-      
+      .eq("id", context.params.serviceId);
+
     if (error) throw error;
 
     return NextResponse.json(
       {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
-        data: context.params.bookingId,
+        code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
+        data: context.params.serviceId,
         success: true,
       },
       { status: 200 }
     );
   } catch (error) {
     return jsonErrorResponse(500, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
       success: false,
       error,
     });
@@ -100,57 +92,47 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: { serviceId: string } }
 ) {
   try {
-    console.log(`API GET bookings/${context?.params?.bookingId}`);
+    console.log(`API GET services/${context?.params?.serviceId}`);
 
-    if (!context?.params?.bookingId) {
+    if (!context?.params?.serviceId) {
       return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
       });
     }
-    
+
     const userObject = await authenticateUser(req);
     if (!userObject?.id)
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
         success: false,
       });
 
-    await verifyBookingAccess(
-      context.params.bookingId,
-      userObject.id,
-      userObject.user_metadata?.role
-    );
+    await verifyServiceAccess(context.params.serviceId);
 
     const _admin = getAdminClient();
-    const { data: booking, error } = await _admin
-      .from("bookings")
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
-      .eq("id", context.params.bookingId)
-      .single<BookingI>();
+    const { data: service, error } = await _admin
+      .from("services")
+      .select("*")
+      .eq("id", context.params.serviceId)
+      .single<ServiceI>();
 
-    if (error || !booking) throw error;
+    if (error || !service) throw error;
 
     return NextResponse.json(
       {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
-        data: booking,
+        code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
+        data: service,
         success: true,
       },
       { status: 200 }
     );
   } catch (error) {
     return jsonErrorResponse(500, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
       success: false,
       error,
     });
@@ -159,84 +141,77 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: { serviceId: string } }
 ) {
   try {
-    const { data: updatedBooking } = await req.json();
-    console.log(`API PUT bookings/${context?.params?.bookingId}`, updatedBooking);
+    const { data: updatedService } = await req.json();
+    console.log(
+      `API PUT services/${context?.params?.serviceId}`,
+      updatedService
+    );
 
-    if (!context?.params?.bookingId) {
+    if (!context?.params?.serviceId) {
       return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
       });
     }
-    
+
+    if (
+      !updatedService?.id ||
+      updatedService?.id !== context.params.serviceId
+    ) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
     const userObject = await authenticateUser(req);
     if (!userObject?.id)
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_UNAUTHORIZED.code,
         success: false,
       });
 
-    if (
-      !updatedBooking?.id ||
-      updatedBooking?.id !== context.params.bookingId
-    ) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
+    const service = (await verifyServiceAccess(
+      context.params.serviceId
+    )) as ServiceI;
+
+    if (service.vigil_id !== userObject.id) {
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.SERVICES_DETAILS_FORBIDDEN.code,
         success: false,
       });
     }
-
-    const booking = await verifyBookingAccess(
-      context.params.bookingId,
-      userObject.id,
-      userObject.user_metadata?.role
-    ) as BookingI;
 
     const _admin = getAdminClient();
 
     // Only allow certain fields to be updated based on user role
     let allowedUpdates = {};
-    if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
-      // Consumers can only update certain fields and only if booking is pending
-      if (booking.status === BookingStatusEnum.PENDING) {
-        allowedUpdates = {
-          service_date: updatedBooking.service_date,
-          duration_hours: updatedBooking.duration_hours,
-          notes: updatedBooking.notes,
-        };
-      }
-    } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
+    if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       // Vigils can update status and notes
       allowedUpdates = {
-        status: updatedBooking.status,
-        notes: updatedBooking.notes,
+        status: updatedService.status,
+        notes: updatedService.notes,
       };
     }
 
     const { data, error } = await _admin
-      .from("bookings")
+      .from("services")
       .update({
-        ...deepMerge(booking, allowedUpdates),
+        ...deepMerge(service, allowedUpdates),
         updated_at: getPostgresTimestamp(),
       })
-      .eq("id", updatedBooking.id)
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
-      .single<BookingI>();
+      .eq("id", updatedService.id)
+      .select("*")
+      .single<ServiceI>();
 
     if (error || !data) throw error;
 
     return NextResponse.json(
       {
-        code: ResponseCodesConstants.BOOKINGS_DETAILS_SUCCESS.code,
+        code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
         data,
         success: true,
       },
@@ -244,7 +219,7 @@ export async function PUT(
     );
   } catch (error) {
     return jsonErrorResponse(500, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
+      code: ResponseCodesConstants.SERVICES_DETAILS_ERROR.code,
       success: false,
       error,
     });
