@@ -128,13 +128,7 @@ export async function GET(
     const _admin = getAdminClient();
     const { data: booking, error } = await _admin
       .from("bookings")
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
+      .select("*")
       .eq("id", context.params.bookingId)
       .single<BookingI>();
 

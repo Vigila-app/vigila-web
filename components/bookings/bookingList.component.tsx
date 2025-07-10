@@ -1,18 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { BookingI } from "@/src/types/booking.types";
 import { Table, Button, Badge, LastUpdate } from "@/components";
 import { TableColsI } from "@/components/table/table.components";
 import { useModalStore } from "@/src/store/modal/modal.store";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { amountDisplay, capitalize } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { ServicesUtils } from "@/src/utils/services.utils";
+import { Routes } from "@/src/routes";
+import { useRouter } from "next/navigation";
 
 const BookingListComponent = () => {
+  const router = useRouter();
   const { bookings, getBookings, lastUpdate } = useBookingsStore();
   const { openModal } = useModalStore();
   const { user } = useUserStore();
@@ -115,12 +122,14 @@ const BookingListComponent = () => {
   const rows = bookings.map((booking: BookingI) => ({
     id: booking.id,
     service_name: booking.service?.name || "Unknown Service",
-    service_date: dateDisplay(booking.service_date, "date"),
-    service_dateValue: new Date(booking.service_date).getTime(),
-    duration_hours: `${booking.duration_hours}h`,
-    duration_hoursValue: booking.duration_hours,
-    total_amount: `${booking.currency} ${amountDisplay(booking.total_amount)}`,
-    total_amountValue: booking.total_amount,
+    service_date: dateDisplay(booking.startDate, "date"),
+    service_dateValue: new Date(booking.startDate).getTime(),
+    duration_hours: booking.quantity,
+    duration_hoursValue: booking.quantity,
+    total_amount: `${booking.service?.currency} ${amountDisplay(
+      booking.price * booking.quantity
+    )}`,
+    total_amountValue: booking.price * booking.quantity,
     status: (
       <Badge
         label={capitalize(booking.status)}
@@ -128,15 +137,26 @@ const BookingListComponent = () => {
       />
     ),
     statusValue: booking.status,
-    vigil_name: booking.vigil?.user_metadata?.displayName || "Unknown",
-    consumer_name: booking.consumer?.user_metadata?.displayName || "Unknown",
+    vigil_name: booking.vigil?.displayName || "Unknown",
+    consumer_name: booking.consumer?.displayName || "Unknown",
     actions: (
       <div className="flex gap-2">
         <Button
           text
-          label="View"
+          label="Dettagli"
           action={() => openModal("booking-details", { bookingId: booking.id })}
         />
+        {booking.payment_status === PaymentStatusEnum.PENDING && isConsumer && (
+          <Button
+            text
+            label="Paga ora"
+            action={() =>
+              router.push(
+                `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+              )
+            }
+          />
+        )}
         {booking.status === BookingStatusEnum.PENDING && isConsumer && (
           <Button
             text
@@ -152,9 +172,9 @@ const BookingListComponent = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Bookings</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Prenotazioni</h2>
           <p className="text-gray-600">
-            {isConsumer ? "Your bookings" : "Bookings for your services"}
+            {isConsumer ? "Le tue prenotazioni" : "Prenotazioni ricevute"}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -162,19 +182,12 @@ const BookingListComponent = () => {
             lastUpdate={lastUpdate || new Date()}
             onUpdate={() => handleGetBookings(true)}
           />
-          {isConsumer && (
-            <Button
-              primary
-              label="New Booking"
-              action={() => openModal("booking-form", { vigilId: "b21de488-b143-443d-920f-a8668d895162" })}
-            />
-          )}
         </div>
       </div>
 
       {loading && !bookings.length ? (
         <div className="text-center py-8">
-          <p className="text-gray-500">Loading bookings...</p>
+          <p className="text-gray-500">Recupero le prenotazioni...</p>
         </div>
       ) : (
         <Table cols={cols} rows={rows} />

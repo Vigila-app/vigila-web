@@ -14,7 +14,7 @@ const LastUpdate = (props: LastUpdateI) => {
         <ArrowPathIcon className="size-4" />
       </button>
       <span className="hidden md:block">
-        Last update:
+        Ultimo aggiornamento:
         {lastUpdate && isValidDate(lastUpdate as Date)
           ? new Date(lastUpdate).toLocaleString()
           : "-"}
