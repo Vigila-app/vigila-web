@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { useServicesStore } from "@/src/store/services/services.store";
-import { get } from "http";
 
 const BookingListComponent = () => {
   const router = useRouter();
@@ -48,10 +47,12 @@ const BookingListComponent = () => {
         getConsumersDetails(uniqueConsumerIds);
       }
 
-      const uniqueVigilIds = Array.from(
-        new Set(bookings.map((b) => b.vigil_id))
-      );
-      getVigilsDetails(uniqueVigilIds);
+      if (user?.user_metadata?.role === RolesEnum.CONSUMER) {
+        const uniqueVigilIds = Array.from(
+          new Set(bookings.map((b) => b.vigil_id))
+        );
+        getVigilsDetails(uniqueVigilIds);
+      }
 
       Array.from(new Set(bookings.map((b) => b.service_id))).forEach(
         (serviceId) => getServiceDetails(serviceId)
@@ -66,7 +67,10 @@ const BookingListComponent = () => {
     user?.user_metadata?.role === RolesEnum.CONSUMER
       ? user.user_metadata
       : consumers.find((c) => c.id === consumerId);
-  const getVigil = (vigilId: string) => vigils.find((v) => v.id === vigilId);
+  const getVigil = (vigilId: string) =>
+    user?.user_metadata?.role === RolesEnum.VIGIL
+      ? user.user_metadata
+      : vigils.find((v) => v.id === vigilId);
 
   const handleGetBookings = async (force = false) => {
     setLoading(true);

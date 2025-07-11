@@ -58,7 +58,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   }, [bookingId]);
 
   useEffect(() => {
-    if (booking?.vigil_id) getVigilsDetails([booking?.vigil_id]);
+    if (booking?.vigil_id && user?.user_metadata?.role === RolesEnum.CONSUMER)
+      getVigilsDetails([booking?.vigil_id]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.vigil_id]);
 
@@ -242,7 +243,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               {isConsumer ? (
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
-                    <Avatar userId={vigil?.id} />
+                    <Avatar userId={vigil?.id} value={vigil?.displayName} />
                     <span className="font-medium flex-1">
                       {vigil?.displayName}
                     </span>
@@ -251,7 +252,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               ) : (
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
-                    <Avatar userId={consumer?.id} />
+                    <Avatar userId={consumer?.id} value={consumer?.displayName} />
                     <span className="font-medium flex-1">
                       {consumer?.displayName}
                     </span>
@@ -275,6 +276,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <>
             <Button
               primary
+              disabled={booking.payment_status !== PaymentStatusEnum.PAID}
               label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
