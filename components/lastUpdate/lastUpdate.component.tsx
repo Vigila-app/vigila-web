@@ -1,3 +1,5 @@
+"use client";
+
 import { isValidDate } from "@/src/utils/date.utils";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 

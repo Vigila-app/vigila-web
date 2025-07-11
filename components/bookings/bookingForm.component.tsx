@@ -136,7 +136,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         if (isModal) {
           closeModal();
         } else {
-          router.push(`${Routes.paymentBooking.url}?bookingId=${newBooking.id}`);
+          router.push(
+            `${Routes.paymentBooking.url}?bookingId=${newBooking.id}`
+          );
         }
       } catch (error) {
         console.error("Error creating booking", error);
@@ -270,34 +272,16 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
         />
 
-        {watchedAddress ? (
-          <Controller
-            name="address"
-            control={control}
-            rules={{ required: true, ...FormFieldType.ADDRESS }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                label="Indirizzo"
-                placeholder="Inserisci l'indirizzo per il Vigil"
-                type="text"
-                disabled={!!watchedAddress}
-                required
-                error={errors.address}
-              />
-            )}
-          />
-        ) : (
-          <SearchAddress
-            onSubmit={(address) =>
-              address?.display_name
-                ? setValue("address", address.display_name)
-                : ""
-            }
-            label="Indirizzo"
-            placeholder="Inserisci l'indirizzo per il Vigil"
-          />
-        )}
+        <SearchAddress
+          location
+          onSubmit={(address) =>
+            address?.display_name
+              ? setValue("address", address.display_name)
+              : ""
+          }
+          label="Indirizzo"
+          placeholder="Inserisci l'indirizzo per il Vigil"
+        />
 
         <Controller
           name="note"
