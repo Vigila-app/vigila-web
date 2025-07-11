@@ -87,7 +87,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                 !get().lastUpdate ||
                 dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
               ) {
-                const bookingStoreBE = await getBookingDetailsBE();
+                const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
                 if (bookingStoreBE?.id) {
                   resolve(bookingStoreBE);
                 }
@@ -99,7 +99,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                 if (bookingStore?.id) {
                   resolve(bookingStore);
                 } else {
-                  const bookingStoreBE = await getBookingDetailsBE();
+                  const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
                   if (bookingStoreBE?.id) {
                     resolve(bookingStoreBE);
                   }

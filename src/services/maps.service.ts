@@ -41,17 +41,28 @@ export const MapsService = {
           addressdetails: 1,
         })) as { data: any[] };
         if (response?.data?.length) {
-          const results = response.data.filter(
-            (result) =>
-              result?.lat &&
-              result?.lon &&
-              (result.addresstype === "road" ||
-                result.addresstype === "village" ||
-                result.addresstype === "town" ||
-                result.addresstype === "quarter") &&
-              result.importance > 0.03 &&
-              result.address?.country_code === "it"
-          );
+          const results = response.data
+            .filter(
+              (result) =>
+                result?.lat &&
+                result?.lon &&
+                (((result.addresstype === "road" ||
+                  result.addresstype === "village" ||
+                  result.addresstype === "town" ||
+                  result.addresstype === "suburb") &&
+                  result.importance > 0.03) ||
+                  result.addresstype === "place") &&
+                result.address?.country_code === "it"
+            )
+            .sort((a, b) => {
+              if (a.importance > b.importance) {
+                return -1;
+              } else if (a.importance < b.importance) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
           resolve(results);
         } else {
           reject(

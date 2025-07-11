@@ -35,15 +35,13 @@ export type UserClaimsType = {
   level: AccessLevelsEnum;
 };
 
-export type UserType =
-  | {
-      email: string;
-      id: string;
-      displayName?: string;
-      photoURL?: string;
-      user_metadata?: UserMetadata;
-    }
-  | undefined;
+export type UserType = {
+  email: string;
+  id: string;
+  displayName?: string;
+  photoURL?: string;
+  user_metadata?: UserMetadata;
+};
 
 export type UserSignupType = UserType & {
   id?: string;
