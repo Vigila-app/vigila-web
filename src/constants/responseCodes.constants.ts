@@ -394,6 +394,27 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   // endregion SALES
 
+  // region CONSUMER
+  CONSUMER_DETAILS_SUCCESS: {
+    code: 7801,
+  },
+  CONSUMER_DETAILS_ERROR: {
+    code: 7802,
+  },
+  CONSUMER_DETAILS_BAD_REQUEST: {
+    code: 7803,
+  },
+  CONSUMER_DETAILS_UNAUTHORIZED: {
+    code: 7804,
+  },
+  CONSUMER_DETAILS_FORBIDDEN: {
+    code: 7805,
+  },
+  CONSUMER_DETAILS_METHOD_NOT_ALLOWED: {
+    code: 7806,
+  },
+  // endregion CONSUMER
+
   // region VIGIL
   VIGIL_DETAILS_SUCCESS: {
     code: 7901,

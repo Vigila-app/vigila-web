@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
-import { Button, Badge } from "@/components";
+import { Button, Badge, Avatar } from "@/components";
 import {
   BookingStatusEnum,
   PaymentStatusEnum,
@@ -18,6 +18,10 @@ import { useModalStore } from "@/src/store/modal/modal.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { useServicesStore } from "@/src/store/services/services.store";
+import { useConsumerStore } from "@/src/store/consumer/consumer.store";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -27,36 +31,47 @@ type BookingDetailsComponentI = {
 const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   const { bookingId, onUpdate = () => ({}) } = props;
   const router = useRouter();
-  const [booking, setBooking] = useState<BookingI | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { showToast, showLoader, hideLoader } = useAppStore();
+  const {
+    showToast,
+    showLoader,
+    hideLoader,
+    loader: { isLoading },
+  } = useAppStore();
+  const { bookings, getBookingDetails } = useBookingsStore();
+  const { consumers, getConsumersDetails } = useConsumerStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
+
+  const booking = bookings.find((b) => b.id === bookingId);
+  const service = services.find((s) => s.id === booking?.service_id);
+  const vigil = vigils.find((v) => v.id === booking?.vigil_id);
+  const consumer = consumers.find((c) => c.id === booking?.consumer_id);
 
   const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
 
   useEffect(() => {
-    loadBookingDetails();
+    if (bookingId) getBookingDetails(bookingId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
-  const loadBookingDetails = async () => {
-    try {
-      setLoading(true);
-      const bookingDetails = await BookingsService.getBookingDetails(bookingId);
-      setBooking(bookingDetails);
-    } catch (error) {
-      console.error("Error loading booking details", error);
-      showToast({
-        message:
-          "Si è verificato un errore durante il caricamento dei dettagli della prenotazione",
-        type: ToastStatusEnum.ERROR,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (booking?.vigil_id) getVigilsDetails([booking?.vigil_id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking?.vigil_id]);
+
+  useEffect(() => {
+    if (booking?.service_id) getServiceDetails(booking?.service_id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking?.service_id]);
+
+  useEffect(() => {
+    if (booking?.consumer_id && user?.user_metadata?.role === RolesEnum.VIGIL)
+      getConsumersDetails([booking?.consumer_id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking?.consumer_id]);
 
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
     if (!booking) return;
@@ -67,7 +82,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         booking.id,
         status
       );
-      setBooking(updatedBooking);
+      getBookingDetails(bookingId, true);
       onUpdate(updatedBooking);
 
       showToast({
@@ -135,7 +150,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">
@@ -173,19 +188,22 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <div>
             <h3 className="font-medium text-gray-900">Servizio prenotato</h3>
             <div className="mt-2 space-y-2 text-sm">
-              <p>{booking.service?.name}</p>
+              <p>{service?.name}</p>
               <p>
-                <span className="font-medium">Descrizione:</span>{" "}
-                {booking.service?.description}
+                <span className="font-medium">Descrizione:</span>&nbsp;
+                {service?.description}
               </p>
               <p>
                 <span className="font-medium">
-                  Prezzo per{" "}
-                  {ServicesUtils.getServiceUnitType(booking.service?.unit_type)}
+                  Prezzo per&nbsp;
+                  {ServicesUtils.getServiceUnitType(
+                    service?.unit_type as string
+                  )}
                   :
-                </span>{" "}
-                {booking.service?.currency}{" "}
-                {amountDisplay(booking.service?.price || 0)}
+                </span>
+                &nbsp;
+                {service?.currency}
+                {amountDisplay(service?.unit_price || 0)}
               </p>
             </div>
           </div>
@@ -200,7 +218,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               <p>
                 <span className="font-medium">Durata:</span> {booking.quantity}
                 &nbsp;
-                {ServicesUtils.getServiceUnitType(booking.service?.unit_type)}
+                {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>{" "}
@@ -209,7 +227,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>{" "}
-                {capitalize(booking.payment_status)}
+                {capitalize(booking.payment_status as string)}
               </p>
             </div>
           </div>
@@ -223,24 +241,20 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             <div className="mt-2 space-y-2 text-sm">
               {isConsumer ? (
                 <>
-                  <p>
-                    <span className="font-medium">Nome:</span>{" "}
-                    {booking.vigil?.displayName}
-                  </p>
-                  <p>
-                    <span className="font-medium">Email:</span>{" "}
-                    {booking.vigil?.email}
+                  <p className="inline-flex items-center flex-nowrap gap-2">
+                    <Avatar userId={vigil?.id} />
+                    <span className="font-medium flex-1">
+                      {vigil?.displayName}
+                    </span>
                   </p>
                 </>
               ) : (
                 <>
-                  <p>
-                    <span className="font-medium">Nome:</span>{" "}
-                    {booking.consumer?.displayName}
-                  </p>
-                  <p>
-                    <span className="font-medium">Email:</span>{" "}
-                    {booking.consumer?.email}
+                  <p className="inline-flex items-center flex-nowrap gap-2">
+                    <Avatar userId={consumer?.id} />
+                    <span className="font-medium flex-1">
+                      {consumer?.displayName}
+                    </span>
                   </p>
                 </>
               )}

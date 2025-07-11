@@ -39,9 +39,10 @@ export async function DELETE(
   context: { params: { serviceId: string } }
 ) {
   try {
-    console.log(`API DELETE services/${context?.params?.serviceId}`);
+    const { serviceId } = await context?.params;
+    console.log(`API DELETE services/${serviceId}`);
 
-    if (!context?.params?.serviceId) {
+    if (!serviceId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -55,7 +56,7 @@ export async function DELETE(
         success: false,
       });
 
-    const service = await verifyServiceAccess(context.params.serviceId);
+    const service = await verifyServiceAccess(serviceId);
 
     if (service.vigil_id !== userObject.id) {
       return jsonErrorResponse(403, {
@@ -69,14 +70,14 @@ export async function DELETE(
     const { error } = await _admin
       .from("services")
       .delete()
-      .eq("id", context.params.serviceId);
+      .eq("id", serviceId);
 
     if (error) throw error;
 
     return NextResponse.json(
       {
         code: ResponseCodesConstants.SERVICES_DETAILS_SUCCESS.code,
-        data: context.params.serviceId,
+        data: serviceId,
         success: true,
       },
       { status: 200 }
@@ -95,9 +96,10 @@ export async function GET(
   context: { params: { serviceId: string } }
 ) {
   try {
-    console.log(`API GET services/${context?.params?.serviceId}`);
+    const { serviceId } = await context?.params;
+    console.log(`API GET services/${serviceId}`);
 
-    if (!context?.params?.serviceId) {
+    if (!serviceId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -111,13 +113,13 @@ export async function GET(
         success: false,
       });
 
-    await verifyServiceAccess(context.params.serviceId);
+    await verifyServiceAccess(serviceId);
 
     const _admin = getAdminClient();
     const { data: service, error } = await _admin
       .from("services")
       .select("*")
-      .eq("id", context.params.serviceId)
+      .eq("id", serviceId)
       .single<ServiceI>();
 
     if (error || !service) throw error;
@@ -145,12 +147,13 @@ export async function PUT(
 ) {
   try {
     const { data: updatedService } = await req.json();
+    const { serviceId } = await context?.params;
     console.log(
-      `API PUT services/${context?.params?.serviceId}`,
+      `API PUT services/${serviceId}`,
       updatedService
     );
 
-    if (!context?.params?.serviceId) {
+    if (!serviceId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
         success: false,
@@ -159,7 +162,7 @@ export async function PUT(
 
     if (
       !updatedService?.id ||
-      updatedService?.id !== context.params.serviceId
+      updatedService?.id !== serviceId
     ) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
@@ -175,7 +178,7 @@ export async function PUT(
       });
 
     const service = (await verifyServiceAccess(
-      context.params.serviceId
+      serviceId
     )) as ServiceI;
 
     if (service.vigil_id !== userObject.id) {

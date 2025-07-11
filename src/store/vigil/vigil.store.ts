@@ -27,7 +27,13 @@ export const useVigilStore = create<ViglStoreType>()(
                 try {
                   const promises = vigils
                     .filter((vigilId) =>
-                      !force
+                      force ||
+                      !get().lastUpdate ||
+                      dateDiff(
+                        new Date(),
+                        get().lastUpdate,
+                        FrequencyEnum.MINUTES
+                      ) > 15
                         ? vigilId
                         : !get().vigils.find((vigil) => vigil.id === vigilId)
                     )
@@ -74,34 +80,13 @@ export const useVigilStore = create<ViglStoreType>()(
                   reject(error);
                 }
               };
-
-              if (
-                force ||
-                !get().lastUpdate ||
-                dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) >
-                  15
-              ) {
-                // TODO retrieve vigils details from BE
-                const vigilsDetailsStoreBE =
-                  (await getVigilsDetailsBE()) as unknown as VigilDetailsType[];
-                if (vigilsDetailsStoreBE) {
-                  resolve(vigilsDetailsStoreBE);
-                }
-                reject();
-              } else {
-                const vigilsDetailsStore = get().vigils;
-                if (vigilsDetailsStore) {
-                  resolve(vigilsDetailsStore);
-                } else {
-                  // TODO retrieve vigils details from BE
-                  const vigilsDetailsStoreBE =
-                    (await getVigilsDetailsBE()) as unknown as VigilDetailsType[];
-                  if (vigilsDetailsStoreBE) {
-                    resolve(vigilsDetailsStoreBE);
-                  }
-                  reject();
-                }
+              // TODO retrieve vigils details from BE
+              const vigilsDetailsStoreBE =
+                (await getVigilsDetailsBE()) as unknown as VigilDetailsType[];
+              if (vigilsDetailsStoreBE) {
+                resolve(vigilsDetailsStoreBE);
               }
+              reject();
             } catch (error) {
               reject(error);
             }

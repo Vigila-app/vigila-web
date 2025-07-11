@@ -9,6 +9,7 @@ import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { VigilDetailsType } from "../types/vigil.types";
+import { ConsumerDetailsType } from "../types/consumer.types";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -90,6 +91,10 @@ const apiControllers = {
   ONBOARD: (isMock?: boolean): string => `${apiBase.V1(isMock)}/onboard`,
   // endregion ONBOARD
 
+  // region CONSUMER
+  CONSUMER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/consumer`,
+  // endregion CONSUMER
+
   // region VIGIL
   VIGIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/vigil`,
   // endregion VIGIL
@@ -164,6 +169,11 @@ export const apiMaps = {
 export const apiCheckout = {
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     apiControllers.INTENT(paymentIntentId, isMock),
+};
+
+export const apiConsumer = {
+  DETAILS: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}`,
 };
 
 export const apiVigil = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { BookingI } from "@/src/types/booking.types";
 import { Table, Button, Badge, LastUpdate } from "@/components";
@@ -14,13 +14,19 @@ import { amountDisplay, capitalize } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ServicesUtils } from "@/src/utils/services.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
+import { useConsumerStore } from "@/src/store/consumer/consumer.store";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { useServicesStore } from "@/src/store/services/services.store";
+import { get } from "http";
 
 const BookingListComponent = () => {
   const router = useRouter();
   const { bookings, getBookings, lastUpdate } = useBookingsStore();
+  const { consumers, getConsumersDetails } = useConsumerStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const { services, getServiceDetails } = useServicesStore();
   const { openModal } = useModalStore();
   const { user } = useUserStore();
   const [loading, setLoading] = useState(false);
@@ -32,6 +38,35 @@ const BookingListComponent = () => {
     handleGetBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (bookings?.length) {
+      if (user?.user_metadata?.role === RolesEnum.VIGIL) {
+        const uniqueConsumerIds = Array.from(
+          new Set(bookings.map((b) => b.consumer_id))
+        );
+        getConsumersDetails(uniqueConsumerIds);
+      }
+
+      const uniqueVigilIds = Array.from(
+        new Set(bookings.map((b) => b.vigil_id))
+      );
+      getVigilsDetails(uniqueVigilIds);
+
+      Array.from(new Set(bookings.map((b) => b.service_id))).forEach(
+        (serviceId) => getServiceDetails(serviceId)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookings]);
+
+  const getService = (serviceId: string) =>
+    services.find((s) => s.id === serviceId);
+  const getConsumer = (consumerId: string) =>
+    user?.user_metadata?.role === RolesEnum.CONSUMER
+      ? user.user_metadata
+      : consumers.find((c) => c.id === consumerId);
+  const getVigil = (vigilId: string) => vigils.find((v) => v.id === vigilId);
 
   const handleGetBookings = async (force = false) => {
     setLoading(true);
@@ -121,24 +156,24 @@ const BookingListComponent = () => {
 
   const rows = bookings.map((booking: BookingI) => ({
     id: booking.id,
-    service_name: booking.service?.name || "Unknown Service",
+    service_name: getService(booking.service_id)?.name || "Unknown Service",
     service_date: dateDisplay(booking.startDate, "date"),
     service_dateValue: new Date(booking.startDate).getTime(),
     duration_hours: booking.quantity,
     duration_hoursValue: booking.quantity,
-    total_amount: `${booking.service?.currency} ${amountDisplay(
+    total_amount: `${getService(booking.service_id)?.currency} ${amountDisplay(
       booking.price * booking.quantity
     )}`,
     total_amountValue: booking.price * booking.quantity,
     status: (
       <Badge
-        label={capitalize(booking.status)}
-        color={getStatusColor(booking.status)}
+        label={capitalize(booking.status as string)}
+        color={getStatusColor(booking.status as BookingStatusEnum)}
       />
     ),
     statusValue: booking.status,
-    vigil_name: booking.vigil?.displayName || "Unknown",
-    consumer_name: booking.consumer?.displayName || "Unknown",
+    vigil_name: getVigil(booking.vigil_id)?.displayName || "Unknown",
+    consumer_name: getConsumer(booking.consumer_id)?.displayName || "Unknown",
     actions: (
       <div className="flex gap-2">
         <Button
