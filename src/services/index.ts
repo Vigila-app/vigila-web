@@ -4,6 +4,7 @@ import { BookingsService } from "./bookings.service";
 import { CmsService } from "./cms.service";
 import { CrmService } from "./crm.service";
 import { MapsService } from "./maps.service";
+import { PaymentService } from "./payment.service";
 import { RecaptchaService } from "./recaptcha.service";
 import { ServicesService } from "./services.service";
 import { UserService } from "./user.service";
@@ -15,6 +16,7 @@ export {
   CmsService,
   CrmService,
   MapsService,
+  PaymentService,
   RecaptchaService,
   ServicesService,
   UserService,
