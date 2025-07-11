@@ -1,17 +1,16 @@
 import { ServiceI } from "@/src/types/services.types";
 
 export const ServicesUtils = {
-  createNewService: async (newService: ServiceI) =>
-    new Promise<ServiceI>(async (resolve, reject) => {
-      try {
-        resolve({
-          ...newService,
-          updated_at: new Date(),
-        });
-      } catch (error) {
-        reject(error);
-      }
-    }),
+  createNewService: async (newService: ServiceI) => {
+    try {
+      return {
+        ...newService,
+        updated_at: new Date(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
   getServiceUnitType: (unitType: string) => {
     switch (unitType) {
       case "hours":
