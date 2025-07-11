@@ -86,8 +86,6 @@ const ServiceFormComponent = (props: ServiceFormI) => {
 
   if (user?.user_metadata?.role !== RolesEnum.VIGIL) return null;
 
-  console.log("errors", errors);
-
   return (
     <div
       className={clsx(
