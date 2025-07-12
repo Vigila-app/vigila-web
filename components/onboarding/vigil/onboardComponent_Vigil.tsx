@@ -114,8 +114,9 @@ const OnboardComponent = () => {
         type: ToastStatusEnum.ERROR,
       });
     }
+    
   };
-
+console.log(addresses);
   return (
     <div className="w-full p-6">
       <Card>
@@ -202,7 +203,9 @@ const OnboardComponent = () => {
               render={() => (
                 <div>
                   <SearchAddress
+                  
                     onSubmit={(address) => {
+                      console.log("testo", address);
                       setAddresses((prev) => [...prev, address]);
                     }}
                     label="Cerca gli indirizzi dove vuoi lavorare"

@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const informazioniTab = () => {
-  const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
+  const { user, userDetails, } = useUserStore();
   const { showToast } = useAppStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const email: string = user?.email || "";
@@ -101,7 +101,7 @@ const informazioniTab = () => {
   };
   return (
     <Card>
-      <h2>Informazioni personali</h2>
+      <h2 className="text-vigil-orange">Informazioni personali</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="name"
@@ -114,6 +114,7 @@ const informazioniTab = () => {
               placeholder="Enter name"
               type="text"
               required
+              role={role}
               autoComplete="given-name"
               aria-invalid={!!errors.name}
               error={errors.name}
@@ -131,6 +132,7 @@ const informazioniTab = () => {
               placeholder="Enter last name"
               type="text"
               required
+              role={role}
               autoComplete="family-name"
               aria-invalid={!!errors.surname}
               error={errors.surname}
@@ -148,6 +150,7 @@ const informazioniTab = () => {
               placeholder="La tua data di nascita"
               type="text"
               required
+              role={role}
               aria-invalid={!!errors.birthday}
               error={errors.birthday}
             />
@@ -164,6 +167,7 @@ const informazioniTab = () => {
               placeholder="la tua email"
               type="text"
               required
+              role={role}
               autoComplete="email"
               aria-invalid={!!errors.email}
               error={errors.email}
@@ -181,6 +185,7 @@ const informazioniTab = () => {
               placeholder="cellulare"
               type="text"
               required
+              role={role}
               aria-invalid={!!errors.phone}
               error={errors.phone}
             />
