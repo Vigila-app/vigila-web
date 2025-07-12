@@ -1,8 +1,7 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
 import { HeadersEnum } from "@/src/enums/headers.enums";
 import { useAppStore } from "@/src/store/app/app.store";
-import { ProviderEnum, RecaptchaActionEnum } from "@/src/enums/common.enums";
-import { ToastStatusEnum } from "@/src/enums/toast.enum";
+import { RecaptchaActionEnum } from "@/src/enums/common.enums";
 import { ApiService, RecaptchaService, UserService } from "@/src/services";
 import { UserTermsType } from "@/src/types/user.types";
 import { useModalStore } from "@/src/store/modal/modal.store";
@@ -14,6 +13,9 @@ import { isServer } from "@/src/utils/common.utils";
 import { useSalesStore } from "@/src/store/sales/sales.store";
 import { Session, User } from "@supabase/supabase-js";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { useConsumerStore } from "@/src/store/consumer/consumer.store";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
 
 export const AuthInstance = AppInstance;
 
@@ -79,6 +81,9 @@ export const AuthService = {
         reject(error);
       } finally {
         useAppStore.getState().onLogout();
+        useBookingsStore.getState().onLogout();
+        useConsumerStore.getState().onLogout();
+        useVigilStore.getState().onLogout();
         useCartStore.getState().onLogout();
         useModalStore.getState().onLogout();
         useSalesStore.getState().onLogout();

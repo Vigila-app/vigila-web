@@ -17,6 +17,7 @@ export default function Account() {
     router.push(Routes.accountSecurity.url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <>
       <HeadComponent title={Routes.account.title} />

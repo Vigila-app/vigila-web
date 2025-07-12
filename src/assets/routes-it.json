@@ -37,7 +37,7 @@
     "private": false,
     "roles": ["CONSUMER"]
   },
-  "registration/vigil": {
+  "registrationVigil": {
     "url": "/auth/registration/vigil",
     "label": "Sign up vigil",
     "title": "Sign up vigil",
@@ -111,17 +111,43 @@
     "roles": []
   },
   "bookings": {
-    "url": "/dashboard/bookings",
-    "label": "Bookings",
-    "title": "Bookings",
+    "url": "/booking",
+    "label": "Prenotazioni",
+    "title": "Prenotazioni",
     "menu": {
       "mobile": true,
-      "desktop": false,
+      "desktop": true,
       "header": true,
       "footer": false
     },
     "private": true,
     "roles": []
+  },
+  "createBooking": {
+    "url": "/booking/create",
+    "label": "Nuova Prenotazione",
+    "title": "Nuova Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "paymentBooking": {
+    "url": "/booking/payment",
+    "label": "Paga Prenotazione",
+    "title": "Pagamento Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "crm": {
     "url": "/dashboard/crm",
@@ -251,35 +277,20 @@
     "roles": []
   },
   "services": {
-    "url": "/dashboard/services",
+    "url": "/services",
     "label": "Servizi",
     "title": "Servizi",
     "menu": {
       "mobile": true,
-      "desktop": false,
+      "desktop": true,
       "header": true,
-      "footer": false
+      "footer": true
     },
     "private": true,
-    "roles": []
-  },
-  "serviceDetails": {
-    "url": "/dashboard/services/:serviceId",
-    "matchingUrl": "/dashboard/services",
-    "label": "Service Details",
-    "title": "Service Details",
-    "parents": ["services"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
+    "roles": ["CONSUMER"]
   },
   "notifications": {
-    "url": "/dashboard/notifications",
+    "url": "/notifications",
     "label": "Notifiche",
     "title": "Notifiche",
     "menu": {
@@ -289,7 +300,7 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "about": {
     "url": "/about",

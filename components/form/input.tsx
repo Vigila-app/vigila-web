@@ -2,6 +2,7 @@
 
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { FormUtils } from "@/src/utils/form.utils";
+import { CogIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { FieldError } from "react-hook-form";
 
@@ -11,6 +12,7 @@ type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: FieldError;
   onChange?: (value: string | number) => void;
   role?: RolesEnum;
+  isLoading?: boolean;
 };
 
 const Input = (props: InputI) => {
@@ -25,11 +27,13 @@ const Input = (props: InputI) => {
     onChange,
     required = false,
     type = "text",
+    isLoading = false,
   } = props;
 
   return (
-    <div>
-      <span
+    <div className="relative w-full">
+      <label
+        htmlFor={name || label}
         className={clsx(
           "pointer-events-none start-2.5 rounded bg-white p-0.5 ",
 
@@ -37,47 +41,52 @@ const Input = (props: InputI) => {
           role === RolesEnum.VIGIL && " text-vigil-orange",
           error && "text-red-500",
           disabled && "!bg-gray-100"
-        )}>
+        )}
+      >
         {label}
         {required && <>*</>}
-      </span>
+      </label>
 
-      {icon ? (
-        <span className="pointer-events-none absolute inset-y-0 end-0 grid w-10 place-content-center text-gray-500">
-          {icon}
-        </span>
-      ) : null}
-
-      <label
-        htmlFor={name || label}
+      <div
         className={clsx(
-          "relative w-full block p-3 rounded-4xl border bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
-          icon && "pr-10",
+          "relative w-full inline-flex items-center p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           role === RolesEnum.CONSUMER &&
             "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",
           role === RolesEnum.VIGIL &&
             " text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
-          error && "border-red-500",
+          error && "border-red-500 mb-4",
           disabled && "!bg-gray-100 cursor-not-allowed"
-        )}>
+        )}
+      >
         <input
           {...{ ...props, type, error: undefined, icon: undefined }}
           id={id || name || label}
           className={clsx(
-            "w-full peer border-none bg-transparent focus:placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0",
+            "w-full flex-1 border-none bg-transparent focus:placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0",
             disabled && "cursor-not-allowed"
           )}
           onChange={({ currentTarget: { value } }) => onChange?.(value)}
         />
 
+        {icon && !isLoading ? (
+          <span className="min-w-10 inline-flex items-center justify-end text-gray-500">
+            {icon}
+          </span>
+        ) : isLoading ? (
+          <span className="min-w-10 inline-flex items-center justify-end text-gray-500">
+            <CogIcon className="size-4 animate-spin text-gray-500" />
+          </span>
+        ) : null}
+
         {error ? (
           <p
             role="alert"
-            className="absolute start-2.5 top-12 text-xs text-red-500">
+            className="absolute start-2.5 top-12 text-xs text-red-500"
+          >
             {FormUtils.getErrorByType(error)}
           </p>
         ) : null}
-      </label>
+      </div>
     </div>
   );
 };

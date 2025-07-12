@@ -1,19 +1,15 @@
 import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
 import { ServiceI } from "@/src/types/services.types";
-import { getUUID } from "@/src/utils/common.utils";
 
 export const ServicesService = {
   createService: async (newService: ServiceI) =>
     new Promise<ServiceI>(async (resolve, reject) => {
       try {
-        const id = newService?.id || getUUID("SERVICE");
-        const { data: service } = (await ApiService.post(apiServices.CREATE(), {
-          ...newService,
-          id,
-          creationDate: new Date(),
-          lastUpdateDate: new Date(),
-        })) as { data: ServiceI };
+        const { data: service } = (await ApiService.post(
+          apiServices.CREATE(),
+          newService
+        )) as { data: ServiceI };
         resolve(service);
       } catch (error) {
         console.error("ServicesService createService error", error);
@@ -45,11 +41,12 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getServices: async () =>
+  getServices: async (vigil_id: ServiceI["vigil_id"]) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
-          apiServices.LIST()
+          apiServices.LIST(),
+          { vigil_id }
         )) as { data: ServiceI[] };
         resolve(response);
       } catch (error) {

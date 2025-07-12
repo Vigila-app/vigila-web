@@ -8,6 +8,8 @@ import { SaleI } from "@/src/types/sales.types";
 import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { VigilDetailsType } from "../types/vigil.types";
+import { ConsumerDetailsType } from "../types/consumer.types";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -53,13 +55,11 @@ const apiControllers = {
   // endregion CMS
 
   // region CRM
-  GUESTS: (isMock?: boolean): string =>
-    `${apiBase.V1(isMock)}/crm/guests`,
+  GUESTS: (isMock?: boolean): string => `${apiBase.V1(isMock)}/crm/guests`,
   // endregion CRM
 
   // region BOOKINGS
-  BOOKINGS: (isMock?: boolean): string =>
-    `${apiBase.V1(isMock)}/bookings`,
+  BOOKINGS: (isMock?: boolean): string => `${apiBase.V1(isMock)}/bookings`,
   // endregion BOOKINGS
 
   // region MAPS
@@ -87,15 +87,25 @@ const apiControllers = {
   USER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/user`,
   // endregion USER
 
-// region ONBOARD
+  // region ONBOARD
   ONBOARD: (isMock?: boolean): string => `${apiBase.V1(isMock)}/onboard`,
   // endregion ONBOARD
+
+  // region CONSUMER
+  CONSUMER: (isMock?: boolean): string => `${apiBase.V1(isMock)}/consumer`,
+  // endregion CONSUMER
+
+  // region VIGIL
+  VIGIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/vigil`,
+  // endregion VIGIL
 };
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
   DETAILS: (id: string, role: RolesEnum, isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${isMock ? "user" : id}`,
+    `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
+      isMock ? "user" : id
+    }`,
   DELETE: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${isMock ? "user" : id}`,
   DEVICES: (id: string, isMock?: boolean): string =>
@@ -103,9 +113,10 @@ export const apiUser = {
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
 };
-export const apiOnboard={
-  ONBOARD:(userId:string, role:RolesEnum,isMock?:boolean): string=>`${apiControllers.ONBOARD(isMock)}/${userId}/${role}`
-}
+export const apiOnboard = {
+  ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
+    `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
+};
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
   LIST: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
@@ -158,4 +169,14 @@ export const apiMaps = {
 export const apiCheckout = {
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     apiControllers.INTENT(paymentIntentId, isMock),
+};
+
+export const apiConsumer = {
+  DETAILS: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}`,
+};
+
+export const apiVigil = {
+  DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
 };

@@ -65,6 +65,7 @@ type AvatarI = {
     metadata: { contentType: string }
   ) => void;
   value?: string;
+  userId?:string;
 };
 
 const AvatarSize = {
@@ -83,13 +84,14 @@ const Avatar = (props: AvatarI) => {
     withUpload = false,
     onFileUpload,
     value,
+    userId,
   } = props;
   const { user, lastUpdate: lastUserUpdate } = useUserStore();
   const [profilePic, setProfilePic] = useState<string | undefined>();
 
-  const getProfilePic = async () => {
-    if (user?.id) {
-      const profilePicUrl = await StorageUtils.getURL("profile-pics", user.id);
+  const getProfilePic = async (id: string) => {
+    if (id) {
+      const profilePicUrl = await StorageUtils.getURL("profile-pics", id);
       if (profilePicUrl) {
         setProfilePic(profilePicUrl);
       }
@@ -97,9 +99,9 @@ const Avatar = (props: AvatarI) => {
   };
 
   useEffect(() => {
-    if (!imgUrl) getProfilePic();
+    if (!imgUrl) getProfilePic(userId || user?.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imgUrl, user?.id, lastUserUpdate]);
+  }, [imgUrl, user?.id, userId, lastUserUpdate]);
 
   const imgStyle = clsx(
     "rounded-full object-cover font-normal",

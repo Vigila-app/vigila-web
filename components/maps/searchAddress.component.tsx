@@ -5,11 +5,12 @@ import { MapsService } from "@/src/services";
 import { debounce } from "@/src/utils/common.utils";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, set, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
 
 type SearchMapFormI = {
   search: string;
@@ -19,13 +20,21 @@ const SearchAddress = (props: {
   onSubmit: (address: AddressI) => void;
   minLength?: number;
   label?: string;
+  location?: boolean;
+  placeholder?: string;
 }) => {
   const {
     onSubmit: eOnSubmit,
     minLength = 3,
     label = "Search Address",
+    location = false,
+    placeholder = "Inserisci città",
   } = props;
+  const { currentLocation } = useCurrentLocation({
+    onRender: location,
+  });
   const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 const { user } = useUserStore();
 
@@ -40,38 +49,98 @@ const { user } = useUserStore();
 
   const submit = (address: AddressI) => {
     eOnSubmit(address);
-    setSubmitted(true);
+  };
+
+  const validateAddress = async (address: Partial<AddressI>) => {
+    try {
+      setIsLoading(true);
+      const validatedAddress = await MapsService.validateAddress(address);
+      if (validatedAddress) {
+        return validatedAddress;
+      } else {
+        console.error("Address validation failed", address);
+        return;
+      }
+    } catch (error) {
+      throw new Error(
+        `Error validating address: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSubmit = async (formData: SearchMapFormI) => {
-    if (isValid) {
-      const { search } = formData;
-      try {
-        const address = await MapsService.validateAddress({ city: search });
+    try {
+      if (isValid) {
+        setSubmitted(true);
+        const { search } = formData;
+        const address = await validateAddress({ city: search });
         if (address) {
           submit(address);
         }
-      } catch (error) {
-        console.error("Error searching on maps", error);
+      } else {
+        console.error(isValid, formData, errors);
+        throw new Error("Form is not valid");
       }
+    } catch (error) {
+      console.error("Error searching on maps", error);
+    }
+  };
+
+  const getLocationAddress = async (locationAddress: Partial<AddressI>) => {
+    try {
+      const address = await validateAddress({
+        q: `${locationAddress.lat}, ${locationAddress.lon}`,
+      });
+      if (address) {
+        setValue("search", address.display_name || address.city || "");
+        return address;
+      } else {
+        throw new Error("Address not found for the given coordinates");
+      }
+    } catch (error) {
+      console.error("Error getting address from coordinates", error);
+      return;
     }
   };
 
   const autocompleteAdress = async () => {
     try {
-      if (watch().search?.length >= minLength && !submitted) {
+      if (watch().search?.length >= minLength) {
+        setIsLoading(true);
         const results = await MapsService.autocompleteAddress(watch().search);
-        setAutocompleteResults(results);
-        console.log(results);
+        if (results.length > 1) {
+          setAutocompleteResults(results);
+        } else if (results.length === 1) {
+          const address = results[0];
+          setValue("search", address.display_name || address.city || "");
+          submit(address);
+          setSubmitted(false);
+        }
       }
     } catch (error) {
       console.error("Error during address autocomplete", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    debounce(autocompleteAdress);
+    if (location && currentLocation) {
+      getLocationAddress({
+        lat: currentLocation.latitude,
+        lon: currentLocation.longitude,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location, currentLocation]);
+
+  useEffect(() => {
     setSubmitted(false);
+    debounce(autocompleteAdress);
     setAutocompleteResults([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch()?.search]);
@@ -88,9 +157,10 @@ const { user } = useUserStore();
               {...field}
               autoFocus
               label={label}
-              placeholder="Inserisci città"
+              placeholder={placeholder}
               type="text"
               required
+              isLoading={isLoading}
               role={role}
               aria-invalid={!!errors.search}
               error={errors.search}
@@ -99,14 +169,15 @@ const { user } = useUserStore();
           )}
         />
       </form>
-      {!submitted && autocompleteResults?.length ? (
+      {!submitted && autocompleteResults?.length > 1 ? (
         <div>
           <ul className="list-disc pl-5">
             {autocompleteResults.map((result, index) => (
               <li key={index} className="my-2">
                 <button
                   onClick={() => {
-                    setValue("search", result.name || result.display_name);
+                    setValue("search", result.display_name || result.name);
+                    setSubmitted(true);
                     submit(result);
                   }}
                   className="text-blue-600 hover:underline">
@@ -116,6 +187,11 @@ const { user } = useUserStore();
             ))}
           </ul>
         </div>
+      ) : null}
+      {submitted && !autocompleteResults.length ? (
+        <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
+      ) : !autocompleteResults.length && !isLoading ? (
+        <div className="text-gray-500">Nessun risultato trovato</div>
       ) : null}
     </>
   );
