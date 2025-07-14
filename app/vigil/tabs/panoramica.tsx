@@ -3,7 +3,7 @@ import Card from "@/components/card/card";
 const PanoramicaTab = () => {
   return (
     <section className="p-4 bg-gray-100 rounded-b-2xl">
-      <Card>
+      <Card  >
         <h1 className="flex flex-row items-center gap-2 pb-2">
           <span>
             <svg

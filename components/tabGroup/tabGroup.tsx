@@ -54,14 +54,14 @@ const TabGroup = (props: TabGroupI) => {
             </option>
           ))}
         </select> */}
-        <div className="flex gap-2 border-y  border-gray-200 pb-2 pt-2 mt-4">
+        <div className="flex justify-center gap-2 py-2 mt-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-                "px-4 py-2 text-sm font-medium transition-colors border-t-2  ",
+                "px-5 py-2 text-[10px] font-medium transition-colors border-t-2  ",
                 activeTab.label === tab.label
                   ? role === RolesEnum.CONSUMER
                     ? "border-consumer-blue text-consumer-blue stroke-consumer-blue"

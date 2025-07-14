@@ -1,8 +1,7 @@
 import React from "react";
 import ButtonLink from "@/components/button/buttonLink";
-import Button from "../button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import Card from "../card/card";
+import Card from "@/components/card/card";
 import Cuore from "@/public/svg/Cuore";
 import Smile from "@/public/svg/Smile";
 import Scudo from "@/public/svg/Scudo";
@@ -82,7 +81,7 @@ const BaseHero = (props: BaseHeroI) => {
                   label="Trova un vigil vicino a te"
                   role={RolesEnum.CONSUMER}
                   full
-                  href={primaryAction?.href} //todo Href corrispondente per la registrazione
+                  href={primaryAction?.href}
                   type="button">
                   Trova un Vigil vicino a te
                 </ButtonLink>
@@ -102,7 +101,7 @@ const BaseHero = (props: BaseHeroI) => {
                 <ButtonLink
                   label="Diventa un Vigil"
                   full
-                  href={secondaryAction?.href} //href corrispondente
+                  href={secondaryAction?.href} 
                   type="button"
                   role={RolesEnum.VIGIL}>
                   Diventa un Vigil!
