@@ -4,8 +4,11 @@
         "subtitle": "L'assistenza del tuo quartiere a portata di click ",
         "payoff": "Con Vigila trovi in pochi secondi un Vigil di fiducia, proprio nella tua zona",
         "cta": [{
-            "label": "Get Started",
-            "url": "/wall"
+            "label": "Get Started consumer",
+            "url": "/auth/registration"
+        },{
+            "label":"Get Started vigil",
+            "url": "/auth/registration/vigil"
         }]
     }
 }

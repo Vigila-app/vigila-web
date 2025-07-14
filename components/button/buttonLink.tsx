@@ -1,6 +1,6 @@
 import Link from "next/link";
 import clsx from "clsx";
-import { ButtonStyle } from "./button.style";
+import { ButtonStyle } from "@/components/button/button.style";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
