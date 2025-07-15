@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     console.error("Error verifying payment intent:", error);
     
     // Gestione errori specifici di Stripe
-    if (error instanceof Stripe.errors.StripeError) {
+    if (error instanceof Stripe.StripeError) {
       if (error.code === 'resource_missing') {
         return jsonErrorResponse(404, {
           code: ResponseCodesConstants.PAYMENT_INTENT_NOT_FOUND.code,
