@@ -36,7 +36,7 @@ const SearchAddress = (props: {
   const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-const { user } = useUserStore();
+  const { user } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const {
@@ -48,7 +48,10 @@ const { user } = useUserStore();
   } = useForm<SearchMapFormI>();
 
   const submit = (address: AddressI) => {
+    if (submitted) return; // no duplicazione di risultati
+    setSubmitted(true);
     eOnSubmit(address);
+    setValue("search", "");
   };
 
   const validateAddress = async (address: Partial<AddressI>) => {
@@ -165,6 +168,11 @@ const { user } = useUserStore();
               aria-invalid={!!errors.search}
               error={errors.search}
               icon={<MagnifyingGlassIcon className="size-4 text-gray-500" />}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                }
+              }}
             />
           )}
         />

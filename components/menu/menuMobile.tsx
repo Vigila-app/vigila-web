@@ -11,12 +11,13 @@ import { useEffect, useState } from "react";
 import { ButtonLink, Divider } from "@/components";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const MenuMobile = () => {
   const pathname = usePathname();
   const { user } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
-
+const role:RolesEnum=  user?.user_metadata?.role as RolesEnum;
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
@@ -71,7 +72,13 @@ const MenuMobile = () => {
             </ul>
             <Divider />
             <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">{MenuLinkItem(Routes.profile)}</li>
+               <li className="block py-2">
+                {MenuLinkItem(
+                  role === RolesEnum.CONSUMER
+                    ? Routes.profileConsumer
+                    : Routes.profileVigil
+                )}
+              </li>
               <li className="block py-2">{MenuLinkItem(Routes.account)}</li>
             </ul>
             <Divider />

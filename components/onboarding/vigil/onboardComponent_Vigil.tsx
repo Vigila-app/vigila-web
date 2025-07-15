@@ -19,6 +19,8 @@ import MapsComponent from "@/components/maps/maps.component";
 import clsx from "clsx";
 import Card from "@/components/card/card";
 
+import { Service } from "@/src/types/offeredService";
+
 type OnboardFormI = {
   birthday: string;
   city: string;
@@ -28,6 +30,7 @@ type OnboardFormI = {
   phone: string;
   transportation: string;
   cap: string;
+
   // TODO add other detail fields
 };
 
@@ -114,9 +117,8 @@ const OnboardComponent = () => {
         type: ToastStatusEnum.ERROR,
       });
     }
-    
   };
-console.log(addresses);
+  console.log(addresses);
   return (
     <div className="w-full p-6">
       <Card>
@@ -203,10 +205,17 @@ console.log(addresses);
               render={() => (
                 <div>
                   <SearchAddress
-                  
                     onSubmit={(address) => {
                       console.log("testo", address);
-                      setAddresses((prev) => [...prev, address]);
+                      setAddresses((prev) => {
+                        if (
+                          prev.some(
+                            (a) => a.display_name === address.display_name
+                          )
+                        )
+                          return prev;
+                        return [...prev, address];
+                      });
                     }}
                     label="Cerca gli indirizzi dove vuoi lavorare"
                   />
@@ -298,6 +307,7 @@ console.log(addresses);
                 />
               )}
             />
+
             <div className="flex items-center justify-end">
               <Button
                 type="submit"
