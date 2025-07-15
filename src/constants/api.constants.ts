@@ -39,6 +39,17 @@ const apiBase = {
 };
 
 const apiControllers = {
+  // region PAYMENT
+  CREATE_PAYMENT_INTENT: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/create-payment-intent`,
+  VERIFY_PAYMENT_INTENT: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/verify-payment-intent`,
+  PAYMENT_INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/intent${
+      paymentIntentId ? `/${paymentIntentId}` : ""
+    }`,
+  // endregion PAYMENT
+
   // region CHECKOUT
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/payment/intent${
@@ -142,6 +153,17 @@ export const apiBookings = {
   LIST: (isMock?: boolean): string => apiControllers.BOOKINGS(isMock),
   DETAILS: (bookingId: BookingI["id"], isMock?: boolean): string =>
     `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}`,
+  UPDATE_PAYMENT: (bookingId: BookingI["id"], isMock?: boolean): string =>
+    `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}/payment`,
+};
+
+export const apiPayment = {
+  CREATE_INTENT: (isMock?: boolean): string =>
+    apiControllers.CREATE_PAYMENT_INTENT(isMock),
+  VERIFY_INTENT: (isMock?: boolean): string =>
+    apiControllers.VERIFY_PAYMENT_INTENT(isMock),
+  INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
+    apiControllers.PAYMENT_INTENT(paymentIntentId, isMock),
 };
 
 export const apiRecaptcha = {

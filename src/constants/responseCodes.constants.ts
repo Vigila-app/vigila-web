@@ -15,8 +15,17 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   PAYMENT_INTENT_BAD_REQUEST: {
     code: 8103,
   },
-  PAYMENT_INTENT_METHOD_NOT_ALLOWED: {
+  PAYMENT_INTENT_UNAUTHORIZED: {
+    code: 8104,
+  },
+  PAYMENT_INTENT_NOT_FOUND: {
+    code: 8105,
+  },
+  PAYMENT_INTENT_ALREADY_PAID: {
     code: 8106,
+  },
+  PAYMENT_INTENT_METHOD_NOT_ALLOWED: {
+    code: 8107,
   },
 
   PAYMENT_WEBHOOK_SUCCESS: {
@@ -152,6 +161,31 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   BOOKINGS_DETAILS_SERVICE_UNAVAILABLE: {
     code: 9608,
+  },
+
+  BOOKINGS_UPDATE_SUCCESS: {
+    code: 9631,
+  },
+  BOOKINGS_UPDATE_ERROR: {
+    code: 9632,
+  },
+  BOOKINGS_UPDATE_BAD_REQUEST: {
+    code: 9633,
+  },
+  BOOKINGS_UPDATE_UNAUTHORIZED: {
+    code: 9634,
+  },
+  BOOKINGS_UPDATE_FORBIDDEN: {
+    code: 9635,
+  },
+  BOOKINGS_UPDATE_METHOD_NOT_ALLOWED: {
+    code: 9636,
+  },
+  BOOKINGS_UPDATE_NOT_FOUND: {
+    code: 9637,
+  },
+  BOOKINGS_UPDATE_SERVICE_UNAVAILABLE: {
+    code: 9638,
   },
   // endregion BOOKINGS
 

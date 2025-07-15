@@ -1,4 +1,4 @@
-import { FrequencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ToastI } from "@/src/types/toast.type";
@@ -214,4 +214,17 @@ export const debounce = (callback: (...args: any) => void, delay = 500) => {
   timeout = setTimeout(() => {
     callback();
   }, delay);
+};
+
+export const getCurrency = (currency: CurrencyEnum) => {
+  switch (currency) {
+    case CurrencyEnum.EURO:
+      return "eur";
+    case CurrencyEnum.US_DOLLAR:
+      return "usd";
+    case CurrencyEnum.GB_POUND:
+      return "gbp";
+    default:
+      return currency.toLowerCase();
+  }
 };

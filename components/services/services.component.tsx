@@ -1,13 +1,23 @@
 "use client";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { SearchAddress } from "@/components/maps";
 import { AddressI } from "@/src/types/maps.types";
 import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
 import { useEffect, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
 import ServiceCard from "./serviceCard.component";
+import dynamic from "next/dynamic";
+
+const SearchAddress = dynamic(
+  () => import("@/components/maps/searchAddress.component"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
+  }
+);
 
 const ServicesComponent = () => {
   const { showLoader, hideLoader } = useAppStore();
