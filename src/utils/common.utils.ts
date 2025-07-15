@@ -225,6 +225,6 @@ export const getCurrency = (currency: CurrencyEnum) => {
     case CurrencyEnum.GB_POUND:
       return "gbp";
     default:
-      return currency;
+      return currency.toLowerCase();
   }
 };
