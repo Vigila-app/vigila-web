@@ -11,6 +11,18 @@
     "private": false,
     "roles": []
   },
+   "homeConsumer": {
+    "url": "/home",
+    "label": "Home Consumer",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": true,
+      "footer": true
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "login": {
     "url": "/auth/login",
     "label": "Login",
