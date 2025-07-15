@@ -7,6 +7,7 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verifica che la prenotazione non sia già stata pagata
-    if (booking.payment_status === "paid") {
+    if (booking.payment_status === PaymentStatusEnum.PAID) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.PAYMENT_INTENT_ALREADY_PAID.code,
         success: false,
