@@ -196,10 +196,6 @@ const CheckoutFormComponent = ({
 };
 
 const CheckoutForm = (props: CheckoutFormProps) => {
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-  );
-
   // Verifica che il clientSecret sia valido
   if (!(props.clientSecret && stripePromise)) {
     return (
