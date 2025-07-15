@@ -123,6 +123,110 @@
     "private": true,
     "roles": []
   },
+  "admin": {
+    "url": "/admin",
+    "label": "Admin Dashboard",
+    "title": "Admin Dashboard",
+    "menu": {
+      "mobile": false,
+      "desktop": true,
+      "header": true,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminOverview": {
+    "url": "/admin/overview",
+    "label": "Panoramica",
+    "title": "Panoramica Admin",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminBookings": {
+    "url": "/admin/bookings",
+    "label": "Gestione Prenotazioni",
+    "title": "Gestione Prenotazioni",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminPayments": {
+    "url": "/admin/payments",
+    "label": "Gestione Pagamenti",
+    "title": "Gestione Pagamenti",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminVigils": {
+    "url": "/admin/vigils",
+    "label": "Gestione Vigili",
+    "title": "Gestione Vigili",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminConsumers": {
+    "url": "/admin/consumers",
+    "label": "Gestione Utenti",
+    "title": "Gestione Utenti",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminServices": {
+    "url": "/admin/services",
+    "label": "Gestione Servizi",
+    "title": "Gestione Servizi",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminAnalytics": {
+    "url": "/admin/analytics",
+    "label": "Analytics",
+    "title": "Analytics e Statistiche",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
   "createBooking": {
     "url": "/booking/create",
     "label": "Nuova Prenotazione",

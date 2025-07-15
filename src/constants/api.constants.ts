@@ -39,6 +39,10 @@ const apiBase = {
 };
 
 const apiControllers = {
+  // region ADMIN
+  ADMIN: (isMock?: boolean): string => `${apiBase.V1(isMock)}/admin`,
+  // endregion ADMIN
+
   // region PAYMENT
   CREATE_PAYMENT_INTENT: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/payment/create-payment-intent`,
@@ -154,7 +158,9 @@ export const apiBookings = {
   DETAILS: (bookingId: BookingI["id"], isMock?: boolean): string =>
     `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}`,
   UPDATE_PAYMENT: (bookingId: BookingI["id"], isMock?: boolean): string =>
-    `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}/payment`,
+    `${apiControllers.BOOKINGS(isMock)}/${
+      isMock ? "booking" : bookingId
+    }/payment`,
 };
 
 export const apiPayment = {
@@ -201,4 +207,13 @@ export const apiConsumer = {
 export const apiVigil = {
   DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
+};
+
+export const apiAdmin = {
+  ANALYTICS: `${apiControllers.ADMIN()}/analytics`,
+  BOOKINGS: `${apiControllers.ADMIN()}/bookings`,
+  VIGILS: `${apiControllers.ADMIN()}/vigils`,
+  CONSUMERS: `${apiControllers.ADMIN()}/consumers`,
+  SERVICES: `${apiControllers.ADMIN()}/services`,
+  PAYMENTS: `${apiControllers.ADMIN()}/payments`,
 };
