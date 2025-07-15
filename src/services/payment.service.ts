@@ -24,9 +24,14 @@ export const PaymentService = {
           apiPayment.CREATE_INTENT(),
           request
         )) as CreatePaymentIntentResponse;
+
         resolve(response);
       } catch (error) {
-        console.error("PaymentService createPaymentIntent error", error);
+        console.error("PaymentService createPaymentIntent error", {
+          error,
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : null,
+        });
         reject(error);
       }
     }),

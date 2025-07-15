@@ -2,16 +2,24 @@
 
 import { useState } from "react";
 import {
+  Elements,
   PaymentElement,
   useStripe,
   useElements,
+  ExpressCheckoutElement,
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useRouter } from "next/navigation";
+import { loadStripe } from "@stripe/stripe-js";
 
 type CheckoutFormProps = {
+  appearance?: {
+    theme?: "stripe" | "flat" | "night";
+    variables?: Record<string, string>;
+  };
+  clientSecret: string;
   returnUrl?: string;
   onSuccess: (paymentIntentId: string) => void;
   onError?: (error: string) => void;
@@ -22,7 +30,7 @@ type CheckoutFormProps = {
   disabled?: boolean;
 };
 
-const CheckoutForm = ({
+const CheckoutFormComponent = ({
   returnUrl,
   onSuccess,
   onError,
@@ -38,21 +46,40 @@ const CheckoutForm = ({
 
   const [message, setMessage] = useState<string>("");
 
-  const { showLoader, hideLoader, showToast, loader: { isLoading } } = useAppStore();
+  const {
+    showLoader,
+    hideLoader,
+    showToast,
+    loader: { isLoading },
+  } = useAppStore();
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event?: React.FormEvent) => {
     try {
-      event.preventDefault();
+      event?.preventDefault?.();
+      showLoader();
 
       if (!stripe || !elements) {
+        setMessage(
+          "Il sistema di pagamento non è ancora pronto. Riprova tra qualche secondo."
+        );
         return;
       }
 
-      showLoader();
+      // Verifica che tutti gli elementi siano validi prima di procedere
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        console.error("Elements submit error:", submitError);
+        setMessage(
+          submitError.message || "Verifica i dati inseriti e riprova."
+        );
+        showToast({
+          message: submitError.message || "Verifica i dati inseriti e riprova.",
+          type: ToastStatusEnum.ERROR,
+        });
+        return;
+      }
 
-      const confirmParams: any = {
-        redirect: "if_required",
-      };
+      const confirmParams: any = {};
 
       if (returnUrl) {
         confirmParams.return_url = returnUrl;
@@ -61,12 +88,18 @@ const CheckoutForm = ({
       const result = await stripe.confirmPayment({
         elements,
         confirmParams,
+        redirect: "always",
       });
 
       if (result.error) {
-        const errorMessage = result.error.message || "Si è verificato un errore durante il pagamento";
-        
-        if (result.error.type === "card_error" || result.error.type === "validation_error") {
+        const errorMessage =
+          result.error.message ||
+          "Si è verificato un errore durante il pagamento";
+
+        if (
+          result.error.type === "card_error" ||
+          result.error.type === "validation_error"
+        ) {
           setMessage(errorMessage);
         } else {
           setMessage("Si è verificato un errore imprevisto.");
@@ -93,7 +126,7 @@ const CheckoutForm = ({
     } catch (err) {
       console.error("Payment error:", err);
       const errorMessage = "Si è verificato un errore durante il pagamento";
-      
+
       setMessage(errorMessage);
 
       showToast({
@@ -124,7 +157,8 @@ const CheckoutForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="payment-element-container">
-        <PaymentElement options={paymentElementOptions} className="mb-4" />
+        <PaymentElement options={paymentElementOptions} className="my-4" />
+        <ExpressCheckoutElement onConfirm={() => handleSubmit()} />
       </div>
 
       {message && (
@@ -148,7 +182,8 @@ const CheckoutForm = ({
           type="submit"
           full
           label={isLoading ? "Elaborazione..." : submitLabel}
-          disabled={isFormDisabled}
+          isLoading={isLoading}
+          disabled={isFormDisabled || isLoading}
         />
       </div>
 
@@ -157,6 +192,50 @@ const CheckoutForm = ({
         <p>Questo sito è protetto da Stripe.</p>
       </div>
     </form>
+  );
+};
+
+const CheckoutForm = (props: CheckoutFormProps) => {
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  );
+
+  // Verifica che il clientSecret sia valido
+  if (!(props.clientSecret && stripePromise)) {
+    return (
+      <div className="text-center p-6 bg-yellow-50 rounded-lg">
+        <p className="text-yellow-600 text-sm">
+          Attendi la creazione del pagamento...
+        </p>
+      </div>
+    );
+  }
+
+  const appearance = {
+    theme: "stripe" as const,
+    variables: {
+      colorPrimary: "#f97316",
+      colorBackground: "#ffffff",
+      colorText: "#30313d",
+      colorDanger: "#df1b41",
+      fontFamily: "Inter, system-ui, sans-serif",
+      spacingUnit: "4px",
+      borderRadius: "8px",
+    },
+    ...props.appearance,
+  };
+
+  const options = {
+    clientSecret: props.clientSecret,
+    appearance,
+    loader: "auto" as const,
+    locale: "it" as const,
+  };
+
+  return (
+    <Elements options={options} stripe={stripePromise}>
+      <CheckoutFormComponent {...props} />
+    </Elements>
   );
 };
 

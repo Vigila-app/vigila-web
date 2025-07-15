@@ -1,12 +1,12 @@
+"use client";
+
 import { BookingI } from "@/src/types/booking.types";
-import { useEffect, useState } from "react";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { useEffect, useMemo, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useAppStore } from "@/src/store/app/app.store";
 import { Button } from "@/components";
 import { CheckoutForm } from "@/components/checkout";
-import { amountDisplay } from "@/src/utils/common.utils";
+import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -15,11 +15,11 @@ import {
   PaymentStatusEnum,
   BookingStatusEnum,
 } from "@/src/enums/booking.enums";
-
-// Carica Stripe (sostituisci con la tua chiave pubblica)
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+import { useServicesStore } from "@/src/store/services/services.store";
+import { ServicesUtils } from "@/src/utils/services.utils";
+import { dateDisplay } from "@/src/utils/date.utils";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { AppConstants } from "@/src/constants";
 
 type PaymentBookingI = {
   bookingId: BookingI["id"];
@@ -34,7 +34,24 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
   const { user } = useUserStore();
   const { bookings, getBookingDetails } = useBookingsStore();
-  const booking = bookings.find((b) => b.id === bookingId);
+  const { services, getServiceDetails } = useServicesStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const booking = useMemo(
+    () => bookings.find((b) => b.id === bookingId),
+    [bookings, bookingId]
+  );
+  const service = useMemo(
+    () => services.find((s) => s.id === booking?.service_id),
+    [services, booking?.service_id]
+  );
+  const vigil = useMemo(
+    () => vigils.find((v) => v.id === booking?.vigil_id),
+    [vigils, booking?.vigil_id]
+  );
+
+  if (error) {
+    console.log("BookingPaymentComponent error:", error);
+  }
 
   const {
     showLoader,
@@ -44,22 +61,32 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
   const loadBookingAndCreatePayment = async () => {
     try {
+      // Previeni chiamate multiple
+      setError("");
+      if (clientSecret) {
+        console.log("Payment creation already in progress or completed");
+        return;
+      }
       showLoader();
+
       if (booking?.id) {
-        // Crea il Payment Intent con Stripe tramite il servizio
         const response = await PaymentService.createPaymentIntent({
           bookingId: booking.id,
           user: user.id,
           amount: Math.round(booking.price * 100), // Converti in centesimi
-          currency: booking.currency.toLowerCase(),
+          currency: service?.currency
+            ? getCurrency(service.currency)
+            : booking.currency?.toLowerCase() || "eur",
         });
 
         if (response.success) {
           setClientSecret(response.clientSecret);
         } else {
+          console.error("Payment intent creation failed:", response);
           setError("Errore durante la creazione del pagamento");
         }
       } else {
+        console.error("Booking not found or missing ID");
         throw new Error("Booking not found");
       }
     } catch (err) {
@@ -77,10 +104,18 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
   useEffect(() => {
     if (booking?.id) {
+      getServiceDetails(booking.service_id);
+      getVigilsDetails([booking.vigil_id]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking?.id]);
+
+  useEffect(() => {
+    if (booking?.id && service?.id) {
       loadBookingAndCreatePayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking]);
+  }, [booking?.id, service?.id]);
 
   const updateBookingPaymentStatus = async (paymentIntentId: string) => {
     try {
@@ -123,16 +158,6 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     router.push(Routes.bookings.url);
   };
 
-  if (isLoading) {
-    return (
-      <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
-        <div className="text-center">
-          <p>Caricamento...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error || !booking) {
     return (
       <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
@@ -150,26 +175,8 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     );
   }
 
-  const appearance = {
-    theme: "stripe" as const,
-    variables: {
-      colorPrimary: "#f97316",
-      colorBackground: "#ffffff",
-      colorText: "#30313d",
-      colorDanger: "#df1b41",
-      fontFamily: "Inter, system-ui, sans-serif",
-      spacingUnit: "4px",
-      borderRadius: "8px",
-    },
-  };
-
-  const options = {
-    clientSecret,
-    appearance,
-  };
-
   return (
-    <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
+    <div className="bg-gray-50 w-full mx-auto p-6 rounded-lg shadow-lg">
       <div className="mb-6">
         <h2 className="text-center font-medium text-xl">
           Completa prenotazione
@@ -181,7 +188,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
       </div>
 
       {/* Riepilogo prenotazione */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="my-6 p-4 bg-white rounded-lg shadow">
         <h3 className="font-medium text-gray-900 mb-3">
           Riepilogo Prenotazione
         </h3>
@@ -190,18 +197,40 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
             <span>ID Prenotazione:</span>
             <span className="font-mono text-xs">{booking.id}</span>
           </div>
+          {service?.id && (
+            <div className="flex justify-between">
+              <span>Servizio:</span>
+              <span>{service?.name}</span>
+            </div>
+          )}
+          {vigil?.id && (
+            <div className="flex justify-between">
+              <span>Vigil:</span>
+              <span>{vigil?.displayName}</span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span>Quando:</span>
+            <span>{dateDisplay(booking.startDate)}</span>
+          </div>
           <div className="flex justify-between">
             <span>Indirizzo:</span>
             <span>{booking.address}</span>
           </div>
           <div className="flex justify-between">
             <span>Quantità:</span>
-            <span>{booking.quantity}</span>
+            <span>
+              {booking.quantity}&nbsp;
+              {service?.unit_type
+                ? ServicesUtils.getServiceUnitType(service?.unit_type)
+                : ""}
+            </span>
           </div>
           <div className="flex justify-between font-medium text-lg border-t pt-2">
             <span>Totale:</span>
             <span>
-              {booking.currency} {amountDisplay(booking.price)}
+              {service?.currency}
+              {amountDisplay(booking.price)}
             </span>
           </div>
         </div>
@@ -209,16 +238,17 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
       {/* Form di pagamento Stripe */}
       {clientSecret && (
-        <Elements options={options} stripe={stripePromise}>
+        <div className="my-6 p-4 bg-white rounded-lg shadow">
+          <h3 className="font-medium text-gray-900 mb-3">Pagamento</h3>
           <CheckoutForm
-            returnUrl={`${window.location.origin}/booking/payment/success?bookingId=${booking.id}`}
+            returnUrl={`${AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
-            onCancel={handleBackToBookings}
+            // onCancel={handleBackToBookings}
             submitLabel="Completa pagamento"
-            cancelLabel="Torna alle prenotazioni"
+            clientSecret={clientSecret}
           />
-        </Elements>
+        </div>
       )}
     </div>
   );

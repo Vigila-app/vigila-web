@@ -149,6 +149,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "paymentBookingConfirm": {
+    "url": "/booking/payment/result",
+    "label": "Conferma Prenotazione",
+    "title": "Conferma Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "crm": {
     "url": "/dashboard/crm",
     "label": "CRM",
