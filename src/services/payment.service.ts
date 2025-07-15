@@ -32,39 +32,35 @@ export type VerifyPaymentIntentResponse = {
 };
 
 export const PaymentService = {
-  createPaymentIntent: async (request: CreatePaymentIntentRequest) =>
-    new Promise<CreatePaymentIntentResponse>(async (resolve, reject) => {
-      try {
-        const response = (await ApiService.post(
-          apiPayment.CREATE_INTENT(),
-          request
-        )) as CreatePaymentIntentResponse;
+  createPaymentIntent: async (request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> => {
+    try {
+      const response = (await ApiService.post(
+        apiPayment.CREATE_INTENT(),
+        request
+      )) as CreatePaymentIntentResponse;
+      return response;
+    } catch (error) {
+      console.error("PaymentService createPaymentIntent error", {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : null,
+      });
+      throw error;
+    }
+  },
 
-        resolve(response);
-      } catch (error) {
-        console.error("PaymentService createPaymentIntent error", {
-          error,
-          message: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : null,
-        });
-        reject(error);
-      }
-    }),
-
-  verifyPaymentIntent: async (paymentIntentId: string) =>
-    new Promise<VerifyPaymentIntentResponse>(async (resolve, reject) => {
-      try {
-        const response = (await ApiService.get(
-          `${apiPayment.VERIFY_INTENT()}?payment_intent=${encodeURIComponent(paymentIntentId)}`
-        )) as VerifyPaymentIntentResponse;
-
-        resolve(response);
-      } catch (error) {
-        console.error("PaymentService verifyPaymentIntent error", {
-          error,
-          message: error instanceof Error ? error.message : 'Unknown error',
-        });
-        reject(error);
-      }
-    }),
+  verifyPaymentIntent: async (paymentIntentId: string): Promise<VerifyPaymentIntentResponse> => {
+    try {
+      const response = (await ApiService.get(
+        `${apiPayment.VERIFY_INTENT()}?payment_intent=${encodeURIComponent(paymentIntentId)}`
+      )) as VerifyPaymentIntentResponse;
+      return response;
+    } catch (error) {
+      console.error("PaymentService verifyPaymentIntent error", {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  },
 };
