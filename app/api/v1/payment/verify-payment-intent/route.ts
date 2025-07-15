@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
 
     // Verifica autenticazione utente
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    ) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.PAYMENT_INTENT_UNAUTHORIZED.code,
         success: false,
@@ -32,7 +35,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Verifica lo stato del payment intent con Stripe utilizzando la funzione centralizzata
-    const paymentData = await verifyPaymentWithStripe(paymentIntentId, userObject.id);
+    const paymentData = await verifyPaymentWithStripe(
+      paymentIntentId,
+      userObject.id
+    );
 
     return NextResponse.json(
       {
@@ -44,10 +50,10 @@ export async function GET(req: NextRequest) {
     );
   } catch (error) {
     console.error("Error verifying payment intent:", error);
-    
+
     // Gestione errori specifici di Stripe
-    if (error instanceof Stripe.StripeError) {
-      if (error.code === 'resource_missing') {
+    if (error instanceof Stripe.errors.StripeError) {
+      if (error.code === "resource_missing") {
         return jsonErrorResponse(404, {
           code: ResponseCodesConstants.PAYMENT_INTENT_NOT_FOUND.code,
           success: false,
