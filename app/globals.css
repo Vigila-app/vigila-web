@@ -19,6 +19,10 @@ body {
   color: rgb(var(--foreground-rgb));
 }
 
+button {
+  cursor: pointer;
+}
+
 .skip-main {
   height: 1px;
   left: -999px;

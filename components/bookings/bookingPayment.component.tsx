@@ -50,13 +50,12 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   );
 
   if (error) {
-    console.log("BookingPaymentComponent error:", error);
+    console.error("BookingPaymentComponent error:", error);
   }
 
   const {
     showLoader,
     hideLoader,
-    loader: { isLoading },
   } = useAppStore();
 
   const loadBookingAndCreatePayment = async () => {
@@ -117,8 +116,31 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.id, service?.id]);
 
-  const updateBookingPaymentStatus = async (paymentIntentId: string) => {
+  const verifyAndUpdatePaymentStatus = async (paymentIntentId: string) => {
     try {
+      showLoader();
+      // Prima verifica lo stato del pagamento con Stripe
+      const paymentVerification = await PaymentService.verifyPaymentIntent(
+        paymentIntentId
+      );
+
+      if (!paymentVerification.success) {
+        throw new Error("Impossibile verificare lo stato del pagamento");
+      }
+
+      const { data: paymentData } = paymentVerification;
+
+      // Verifica che il pagamento sia andato a buon fine
+      if (!paymentData.succeeded || paymentData.status !== "succeeded") {
+        throw new Error("Il pagamento non è stato completato con successo");
+      }
+
+      // Verifica che il bookingId corrisponda
+      if (paymentData.bookingId !== booking!.id) {
+        throw new Error("Errore nella corrispondenza dei dati di pagamento");
+      }
+
+      // Se la verifica è ok, aggiorna lo stato della prenotazione
       const result = await BookingsService.updateBookingPaymentStatus(
         booking!.id,
         {
@@ -129,23 +151,38 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
       );
       return result;
     } catch (error) {
-      console.error("Failed to update booking payment status:", error);
+      console.error(
+        "Failed to verify and update booking payment status:",
+        error
+      );
       throw error;
+    } finally {
+      hideLoader();
     }
   };
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
-      // Aggiorna lo stato della prenotazione
-      await updateBookingPaymentStatus(paymentIntentId);
+      showLoader();
+      // Verifica e aggiorna lo stato della prenotazione
+      await verifyAndUpdatePaymentStatus(paymentIntentId);
 
       // Reindirizza alla pagina di successo o delle prenotazioni
       router.push(`${Routes.bookings.url}?success=true`);
     } catch (error) {
-      console.error("Error updating booking after payment:", error);
+      console.error(
+        "Error verifying and updating booking after payment:",
+        error
+      );
       // Anche se l'aggiornamento fallisce, il pagamento è andato a buon fine
-      // Quindi reindirizza comunque
-      router.push(`${Routes.bookings.url}?success=true`);
+      // Quindi reindirizza comunque alla pagina di risultato per gestire l'errore
+      router.push(
+        `${Routes.paymentBookingConfirm.url}?bookingId=${
+          booking!.id
+        }&payment_intent=${paymentIntentId}`
+      );
+    } finally {
+      hideLoader();
     }
   };
 

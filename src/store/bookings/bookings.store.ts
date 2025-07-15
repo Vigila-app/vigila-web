@@ -52,7 +52,7 @@ export const useBookingsStore = create<BookingStoreType>()(
               const getBookingDetailsBE = async () => {
                 try {
                   const bookingStoreBE = await BookingsService.getBookingDetails(bookingId);
-                  if (get().bookings?.length) {
+                  if (get().bookings.some((b) => b.id === bookingStoreBE.id)) {
                     set(
                       () => ({
                         bookings: get().bookings.map((booking) => {

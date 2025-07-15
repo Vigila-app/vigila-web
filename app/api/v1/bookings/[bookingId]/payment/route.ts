@@ -3,6 +3,7 @@ import {
   authenticateUser,
   getAdminClient,
   jsonErrorResponse,
+  verifyPaymentWithStripe,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -50,6 +51,28 @@ export async function PUT(
         code: ResponseCodesConstants.BOOKINGS_UPDATE_NOT_FOUND.code,
         success: false,
       });
+    }
+
+    // Verifica del pagamento con Stripe se si sta aggiornando lo stato di pagamento a "paid"
+    if (payment_id && payment_status === PaymentStatusEnum.PAID) {
+      try {
+        console.log(`Verifying payment for booking ${bookingId} with payment ID ${payment_id}`);
+        
+        await verifyPaymentWithStripe(
+          payment_id,
+          userObject.id,
+          bookingId
+        );
+
+        console.log(`Payment verification successful for booking ${bookingId}`);
+      } catch (paymentError) {
+        console.error(`Payment verification failed for booking ${bookingId}:`, paymentError);
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
+          success: false,
+          error: `Payment verification failed: ${paymentError instanceof Error ? paymentError.message : 'Unknown error'}`,
+        });
+      }
     }
 
     // Prepara i dati di aggiornamento
