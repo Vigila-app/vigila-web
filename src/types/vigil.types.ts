@@ -5,6 +5,7 @@ export type VigilDetailsType = {
   surname?: string;
   email?: string;
   id: string;
+  information?:string;
   username?: string;
   other?: { [key: string]: string | number };
 };

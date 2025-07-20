@@ -6,6 +6,8 @@ export type ConsumerDetailsType = {
   email?: string;
   id: string;
   username?: string;
+  lovedOneName?:string;
+  lovedOneAge?:string;
   other?: { [key: string]: string | number };
 };
 

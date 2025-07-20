@@ -4,6 +4,7 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { useState } from "react";
 
 import TabInattesa from "@/app/vigil/tabs/TabsPrenotazioni/TabInAttesa";
+import TabConfirmed from "./TabsPrenotazioni/TabConfirmed";
 
 const tabs: TabI[] = [
   {
@@ -36,7 +37,7 @@ const PrenotationTabs = () => {
       </div>
       
       {selectedTab.label === "In attesa" && <TabInattesa />}
-      {selectedTab.label === "Accettate" && <TabInattesa />}
+      {selectedTab.label === "Accettate" && <TabConfirmed/>}
       {selectedTab.label === "Completate" && <TabInattesa />}
       {/* //  ToDO popolazione delle prenotazione  */}
     </section>

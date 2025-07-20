@@ -1,9 +1,23 @@
 import Card from "@/components/card/card";
+import { useUserStore } from "@/src/store/user/user.store";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { useEffect } from "react";
 
 const PanoramicaTab = () => {
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const { user, userDetails } = useUserStore();
+
+  useEffect(() => {
+    if (user?.id) {
+      getVigilsDetails([user.id], true);
+    }
+  }, [user?.id]);
+
+  const vigil = vigils.find((v) => v.id === user?.id);
+
   return (
     <section className="p-4 bg-gray-100 rounded-b-2xl">
-      <Card  >
+      <Card>
         <h1 className="flex flex-row items-center gap-2 pb-2">
           <span>
             <svg
@@ -26,10 +40,7 @@ const PanoramicaTab = () => {
 
         <div>
           <p className="font-medium leading-relaxed text-[13px]">
-           Ciao! Sono Marco, uno studente di Psicologia appassionato di scienze
-            e sport. Mi piace socializzare e stare delle persone e imparare
-            dalle loro esperienze. Sono disponibile per accompagnamento,
-            commissioni e piccole commissioni.
+            {vigil?.information}
           </p>
         </div>
       </Card>

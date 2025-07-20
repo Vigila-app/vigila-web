@@ -6,6 +6,7 @@ import { ServicesUtils } from "@/src/utils/services.utils";
 import { Avatar, Button } from "@/components";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type ServiceCardI = {
   service: ServiceI;
@@ -45,7 +46,7 @@ const ServiceCard = (props: ServiceCardI) => {
       </div>
       <div className="inline-flex w-full items-center justify-center gap-4">
         <Button secondary label="Vedi dettagli" />
-        <Button label="Prenota ora" action={goToBooking} />
+        <Button label="Prenota ora" role={RolesEnum.VIGIL} action={goToBooking} />
       </div>
     </article>
   );
