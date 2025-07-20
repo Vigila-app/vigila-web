@@ -16,10 +16,17 @@ import Avatar from "../avatar/avatar";
 import Badge from "../badge/badge.component";
 import { capitalize } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
+import Button from "../button/button";
+import Prenotazioni from "@/public/svg/Prenotazioni";
+import Orologio from "@/public/svg/Orologio";
+import { MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { BookingsService } from "@/src/services";
+import Cestino from "@/public/svg/cestino";
 
 type BookingCardComponentI = {
   bookingId: BookingI["id"];
   onUpdate?: (booking: BookingI) => void;
+  context?: "home" | "profile";
 };
 
 const BookingCardComponent = (props: BookingCardComponentI) => {
@@ -36,7 +43,6 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
-
   const booking = bookings.find((b) => b.id === bookingId);
   const service = services.find((s) => s.id === booking?.service_id);
   const vigil = vigils.find((v) => v.id === booking?.vigil_id);
@@ -77,6 +83,60 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       setLoading(false);
     }
   };
+  const [accepted, setAccepted] = useState<null | boolean>(null);
+
+  const handleAccepted = async () => {
+    setLoading(true);
+    // try {
+    await // TODO SERVICE PER I BOOKING BookingService.updateStatus(
+    //             ...,true,
+    //           );
+    console.log("successo");
+    setAccepted(true);
+    // showToast({
+    //   message: "Prenotazione updated successfully",
+    //   type: ToastStatusEnum.SUCCESS,
+    // });
+    // } catch (error) {...
+    // } finally {
+    setLoading(false);
+    // }
+  };
+  const handleRefused = async () => {
+    setLoading(true);
+    //   try {
+    console.log("successo");
+    setAccepted(false);
+    //   } catch (error) {...
+    //   } finally {
+    setLoading(false);
+    //   }
+  };
+
+  //cancellare prenotazione
+  const handleCancelBooking = async () => {
+    if (!bookingId) return;
+    setLoading(true);
+    try {
+      await BookingsService.cancelBooking(bookingId);
+      showToast({
+        message: "Prenotazione cancellata con successo.",
+        // type: "success",
+      });
+
+      if (booking) {
+        //se esiste booking per evitare il caso in cui booking è undefined
+        onUpdate?.(booking);
+      } // o triggera un refetch
+    } catch (error) {
+      showToast({
+        message: "Errore nella cancellazione della prenotazione.",
+        // type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: BookingStatusEnum) => {
     switch (status) {
@@ -113,27 +173,158 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       </div>
     );
   }
+  if (isConsumer) {
+    if (props.context === "profile") {
+      return (
+        <Card>
+          <div className="flex flex-col gap-2 mb-1">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start gap-2">
+                <Avatar
+                  size="big"
+                  userId={vigil?.id}
+                  value={vigil?.displayName}
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold text-[16]">
+                    {consumer?.lovedOneName}{" "}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {consumer?.lovedOneAge} anni
+                  </p>
+                </div>
+              </div>
+              <Button
+                label={<Cestino />}
+                className=" flex items-center justify-center "
+                action={handleCancelBooking}
+              />
+            </div>
+            <div className="flex justify-between">
+              <p className="font-semibold text-[12px] text-consumer-blue">
+                {service?.name}
+              </p>
+              <p className="font-semibold text-[12px] text-vigil-orange">
+                €{service?.unit_price}{" "}
+              </p>
+              {/* <p>{service?.adress}</p> */}
+            </div>
+            <div className="flex gap-2">
+              <span className="flex items-center justify-center gap-1">
+                <Prenotazioni /> date
+              </span>
+              <span className="flex items-center justify-center gap-1">
+                <Orologio /> time
+              </span>
+            </div>
+            <div className="flex items-start space-x-2 text-sm">
+              <MapPinIcon className="w-4 h-4  mt-0.5" />
+              <span className="text-gray-600">{booking?.address}</span>
+            </div>
+            {service?.description && (
+              <div className="flex flex-col">
+                <p className="text-[10px] font-semibold text-consumer-blue">
+                  Note
+                </p>
+                <p className="text-[10px] font-normal">{booking?.note}</p>
+              </div>
+            )}
+          </div>
+        </Card>
+      );
+    } else {
+      return (
+        <Card>
+          <div className="flex gap-2 ">
+            <div className="">
+              <div className="inline-flex items-center flex-nowrap gap-2">
+                <Avatar
+                  size="big"
+                  userId={consumer?.id}
+                  value={consumer?.displayName}
+                />
+              </div>
+            </div>
+            <div className=" text-[10px]">
+              <p>{service?.name}</p>
+              <p>{service?.description}</p>
+              <p>
+                <span className="font-medium text-[10px]">
+                  Data del Servizio:
+                </span>
+                {dateDisplay(booking.startDate)}
+              </p>
+            </div>
+            <div className="flex justify-between items-center">
+              <Badge
+                label={capitalize(booking.status as string)}
+                color={getStatusColor(booking.status as BookingStatusEnum)}
+              />
+            </div>
+          </div>
+        </Card>
+      );
+    }
+  }
   return (
     <Card>
-      <div className="flex gap-2 ">
-        <div className="">
-          <p className="inline-flex items-center flex-nowrap gap-2">
-            <Avatar size="big" userId={vigil?.id} value={vigil?.displayName} />
-          </p>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-start gap-2">
+          <Avatar size="big" userId={vigil?.id} value={vigil?.displayName} />
+          <div className="flex flex-col">
+            <p className="font-semibold text-[16]">{consumer?.lovedOneName} </p>
+            <p className="text-sm text-gray-600">
+              {consumer?.lovedOneAge} anni
+            </p>
+          </div>
         </div>
-        <div className=" text-[10px]">
-          <p>{service?.name}</p>
-          <p>{service?.description}</p>
-          <p>
-            <span className="font-medium text-[10px]">Data del Servizio:</span>
-            {dateDisplay(booking.startDate)}
+        <div className="flex justify-between">
+          <p className="font-semibold text-[12px] text-consumer-blue">
+            {service?.name}
           </p>
+          <p className="font-semibold text-[12px] text-vigil-orange">
+            €{service?.unit_price}{" "}
+          </p>
+          {/* <p>{service?.adress}</p> */}
         </div>
-        <div className="flex justify-between items-center">
-          <Badge
-            label={capitalize(booking.status as string)}
-            color={getStatusColor(booking.status as BookingStatusEnum)}
-          />
+        <div className="flex gap-2">
+          <span className="flex items-center justify-center gap-1">
+            <Prenotazioni /> date
+          </span>
+          <span className="flex items-center justify-center gap-1">
+            <Orologio /> time
+          </span>
+        </div>
+        <div className="flex items-start space-x-2 text-sm">
+          <MapPinIcon className="w-4 h-4  mt-0.5" />
+          <span className="text-gray-600">{booking?.address}</span>
+        </div>
+        {booking?.note && (
+          <div className="bg-gray-100 p-3 rounded-2xl">
+            <p className="text-[10px] ">{booking?.note}</p>
+          </div>
+        )}
+        <div className="flex justify-center gap-3">
+          {accepted === null ? (
+            <>
+              <Button
+                customclass="!px-6 !py-2"
+                role={RolesEnum.CONSUMER}
+                label="Accetta"
+                action={handleAccepted}
+              />
+              <Button
+                customclass="!px-6 !py-2"
+                role={RolesEnum.VIGIL}
+                action={handleRefused}
+                label="Rifiuta"
+              />
+            </>
+          ) : accepted === true ? (
+            <Button label="Accettata" disabled />
+          ) : (
+            <Button label="Rifiutata" disabled />
+          )}
         </div>
       </div>
     </Card>

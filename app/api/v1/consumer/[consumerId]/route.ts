@@ -25,7 +25,7 @@ export async function GET(
     const userObject = await authenticateUser(req);
     if (
       !userObject?.id ||
-      userObject.user_metadata?.role?.toUpperCase() !== RolesEnum.VIGIL
+      userObject.user_metadata?.role?.toUpperCase() == RolesEnum.VIGIL
     )
       return jsonErrorResponse(403, {
         code: ResponseCodesConstants.CONSUMER_DETAILS_FORBIDDEN.code,
