@@ -19,6 +19,7 @@ import { FormFieldType } from "@/src/constants/form.constants";
 import { SearchAddress } from "../maps";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -177,7 +178,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           </p>
         </div>
 
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-blue-100 border border-blue-400 p-3">
+        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-consumer-light-blue border border-consumer-blue p-3">
           <Avatar
             size="big"
             userId={vigilDetails?.id}
@@ -210,6 +211,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 type="text"
                 disabled
                 required
+                role={RolesEnum.VIGIL}
                 error={errors.service_id}
                 value={selectedService?.name || ""}
               />
@@ -227,6 +229,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               label="Data"
               type="datetime-local"
               required
+              role={RolesEnum.VIGIL}
               error={errors.startDate}
               value={
                 field.value
@@ -261,6 +264,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           render={({ field }) => (
             <InputQuantity
               {...field}
+              role={RolesEnum.VIGIL}
               label={`Durata (${ServicesUtils.getServiceUnitType(
                 selectedService?.unit_type as string
               )})`}
@@ -274,6 +278,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
         <SearchAddress
           location
+          form={true}
           onSubmit={(address) =>
             address?.display_name
               ? setValue("address", address.display_name)
@@ -292,16 +297,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               label="Note"
               placeholder="Aggiungi eventuali note per il Vigil"
               rows={3}
+              role={RolesEnum.VIGIL}
               error={errors.note}
             />
           )}
         />
 
         {selectedService && (
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <h3 className="font-medium text-gray-900">
-              Riepilogo Prenotazione
-            </h3>
+          <div className="p-4 bg-vigil-light-orange rounded-lg border border-vigil-orange">
+            <h3 className="font-medium">Riepilogo Prenotazione</h3>
             <div className="mt-2 space-y-1 text-sm text-gray-600">
               <p>
                 Servizio: {selectedService.name}
@@ -318,7 +322,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 Quantità: {watchedDuration}&nbsp;
                 {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
               </p>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium">
                 Totale: {selectedService.currency} {amountDisplay(totalAmount)}
               </p>
             </div>

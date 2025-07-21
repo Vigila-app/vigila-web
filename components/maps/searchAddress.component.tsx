@@ -20,6 +20,8 @@ const SearchAddress = (props: {
   onSubmit: (address: AddressI) => void;
   minLength?: number;
   label?: string;
+  role?: RolesEnum;
+  form?:boolean;
   location?: boolean;
   placeholder?: string;
 }) => {
@@ -28,6 +30,7 @@ const SearchAddress = (props: {
     minLength = 3,
     label = "Search Address",
     location = false,
+    form,
     placeholder = "Inserisci città",
   } = props;
   const { currentLocation } = useCurrentLocation({
@@ -163,6 +166,7 @@ const SearchAddress = (props: {
               placeholder={placeholder}
               type="text"
               required
+              form={form}
               isLoading={isLoading}
               role={role}
               aria-invalid={!!errors.search}
