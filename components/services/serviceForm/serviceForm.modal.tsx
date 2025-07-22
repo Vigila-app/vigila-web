@@ -1,5 +1,7 @@
 import { ModalBase } from "@/components/@core/modal";
-import ServiceFormComponent, { ServiceFormI } from "@/components/services/serviceForm/serviceForm.component";
+import ServiceFormComponent, {
+  ServiceFormI,
+} from "@/components/services/serviceForm/serviceForm.component";
 import { ServiceI } from "@/src/types/services.types";
 
 export const ServiceFormModalId = "service-form-modal";

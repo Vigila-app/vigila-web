@@ -89,14 +89,12 @@ const ServiceFormComponent = (props: ServiceFormI) => {
   return (
     <div
       className={clsx(
-        "bg-white w-full mx-auto rounded-lg",
+        "bg-white w-full mx-auto rounded-lg p-4 mt-2",
         isModal ? "!p-0 mb-0" : /*"shadow-lg"*/ ""
-      )}
-    >
+      )}>
       <form
         onSubmit={handleSubmit(handleOnSubmit)}
-        className="space-y-6 text-black"
-      >
+        className="space-y-6 text-black">
         {title || text ? (
           <div>
             {title ? (
@@ -118,6 +116,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               label="Nome"
               placeholder="Nome del servizio"
               type="text"
+              role={RolesEnum.VIGIL}
               required
               aria-invalid={!!errors.name}
               error={errors.name}
@@ -133,6 +132,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
             <TextArea
               {...field}
               label="Descrizione"
+              role={RolesEnum.VIGIL}
               placeholder="Descrivi il servizio che vuoi offrire"
               aria-invalid={!!errors.description}
               error={errors.description}
@@ -152,7 +152,8 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               placeholder="Inserisci il prezzo unitario"
               type="number"
               required
-              step=".01"
+              role={RolesEnum.VIGIL}
+              step=".5"
               aria-invalid={!!errors.unit_price}
               error={errors.unit_price}
               onChange={(v) => field.onChange(Number(v))}
@@ -170,6 +171,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               label="Unità"
               placeholder="Seleziona unità"
               required
+              role={RolesEnum.VIGIL}
               error={errors.unit_type}
               options={[
                 { label: "Minuti", value: "minutes" },
@@ -196,6 +198,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
                   {...field}
                   label="Active"
                   withIcon
+                  role={RolesEnum.VIGIL}
                   aria-invalid={!!errors.active}
                   value="active"
                   checked={field.value}
