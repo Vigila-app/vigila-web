@@ -1,38 +1,57 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { FormUtils } from "@/src/utils/form.utils";
-import clsx from "clsx";
 import { FieldError } from "react-hook-form";
 
-type SelectI = React.SelectHTMLAttributes<HTMLSelectElement> & {
+type Option = {
   label: string;
-  placeholder?: string;
-  icon?: React.ReactElement;
-  error?: FieldError;
-  options: { label: string; value: string | number; disabled?: boolean }[];
-  onChange?: (value: string) => void;
-  role?: RolesEnum;
+  value: string | number;
+  disabled?: boolean;
 };
 
-const Select = (props: SelectI) => {
-  const {
-    error,
-    icon,
-    id,
-    label,
-    name,
-    onChange,
-    options = [],
-    placeholder,
-    required = false,
-    disabled,
-    role,
-  } = props;
+type CustomSelectProps = {
+  label: string;
+  placeholder?: string;
+  error?: FieldError;
+  options: Option[];
+  onChange?: (value: string) => void;
+  value?: string;
+  role?: RolesEnum;
+  required?: boolean;
+  disabled?: boolean;
+};
+
+const CustomSelect = ({
+  label,
+  placeholder,
+  error,
+  options,
+  onChange,
+  value,
+  role,
+  required = false,
+  disabled = false,
+}: CustomSelectProps) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const selected = options.find((opt) => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="">
-      
+    <div ref={wrapperRef} className="relative">
+      {/* Label */}
       <span
         className={clsx(
           "pointer-events-none start-2.5 rounded bg-white p-0.5",
@@ -40,65 +59,64 @@ const Select = (props: SelectI) => {
           role === RolesEnum.VIGIL && "text-vigil-orange",
           error && "text-red-500",
           disabled && "!bg-gray-100"
-        )}>
+        )}
+      >
         {label}
         {required && <>*</>}
       </span>
 
-      <label
-        htmlFor={name || label}
+      {/* Trigger Button */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((prev) => !prev)}
         className={clsx(
-          "relative block p-3 rounded-4xl border bg-white shadow-sm",
-          icon && "pr-10",
+          "w-full p-3 text-left rounded-4xl border bg-white shadow-sm",
+          "focus:outline-none",
           role === RolesEnum.CONSUMER &&
-            "text-consumer-blue border-consumer-blue focus-within:border-consumer-blue focus-within:ring-1 focus-within:ring-consumer-blue",
+            "text-consumer-blue border-consumer-blue focus:ring-1 focus:ring-consumer-blue",
           role === RolesEnum.VIGIL &&
-            "text-vigil-orange border-vigil-orange focus-within:border-vigil-orange focus-within:ring-1 focus-within:ring-vigil-orange",
+            "text-vigil-orange border-vigil-orange focus:ring-1 focus:ring-vigil-orange",
           error && "border-red-500",
           disabled && "!bg-gray-100 cursor-not-allowed"
-        )}>
-        <section className="w-[100]">
-          <select
-            {...{ ...props, error: undefined, icon: undefined }}
-            id={id || name || label}
-            defaultValue=""
-            className={clsx(
-              "w-full border-none bg-transparent text-black placeholder:text-gray-400  focus:outline-none disabled:cursor-not-allowed",
-              role === RolesEnum.CONSUMER &&
-                "text-consumer-blue border-consumer-blue ",
-              role === RolesEnum.VIGIL &&
-                "text-vigil-orange border-vigil-orange "
-            )}
-            onChange={({ currentTarget: { value } }) => onChange?.(value)}>
-            {[
-              { label: placeholder || label, value: "", disabled: true },
-              ...options,
-            ].map((option) => (
-              <option
-                key={option.label}
-                value={option.value}
-                disabled={option.disabled}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </section>
-        {icon ? (
-          <span className="pointer-events-none absolute inset-y-0 end-0 grid w-10 place-content-center text-gray-500">
-            {icon}
-          </span>
-        ) : null}
+        )}
+      >
+        {selected ? selected.label : placeholder || "Seleziona..."}
+      </button>
 
-        {error ? (
-          <p
-            role="alert"
-            className="absolute start-2.5 -bottom-4 text-xs text-red-500">
-            {FormUtils.getErrorByType(error)}
-          </p>
-        ) : null}
-      </label>
+      {/* Dropdown Options */}
+      {open && (
+        <ul
+          className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-60 overflow-auto"
+        >
+          {options.map((option) => (
+            <li
+              key={option.value}
+              className={clsx(
+                "cursor-pointer px-4 py-2 text-sm text-vigil-orange hover:bg-gray-100",
+                option.disabled && "text-gray-400 cursor-not-allowed",
+               
+              )}
+              onClick={() => {
+                if (option.disabled) return;
+                onChange?.(String(option.value));
+                setOpen(false);
+              }}
+            >
+              {option.label}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Error */}
+      {error ? (
+        <p role="alert" className="mt-1 text-xs text-red-500">
+          {FormUtils.getErrorByType(error)}
+        </p>
+      ) : null}
     </div>
   );
 };
 
-export default Select;
+export default CustomSelect;
