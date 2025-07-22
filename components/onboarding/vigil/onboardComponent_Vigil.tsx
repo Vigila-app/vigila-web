@@ -18,8 +18,9 @@ import { AddressI } from "@/src/types/maps.types";
 import MapsComponent from "@/components/maps/maps.component";
 import clsx from "clsx";
 import Card from "@/components/card/card";
+import ServiceOboard from "./VigilOnbordComp/ServiceOnboard";
 
-import { Service } from "@/src/types/offeredService";
+import { ServiceI } from "@/src/types/services.types";
 
 type OnboardFormI = {
   birthday: string;
@@ -30,7 +31,7 @@ type OnboardFormI = {
   phone: string;
   transportation: string;
   cap: string;
-
+  services: ServiceI[]; // Ora è un array di oggetti Service
   // TODO add other detail fields
 };
 
@@ -76,6 +77,7 @@ const OnboardComponent = () => {
         cap,
         information,
         phone,
+        services,
       } = formData;
 
       {
@@ -100,6 +102,7 @@ const OnboardComponent = () => {
             transportation,
             information,
             phone,
+            services,
           },
         });
         //TODO {qui aggiungi i campi modificati } );
@@ -307,7 +310,14 @@ const OnboardComponent = () => {
                 />
               )}
             />
-
+            {/* TODo chiedere se si deve collegare il field e aggiornare il form con onchange  */}
+            <Controller
+            name="services"
+            control={control}
+             render={({})=>(
+              <ServiceOboard />
+            )}/>
+            
             <div className="flex items-center justify-end">
               <Button
                 type="submit"

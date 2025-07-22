@@ -1,5 +1,6 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { AddressI } from "./maps.types";
+import { ServiceI } from "./services.types";
 
 export type FormFieldRegex = {
   [fieldName: string]: {
@@ -40,6 +41,7 @@ export interface VigilFormData {
   information?: string;
   addresses: AddressI[];
   cap: string[];
+  services:ServiceI[]
 }
 export type RoleBasedFormData =
   | { role: RolesEnum.VIGIL; data: VigilFormData }

@@ -59,6 +59,16 @@ const ServiceFormComponent = (props: ServiceFormI) => {
       if (isValid) {
         showLoader();
         const newService = await ServicesUtils.createNewService(formData);
+        if (isModal) {
+          onSubmit?.(newService);
+          showToast({
+            message: "Servizio aggiunto alla lista temporanea!",
+            type: ToastStatusEnum.SUCCESS,
+          });
+          reset();
+          closeModal();
+          return;
+        }
         let result: ServiceI;
         if (service?.id) {
           // Edit service
