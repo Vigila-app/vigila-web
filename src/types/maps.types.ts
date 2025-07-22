@@ -5,6 +5,7 @@ export type AddressI = {
   quarter?:string;
   country?: string;
   postCode?: string;
+  postalCode?:string;
   postcode?: string;
   cap?: string;
   intercom?: string;

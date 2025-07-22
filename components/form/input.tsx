@@ -12,7 +12,7 @@ type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: FieldError;
   onChange?: (value: string | number) => void;
   role?: RolesEnum;
-  form?: boolean;
+  isForm?: boolean;
   isLoading?: boolean;
 };
 
@@ -24,7 +24,7 @@ const Input = (props: InputI) => {
     id,
     label,
     name,
-    form,
+    isForm,
     role,
     onChange,
     required = false,
@@ -38,7 +38,7 @@ const Input = (props: InputI) => {
         htmlFor={name || label}
         className={clsx(
           "pointer-events-none start-2.5  bg-white p-0.5 ",
-          form === true && "text-vigil-orange",
+          isForm === true && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
           role === RolesEnum.VIGIL && " text-vigil-orange",
           error && "text-red-500",
@@ -51,7 +51,7 @@ const Input = (props: InputI) => {
       <div
         className={clsx(
           "relative w-full inline-flex items-center p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
-          form === true &&
+          isForm === true &&
             "text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
           role === RolesEnum.CONSUMER &&
             "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",

@@ -278,7 +278,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
         <SearchAddress
           location
-          form={true}
+          isForm={true}
           onSubmit={(address) =>
             address?.display_name
               ? setValue("address", address.display_name)

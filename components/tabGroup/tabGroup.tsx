@@ -61,12 +61,10 @@ const TabGroup = (props: TabGroupI) => {
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-                "px-5 py-2 text-[10px] font-medium transition-colors border-t-2  ",
-                activeTab.label === tab.label
-                  ? role === RolesEnum.CONSUMER
-                    ? "border-consumer-blue text-consumer-blue stroke-consumer-blue"
-                    : "border-vigil-orange text-vigil-orange stroke-vigil-orange"
-                  : "border-transparent text-gray-500 stroke-gray-500 hover:text-black  hover:stroke-black"
+                "px-5 py-2 text-[10px] font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500 focus:bg-white ",
+                activeTab.label === tab.label && role === RolesEnum.CONSUMER
+                  ? " focus-within:text-consumer-blue"
+                  : "focus-within:text-vigil-orange   "
               )}>
               {tab.label}
             </button>

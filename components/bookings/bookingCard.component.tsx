@@ -14,7 +14,11 @@ import { useEffect, useState } from "react";
 import Card from "../card/card";
 import Avatar from "../avatar/avatar";
 import Badge from "../badge/badge.component";
-import { capitalize } from "@/src/utils/common.utils";
+import {
+  amountDisplay,
+  capitalize,
+  formatBookingDate,
+} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import Button from "../button/button";
 import Prenotazioni from "@/public/svg/Prenotazioni";
@@ -43,6 +47,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
+
+
   const booking = bookings.find((b) => b.id === bookingId);
   const service = services.find((s) => s.id === booking?.service_id);
   const vigil = vigils.find((v) => v.id === booking?.vigil_id);
@@ -137,7 +143,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       setLoading(false);
     }
   };
-
+console.log(service?.name);
   const getStatusColor = (status: BookingStatusEnum) => {
     switch (status) {
       case BookingStatusEnum.PENDING:
@@ -204,24 +210,23 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
               <p className="font-semibold text-[12px] text-consumer-blue">
                 {service?.name}
               </p>
-              <p className="font-semibold text-[12px] text-vigil-orange">
-                €{service?.unit_price}{" "}
-              </p>
-              {/* <p>{service?.adress}</p> */}
-            </div>
-            <div className="flex gap-2">
-              <span className="flex items-center justify-center gap-1">
-                <Prenotazioni /> date
+
+              <span className="font-semibold text-[12px] text-vigil-orange">
+                {service?.currency}
+                {amountDisplay(booking?.price * booking?.quantity)}
               </span>
-              <span className="flex items-center justify-center gap-1">
-                <Orologio /> time
+            </div>
+
+            <div className="flex ">
+              <span className="flex items-center justify-center gap-1 font font-normal text-sm">
+                <Prenotazioni /> {formatBookingDate(booking?.startDate)}
               </span>
             </div>
             <div className="flex items-start space-x-2 text-sm">
               <MapPinIcon className="w-4 h-4  mt-0.5" />
               <span className="text-gray-600">{booking?.address}</span>
             </div>
-            {service?.description && (
+            {booking?.note && (
               <div className="flex flex-col">
                 <p className="text-[10px] font-semibold text-consumer-blue">
                   Note

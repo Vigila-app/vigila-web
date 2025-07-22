@@ -48,12 +48,7 @@ export default function FamigliaTab() {
           <MapPinIcon className="w-4 h-4  mt-0.5" />
           <span className="text-gray-600">adress del consumer</span>
         </div>
-        {/* {service?.description && (
-          <div className="flex flex-col">
-            <p className="text-[10px] font-semibold text-consumer-blue">Note</p>
-            <p className="text-[10px] font-normal">{booking?.note}</p>
-          </div>
-        )} */}
+        
       </div>
     </Card>
   );

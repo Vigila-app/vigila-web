@@ -114,13 +114,13 @@ const ProfileComponent = () => {
                     <h1 className="text-3xl font-bold mb-2 text-center">
                       {userDetails?.displayName}
                     </h1>
-                    {/* <span className="text-gray-500 font-medium flex items-center text-center">
+                    <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
-                  </span> */}
+                  </span>
                     <div className="flex items-center gap-2  mb-3">
                       <span>📍 TODO localizzazione</span>
                       <span>
-                        🗓️ Su Vigil da:
+                        🗓️ Su Vigila da:
                         {/* {created_at} */}
                       </span>
                     </div>
@@ -130,6 +130,7 @@ const ProfileComponent = () => {
               <TabGroup
                 role={role}
                 tabs={tabs}
+                
                 onTabChange={(tab) => setSelectedTab(tab)}
               />
               {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}

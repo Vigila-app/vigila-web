@@ -16,14 +16,14 @@ const ServicesComponent = () => {
 
   const searchServices = async ({ address }: AddressI) => {
     try {
-      if (address?.postCode || address?.postalCode || address?.postcode) {
+      if (address?.postCode || address?.postalCode || address?.postcode ||address?.cap) {
         showLoader();
         const services = await ApiService.get<{ data: ServiceI[] }>(
           apiServices.LIST(),
           {
             postalCode: (address.postCode ||
               address.postalCode ||
-              address.postcode) as string,
+              address.postcode || address.cap) as string,
           }
         );
         if (!services?.data) {

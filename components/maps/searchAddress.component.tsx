@@ -4,7 +4,7 @@ import { FormFieldType } from "@/src/constants/form.constants";
 import { MapsService } from "@/src/services";
 import { debounce } from "@/src/utils/common.utils";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, set, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
@@ -21,7 +21,7 @@ const SearchAddress = (props: {
   minLength?: number;
   label?: string;
   role?: RolesEnum;
-  form?:boolean;
+  isForm?: boolean;
   location?: boolean;
   placeholder?: string;
 }) => {
@@ -30,7 +30,7 @@ const SearchAddress = (props: {
     minLength = 3,
     label = "Search Address",
     location = false,
-    form,
+    isForm,
     placeholder = "Inserisci città",
   } = props;
   const { currentLocation } = useCurrentLocation({
@@ -120,9 +120,11 @@ const SearchAddress = (props: {
         const results = await MapsService.autocompleteAddress(watch().search);
         if (results.length > 1) {
           setAutocompleteResults(results);
+          console.log(results);
         } else if (results.length === 1) {
           const address = results[0];
           setValue("search", address.display_name || address.city || "");
+          console.log(address);
           submit(address);
           setSubmitted(false);
         }
@@ -143,13 +145,20 @@ const SearchAddress = (props: {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, currentLocation]);
+  
+  const debouncedAutocomplete = useCallback(
+    debounce(()=>autocompleteAdress(), 500), // es: 500ms
+    []
+  );
 
   useEffect(() => {
+    console.log("Input corrente:", watch().search);
     setSubmitted(false);
-    debounce(autocompleteAdress);
     setAutocompleteResults([]);
+    debouncedAutocomplete();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch()?.search]);
+
 
   return (
     <>
@@ -166,7 +175,7 @@ const SearchAddress = (props: {
               placeholder={placeholder}
               type="text"
               required
-              form={form}
+              isForm={isForm}
               isLoading={isLoading}
               role={role}
               aria-invalid={!!errors.search}
