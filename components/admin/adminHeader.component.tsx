@@ -2,67 +2,38 @@
 
 import { Routes } from "@/src/routes";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { RolesEnum } from "@/src/enums/roles.enums";
 import Link from "next/link";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
+type AdminHeaderProps = {
+  children?: React.ReactNode;
+};
+export const AdminHeader = (props: AdminHeaderProps) => {
+  const { children } = props;
   const user = useUserStore((state) => state.user);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user === null) {
-      // Still loading
-      return;
-    }
-    
-    if (!user?.id || user.user_metadata?.role !== RolesEnum.ADMIN) {
-      router.replace(Routes.home.url);
-      return;
-    }
-    
-    setLoading(false);
-  }, [user, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
 
   const navigationItems = [
     { href: Routes.adminOverview.url, label: "Panoramica", icon: "📊" },
     { href: Routes.adminBookings.url, label: "Prenotazioni", icon: "📅" },
     { href: Routes.adminPayments.url, label: "Pagamenti", icon: "💳" },
-    { href: Routes.adminVigils.url, label: "Vigili", icon: "👮" },
+    { href: Routes.adminVigils.url, label: "Vigils", icon: "👮" },
     { href: Routes.adminConsumers.url, label: "Utenti", icon: "👥" },
     { href: Routes.adminServices.url, label: "Servizi", icon: "🛠️" },
     { href: Routes.adminAnalytics.url, label: "Analytics", icon: "📈" },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <>
+      <nav className="bg-white shadow-sm border-b w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
+            <div className="inline-flex items-center">
                 <h1 className="text-xl font-bold text-gray-900">
                   Admin Dashboard
                 </h1>
-              </div>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">
-                Benvenuto, {user?.user_metadata?.name}
+                Benvenuto, {user?.user_metadata?.name || "Admin"}
               </span>
               <Link
                 href={Routes.home.url}
@@ -76,7 +47,7 @@ export default function AdminLayout({
       </nav>
 
       <div className="flex">
-        <aside className="w-64 bg-white shadow-sm min-h-screen">
+        <aside className="w-64 bg-white border-r border-gray-200 shadow min-h-screen">
           <nav className="mt-5 px-2">
             <div className="space-y-1">
               {navigationItems.map((item) => (
@@ -92,11 +63,8 @@ export default function AdminLayout({
             </div>
           </nav>
         </aside>
-
-        <main className="flex-1 p-6">
-          {children}
-        </main>
+        <div className="bg-gray-50 flex-1 p-6 max-h-[calc(100vh-4rem)] overflow-y-auto">{children}</div>
       </div>
-    </div>
+    </>
   );
-}
+};

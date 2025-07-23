@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ApiService } from "@/src/services";
+import PromoteUserComponent from "@/components/admin/promoteUser.component";
 
 interface DashboardStats {
   totalBookings: number;
@@ -93,7 +94,7 @@ export default function AdminOverviewPage() {
           <div className="flex items-center">
             <div className="text-3xl mr-4">👮</div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Vigili Attivi</p>
+              <p className="text-sm font-medium text-gray-600">Vigils Attivi</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalVigils}</p>
             </div>
           </div>
@@ -192,6 +193,14 @@ export default function AdminOverviewPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Sezione Promozione Admin */}
+      <div className="mt-8">
+        <PromoteUserComponent onSuccess={() => {
+          // Potremmo aggiornare le statistiche dopo una promozione
+          console.log("Utente promosso con successo");
+        }} />
       </div>
     </div>
   );

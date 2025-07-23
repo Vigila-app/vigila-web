@@ -212,7 +212,7 @@ export default function AdminAnalyticsPage() {
             </p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-600">Nuovi Vigili</p>
+            <p className="text-sm text-gray-600">Nuovi Vigils</p>
             <p className={`text-2xl font-bold ${analytics.monthlyGrowth.vigils >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {analytics.monthlyGrowth.vigils >= 0 ? '+' : ''}{analytics.monthlyGrowth.vigils}%
             </p>
@@ -283,7 +283,7 @@ export default function AdminAnalyticsPage() {
       {/* Top performers */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Vigili</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Vigils</h3>
           <div className="space-y-3">
             {analytics.topPerformers.vigils.map((vigil, index) => (
               <div key={index} className="flex justify-between items-center">

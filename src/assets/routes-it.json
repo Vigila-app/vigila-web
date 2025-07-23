@@ -103,8 +103,8 @@
     "title": "Dashboard",
     "menu": {
       "mobile": false,
-      "desktop": true,
-      "header": true,
+      "desktop": false,
+      "header": false,
       "footer": false
     },
     "private": true,
@@ -124,20 +124,20 @@
     "roles": []
   },
   "admin": {
-    "url": "/admin",
+    "url": "/dashboard-admin",
     "label": "Admin Dashboard",
     "title": "Admin Dashboard",
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": true,
     "roles": ["ADMIN"]
   },
   "adminOverview": {
-    "url": "/admin/overview",
+    "url": "/dashboard-admin/overview",
     "label": "Panoramica",
     "title": "Panoramica Admin",
     "menu": {
@@ -150,7 +150,7 @@
     "roles": ["ADMIN"]
   },
   "adminBookings": {
-    "url": "/admin/bookings",
+    "url": "/dashboard-admin/bookings",
     "label": "Gestione Prenotazioni",
     "title": "Gestione Prenotazioni",
     "menu": {
@@ -163,7 +163,7 @@
     "roles": ["ADMIN"]
   },
   "adminPayments": {
-    "url": "/admin/payments",
+    "url": "/dashboard-admin/payments",
     "label": "Gestione Pagamenti",
     "title": "Gestione Pagamenti",
     "menu": {
@@ -176,7 +176,7 @@
     "roles": ["ADMIN"]
   },
   "adminVigils": {
-    "url": "/admin/vigils",
+    "url": "/dashboard-admin/vigils",
     "label": "Gestione Vigili",
     "title": "Gestione Vigili",
     "menu": {
@@ -189,7 +189,7 @@
     "roles": ["ADMIN"]
   },
   "adminConsumers": {
-    "url": "/admin/consumers",
+    "url": "/dashboard-admin/consumers",
     "label": "Gestione Utenti",
     "title": "Gestione Utenti",
     "menu": {
@@ -202,7 +202,7 @@
     "roles": ["ADMIN"]
   },
   "adminServices": {
-    "url": "/admin/services",
+    "url": "/dashboard-admin/services",
     "label": "Gestione Servizi",
     "title": "Gestione Servizi",
     "menu": {
@@ -215,7 +215,7 @@
     "roles": ["ADMIN"]
   },
   "adminAnalytics": {
-    "url": "/admin/analytics",
+    "url": "/dashboard-admin/analytics",
     "label": "Analytics",
     "title": "Analytics e Statistiche",
     "menu": {

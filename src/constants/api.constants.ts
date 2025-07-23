@@ -210,10 +210,11 @@ export const apiVigil = {
 };
 
 export const apiAdmin = {
-  ANALYTICS: `${apiControllers.ADMIN()}/analytics`,
-  BOOKINGS: `${apiControllers.ADMIN()}/bookings`,
-  VIGILS: `${apiControllers.ADMIN()}/vigils`,
-  CONSUMERS: `${apiControllers.ADMIN()}/consumers`,
-  SERVICES: `${apiControllers.ADMIN()}/services`,
-  PAYMENTS: `${apiControllers.ADMIN()}/payments`,
+  ANALYTICS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/analytics`,
+  BOOKINGS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/bookings`,
+  VIGILS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/vigils`,
+  CONSUMERS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/consumers`,
+  SERVICES: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/services`,
+  PAYMENTS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/payments`,
+  PROMOTE_USER: (userId: string, isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
 };

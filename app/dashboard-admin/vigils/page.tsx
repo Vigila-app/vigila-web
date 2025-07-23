@@ -194,14 +194,14 @@ export default function AdminVigilsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Gestione Vigili</h1>
-        <p className="text-gray-600">Visualizza e gestisci tutti i vigili della piattaforma</p>
+        <h1 className="text-2xl font-bold text-gray-900">Gestione Vigils</h1>
+        <p className="text-gray-600">Visualizza e gestisci tutti i vigils della piattaforma</p>
       </div>
 
       {/* Statistiche */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Totale Vigili</p>
+          <p className="text-sm text-gray-600">Totale Vigils</p>
           <p className="text-2xl font-bold">{vigils.length}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
@@ -264,14 +264,14 @@ export default function AdminVigilsPage() {
         </div>
       </div>
 
-      {/* Tabella vigili */}
+      {/* Tabella vigils */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vigile
+                  Vigil
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contatti
