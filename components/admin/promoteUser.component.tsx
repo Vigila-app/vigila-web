@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { apiAdmin } from "@/src/constants/api.constants";
-import { ApiService } from "@/src/services";
+import { useAdminStore } from "@/src/store/admin/admin.store";
 
 interface PromoteUserComponentProps {
   userId?: string;
@@ -10,6 +9,7 @@ interface PromoteUserComponentProps {
 }
 
 export default function PromoteUserComponent({ userId: initialUserId, onSuccess }: PromoteUserComponentProps) {
+  const { promoteUser } = useAdminStore();
   const [userId, setUserId] = useState(initialUserId || "");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -18,7 +18,7 @@ export default function PromoteUserComponent({ userId: initialUserId, onSuccess 
     details?: any;
   }>({ type: null, message: "" });
 
-  const promoteUser = async () => {
+  const handlePromoteUser = async () => {
     if (!userId.trim()) {
       setResult({
         type: "error",
@@ -31,11 +31,7 @@ export default function PromoteUserComponent({ userId: initialUserId, onSuccess 
       setLoading(true);
       setResult({ type: null, message: "" });
 
-      const response = await ApiService.post(apiAdmin.PROMOTE_USER(userId)) as {
-        success: boolean;
-        message: string;
-        data?: any;
-      };
+      const response = await promoteUser(userId);
 
       if (response?.success) {
         setResult({
@@ -91,7 +87,7 @@ export default function PromoteUserComponent({ userId: initialUserId, onSuccess 
         </div>
 
         <button
-          onClick={promoteUser}
+          onClick={handlePromoteUser}
           disabled={loading || !userId.trim()}
           className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
             loading || !userId.trim()

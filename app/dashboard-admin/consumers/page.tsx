@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
 
-export default function AdminVigilsPage() {
+export default function AdminConsumersPage() {
   const { 
-    vigils, 
-    vigilsLoading, 
-    getVigils, 
-    updateVigilStatus 
+    consumers, 
+    consumersLoading, 
+    getConsumers 
   } = useAdminStore();
   
   const [filter, setFilter] = useState("all");
@@ -16,21 +15,21 @@ export default function AdminVigilsPage() {
 
   useEffect(() => {
     const filters = filter !== "all" ? { status: filter } : undefined;
-    getVigils(filters);
-  }, [filter, getVigils]);
+    getConsumers(filters);
+  }, [filter, getConsumers]);
 
-  const filteredVigils = vigils.filter(vigil => 
-    vigil.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vigil.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vigil.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConsumers = consumers.filter(consumer => 
+    consumer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    consumer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    consumer.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-gray-100 text-gray-800";
-      case "suspended": return "bg-red-100 text-red-800";
-      case "pending_verification": return "bg-yellow-100 text-yellow-800";
+      case "suspended": return "bg-yellow-100 text-yellow-800";
+      case "banned": return "bg-red-100 text-red-800";
+      case "pending_verification": return "bg-blue-100 text-blue-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -44,15 +43,7 @@ export default function AdminVigilsPage() {
     }
   };
 
-  const handleStatusUpdate = async (vigilId: string, newStatus: string) => {
-    try {
-      await updateVigilStatus(vigilId, newStatus);
-    } catch (error) {
-      console.error('Error updating vigil status:', error);
-    }
-  };
-
-  if (vigilsLoading) {
+  if (consumersLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -63,8 +54,8 @@ export default function AdminVigilsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Gestione Vigili</h1>
-        <p className="text-gray-600">Visualizza e gestisci tutti i vigili registrati sulla piattaforma</p>
+        <h1 className="text-2xl font-bold text-gray-900">Gestione Consumers</h1>
+        <p className="text-gray-600">Visualizza e gestisci tutti i clienti della piattaforma</p>
       </div>
 
       {/* Filtri e ricerca */}
@@ -81,20 +72,20 @@ export default function AdminVigilsPage() {
             >
               <option value="all">Tutti gli stati</option>
               <option value="active">Attivo</option>
-              <option value="inactive">Inattivo</option>
               <option value="suspended">Sospeso</option>
+              <option value="banned">Bannato</option>
               <option value="pending_verification">In attesa verifica</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cerca vigile
+              Cerca consumer
             </label>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Cerca per nome, email o località..."
+              placeholder="Cerca per nome, email o città..."
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -102,52 +93,44 @@ export default function AdminVigilsPage() {
       </div>
 
       {/* Statistiche rapide */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
-            <p className="text-3xl font-bold text-blue-600">{vigils.length}</p>
-            <p className="text-sm text-gray-600">Totale Vigili</p>
+            <p className="text-3xl font-bold text-blue-600">{consumers.length}</p>
+            <p className="text-sm text-gray-600">Totale Consumers</p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">
-              {vigils.filter(v => v.status === 'active').length}
+              {consumers.filter(c => c.status === 'active').length}
             </p>
             <p className="text-sm text-gray-600">Attivi</p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
-            <p className="text-3xl font-bold text-yellow-600">
-              {vigils.filter(v => v.status === 'pending_verification').length}
-            </p>
-            <p className="text-sm text-gray-600">In Verifica</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
-              {vigils.reduce((avg, v) => avg + v.rating, 0) / vigils.length || 0}
+              €{consumers.reduce((avg, c) => avg + c.total_spent, 0) / consumers.length || 0}
             </p>
-            <p className="text-sm text-gray-600">Rating Medio</p>
+            <p className="text-sm text-gray-600">Spesa Media</p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600">
-              €{vigils.reduce((avg, v) => avg + v.total_earnings, 0) / vigils.length || 0}
+              {consumers.reduce((avg, c) => avg + c.total_bookings, 0) / consumers.length || 0}
             </p>
-            <p className="text-sm text-gray-600">Guadagno Medio</p>
+            <p className="text-sm text-gray-600">Prenotazioni Medie</p>
           </div>
         </div>
       </div>
 
-      {/* Lista vigili */}
+      {/* Lista consumers */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Vigili ({filteredVigils.length})
+            Consumers ({filteredConsumers.length})
           </h3>
         </div>
         <div className="overflow-x-auto">
@@ -155,7 +138,7 @@ export default function AdminVigilsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vigile
+                  Consumer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contatto
@@ -164,16 +147,16 @@ export default function AdminVigilsPage() {
                   Località
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Performance
+                  Prenotazioni
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Guadagni
+                  Spesa Totale
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Registrazione
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ultima Attività
+                  Ultima Prenotazione
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Verifica
@@ -187,81 +170,60 @@ export default function AdminVigilsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredVigils.map((vigil) => (
-                <tr key={vigil.id}>
+              {filteredConsumers.map((consumer) => (
+                <tr key={consumer.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-blue-700">
-                            {vigil.name.charAt(0)}
+                            {consumer.name.charAt(0)}
                           </span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {vigil.name}
+                          {consumer.name}
                         </div>
                         <div className="text-sm text-gray-500">
-                          ID: {vigil.id.substring(0, 8)}...
+                          ID: {consumer.id.substring(0, 8)}...
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{vigil.email}</div>
-                    <div className="text-sm text-gray-500">{vigil.phone}</div>
+                    <div className="text-sm text-gray-900">{consumer.email}</div>
+                    <div className="text-sm text-gray-500">{consumer.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{vigil.location}</div>
+                    <div className="text-sm text-gray-900">{consumer.location}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center mb-1">
-                      <div className="text-sm font-medium text-gray-900 mr-2">{vigil.rating}/5</div>
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(vigil.rating) 
-                                ? 'text-yellow-400' 
-                                : 'text-gray-300'
-                            }`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                          </svg>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {vigil.completed_services} completati / {vigil.active_services} attivi
-                    </div>
+                    <div className="text-sm text-gray-900">{consumer.total_bookings}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      €{vigil.total_earnings.toFixed(2)}
+                      €{consumer.total_spent.toFixed(2)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(vigil.joined_date).toLocaleDateString()}
+                      {new Date(consumer.joined_date).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {vigil.last_active ? new Date(vigil.last_active).toLocaleDateString() : 'Mai'}
+                      {consumer.last_booking ? new Date(consumer.last_booking).toLocaleDateString() : 'Mai'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(vigil.verification_status)}`}>
-                      {vigil.verification_status}
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(consumer.verification_status)}`}>
+                      {consumer.verification_status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(vigil.status)}`}>
-                      {vigil.status}
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(consumer.status)}`}>
+                      {consumer.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -269,47 +231,38 @@ export default function AdminVigilsPage() {
                       <button
                         className="text-blue-600 hover:text-blue-900 text-xs bg-blue-50 px-2 py-1 rounded"
                         onClick={() => {
-                          // TODO: Implementare visualizzazione dettagli vigile
-                          console.log('View vigil details:', vigil.id);
+                          // TODO: Implementare visualizzazione dettagli consumer
+                          console.log('View consumer details:', consumer.id);
                         }}
                       >
                         Dettagli
                       </button>
-                      
-                      {vigil.verification_status === 'pending' && (
-                        <>
-                          <button
-                            className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
-                            onClick={() => {
-                              // TODO: Implementare verifica vigile
-                              console.log('Verify vigil:', vigil.id);
-                            }}
-                          >
-                            Verifica
-                          </button>
-                          <button
-                            className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
-                            onClick={() => {
-                              // TODO: Implementare rifiuto verifica
-                              console.log('Reject vigil:', vigil.id);
-                            }}
-                          >
-                            Rifiuta
-                          </button>
-                        </>
-                      )}
-
-                      {vigil.status === 'active' ? (
+                      <button
+                        className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
+                        onClick={() => {
+                          // TODO: Implementare messaggistica diretta
+                          console.log('Message consumer:', consumer.id);
+                        }}
+                      >
+                        Messaggio
+                      </button>
+                      {consumer.status === 'active' ? (
                         <button
                           className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
-                          onClick={() => handleStatusUpdate(vigil.id, 'suspended')}
+                          onClick={() => {
+                            // TODO: Implementare sospensione consumer
+                            console.log('Suspend consumer:', consumer.id);
+                          }}
                         >
                           Sospendi
                         </button>
                       ) : (
                         <button
                           className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
-                          onClick={() => handleStatusUpdate(vigil.id, 'active')}
+                          onClick={() => {
+                            // TODO: Implementare riattivazione consumer
+                            console.log('Activate consumer:', consumer.id);
+                          }}
                         >
                           Attiva
                         </button>
@@ -326,52 +279,46 @@ export default function AdminVigilsPage() {
       {/* Statistiche dettagliate */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Performers</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Spenders</h3>
           <div className="space-y-3">
-            {vigils
-              .sort((a, b) => b.total_earnings - a.total_earnings)
+            {consumers
+              .sort((a, b) => b.total_spent - a.total_spent)
               .slice(0, 5)
-              .map((vigil, index) => (
-                <div key={vigil.id} className="flex justify-between items-center">
+              .map((consumer, index) => (
+                <div key={consumer.id} className="flex justify-between items-center">
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{vigil.name}</p>
-                      <p className="text-xs text-gray-500">{vigil.completed_services} servizi completati</p>
+                      <p className="text-sm font-medium text-gray-900">{consumer.name}</p>
+                      <p className="text-xs text-gray-500">{consumer.total_bookings} prenotazioni</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-green-600">€{vigil.total_earnings.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">{vigil.rating}/5 ⭐</p>
-                  </div>
+                  <p className="text-sm font-bold text-green-600">€{consumer.total_spent.toFixed(2)}</p>
                 </div>
               ))}
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Vigili più Attivi</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Customers più Fedeli</h3>
           <div className="space-y-3">
-            {vigils
-              .sort((a, b) => b.completed_services - a.completed_services)
+            {consumers
+              .sort((a, b) => b.total_bookings - a.total_bookings)
               .slice(0, 5)
-              .map((vigil, index) => (
-                <div key={vigil.id} className="flex justify-between items-center">
+              .map((consumer, index) => (
+                <div key={consumer.id} className="flex justify-between items-center">
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{vigil.name}</p>
-                      <p className="text-xs text-gray-500">€{vigil.total_earnings.toFixed(2)} guadagnati</p>
+                      <p className="text-sm font-medium text-gray-900">{consumer.name}</p>
+                      <p className="text-xs text-gray-500">€{consumer.total_spent.toFixed(2)} spesi</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-blue-600">{vigil.completed_services} servizi</p>
-                    <p className="text-xs text-gray-500">{vigil.rating}/5 ⭐</p>
-                  </div>
+                  <p className="text-sm font-bold text-blue-600">{consumer.total_bookings} prenotazioni</p>
                 </div>
               ))}
           </div>
@@ -383,16 +330,16 @@ export default function AdminVigilsPage() {
         <h3 className="text-lg font-medium text-gray-900 mb-4">Azioni Rapide</h3>
         <div className="flex flex-wrap gap-4">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            Export Vigili
+            Export Consumers
           </button>
           <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-            Invia Comunicazione
+            Invia Newsletter
           </button>
           <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
-            Report Performance
+            Report Attività
           </button>
           <button className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700">
-            Gestione Verifiche
+            Analisi Comportamento
           </button>
         </div>
       </div>
