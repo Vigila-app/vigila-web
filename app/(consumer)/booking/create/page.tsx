@@ -4,8 +4,9 @@ import { BookingFormComponent } from "@/components/bookings";
 import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { Routes } from "@/src/routes";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default function CreateBookingPage() {
+function CreateBookingContent() {
   const {
     params: { serviceId, vigilId },
   } = useQueryParams();
@@ -22,5 +23,13 @@ export default function CreateBookingPage() {
         vigilId={vigilId}
       />
     </div>
+  );
+}
+
+export default function CreateBookingPage() {
+  return (
+    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+      <CreateBookingContent />
+    </Suspense>
   );
 }

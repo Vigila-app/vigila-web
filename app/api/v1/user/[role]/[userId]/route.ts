@@ -50,7 +50,7 @@ const verifyUserAccess = async (userId: string, role: RolesEnum) => {
 
 export async function DELETE(
   req: Request,
-  context: { params: { userId: string; role: RolesEnum } }
+  context: { params: Promise<{ userId: string; role: RolesEnum }> }
 ) {
   try {
     const { userId, role } = await context?.params;
@@ -95,7 +95,7 @@ export async function DELETE(
     return NextResponse.json(
       {
         code: ResponseCodesConstants.USER_DETAILS_SUCCESS.code,
-        data: context.params.userId,
+        data: userId,
         success: true,
       },
       { status: 200 }
@@ -111,7 +111,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: { userId: string; role: RolesEnum } }
+  context: { params: Promise<{ userId: string; role: RolesEnum }> }
 ) {
   try {
     const { userId, role } = await context?.params;
@@ -178,7 +178,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: { userId: string; role: RolesEnum } }
+  context: { params: Promise<{ userId: string; role: RolesEnum }> }
 ) {
   try {
     const { userId, role } = await context?.params;

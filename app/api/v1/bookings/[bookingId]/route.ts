@@ -53,7 +53,7 @@ const verifyBookingAccess = async (bookingId: string, userId: string, userRole: 
 
 export async function DELETE(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -102,7 +102,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -158,7 +158,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { data: updatedBooking } = await req.json();

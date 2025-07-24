@@ -11,7 +11,7 @@ import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums"
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { bookingId } = await context.params;

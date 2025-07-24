@@ -68,7 +68,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
       }
       showLoader();
 
-      if (booking?.id) {
+      if (booking?.id && user?.id) {
         const response = await PaymentService.createPaymentIntent({
           bookingId: booking.id,
           user: user.id,

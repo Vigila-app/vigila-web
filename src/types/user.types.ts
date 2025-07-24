@@ -56,7 +56,7 @@ export type UserSignupType = UserType & {
 export type UserStoreType = {
   onLogout: () => void;
   lastUpdate?: Date;
-  user: UserType;
+  user?: UserType;
   userDetails?: UserDetailsType;
   userDevices?: UserDevicesType;
   userTerms?: UserTermsType;

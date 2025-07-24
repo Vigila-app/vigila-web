@@ -4,7 +4,6 @@ import {
   getAdminClient,
   jsonErrorResponse,
 } from "@/server/api.utils.server";
-import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 export async function GET(req: NextRequest) {
@@ -56,23 +55,105 @@ export async function GET(req: NextRequest) {
       .limit(10);
 
     // Statistiche di crescita mensile (calcolate dinamicamente)
-    const [currentMonthBookings, previousMonthBookings, currentMonthRevenue, previousMonthRevenue, currentMonthUsers, previousMonthUsers, currentMonthVigils, previousMonthVigils] =
-      await Promise.all([
-        _admin.from("bookings").select("*", { count: "exact" }).gte("created_at", new Date(new Date().setDate(1)).toISOString()),
-        _admin.from("bookings").select("*", { count: "exact" }).lt("created_at", new Date(new Date().setDate(1)).toISOString()).gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1, 1)).toISOString()),
-        _admin.from("payments").select("amount", { count: "exact" }).eq("status", "completed").gte("created_at", new Date(new Date().setDate(1)).toISOString()),
-        _admin.from("payments").select("amount", { count: "exact" }).eq("status", "completed").lt("created_at", new Date(new Date().setDate(1)).toISOString()).gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1, 1)).toISOString()),
-        _admin.from("consumers").select("*", { count: "exact" }).gte("created_at", new Date(new Date().setDate(1)).toISOString()),
-        _admin.from("consumers").select("*", { count: "exact" }).lt("created_at", new Date(new Date().setDate(1)).toISOString()).gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1, 1)).toISOString()),
-        _admin.from("vigils").select("*", { count: "exact" }).gte("created_at", new Date(new Date().setDate(1)).toISOString()),
-        _admin.from("vigils").select("*", { count: "exact" }).lt("created_at", new Date(new Date().setDate(1)).toISOString()).gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 1, 1)).toISOString()),
-      ]);
+    const [
+      currentMonthBookings,
+      previousMonthBookings,
+      currentMonthRevenue,
+      previousMonthRevenue,
+      currentMonthUsers,
+      previousMonthUsers,
+      currentMonthVigils,
+      previousMonthVigils,
+    ] = await Promise.all([
+      _admin
+        .from("bookings")
+        .select("*", { count: "exact" })
+        .gte("created_at", new Date(new Date().setDate(1)).toISOString()),
+      _admin
+        .from("bookings")
+        .select("*", { count: "exact" })
+        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+        .gte(
+          "created_at",
+          new Date(
+            new Date().setMonth(new Date().getMonth() - 1, 1)
+          ).toISOString()
+        ),
+      _admin
+        .from("payments")
+        .select("amount", { count: "exact" })
+        .eq("status", "completed")
+        .gte("created_at", new Date(new Date().setDate(1)).toISOString()),
+      _admin
+        .from("payments")
+        .select("amount", { count: "exact" })
+        .eq("status", "completed")
+        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+        .gte(
+          "created_at",
+          new Date(
+            new Date().setMonth(new Date().getMonth() - 1, 1)
+          ).toISOString()
+        ),
+      _admin
+        .from("consumers")
+        .select("*", { count: "exact" })
+        .gte("created_at", new Date(new Date().setDate(1)).toISOString()),
+      _admin
+        .from("consumers")
+        .select("*", { count: "exact" })
+        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+        .gte(
+          "created_at",
+          new Date(
+            new Date().setMonth(new Date().getMonth() - 1, 1)
+          ).toISOString()
+        ),
+      _admin
+        .from("vigils")
+        .select("*", { count: "exact" })
+        .gte("created_at", new Date(new Date().setDate(1)).toISOString()),
+      _admin
+        .from("vigils")
+        .select("*", { count: "exact" })
+        .lt("created_at", new Date(new Date().setDate(1)).toISOString())
+        .gte(
+          "created_at",
+          new Date(
+            new Date().setMonth(new Date().getMonth() - 1, 1)
+          ).toISOString()
+        ),
+    ]);
 
     const monthlyGrowth = {
-      bookings: previousMonthBookings.count > 0 ? ((currentMonthBookings.count - previousMonthBookings.count) / previousMonthBookings.count) * 100 : 0,
-      revenue: previousMonthRevenue.count > 0 ? ((currentMonthRevenue.count - previousMonthRevenue.count) / previousMonthRevenue.count) * 100 : 0,
-      users: previousMonthUsers.count > 0 ? ((currentMonthUsers.count - previousMonthUsers.count) / previousMonthUsers.count) * 100 : 0,
-      vigils: previousMonthVigils.count > 0 ? ((currentMonthVigils.count - previousMonthVigils.count) / previousMonthVigils.count) * 100 : 0,
+      bookings:
+        (previousMonthBookings?.count ?? 0) > 0
+          ? (((currentMonthBookings?.count ?? 0) -
+              (previousMonthBookings?.count ?? 0)) /
+              (previousMonthBookings?.count ?? 1)) *
+            100
+          : 0,
+      revenue:
+        (previousMonthRevenue?.count ?? 0) > 0
+          ? (((currentMonthRevenue?.count ?? 0) -
+              (previousMonthRevenue?.count ?? 0)) /
+              (previousMonthRevenue?.count ?? 1)) *
+            100
+          : 0,
+      users:
+        (previousMonthUsers?.count ?? 0) > 0
+          ? (((currentMonthUsers?.count ?? 0) -
+              (previousMonthUsers?.count ?? 0)) /
+              (previousMonthUsers?.count ?? 1)) *
+            100
+          : 0,
+      vigils:
+        (previousMonthVigils?.count ?? 0) > 0
+          ? (((currentMonthVigils?.count ?? 0) -
+              (previousMonthVigils?.count ?? 0)) /
+              (previousMonthVigils?.count ?? 1)) *
+            100
+          : 0,
     };
 
     // Top performers (da implementare con query più complesse)

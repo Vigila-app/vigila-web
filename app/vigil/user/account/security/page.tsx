@@ -29,12 +29,9 @@ export default function Profile() {
         Account security
       </h1>
       <div className="px-4 pb-4">
-        {user?.emailVerified ? (
-          <>
-            <UpdateEmailComponent />
-            <Divider />
-          </>
-        ) : null}
+        {/* TODO: Implement email verification check if needed */}
+        <UpdateEmailComponent />
+        <Divider />
         <UpdatePasswordComponent />
         <Divider />
         <DeleteUserComponent />

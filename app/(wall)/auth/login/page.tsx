@@ -3,11 +3,9 @@ import LoginComponent from "./login.component";
 import { CmsPageI } from "@/src/types/cms.types";
 import { SimplePage } from "@/components";
 import { cache } from "react";
-import { calcDelay } from "@/src/utils/common.utils";
-import { FrequencyEnum } from "@/src/enums/common.enums";
 
-// cache revalidation
-export const revalidate = calcDelay(1, FrequencyEnum.HOURS);
+// cache revalidation - 1 hour
+export const revalidate = 3600;
 
 const getCmsData = cache(async () => {
   try {

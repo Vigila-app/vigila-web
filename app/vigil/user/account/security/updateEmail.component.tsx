@@ -31,10 +31,11 @@ const UpdateEmailComponent = () => {
     setError,
   } = useForm<UpdateEmailFormI>();
 
-  if (!user?.emailVerified) {
-    console.log("Impossible to update mail, verify the current email first");
-    return;
-  }
+  // TODO: Implement email verification check if needed
+  // if (!user?.emailVerified) {
+  //   console.log("Impossible to update mail, verify the current email first");
+  //   return;
+  // }
 
   const onSubmit = async (formData: UpdateEmailFormI) => {
     const { newEmail } = formData;

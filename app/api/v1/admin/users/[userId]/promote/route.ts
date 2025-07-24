@@ -8,18 +8,18 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { deepMerge } from "@/src/utils/common.utils";
 
 export async function PUT(
-  req: NextRequest,
-  context: { params: { userId: string } }
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
+  const { userId } = await params;
   try {
-    const { userId } = await context.params;
-    const { data: body } = await req.json();
+    const { data: body } = await request.json();
     console.log(`API PUT admin/users/${userId}/promote`, body);
 
     // Verifica che la richiesta arrivi solo da localhost
-    const forwarded = req.headers.get("x-forwarded-for");
-    const realIp = req.headers.get("x-real-ip");
-    const host = req.headers.get("host");
+    const forwarded = request.headers.get("x-forwarded-for");
+    const realIp = request.headers.get("x-real-ip");
+    const host = request.headers.get("host");
 
     const isLocalhost =
       host?.includes("localhost") ||
@@ -47,7 +47,7 @@ export async function PUT(
     }
 
     // Verifica autenticazione dell'utente che fa la richiesta
-    const requestingUser = await authenticateUser(req);
+    const requestingUser = await authenticateUser(request);
     // if (!requestingUser?.id || requestingUser.user_metadata?.role !== RolesEnum.ADMIN) {
     //   return jsonErrorResponse(403, {
     //     code: "ADMIN_PROMOTE_UNAUTHORIZED",
