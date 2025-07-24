@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
     const { nextUrl } = req;
     console.log(`API GET admin/payments`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -41,18 +40,18 @@ export async function GET(req: NextRequest) {
         updated_at,
         status,
         payment_status,
-        payment_intent_id,
-        amount,
-        consumers(name, surname, email),
-        vigils(name, surname, email),
-        services(title, price)
+        payment_id,
+        price,
+        quantity,
+        consumers(displayName),
+        vigils(displayName),
+        services(name, unit_price)
       `,
         { count: "exact" }
       )
-      .not("payment_intent_id", "is", null)
+      .not("payment_id", "is", null)
       .order("created_at", { ascending: false });
 
-    // Applica filtri se presenti
     if (filters.status) {
       query = query.eq("payment_status", filters.status);
     }
@@ -60,7 +59,6 @@ export async function GET(req: NextRequest) {
       query = query.eq("id", filters.booking_id);
     }
 
-    // Applica paginazione
     if (from !== undefined && to !== undefined) {
       query = query.range(from, to);
     }
@@ -71,27 +69,20 @@ export async function GET(req: NextRequest) {
       throw error;
     }
 
-    // Trasforma i dati per il formato payment
     const paymentsData = (data || []).map((booking: any) => ({
       id: booking.id,
       booking_id: booking.id,
-      payment_intent_id: booking.payment_intent_id,
-      amount: booking.amount || booking.services?.price || 0,
+      payment_id: booking.payment_id,
+      amount: booking.price,
       status: booking.payment_status,
       created_at: booking.created_at,
       updated_at: booking.updated_at,
-      consumer_name: booking.consumers
-        ? `${booking.consumers.name} ${booking.consumers.surname}`
-        : "N/A",
-      consumer_email: booking.consumers?.email || "N/A",
-      vigil_name: booking.vigils
-        ? `${booking.vigils.name} ${booking.vigils.surname}`
-        : "N/A",
-      service_name: booking.services?.title || "N/A",
-      service_price: booking.services?.price || 0,
+      consumer_name: booking.consumers.displayName,
+      vigil_name: booking.vigils.displayName,
+      service_name: booking.services?.name,
+      service_price: booking.services?.unit_price,
     }));
 
-    // Calcola statistiche finanziarie
     const totalRevenue = paymentsData
       .filter((payment: any) => payment.status === "PAID")
       .reduce((sum: number, payment: any) => sum + payment.amount, 0);
@@ -130,7 +121,6 @@ export async function PUT(req: NextRequest) {
   try {
     console.log(`API PUT admin/payments`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -151,7 +141,6 @@ export async function PUT(req: NextRequest) {
 
     const _admin = getAdminClient();
 
-    // Aggiorna lo stato del pagamento nella prenotazione
     const updateData: any = {
       payment_status,
       updated_at: new Date().toISOString(),
@@ -168,9 +157,9 @@ export async function PUT(req: NextRequest) {
       .select(
         `
         *,
-        consumers(name, surname, email),
-        vigils(name, surname, email),
-        services(title, price)
+        consumers(displayName),
+        vigils(displayName),
+        services(name, unit_price)
       `
       )
       .single();
@@ -191,13 +180,9 @@ export async function PUT(req: NextRequest) {
       code: "ADMIN_PAYMENTS_UPDATE_SUCCESS",
       data: {
         ...data,
-        consumer_name: data.consumers
-          ? `${data.consumers.name} ${data.consumers.surname}`
-          : "N/A",
-        vigil_name: data.vigils
-          ? `${data.vigils.name} ${data.vigils.surname}`
-          : "N/A",
-        service_name: data.services?.title || "N/A",
+        consumer_name: data.consumers.displayName,
+        vigil_name: data.vigils.displayName,
+        service_name: data.services?.name,
       },
       success: true,
     });
