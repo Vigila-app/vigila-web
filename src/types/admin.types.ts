@@ -138,15 +138,20 @@ export interface AdminServiceI {
   id: string;
   name: string;
   description: string;
-  price: number;
+  unit_price: number;
+  unit_type: string;
   status: string;
   category: string;
+  currency: string;
   total_bookings: number;
   average_rating: number;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  postalCode: string[];
   vigil_id: string;
-  vigil_name: string;
+  vigils: {
+    displayName: string;
+  };
 }
 
 export interface AdminPaymentI {

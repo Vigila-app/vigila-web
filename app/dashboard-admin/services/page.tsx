@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
+import { Avatar } from "@/components";
+import { dateDisplay } from "@/src/utils/date.utils";
+import { amountDisplay } from "@/src/utils/common.utils";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { ServicesUtils } from "@/src/utils/services.utils";
 
 export default function AdminServicesPage() {
   const { services, servicesLoading, getServices, updateServiceStatus } =
@@ -17,7 +22,9 @@ export default function AdminServicesPage() {
 
   const filteredServices = services.filter(
     (service) =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.vigils.displayName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       service.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -126,7 +133,7 @@ export default function AdminServicesPage() {
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
               €
-              {services.reduce((avg, s) => avg + s.price, 0) /
+              {services.reduce((avg, s) => avg + s.unit_price, 0) /
                 services.length || 0}
             </p>
             <p className="text-sm text-gray-600">Prezzo Medio</p>
@@ -155,6 +162,9 @@ export default function AdminServicesPage() {
                   Prezzo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  CAP
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Prenotazioni Totali
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -177,11 +187,10 @@ export default function AdminServicesPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-700">
-                            {service.name.charAt(0)}
-                          </span>
-                        </div>
+                        <Avatar
+                          userId={service.vigil_id}
+                          value={service.vigils?.displayName}
+                        />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
@@ -202,7 +211,16 @@ export default function AdminServicesPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      €{service.price.toFixed(2)}
+                      {amountDisplay(
+                        service.unit_price,
+                        service.currency as CurrencyEnum
+                      )}
+                      /{ServicesUtils.getServiceUnitType(service.unit_type)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {service.postalCode?.join(", ")}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -235,7 +253,7 @@ export default function AdminServicesPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(service.created_at).toLocaleDateString()}
+                      {dateDisplay(service.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -334,7 +352,7 @@ export default function AdminServicesPage() {
                         {service.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        €{service.price} - {service.category}
+                        €{service.unit_price} - {service.category}
                       </p>
                     </div>
                   </div>

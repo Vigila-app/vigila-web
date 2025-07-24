@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
     const { nextUrl } = req;
     console.log(`API GET admin/services`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -33,13 +32,12 @@ export async function GET(req: NextRequest) {
       .select(
         `
         *,
-        vigils(name, surname, email)
+        vigils(displayName)
       `,
         { count: "exact" }
       )
       .order("created_at", { ascending: false });
 
-    // Applica filtri se presenti
     if (filters.category) {
       query = query.eq("category", filters.category);
     }
@@ -50,7 +48,6 @@ export async function GET(req: NextRequest) {
       query = query.eq("vigil_id", filters.vigil_id);
     }
 
-    // Applica paginazione
     if (from !== undefined && to !== undefined) {
       query = query.range(from, to);
     }
@@ -61,7 +58,6 @@ export async function GET(req: NextRequest) {
       throw error;
     }
 
-    // Calcola statistiche aggiuntive per ogni servizio
     const servicesWithStats = await Promise.all(
       (data || []).map(async (service) => {
         const [bookingsResult, revenueResult] = await Promise.all([
@@ -81,9 +77,6 @@ export async function GET(req: NextRequest) {
 
         return {
           ...service,
-          vigil_name: service.vigils
-            ? `${service.vigils.name} ${service.vigils.surname}`
-            : "N/A",
           total_bookings: bookingsResult.count || 0,
           total_revenue: totalRevenue,
         };
