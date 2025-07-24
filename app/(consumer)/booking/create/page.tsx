@@ -11,7 +11,7 @@ function CreateBookingContent() {
     params: { serviceId, vigilId },
   } = useQueryParams();
 
-  if (!(serviceId && vigilId)) {
+  if (!vigilId) {
     redirect(Routes.home.url);
   }
 

@@ -23,6 +23,7 @@ const ServicesComponent = () => {
   const { showLoader, hideLoader } = useAppStore();
   const { getVigilsDetails } = useVigilStore();
   const [services, setServices] = useState<ServiceI[]>([]);
+  const [showServices, setShowServices] = useState(false);
 
   const searchServices = async ({ address }: AddressI) => {
     try {
@@ -40,6 +41,7 @@ const ServicesComponent = () => {
           throw new Error("No services found for the provided postal code.");
         }
         setServices(services.data);
+        setShowServices(true);
       } else {
         throw new Error("Postal code is required to search for services.");
       }
@@ -68,13 +70,20 @@ const ServicesComponent = () => {
       <SearchAddress
         location
         onSubmit={searchServices}
+        onChange={() => setShowServices(false)}
         label="Trova servizi in questa zona:"
         placeholder="Inserisci indirizzo, città o codice postale"
       />
       <div className="my-4">
-        {services.map((service) => (
-          <ServiceCard service={service} key={service.id} />
-        ))}
+        {showServices ? (
+          services.length ? (
+            services.map((service) => (
+              <ServiceCard service={service} key={service.id} />
+            ))
+          ) : (
+            <div>Nessun servizio trovato</div>
+          )
+        ) : null}
       </div>
     </div>
   );

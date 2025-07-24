@@ -6,6 +6,7 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { ReviewsUtils } from "@/src/utils/reviews.utils";
 
 export async function GET(
   req: Request,
@@ -35,15 +36,25 @@ export async function GET(
     const _admin = getAdminClient();
     const { data, error } = await _admin
       .from("vigils")
-      .select()
+      .select(
+        `
+        *,
+        reviews(rating, comment, visible)
+      `
+      )
       .eq("id", vigilId)
       .maybeSingle();
 
     if (data) {
+      const averageRating = ReviewsUtils.calculateAverageRating(data.reviews || []);
+
       return NextResponse.json(
         {
           code: ResponseCodesConstants.VIGIL_DETAILS_SUCCESS.code,
-          data,
+          data: {
+            ...data,
+            averageRating
+          },
           success: true,
         },
         { status: 200 }

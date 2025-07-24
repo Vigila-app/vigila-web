@@ -16,6 +16,9 @@ export type ServiceI = {
   max_unit?: number;
   info?: Record<string, any>;
   postalCode: string[];
+  vigil?: {
+    displayName: string;
+  };
 };
 
 export type ServicesStoreType = {

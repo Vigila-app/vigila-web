@@ -9,7 +9,11 @@ import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
-import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import {
+  amountDisplay,
+  capitalize,
+  replaceDynamicUrl,
+} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
@@ -25,6 +29,7 @@ import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { CurrencyEnum } from "@/src/enums/common.enums";
 import { BookingUtils } from "@/src/utils/booking.utils";
+import Link from "next/link";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -230,9 +235,21 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
                     <Avatar userId={vigil?.id} value={vigil?.displayName} />
-                    <span className="font-medium flex-1">
-                      {vigil?.displayName}
-                    </span>
+                    <div className="flex-1">
+                      <div className="font-medium">{vigil?.displayName}</div>
+                      {vigil?.id && (
+                        <Link
+                          href={replaceDynamicUrl(
+                            Routes.vigilDetails.url,
+                            ":vigilId",
+                            vigil.id
+                          )}
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          Vedi profilo completo
+                        </Link>
+                      )}
+                    </div>
                   </p>
                 </>
               ) : (

@@ -48,7 +48,7 @@
       "footer": false
     },
     "private": false,
-    "roles": ["VIGIL"]
+    "roles": []
   },
   "onBoard": {
     "url": "/onboard",
@@ -279,6 +279,14 @@
     "title": "Profilo",
     "private": true,
     "roles": ["VIGIL"]
+  },
+  "vigilDetails": {
+    "url": "/vigil/:vigilId",
+    "label": "Dettagli Vigil",
+    "title": "Dettagli Vigil",
+    "matchingUrl": "/vigil/",
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "services": {
     "url": "/services",

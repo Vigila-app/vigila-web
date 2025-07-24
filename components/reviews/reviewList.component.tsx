@@ -82,7 +82,6 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
             ★
           </span>
         ))}
-        <span className="ml-2 text-sm text-gray-600">{rating}/5</span>
       </div>
     );
   };
