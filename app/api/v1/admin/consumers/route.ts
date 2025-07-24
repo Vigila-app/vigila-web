@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
     const { nextUrl } = req;
     console.log(`API GET admin/consumers`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -33,7 +32,6 @@ export async function GET(req: NextRequest) {
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    // Applica filtri se presenti
     if (filters.status) {
       query = query.eq("status", filters.status);
     }
@@ -44,7 +42,6 @@ export async function GET(req: NextRequest) {
       query = query.eq("verified", filters.verified === "true");
     }
 
-    // Applica paginazione
     if (from !== undefined && to !== undefined) {
       query = query.range(from, to);
     }
@@ -65,7 +62,7 @@ export async function GET(req: NextRequest) {
             .eq("consumer_id", consumer.id),
           _admin
             .from("bookings")
-            .select("services(price)")
+            .select("price")
             .eq("consumer_id", consumer.id)
             .eq("status", "COMPLETED"),
         ]);
@@ -103,7 +100,6 @@ export async function PUT(req: NextRequest) {
   try {
     console.log(`API PUT admin/consumers`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {

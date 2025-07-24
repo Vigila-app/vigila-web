@@ -118,9 +118,9 @@ export interface AdminVigilI {
 
 export interface AdminConsumerI {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
+  displayName: string;
+  email?: string;
+  phone?: string;
   status: string;
   total_bookings: number;
   total_spent: number;
@@ -128,6 +128,10 @@ export interface AdminConsumerI {
   last_booking: string;
   verification_status: string;
   location: string;
+  city: string;
+  cap: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface AdminServiceI {

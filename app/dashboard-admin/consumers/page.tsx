@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
+import { Avatar } from "@/components";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 export default function AdminConsumersPage() {
   const { consumers, consumersLoading, getConsumers } = useAdminStore();
@@ -16,9 +18,10 @@ export default function AdminConsumersPage() {
 
   const filteredConsumers = consumers.filter(
     (consumer) =>
-      consumer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      consumer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      consumer.location.toLowerCase().includes(searchTerm.toLowerCase())
+      consumer.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consumer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consumer.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consumer.cap.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -188,15 +191,14 @@ export default function AdminConsumersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-700">
-                            {consumer.name.charAt(0)}
-                          </span>
-                        </div>
+                        <Avatar
+                          userId={consumer.id}
+                          value={consumer.displayName}
+                        />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {consumer.name}
+                          {consumer.displayName}
                         </div>
                         <div className="text-sm text-gray-500">
                           ID: {consumer.id.substring(0, 8)}...
@@ -214,7 +216,7 @@ export default function AdminConsumersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {consumer.location}
+                      {consumer.city}, {consumer.cap}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -224,12 +226,12 @@ export default function AdminConsumersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      €{consumer.total_spent.toFixed(2)}
+                      €{consumer.total_spent?.toFixed(2)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(consumer.joined_date).toLocaleDateString()}
+                      {dateDisplay(consumer.created_at, "date")}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -328,7 +330,7 @@ export default function AdminConsumersPage() {
                     </span>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {consumer.name}
+                        {consumer.displayName}
                       </p>
                       <p className="text-xs text-gray-500">
                         {consumer.total_bookings} prenotazioni
@@ -336,7 +338,7 @@ export default function AdminConsumersPage() {
                     </div>
                   </div>
                   <p className="text-sm font-bold text-green-600">
-                    €{consumer.total_spent.toFixed(2)}
+                    €{consumer.total_spent?.toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -362,10 +364,10 @@ export default function AdminConsumersPage() {
                     </span>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {consumer.name}
+                        {consumer.displayName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        €{consumer.total_spent.toFixed(2)} spesi
+                        €{consumer.total_spent?.toFixed(2)} spesi
                       </p>
                     </div>
                   </div>
