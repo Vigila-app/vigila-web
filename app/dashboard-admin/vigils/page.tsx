@@ -139,8 +139,9 @@ export default function AdminVigilsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
-              {vigils.reduce((avg, v) => avg + v.rating, 0) / vigils.length ||
-                0}
+              {vigils.length > 0
+                ? vigils.reduce((avg, v) => avg + v.rating, 0) / vigils.length
+                : 0}
             </p>
             <p className="text-sm text-gray-600">Rating Medio</p>
           </div>
