@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
 import { Button, Badge, Avatar } from "@/components";
@@ -22,6 +22,8 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { BookingUtils } from "@/src/utils/booking.utils";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -133,24 +135,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   };
 
-  const getStatusColor = (status: BookingStatusEnum) => {
-    switch (status) {
-      case BookingStatusEnum.PENDING:
-        return "yellow";
-      case BookingStatusEnum.CONFIRMED:
-        return "blue";
-      case BookingStatusEnum.IN_PROGRESS:
-        return "purple";
-      case BookingStatusEnum.COMPLETED:
-        return "green";
-      case BookingStatusEnum.CANCELLED:
-      case BookingStatusEnum.REFUNDED:
-        return "red";
-      default:
-        return "gray";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -180,7 +164,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         </div>
         <Badge
           label={capitalize(booking.status as string)}
-          color={getStatusColor(booking.status as BookingStatusEnum)}
+          color={BookingUtils.getStatusColor(booking.status as BookingStatusEnum)}
         />
       </div>
 
@@ -223,8 +207,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>{" "}
-                {booking.currency}{" "}
-                {amountDisplay(booking.price * booking.quantity)}
+                {amountDisplay(
+                  booking.price * booking.quantity,
+                  booking.currency as CurrencyEnum
+                )}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>{" "}
@@ -252,7 +238,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               ) : (
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
-                    <Avatar userId={consumer?.id} value={consumer?.displayName} />
+                    <Avatar
+                      userId={consumer?.id}
+                      value={consumer?.displayName}
+                    />
                     <span className="font-medium flex-1">
                       {consumer?.displayName}
                     </span>

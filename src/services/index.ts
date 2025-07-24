@@ -1,3 +1,4 @@
+import { AdminService } from "./admin.service";
 import { ApiService } from "./api.service";
 import { AuthService } from "./auth.service";
 import { BookingsService } from "./bookings.service";
@@ -10,6 +11,7 @@ import { ServicesService } from "./services.service";
 import { UserService } from "./user.service";
 
 export {
+  AdminService,
   ApiService,
   AuthService,
   BookingsService,
