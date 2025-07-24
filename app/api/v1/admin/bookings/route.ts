@@ -6,7 +6,6 @@ import {
   getPagination,
   getQueryParams,
 } from "@/server/api.utils.server";
-import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 export async function GET(req: NextRequest) {
@@ -14,7 +13,6 @@ export async function GET(req: NextRequest) {
     const { nextUrl } = req;
     console.log(`API GET admin/bookings`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -38,15 +36,14 @@ export async function GET(req: NextRequest) {
       .select(
         `
         *,
-        consumers(name, surname, email),
-        vigils(name, surname, email),
-        services(title, price)
+        consumers(displayName),
+        vigils(displayName),
+        services(name,currency)
       `,
         { count: "exact" }
       )
       .order("created_at", { ascending: false });
 
-    // Applica filtri se presenti
     if (filters.status) {
       query = query.eq("status", filters.status);
     }
@@ -70,14 +67,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       code: "ADMIN_BOOKINGS_SUCCESS",
-      data:
-        data?.map((booking) => ({
-          ...booking,
-          consumer_name: `${booking.consumers?.name} ${booking.consumers?.surname}`,
-          vigil_name: `${booking.vigils?.name} ${booking.vigils?.surname}`,
-          service_name: booking.services?.title,
-          amount: booking.services?.price || 0,
-        })) || [],
+      data,
       count,
       success: true,
     });

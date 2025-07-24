@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
+import { dateDisplay } from "@/src/utils/date.utils";
+import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { BookingUtils } from "@/src/utils/booking.utils";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import { Badge } from "@/components";
 
 export default function AdminBookingsPage() {
   const { bookings, bookingsLoading, getBookings, updateBookingStatus } =
@@ -17,27 +23,14 @@ export default function AdminBookingsPage() {
 
   const filteredBookings = bookings.filter(
     (booking) =>
-      booking.consumer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.vigil_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.service_name.toLowerCase().includes(searchTerm.toLowerCase())
+      booking.consumers?.displayName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      booking.vigils?.displayName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      booking.services?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "confirmed":
-        return "bg-blue-100 text-blue-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      case "in_progress":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const handleStatusUpdate = async (bookingId: string, newStatus: string) => {
     try {
@@ -94,7 +87,7 @@ export default function AdminBookingsPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Cerca per cliente, vigile o servizio..."
+              placeholder="Cerca per cliente, vigil o servizio..."
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -163,7 +156,7 @@ export default function AdminBookingsPage() {
                   Cliente
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vigile
+                  Vigil
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Servizio
@@ -193,7 +186,7 @@ export default function AdminBookingsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {booking.consumer_name}
+                      {booking.consumers?.displayName}
                     </div>
                     <div className="text-sm text-gray-500">
                       ID: {booking.consumer_id.substring(0, 8)}...
@@ -201,7 +194,7 @@ export default function AdminBookingsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {booking.vigil_name}
+                      {booking.vigils?.displayName}
                     </div>
                     <div className="text-sm text-gray-500">
                       ID: {booking.vigil_id.substring(0, 8)}...
@@ -209,7 +202,7 @@ export default function AdminBookingsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {booking.service_name}
+                      {booking.services?.name}
                     </div>
                     <div className="text-sm text-gray-500">
                       ID: {booking.service_id.substring(0, 8)}...
@@ -217,29 +210,33 @@ export default function AdminBookingsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(booking.date).toLocaleDateString()}
-                    </div>
-                    <div className="text-sm text-gray-500">{booking.time}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      €{booking.amount.toFixed(2)}
+                      {dateDisplay(booking.created_at, "date")}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      €{(booking.amount * 0.1).toFixed(2)}
+                      {amountDisplay(
+                        booking.price,
+                        booking.services?.currency as CurrencyEnum
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {amountDisplay(
+                        booking.price * 0.1, // Assuming 10% commission
+                        booking.services?.currency as CurrencyEnum
+                      )}
                     </div>
                     <div className="text-xs text-gray-500">10% commissione</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        booking.status
-                      )}`}
-                    >
-                      {booking.status}
-                    </span>
+                    <Badge
+                      label={capitalize(booking.status as string)}
+                      color={BookingUtils.getStatusColor(
+                        booking.status as BookingStatusEnum
+                      )}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">

@@ -67,20 +67,27 @@ export interface AdminAnalyticsI {
 
 export interface AdminBookingI {
   id: string;
-  consumer_name: string;
   consumer_id: string;
-  vigil_name: string;
   vigil_id: string;
-  service_name: string;
   service_id: string;
   date: string;
   time: string;
   status: string;
-  amount: number;
+  price: number;
   location: string;
   payment_status: string;
   created_at: string;
   updated_at: string;
+  consumers: {
+    displayName: string;
+  };
+  vigils: {
+    displayName: string;
+  };
+  services: {
+    name: string;
+    currency?: string;
+  };
 }
 
 export interface AdminVigilI {
