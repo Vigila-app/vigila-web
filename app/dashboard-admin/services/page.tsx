@@ -133,8 +133,9 @@ export default function AdminServicesPage() {
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
               €
-              {services.reduce((avg, s) => avg + s.unit_price, 0) /
-                services.length || 0}
+              {services.length > 0
+                ? services.reduce((avg, s) => avg + s.unit_price, 0) / services.length
+                : 0}
             </p>
             <p className="text-sm text-gray-600">Prezzo Medio</p>
           </div>
