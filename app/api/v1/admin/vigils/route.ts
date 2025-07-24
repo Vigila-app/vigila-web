@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
           total_services: servicesCount || 0,
           total_bookings: totalBookings,
           earnings: totalEarnings,
-          rating: 4.5, // Mock rating - da implementare sistema di rating
+          rating: null, // TODO: Implement rating calculation or retrieval system
         };
       })
     );
