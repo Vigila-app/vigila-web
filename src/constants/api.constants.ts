@@ -111,6 +111,10 @@ const apiControllers = {
   // region VIGIL
   VIGIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/vigil`,
   // endregion VIGIL
+
+  // region REVIEWS
+  REVIEWS: (isMock?: boolean): string => `${apiBase.V1(isMock)}/reviews`,
+  // endregion REVIEWS
 };
 
 export const apiUser = {
@@ -202,4 +206,19 @@ export const apiAdmin = {
   SERVICES: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/services`,
   PAYMENTS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/payments`,
   PROMOTE_USER: (userId: string, isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
+};
+
+export const apiReviews = {
+  CREATE: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
+  LIST: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
+  LIST_BY_VIGIL: (vigilId: string, isMock?: boolean): string => 
+    `${apiControllers.REVIEWS(isMock)}/vigil/${vigilId}`,
+  BY_BOOKING: (bookingId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/booking/${bookingId}`,
+  VIGIL_STATS: (vigilId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/vigil/${vigilId}/stats`,
+  UPDATE: (reviewId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
+  DELETE: (reviewId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
 };

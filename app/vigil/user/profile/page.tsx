@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 const ProfileComponent = dynamic(
-  () => import("../../../../components/profile/profileComponent"),
+  () => import("@/components/profile/profileComponent"),
   { ssr: !!false }
 );
 

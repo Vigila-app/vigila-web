@@ -9,11 +9,11 @@ export type UserDetailsType = {
   surname?: string;
   email?: string;
   email_verified?: boolean;
-  host_id?: string;
   username?: string;
   birthday?: string;
   gender?: GenderEnum;
   other?: { [key: string]: string | number };
+  role?: RolesEnum;
 };
 
 export type UserDevicesType = {

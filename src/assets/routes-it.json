@@ -227,6 +227,19 @@
     "private": true,
     "roles": ["ADMIN"]
   },
+  "adminReviews": {
+    "url": "/dashboard-admin/reviews",
+    "label": "Gestione Recensioni",
+    "title": "Gestione Recensioni",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
   "createBooking": {
     "url": "/booking/create",
     "label": "Nuova Prenotazione",

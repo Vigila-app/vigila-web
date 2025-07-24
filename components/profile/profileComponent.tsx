@@ -1,6 +1,7 @@
 "use client";
 
 import {  Button, TabGroup,  } from "@/components";
+import { ReviewStatsComponent, ReviewListComponent } from "@/components/reviews";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { UserService } from "@/src/services";
@@ -8,7 +9,7 @@ import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { TabI } from "@/components/tabGroup/tabGroup";
 import PrenotazioniTab from "@/app/vigil/tabs/prenotazioni";
 
@@ -28,11 +29,25 @@ const tabs: TabI[] = [
   },
 ];
 
+// Add reviews tab for vigils
+const getTabsForRole = (role: RolesEnum): TabI[] => {
+  const baseTabs = [...tabs];
+  
+  if (role === RolesEnum.VIGIL) {
+    baseTabs.splice(1, 0, {
+      label: "Recensioni",
+    });
+  }
+  
+  return baseTabs;
+};
+
 const ProfileComponent = () => {
   const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
   const { showToast } = useAppStore();
-  const [selectedTab, setSelectedTab] = useState<TabI>(tabs[0]); //per avere tab attive
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
+  const userTabs = getTabsForRole(role);
+  const [selectedTab, setSelectedTab] = useState<TabI>(userTabs[0]); //per avere tab attive
 
   const formatRole = (role: string) => {
     if (!role) return "";
@@ -211,12 +226,27 @@ const ProfileComponent = () => {
                 </div>
                 <TabGroup
                   role={role}
-                  tabs={tabs}
+                  tabs={userTabs}
                   onTabChange={(tab) => setSelectedTab(tab)}
                 />
 
                 {selectedTab.label === "Informazioni Personali" && (
                   <PrenotazioniTab />
+                )}
+
+                {selectedTab.label === "Recensioni" && role === RolesEnum.VIGIL && user?.id && (
+                  <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* <div className="lg:col-span-1">
+                      <ReviewStatsComponent vigilId={user.id} />
+                    </div> */}
+                    <div className="lg:col-span-2">
+                      <ReviewListComponent
+                        vigilId={user.id}
+                        showActions={false}
+                        title="Le tue recensioni"
+                      />
+                    </div>
+                  </div>
                 )}
 
                 {selectedTab.label === "Impostazioni" && <PrenotazioniTab />}

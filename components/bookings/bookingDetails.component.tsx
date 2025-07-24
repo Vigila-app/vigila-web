@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
 import { Button, Badge, Avatar } from "@/components";
+import { ReviewButtonComponent } from "@/components/reviews";
 import {
   BookingStatusEnum,
   PaymentStatusEnum,
@@ -164,7 +165,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         </div>
         <Badge
           label={capitalize(booking.status as string)}
-          color={BookingUtils.getStatusColor(booking.status as BookingStatusEnum)}
+          color={BookingUtils.getStatusColor(
+            booking.status as BookingStatusEnum
+          )}
         />
       </div>
 
@@ -207,10 +210,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>{" "}
-                {amountDisplay(
-                  booking.price * booking.quantity,
-                  booking.currency as CurrencyEnum
-                )}
+                {amountDisplay(booking.price, booking.currency as CurrencyEnum)}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>{" "}
@@ -305,6 +305,20 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         <Button secondary label="Chiudi" action={closeModal} />
       </div>
+
+      {/* Review Section - Only for completed bookings */}
+      {booking.status === BookingStatusEnum.COMPLETED && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <ReviewButtonComponent
+            booking={booking}
+            vigilName={vigil?.displayName}
+            onReviewCreated={() => {
+              // Optionally refresh booking details or show success message
+              console.log("Review created/updated");
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

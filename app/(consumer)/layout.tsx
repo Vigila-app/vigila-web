@@ -46,6 +46,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("ConsumerLayout rendered");
   return (
     <HtmlDocument
       otherBody={
