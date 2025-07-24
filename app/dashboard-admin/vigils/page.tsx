@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
+import { Avatar } from "@/components";
 
 export default function AdminVigilsPage() {
   const { vigils, vigilsLoading, getVigils, updateVigilStatus } =
@@ -17,9 +18,11 @@ export default function AdminVigilsPage() {
 
   const filteredVigils = vigils.filter(
     (vigil) =>
-      vigil.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vigil.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vigil.location.toLowerCase().includes(searchTerm.toLowerCase())
+      vigil.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vigil.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vigil.addresses?.some((address) =>
+        address.display_name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   const getStatusColor = (status: string) => {
@@ -96,7 +99,7 @@ export default function AdminVigilsPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cerca vigile
+              Cerca vigil
             </label>
             <input
               type="text"
@@ -166,7 +169,7 @@ export default function AdminVigilsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vigile
+                  Vigil
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contatto
@@ -203,15 +206,11 @@ export default function AdminVigilsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-700">
-                            {vigil.name.charAt(0)}
-                          </span>
-                        </div>
+                        <Avatar userId={vigil.id} value={vigil.displayName} />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {vigil.name}
+                          {vigil.displayName}
                         </div>
                         <div className="text-sm text-gray-500">
                           ID: {vigil.id.substring(0, 8)}...
@@ -225,7 +224,7 @@ export default function AdminVigilsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {vigil.location}
+                      {vigil.addresses?.[0]?.display_name}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -257,12 +256,12 @@ export default function AdminVigilsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      €{vigil.total_earnings.toFixed(2)}
+                      €{vigil.total_earnings?.toFixed(2)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(vigil.joined_date).toLocaleDateString()}
+                      {new Date(vigil.created_at).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -372,7 +371,7 @@ export default function AdminVigilsPage() {
                     </span>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {vigil.name}
+                        {vigil.displayName}
                       </p>
                       <p className="text-xs text-gray-500">
                         {vigil.completed_services} servizi completati
@@ -381,7 +380,7 @@ export default function AdminVigilsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-green-600">
-                      €{vigil.total_earnings.toFixed(2)}
+                      €{vigil.total_earnings?.toFixed(2)}
                     </p>
                     <p className="text-xs text-gray-500">{vigil.rating}/5 ⭐</p>
                   </div>
@@ -409,10 +408,10 @@ export default function AdminVigilsPage() {
                     </span>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {vigil.name}
+                        {vigil.displayName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        €{vigil.total_earnings.toFixed(2)} guadagnati
+                        €{vigil.total_earnings?.toFixed(2)} guadagnati
                       </p>
                     </div>
                   </div>

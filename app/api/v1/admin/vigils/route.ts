@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
     const { nextUrl } = req;
     console.log(`API GET admin/vigils`);
 
-    // Verifica autenticazione e ruolo admin
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.ADMIN) {
       return jsonErrorResponse(403, {
@@ -33,7 +32,6 @@ export async function GET(req: NextRequest) {
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    // Applica filtri se presenti
     if (filters.status) {
       query = query.eq("status", filters.status);
     }
@@ -44,7 +42,6 @@ export async function GET(req: NextRequest) {
       query = query.ilike("location", `%${filters.location}%`);
     }
 
-    // Applica paginazione
     if (from !== undefined && to !== undefined) {
       query = query.range(from, to);
     }
@@ -55,7 +52,6 @@ export async function GET(req: NextRequest) {
       throw error;
     }
 
-    // Ottieni statistiche aggiuntive per ogni vigile
     const vigilsWithStats = await Promise.all(
       (data || []).map(async (vigil) => {
         const { data: servicesCount } = await _admin
