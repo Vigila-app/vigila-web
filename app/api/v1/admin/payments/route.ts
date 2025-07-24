@@ -24,13 +24,18 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to } = pagination;
-    const filters = getQueryParams(req.url, ["status", "payment_method", "booking_id"]);
+    const filters = getQueryParams(req.url, [
+      "status",
+      "payment_method",
+      "booking_id",
+    ]);
 
     const _admin = getAdminClient();
-    
+
     let query = _admin
       .from("bookings")
-      .select(`
+      .select(
+        `
         id,
         created_at,
         updated_at,
@@ -41,7 +46,9 @@ export async function GET(req: NextRequest) {
         consumers(name, surname, email),
         vigils(name, surname, email),
         services(title, price)
-      `, { count: "exact" })
+      `,
+        { count: "exact" }
+      )
       .not("payment_intent_id", "is", null)
       .order("created_at", { ascending: false });
 
@@ -73,9 +80,13 @@ export async function GET(req: NextRequest) {
       status: booking.payment_status,
       created_at: booking.created_at,
       updated_at: booking.updated_at,
-      consumer_name: booking.consumers ? `${booking.consumers.name} ${booking.consumers.surname}` : "N/A",
+      consumer_name: booking.consumers
+        ? `${booking.consumers.name} ${booking.consumers.surname}`
+        : "N/A",
       consumer_email: booking.consumers?.email || "N/A",
-      vigil_name: booking.vigils ? `${booking.vigils.name} ${booking.vigils.surname}` : "N/A",
+      vigil_name: booking.vigils
+        ? `${booking.vigils.name} ${booking.vigils.surname}`
+        : "N/A",
       service_name: booking.services?.title || "N/A",
       service_price: booking.services?.price || 0,
     }));
@@ -105,7 +116,6 @@ export async function GET(req: NextRequest) {
       },
       success: true,
     });
-
   } catch (error) {
     console.error("Admin payments error:", error);
     return jsonErrorResponse(500, {
@@ -140,7 +150,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     // Aggiorna lo stato del pagamento nella prenotazione
     const updateData: any = {
       payment_status,
@@ -155,12 +165,14 @@ export async function PUT(req: NextRequest) {
       .from("bookings")
       .update(updateData)
       .eq("id", booking_id)
-      .select(`
+      .select(
+        `
         *,
         consumers(name, surname, email),
         vigils(name, surname, email),
         services(title, price)
-      `)
+      `
+      )
       .single();
 
     if (error) {
@@ -170,20 +182,25 @@ export async function PUT(req: NextRequest) {
     // TODO: Implementare logica di rimborso con Stripe se necessario
     if (payment_status === "REFUNDED" && data.payment_intent_id) {
       // Qui dovrebbe essere implementata la logica di rimborso con Stripe
-      console.log(`Refund needed for payment_intent: ${data.payment_intent_id}`);
+      console.log(
+        `Refund needed for payment_intent: ${data.payment_intent_id}`
+      );
     }
 
     return NextResponse.json({
       code: "ADMIN_PAYMENTS_UPDATE_SUCCESS",
       data: {
         ...data,
-        consumer_name: data.consumers ? `${data.consumers.name} ${data.consumers.surname}` : "N/A",
-        vigil_name: data.vigils ? `${data.vigils.name} ${data.vigils.surname}` : "N/A",
+        consumer_name: data.consumers
+          ? `${data.consumers.name} ${data.consumers.surname}`
+          : "N/A",
+        vigil_name: data.vigils
+          ? `${data.vigils.name} ${data.vigils.surname}`
+          : "N/A",
         service_name: data.services?.title || "N/A",
       },
       success: true,
     });
-
   } catch (error) {
     console.error("Admin payments update error:", error);
     return jsonErrorResponse(500, {

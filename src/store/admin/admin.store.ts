@@ -30,7 +30,15 @@ const initAdminStore: {
   consumers: [],
   services: [],
   payments: [],
-  lastUpdate: undefined,
+  lastUpdate: {
+    dashboardStats: undefined,
+    analytics: undefined,
+    bookings: undefined,
+    vigils: undefined,
+    consumers: undefined,
+    services: undefined,
+    payments: undefined,
+  },
   dashboardLoading: false,
   analyticsLoading: false,
   bookingsLoading: false,
@@ -48,7 +56,7 @@ export const useAdminStore = create<AdminStoreType>()(
         
         getDashboardStats: async (force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.dashboardStats;
             if (
               force ||
               !lastUpdate ||
@@ -60,7 +68,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (stats) {
                 set({
                   dashboardStats: stats,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    dashboardStats: new Date(),
+                  },
                   dashboardLoading: false,
                 });
               }
@@ -73,7 +84,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getAnalytics: async (dateRange?: string, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.analytics;
             if (
               force ||
               !lastUpdate ||
@@ -85,7 +96,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (analytics) {
                 set({
                   analytics,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    analytics: new Date(),
+                  },
                   analyticsLoading: false,
                 });
               }
@@ -98,7 +112,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getBookings: async (filters?: Record<string, string>, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.bookings;
             if (
               force ||
               !lastUpdate ||
@@ -109,7 +123,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (bookings) {
                 set({
                   bookings,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    bookings: new Date(),
+                  },
                   bookingsLoading: false,
                 });
               }
@@ -137,7 +154,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getVigils: async (filters?: Record<string, string>, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.vigils;
             if (
               force ||
               !lastUpdate ||
@@ -148,7 +165,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (vigils) {
                 set({
                   vigils,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    vigils: new Date(),
+                  },
                   vigilsLoading: false,
                 });
               }
@@ -176,7 +196,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getConsumers: async (filters?: Record<string, string>, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.consumers;
             if (
               force ||
               !lastUpdate ||
@@ -187,7 +207,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (consumers) {
                 set({
                   consumers,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    consumers: new Date(),
+                  },
                   consumersLoading: false,
                 });
               }
@@ -200,7 +223,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getServices: async (filters?: Record<string, string>, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.services;
             if (
               force ||
               !lastUpdate ||
@@ -211,7 +234,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (services) {
                 set({
                   services,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    services: new Date(),
+                  },
                   servicesLoading: false,
                 });
               }
@@ -239,7 +265,7 @@ export const useAdminStore = create<AdminStoreType>()(
 
         getPayments: async (filters?: Record<string, string>, force: boolean = false) => {
           try {
-            const lastUpdate = get().lastUpdate;
+            const lastUpdate = get().lastUpdate.payments;
             if (
               force ||
               !lastUpdate ||
@@ -250,7 +276,10 @@ export const useAdminStore = create<AdminStoreType>()(
               if (payments) {
                 set({
                   payments,
-                  lastUpdate: new Date(),
+                  lastUpdate: {
+                    ...get().lastUpdate,
+                    payments: new Date(),
+                  },
                   paymentsLoading: false,
                 });
               }
@@ -270,10 +299,27 @@ export const useAdminStore = create<AdminStoreType>()(
           }
         },
 
-        clearCache: () => {
-          set({
-            lastUpdate: undefined,
-          });
+        clearCache: (cacheKey?: keyof AdminStoreType["lastUpdate"]) => {
+          if (cacheKey) {
+            set({
+              lastUpdate: {
+                ...get().lastUpdate,
+                [cacheKey]: undefined,
+              },
+            });
+          } else {
+            set({
+              lastUpdate: {
+                dashboardStats: undefined,
+                analytics: undefined,
+                bookings: undefined,
+                vigils: undefined,
+                consumers: undefined,
+                services: undefined,
+                payments: undefined,
+              },
+            });
+          }
         },
 
         resetStore: () => {

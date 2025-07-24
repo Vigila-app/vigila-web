@@ -61,9 +61,7 @@ export default function AdminLayout({
         </>
       }
     >
-      <AdminHeader>
-        {children}
-      </AdminHeader>
+      <AdminHeader>{children}</AdminHeader>
     </HtmlDocument>
   );
 }

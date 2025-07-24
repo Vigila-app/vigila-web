@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
 
 export default function AdminConsumersPage() {
-  const { 
-    consumers, 
-    consumersLoading, 
-    getConsumers 
-  } = useAdminStore();
-  
+  const { consumers, consumersLoading, getConsumers } = useAdminStore();
+
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -18,28 +14,38 @@ export default function AdminConsumersPage() {
     getConsumers(filters);
   }, [filter, getConsumers]);
 
-  const filteredConsumers = consumers.filter(consumer => 
-    consumer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    consumer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    consumer.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConsumers = consumers.filter(
+    (consumer) =>
+      consumer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consumer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consumer.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "suspended": return "bg-yellow-100 text-yellow-800";
-      case "banned": return "bg-red-100 text-red-800";
-      case "pending_verification": return "bg-blue-100 text-blue-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "suspended":
+        return "bg-yellow-100 text-yellow-800";
+      case "banned":
+        return "bg-red-100 text-red-800";
+      case "pending_verification":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getVerificationColor = (status: string) => {
     switch (status) {
-      case "verified": return "bg-green-100 text-green-800";
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "rejected": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "verified":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -55,7 +61,9 @@ export default function AdminConsumersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Gestione Consumers</h1>
-        <p className="text-gray-600">Visualizza e gestisci tutti i clienti della piattaforma</p>
+        <p className="text-gray-600">
+          Visualizza e gestisci tutti i clienti della piattaforma
+        </p>
       </div>
 
       {/* Filtri e ricerca */}
@@ -96,14 +104,16 @@ export default function AdminConsumersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
-            <p className="text-3xl font-bold text-blue-600">{consumers.length}</p>
+            <p className="text-3xl font-bold text-blue-600">
+              {consumers.length}
+            </p>
             <p className="text-sm text-gray-600">Totale Consumers</p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">
-              {consumers.filter(c => c.status === 'active').length}
+              {consumers.filter((c) => c.status === "active").length}
             </p>
             <p className="text-sm text-gray-600">Attivi</p>
           </div>
@@ -111,7 +121,9 @@ export default function AdminConsumersPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
-              €{consumers.reduce((avg, c) => avg + c.total_spent, 0) / consumers.length || 0}
+              €
+              {consumers.reduce((avg, c) => avg + c.total_spent, 0) /
+                consumers.length || 0}
             </p>
             <p className="text-sm text-gray-600">Spesa Media</p>
           </div>
@@ -119,7 +131,8 @@ export default function AdminConsumersPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600">
-              {consumers.reduce((avg, c) => avg + c.total_bookings, 0) / consumers.length || 0}
+              {consumers.reduce((avg, c) => avg + c.total_bookings, 0) /
+                consumers.length || 0}
             </p>
             <p className="text-sm text-gray-600">Prenotazioni Medie</p>
           </div>
@@ -192,14 +205,22 @@ export default function AdminConsumersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{consumer.email}</div>
-                    <div className="text-sm text-gray-500">{consumer.phone}</div>
+                    <div className="text-sm text-gray-900">
+                      {consumer.email}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {consumer.phone}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{consumer.location}</div>
+                    <div className="text-sm text-gray-900">
+                      {consumer.location}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{consumer.total_bookings}</div>
+                    <div className="text-sm text-gray-900">
+                      {consumer.total_bookings}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
@@ -213,16 +234,26 @@ export default function AdminConsumersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {consumer.last_booking ? new Date(consumer.last_booking).toLocaleDateString() : 'Mai'}
+                      {consumer.last_booking
+                        ? new Date(consumer.last_booking).toLocaleDateString()
+                        : "Mai"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(consumer.verification_status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(
+                        consumer.verification_status
+                      )}`}
+                    >
                       {consumer.verification_status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(consumer.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        consumer.status
+                      )}`}
+                    >
                       {consumer.status}
                     </span>
                   </td>
@@ -232,7 +263,7 @@ export default function AdminConsumersPage() {
                         className="text-blue-600 hover:text-blue-900 text-xs bg-blue-50 px-2 py-1 rounded"
                         onClick={() => {
                           // TODO: Implementare visualizzazione dettagli consumer
-                          console.log('View consumer details:', consumer.id);
+                          console.log("View consumer details:", consumer.id);
                         }}
                       >
                         Dettagli
@@ -241,17 +272,17 @@ export default function AdminConsumersPage() {
                         className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                         onClick={() => {
                           // TODO: Implementare messaggistica diretta
-                          console.log('Message consumer:', consumer.id);
+                          console.log("Message consumer:", consumer.id);
                         }}
                       >
                         Messaggio
                       </button>
-                      {consumer.status === 'active' ? (
+                      {consumer.status === "active" ? (
                         <button
                           className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
                           onClick={() => {
                             // TODO: Implementare sospensione consumer
-                            console.log('Suspend consumer:', consumer.id);
+                            console.log("Suspend consumer:", consumer.id);
                           }}
                         >
                           Sospendi
@@ -261,7 +292,7 @@ export default function AdminConsumersPage() {
                           className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                           onClick={() => {
                             // TODO: Implementare riattivazione consumer
-                            console.log('Activate consumer:', consumer.id);
+                            console.log("Activate consumer:", consumer.id);
                           }}
                         >
                           Attiva
@@ -279,46 +310,68 @@ export default function AdminConsumersPage() {
       {/* Statistiche dettagliate */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Spenders</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Top Spenders
+          </h3>
           <div className="space-y-3">
             {consumers
               .sort((a, b) => b.total_spent - a.total_spent)
               .slice(0, 5)
               .map((consumer, index) => (
-                <div key={consumer.id} className="flex justify-between items-center">
+                <div
+                  key={consumer.id}
+                  className="flex justify-between items-center"
+                >
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{consumer.name}</p>
-                      <p className="text-xs text-gray-500">{consumer.total_bookings} prenotazioni</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {consumer.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {consumer.total_bookings} prenotazioni
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-green-600">€{consumer.total_spent.toFixed(2)}</p>
+                  <p className="text-sm font-bold text-green-600">
+                    €{consumer.total_spent.toFixed(2)}
+                  </p>
                 </div>
               ))}
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Customers più Fedeli</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Customers più Fedeli
+          </h3>
           <div className="space-y-3">
             {consumers
               .sort((a, b) => b.total_bookings - a.total_bookings)
               .slice(0, 5)
               .map((consumer, index) => (
-                <div key={consumer.id} className="flex justify-between items-center">
+                <div
+                  key={consumer.id}
+                  className="flex justify-between items-center"
+                >
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{consumer.name}</p>
-                      <p className="text-xs text-gray-500">€{consumer.total_spent.toFixed(2)} spesi</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {consumer.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        €{consumer.total_spent.toFixed(2)} spesi
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-blue-600">{consumer.total_bookings} prenotazioni</p>
+                  <p className="text-sm font-bold text-blue-600">
+                    {consumer.total_bookings} prenotazioni
+                  </p>
                 </div>
               ))}
           </div>
@@ -327,7 +380,9 @@ export default function AdminConsumersPage() {
 
       {/* Azioni rapide */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Azioni Rapide</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Azioni Rapide
+        </h3>
         <div className="flex flex-wrap gap-4">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Export Consumers

@@ -21,14 +21,15 @@ export async function GET(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     // Ottieni statistiche di base
-    const [bookingsResult, usersResult, vigilsResult, servicesResult] = await Promise.all([
-      _admin.from("bookings").select("*", { count: "exact" }),
-      _admin.from("consumers").select("*", { count: "exact" }),
-      _admin.from("vigils").select("*", { count: "exact" }),
-      _admin.from("services").select("*", { count: "exact" })
-    ]);
+    const [bookingsResult, usersResult, vigilsResult, servicesResult] =
+      await Promise.all([
+        _admin.from("bookings").select("*", { count: "exact" }),
+        _admin.from("consumers").select("*", { count: "exact" }),
+        _admin.from("vigils").select("*", { count: "exact" }),
+        _admin.from("services").select("*", { count: "exact" }),
+      ]);
 
     // Calcola metriche finanziarie
     const { data: paymentsData } = await _admin
@@ -36,18 +37,21 @@ export async function GET(req: NextRequest) {
       .select("amount, created_at, status")
       .eq("status", "completed");
 
-    const totalRevenue = paymentsData?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+    const totalRevenue =
+      paymentsData?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
     const platformCommission = totalRevenue * 0.1; // Assumendo 10% di commissione
 
     // Ottieni prenotazioni recenti con dettagli
     const { data: recentBookings } = await _admin
       .from("bookings")
-      .select(`
+      .select(
+        `
         *,
-        consumers(name, surname),
-        vigils(name, surname),
-        services(title)
-      `)
+        consumers(displayName),
+        vigils(displayName),
+        services(name,currency)
+      `
+      )
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -56,14 +60,14 @@ export async function GET(req: NextRequest) {
       bookings: 23,
       revenue: 31,
       users: 18,
-      vigils: 12
+      vigils: 12,
     };
 
     // Top performers (da implementare con query più complesse)
     const topVigils = [
       { name: "Roberto Rossi", earnings: 3120, rating: 4.9 },
       { name: "Luca Bianchi", earnings: 2340, rating: 4.8 },
-      { name: "Marco Neri", earnings: 1890, rating: 4.6 }
+      { name: "Marco Neri", earnings: 1890, rating: 4.6 },
     ];
 
     const analytics = {
@@ -73,21 +77,23 @@ export async function GET(req: NextRequest) {
         totalVigils: vigilsResult.count || 0,
         totalServices: servicesResult.count || 0,
         totalRevenue,
-        platformCommission
+        platformCommission,
       },
       monthlyGrowth,
-      recentBookings: recentBookings?.map(booking => ({
-        id: booking.id,
-        consumer: `${booking.consumers?.name} ${booking.consumers?.surname}`,
-        vigil: `${booking.vigils?.name} ${booking.vigils?.surname}`,
-        service: booking.services?.title,
-        date: booking.date,
-        status: booking.status,
-        amount: booking.amount
-      })) || [],
+      recentBookings:
+        recentBookings?.map((booking) => ({
+          id: booking.id,
+          consumer: booking.consumers?.displayName,
+          vigil: booking.vigils?.displayName,
+          service: booking.services?.name,
+          date: booking.startDate,
+          status: booking.status,
+          amount: booking.price,
+          currency: booking.services?.currency,
+        })) || [],
       topPerformers: {
-        vigils: topVigils
-      }
+        vigils: topVigils,
+      },
     };
 
     return NextResponse.json({
@@ -95,7 +101,6 @@ export async function GET(req: NextRequest) {
       data: analytics,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin analytics error:", error);
     return jsonErrorResponse(500, {

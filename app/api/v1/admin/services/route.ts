@@ -27,13 +27,16 @@ export async function GET(req: NextRequest) {
     const filters = getQueryParams(req.url, ["category", "status", "vigil_id"]);
 
     const _admin = getAdminClient();
-    
+
     let query = _admin
       .from("services")
-      .select(`
+      .select(
+        `
         *,
         vigils(name, surname, email)
-      `, { count: "exact" })
+      `,
+        { count: "exact" }
+      )
       .order("created_at", { ascending: false });
 
     // Applica filtri se presenti
@@ -70,14 +73,17 @@ export async function GET(req: NextRequest) {
             .from("bookings")
             .select("*")
             .eq("service_id", service.id)
-            .eq("status", "COMPLETED")
+            .eq("status", "COMPLETED"),
         ]);
 
-        const totalRevenue = (revenueResult.data || []).length * (service.price || 0);
+        const totalRevenue =
+          (revenueResult.data || []).length * (service.price || 0);
 
         return {
           ...service,
-          vigil_name: service.vigils ? `${service.vigils.name} ${service.vigils.surname}` : "N/A",
+          vigil_name: service.vigils
+            ? `${service.vigils.name} ${service.vigils.surname}`
+            : "N/A",
           total_bookings: bookingsResult.count || 0,
           total_revenue: totalRevenue,
         };
@@ -90,7 +96,6 @@ export async function GET(req: NextRequest) {
       count,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin services error:", error);
     return jsonErrorResponse(500, {
@@ -125,7 +130,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     const { data, error } = await _admin
       .from("services")
       .update({
@@ -145,7 +150,6 @@ export async function PUT(req: NextRequest) {
       data,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin services update error:", error);
     return jsonErrorResponse(500, {

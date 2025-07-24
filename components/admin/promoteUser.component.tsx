@@ -137,10 +137,10 @@ export default function PromoteUserComponent({ userId: initialUserId, onSuccess 
       <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <h4 className="font-medium text-yellow-800 mb-2">⚠️ Importante</h4>
         <ul className="text-sm text-yellow-700 space-y-1">
-          <li>• Questa API funziona solo da localhost</li>
-          <li>• Solo gli admin esistenti possono promuovere altri utenti</li>
+          <li>• Questa API funziona solo da <i>localhost</i></li>
+          <li>• Solo gli <i>Admin</i> esistenti possono promuovere altri utenti</li>
           <li>• L&apos;operazione viene loggata per audit</li>
-          <li>• Usa con cautela: gli admin hanno accesso completo al sistema</li>
+          <li>• Usa con cautela: gli <i>Admin</i> hanno accesso completo al sistema</li>
         </ul>
       </div>
     </div>

@@ -3,6 +3,12 @@
 import { useEffect } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
 import PromoteUserComponent from "@/components/admin/promoteUser.component";
+import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import { dateDisplay } from "@/src/utils/date.utils";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { Badge } from "@/components";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import { BookingUtils } from "@/src/utils/booking.utils";
 
 export default function AdminOverviewPage() {
   const { dashboardStats, dashboardLoading, getDashboardStats } =
@@ -42,82 +48,64 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* Statistiche principali */}
-      {dashboardStats?.overview ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="text-3xl mr-4">📅</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Prenotazioni Totali
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {dashboardStats.overview.totalBookings}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="text-3xl mr-4">👥</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Utenti Registrati
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {dashboardStats.overview.totalUsers}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="text-3xl mr-4">👮</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Vigils Attivi
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {dashboardStats.overview.totalVigils}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="text-3xl mr-4">💰</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Ricavi Totali
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  €{dashboardStats.overview.totalRevenue?.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="text-3xl mr-4">🤑</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Commissioni Totali
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  €{dashboardStats.overview.platformCommission?.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Prenotazioni Totali
+          </h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {dashboardStats.overview?.totalBookings}
+          </p>
         </div>
-      ) : null}
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Utenti Totali
+          </h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {dashboardStats.overview?.totalUsers}
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Vigils Totali
+          </h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {dashboardStats.overview?.totalVigils}
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Servizi Totali
+          </h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {dashboardStats.overview?.totalServices}
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Ricavi Totali
+          </h3>
+          <p className="text-3xl font-bold text-green-600">
+            €{dashboardStats.overview?.totalRevenue}
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-sm font-medium text-gray-500 mb-2">
+            Commissioni Piattaforma
+          </h3>
+          <p className="text-3xl font-bold text-blue-600">
+            €{dashboardStats.overview?.platformCommission}
+          </p>
+        </div>
+      </div>
 
       {/* Grafici e statistiche aggiuntive */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             Servizi Attivi
@@ -164,7 +152,7 @@ export default function AdminOverviewPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Prenotazioni recenti */}
       <div className="bg-white rounded-lg shadow">
@@ -187,6 +175,9 @@ export default function AdminOverviewPage() {
                   Data
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Importo
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stato
                 </th>
               </tr>
@@ -195,26 +186,27 @@ export default function AdminOverviewPage() {
               {dashboardStats.recentBookings.map((booking) => (
                 <tr key={booking.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {booking.consumer_name}
+                    {booking.consumer}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {booking.service_name}
+                    {booking.service}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {booking.date}
+                    {dateDisplay(booking.date, "date")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {amountDisplay(
+                      booking.amount,
+                      booking.currency as CurrencyEnum
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        booking.status === "confermata"
-                          ? "bg-green-100 text-green-800"
-                          : booking.status === "in_corso"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
+                    <Badge
+                      label={capitalize(booking.status as string)}
+                      color={BookingUtils.getStatusColor(
+                        booking.status as BookingStatusEnum
+                      )}
+                    />
                   </td>
                 </tr>
               ))}
@@ -227,7 +219,6 @@ export default function AdminOverviewPage() {
       <div className="mt-8">
         <PromoteUserComponent
           onSuccess={() => {
-            // Potremmo aggiornare le statistiche dopo una promozione
             console.log("Utente promosso con successo");
           }}
         />

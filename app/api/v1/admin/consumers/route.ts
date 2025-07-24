@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     const filters = getQueryParams(req.url, ["status", "location", "verified"]);
 
     const _admin = getAdminClient();
-    
+
     let query = _admin
       .from("consumers")
       .select("*", { count: "exact" })
@@ -67,12 +67,13 @@ export async function GET(req: NextRequest) {
             .from("bookings")
             .select("services(price)")
             .eq("consumer_id", consumer.id)
-            .eq("status", "COMPLETED")
+            .eq("status", "COMPLETED"),
         ]);
 
-        const totalSpent = totalSpentResult.data?.reduce((sum, booking: any) => {
-          return sum + (booking.services?.price || 0);
-        }, 0) || 0;
+        const totalSpent =
+          totalSpentResult.data?.reduce((sum, booking: any) => {
+            return sum + (booking.services?.price || 0);
+          }, 0) || 0;
 
         return {
           ...consumer,
@@ -88,7 +89,6 @@ export async function GET(req: NextRequest) {
       count,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin consumers error:", error);
     return jsonErrorResponse(500, {
@@ -123,7 +123,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     const { data, error } = await _admin
       .from("consumers")
       .update({
@@ -143,7 +143,6 @@ export async function PUT(req: NextRequest) {
       data,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin consumers update error:", error);
     return jsonErrorResponse(500, {

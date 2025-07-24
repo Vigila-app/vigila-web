@@ -157,11 +157,11 @@ export const getUUID = (root = "") =>
 export const amountFormatter = (amount: number) =>
   Math.round((amount + Number.EPSILON) * 100) / 100;
 
-export const amountDisplay = (amount: number) =>
-  amountFormatter(amount).toLocaleString(undefined, {
+export const amountDisplay = (amount: number, currency?: CurrencyEnum) =>
+  `${currency || ""}${amountFormatter(amount).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
+  })}`;
 
 export const timestampToDate = (timestamp: any) => {
   try {
@@ -225,6 +225,6 @@ export const getCurrency = (currency: CurrencyEnum) => {
     case CurrencyEnum.GB_POUND:
       return "gbp";
     default:
-      return currency.toLowerCase();
+      return (currency as string).toLowerCase();
   }
 };

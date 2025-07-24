@@ -4,13 +4,9 @@ import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
 
 export default function AdminVigilsPage() {
-  const { 
-    vigils, 
-    vigilsLoading, 
-    getVigils, 
-    updateVigilStatus 
-  } = useAdminStore();
-  
+  const { vigils, vigilsLoading, getVigils, updateVigilStatus } =
+    useAdminStore();
+
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -19,28 +15,38 @@ export default function AdminVigilsPage() {
     getVigils(filters);
   }, [filter, getVigils]);
 
-  const filteredVigils = vigils.filter(vigil => 
-    vigil.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vigil.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vigil.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVigils = vigils.filter(
+    (vigil) =>
+      vigil.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vigil.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vigil.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-gray-100 text-gray-800";
-      case "suspended": return "bg-red-100 text-red-800";
-      case "pending_verification": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-gray-100 text-gray-800";
+      case "suspended":
+        return "bg-red-100 text-red-800";
+      case "pending_verification":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getVerificationColor = (status: string) => {
     switch (status) {
-      case "verified": return "bg-green-100 text-green-800";
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "rejected": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "verified":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -48,7 +54,7 @@ export default function AdminVigilsPage() {
     try {
       await updateVigilStatus(vigilId, newStatus);
     } catch (error) {
-      console.error('Error updating vigil status:', error);
+      console.error("Error updating vigil status:", error);
     }
   };
 
@@ -63,8 +69,10 @@ export default function AdminVigilsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Gestione Vigili</h1>
-        <p className="text-gray-600">Visualizza e gestisci tutti i vigili registrati sulla piattaforma</p>
+        <h1 className="text-2xl font-bold text-gray-900">Gestione Vigils</h1>
+        <p className="text-gray-600">
+          Visualizza e gestisci tutti i vigils registrati sulla piattaforma
+        </p>
       </div>
 
       {/* Filtri e ricerca */}
@@ -106,13 +114,13 @@ export default function AdminVigilsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-blue-600">{vigils.length}</p>
-            <p className="text-sm text-gray-600">Totale Vigili</p>
+            <p className="text-sm text-gray-600">Totale Vigils</p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">
-              {vigils.filter(v => v.status === 'active').length}
+              {vigils.filter((v) => v.status === "active").length}
             </p>
             <p className="text-sm text-gray-600">Attivi</p>
           </div>
@@ -120,7 +128,7 @@ export default function AdminVigilsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">
-              {vigils.filter(v => v.status === 'pending_verification').length}
+              {vigils.filter((v) => v.status === "pending_verification").length}
             </p>
             <p className="text-sm text-gray-600">In Verifica</p>
           </div>
@@ -128,7 +136,8 @@ export default function AdminVigilsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
-              {vigils.reduce((avg, v) => avg + v.rating, 0) / vigils.length || 0}
+              {vigils.reduce((avg, v) => avg + v.rating, 0) / vigils.length ||
+                0}
             </p>
             <p className="text-sm text-gray-600">Rating Medio</p>
           </div>
@@ -136,18 +145,20 @@ export default function AdminVigilsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600">
-              €{vigils.reduce((avg, v) => avg + v.total_earnings, 0) / vigils.length || 0}
+              €
+              {vigils.reduce((avg, v) => avg + v.total_earnings, 0) /
+                vigils.length || 0}
             </p>
             <p className="text-sm text-gray-600">Guadagno Medio</p>
           </div>
         </div>
       </div>
 
-      {/* Lista vigili */}
+      {/* Lista vigils */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Vigili ({filteredVigils.length})
+            Vigils ({filteredVigils.length})
           </h3>
         </div>
         <div className="overflow-x-auto">
@@ -213,19 +224,23 @@ export default function AdminVigilsPage() {
                     <div className="text-sm text-gray-500">{vigil.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{vigil.location}</div>
+                    <div className="text-sm text-gray-900">
+                      {vigil.location}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center mb-1">
-                      <div className="text-sm font-medium text-gray-900 mr-2">{vigil.rating}/5</div>
+                      <div className="text-sm font-medium text-gray-900 mr-2">
+                        {vigil.rating}/5
+                      </div>
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
                             className={`h-4 w-4 ${
-                              i < Math.floor(vigil.rating) 
-                                ? 'text-yellow-400' 
-                                : 'text-gray-300'
+                              i < Math.floor(vigil.rating)
+                                ? "text-yellow-400"
+                                : "text-gray-300"
                             }`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
@@ -236,7 +251,8 @@ export default function AdminVigilsPage() {
                       </div>
                     </div>
                     <div className="text-xs text-gray-500">
-                      {vigil.completed_services} completati / {vigil.active_services} attivi
+                      {vigil.completed_services} completati /{" "}
+                      {vigil.active_services} attivi
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -251,16 +267,26 @@ export default function AdminVigilsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {vigil.last_active ? new Date(vigil.last_active).toLocaleDateString() : 'Mai'}
+                      {vigil.last_active
+                        ? new Date(vigil.last_active).toLocaleDateString()
+                        : "Mai"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(vigil.verification_status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getVerificationColor(
+                        vigil.verification_status
+                      )}`}
+                    >
                       {vigil.verification_status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(vigil.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        vigil.status
+                      )}`}
+                    >
                       {vigil.status}
                     </span>
                   </td>
@@ -270,19 +296,19 @@ export default function AdminVigilsPage() {
                         className="text-blue-600 hover:text-blue-900 text-xs bg-blue-50 px-2 py-1 rounded"
                         onClick={() => {
                           // TODO: Implementare visualizzazione dettagli vigile
-                          console.log('View vigil details:', vigil.id);
+                          console.log("View vigil details:", vigil.id);
                         }}
                       >
                         Dettagli
                       </button>
-                      
-                      {vigil.verification_status === 'pending' && (
+
+                      {vigil.verification_status === "pending" && (
                         <>
                           <button
                             className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                             onClick={() => {
                               // TODO: Implementare verifica vigile
-                              console.log('Verify vigil:', vigil.id);
+                              console.log("Verify vigil:", vigil.id);
                             }}
                           >
                             Verifica
@@ -291,7 +317,7 @@ export default function AdminVigilsPage() {
                             className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
                             onClick={() => {
                               // TODO: Implementare rifiuto verifica
-                              console.log('Reject vigil:', vigil.id);
+                              console.log("Reject vigil:", vigil.id);
                             }}
                           >
                             Rifiuta
@@ -299,17 +325,19 @@ export default function AdminVigilsPage() {
                         </>
                       )}
 
-                      {vigil.status === 'active' ? (
+                      {vigil.status === "active" ? (
                         <button
                           className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
-                          onClick={() => handleStatusUpdate(vigil.id, 'suspended')}
+                          onClick={() =>
+                            handleStatusUpdate(vigil.id, "suspended")
+                          }
                         >
                           Sospendi
                         </button>
                       ) : (
                         <button
                           className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
-                          onClick={() => handleStatusUpdate(vigil.id, 'active')}
+                          onClick={() => handleStatusUpdate(vigil.id, "active")}
                         >
                           Attiva
                         </button>
@@ -326,24 +354,35 @@ export default function AdminVigilsPage() {
       {/* Statistiche dettagliate */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Performers</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Top Performers
+          </h3>
           <div className="space-y-3">
             {vigils
               .sort((a, b) => b.total_earnings - a.total_earnings)
               .slice(0, 5)
               .map((vigil, index) => (
-                <div key={vigil.id} className="flex justify-between items-center">
+                <div
+                  key={vigil.id}
+                  className="flex justify-between items-center"
+                >
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{vigil.name}</p>
-                      <p className="text-xs text-gray-500">{vigil.completed_services} servizi completati</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {vigil.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {vigil.completed_services} servizi completati
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-green-600">€{vigil.total_earnings.toFixed(2)}</p>
+                    <p className="text-sm font-bold text-green-600">
+                      €{vigil.total_earnings.toFixed(2)}
+                    </p>
                     <p className="text-xs text-gray-500">{vigil.rating}/5 ⭐</p>
                   </div>
                 </div>
@@ -352,24 +391,35 @@ export default function AdminVigilsPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Vigili più Attivi</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Vigils più Attivi
+          </h3>
           <div className="space-y-3">
             {vigils
               .sort((a, b) => b.completed_services - a.completed_services)
               .slice(0, 5)
               .map((vigil, index) => (
-                <div key={vigil.id} className="flex justify-between items-center">
+                <div
+                  key={vigil.id}
+                  className="flex justify-between items-center"
+                >
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{vigil.name}</p>
-                      <p className="text-xs text-gray-500">€{vigil.total_earnings.toFixed(2)} guadagnati</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {vigil.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        €{vigil.total_earnings.toFixed(2)} guadagnati
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-blue-600">{vigil.completed_services} servizi</p>
+                    <p className="text-sm font-bold text-blue-600">
+                      {vigil.completed_services} servizi
+                    </p>
                     <p className="text-xs text-gray-500">{vigil.rating}/5 ⭐</p>
                   </div>
                 </div>
@@ -380,10 +430,12 @@ export default function AdminVigilsPage() {
 
       {/* Azioni rapide */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Azioni Rapide</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Azioni Rapide
+        </h3>
         <div className="flex flex-wrap gap-4">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            Export Vigili
+            Export Vigils
           </button>
           <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
             Invia Comunicazione

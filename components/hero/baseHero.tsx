@@ -218,7 +218,7 @@ const BaseHero = (props: BaseHeroI) => {
                     </li>
                     <li className="flex items-center">
                       <span className="inline-block w-2 h-2 rounded-full bg-consumer-blue mr-2"></span>
-                      Lavoro flessibile per i giovani Vigili
+                      Lavoro flessibile per i giovani Vigils
                     </li>
                     <li className="flex items-center">
                       <span className="inline-block w-2 h-2 rounded-full bg-vigil-orange mr-2"></span>

@@ -1,13 +1,13 @@
 import { ApiService } from "@/src/services";
 import { apiAdmin } from "@/src/constants/api.constants";
-import { 
-  AdminAnalyticsI, 
-  AdminDashboardStatsI, 
-  AdminBookingI, 
-  AdminVigilI, 
-  AdminConsumerI, 
+import {
+  AdminAnalyticsI,
+  AdminDashboardStatsI,
+  AdminBookingI,
+  AdminVigilI,
+  AdminConsumerI,
   AdminServiceI,
-  AdminPaymentI 
+  AdminPaymentI,
 } from "@/src/types/admin.types";
 
 export const AdminService = {
@@ -160,15 +160,17 @@ export const AdminService = {
 
   // User Promotion
   promoteUser: async (userId: string) =>
-    new Promise<{ success: boolean; message: string; data?: any }>(async (resolve, reject) => {
-      try {
-        const response = (await ApiService.post(
-          apiAdmin.PROMOTE_USER(userId)
-        )) as { success: boolean; message: string; data?: any };
-        resolve(response);
-      } catch (error) {
-        console.error("AdminService promoteUser error", error);
-        reject(error);
+    new Promise<{ success: boolean; message: string; data?: any }>(
+      async (resolve, reject) => {
+        try {
+          const response = (await ApiService.post(
+            apiAdmin.PROMOTE_USER(userId)
+          )) as { success: boolean; message: string; data?: any };
+          resolve(response);
+        } catch (error) {
+          console.error("AdminService promoteUser error", error);
+          reject(error);
+        }
       }
-    }),
+    ),
 };

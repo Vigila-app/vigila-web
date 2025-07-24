@@ -177,8 +177,8 @@
   },
   "adminVigils": {
     "url": "/dashboard-admin/vigils",
-    "label": "Gestione Vigili",
-    "title": "Gestione Vigili",
+    "label": "Gestione Vigils",
+    "title": "Gestione Vigils",
     "menu": {
       "mobile": false,
       "desktop": false,

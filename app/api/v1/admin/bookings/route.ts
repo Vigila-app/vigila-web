@@ -25,18 +25,25 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to } = pagination;
-    const filters = getQueryParams(req.url, ["status", "consumer_id", "vigil_id"]);
+    const filters = getQueryParams(req.url, [
+      "status",
+      "consumer_id",
+      "vigil_id",
+    ]);
 
     const _admin = getAdminClient();
-    
+
     let query = _admin
       .from("bookings")
-      .select(`
+      .select(
+        `
         *,
         consumers(name, surname, email),
         vigils(name, surname, email),
         services(title, price)
-      `, { count: "exact" })
+      `,
+        { count: "exact" }
+      )
       .order("created_at", { ascending: false });
 
     // Applica filtri se presenti
@@ -63,17 +70,17 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       code: "ADMIN_BOOKINGS_SUCCESS",
-      data: data?.map(booking => ({
-        ...booking,
-        consumer_name: `${booking.consumers?.name} ${booking.consumers?.surname}`,
-        vigil_name: `${booking.vigils?.name} ${booking.vigils?.surname}`,
-        service_name: booking.services?.title,
-        amount: booking.services?.price || 0
-      })) || [],
+      data:
+        data?.map((booking) => ({
+          ...booking,
+          consumer_name: `${booking.consumers?.name} ${booking.consumers?.surname}`,
+          vigil_name: `${booking.vigils?.name} ${booking.vigils?.surname}`,
+          service_name: booking.services?.title,
+          amount: booking.services?.price || 0,
+        })) || [],
       count,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin bookings error:", error);
     return jsonErrorResponse(500, {
@@ -106,12 +113,12 @@ export async function PUT(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     const { data, error } = await _admin
       .from("bookings")
-      .update({ 
+      .update({
         status,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId)
       .select()
@@ -126,7 +133,6 @@ export async function PUT(req: NextRequest) {
       data,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin booking update error:", error);
     return jsonErrorResponse(500, {

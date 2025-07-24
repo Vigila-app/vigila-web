@@ -1,15 +1,35 @@
 export interface AdminDashboardStatsI {
-  totalBookings: number;
-  totalUsers: number;
-  totalVigils: number;
-  totalRevenue: number;
-  recentBookings: AdminBookingI[];
+  overview: {
+    totalBookings: number;
+    totalUsers: number;
+    totalVigils: number;
+    totalServices: number;
+    totalRevenue: number;
+    platformCommission: number;
+  };
   activeServices: number;
   monthlyGrowth: {
     bookings: number;
     revenue: number;
     users: number;
     vigils: number;
+  };
+  recentBookings: {
+    id: string;
+    consumer: string;
+    vigil: string;
+    service: string;
+    date: string;
+    status: string;
+    amount: number;
+    currency?: string;
+  }[];
+  topPerformers: {
+    vigils: {
+      name: string;
+      earnings: number;
+      rating: number;
+    }[];
   };
 }
 
@@ -127,48 +147,73 @@ export interface AdminStoreType {
   // Dashboard
   dashboardStats: AdminDashboardStatsI | null;
   dashboardLoading: boolean;
-  
+
   // Analytics
   analytics: AdminAnalyticsI | null;
   analyticsLoading: boolean;
-  
+
   // Bookings
   bookings: AdminBookingI[];
   bookingsLoading: boolean;
-  
+
   // Vigils
   vigils: AdminVigilI[];
   vigilsLoading: boolean;
-  
+
   // Consumers
   consumers: AdminConsumerI[];
   consumersLoading: boolean;
-  
+
   // Services
   services: AdminServiceI[];
   servicesLoading: boolean;
-  
+
   // Payments
   payments: AdminPaymentI[];
   paymentsLoading: boolean;
-  
+
   // Cache
-  lastUpdate: Date | undefined;
-  
+  lastUpdate: {
+    dashboardStats?: Date;
+    analytics?: Date;
+    bookings?: Date;
+    vigils?: Date;
+    consumers?: Date;
+    services?: Date;
+    payments?: Date;
+  };
+
   // Actions
   getDashboardStats: (force?: boolean) => Promise<void>;
   getAnalytics: (dateRange?: string, force?: boolean) => Promise<void>;
-  getBookings: (filters?: Record<string, string>, force?: boolean) => Promise<void>;
+  getBookings: (
+    filters?: Record<string, string>,
+    force?: boolean
+  ) => Promise<void>;
   updateBookingStatus: (bookingId: string, status: string) => Promise<void>;
-  getVigils: (filters?: Record<string, string>, force?: boolean) => Promise<void>;
+  getVigils: (
+    filters?: Record<string, string>,
+    force?: boolean
+  ) => Promise<void>;
   updateVigilStatus: (vigilId: string, status: string) => Promise<void>;
-  getConsumers: (filters?: Record<string, string>, force?: boolean) => Promise<void>;
-  getServices: (filters?: Record<string, string>, force?: boolean) => Promise<void>;
+  getConsumers: (
+    filters?: Record<string, string>,
+    force?: boolean
+  ) => Promise<void>;
+  getServices: (
+    filters?: Record<string, string>,
+    force?: boolean
+  ) => Promise<void>;
   updateServiceStatus: (serviceId: string, status: string) => Promise<void>;
-  getPayments: (filters?: Record<string, string>, force?: boolean) => Promise<void>;
-  promoteUser: (userId: string) => Promise<{ success: boolean; message: string; data?: any }>;
-  
+  getPayments: (
+    filters?: Record<string, string>,
+    force?: boolean
+  ) => Promise<void>;
+  promoteUser: (
+    userId: string
+  ) => Promise<{ success: boolean; message: string; data?: any }>;
+
   // Utility
-  clearCache: () => void;
+  clearCache: (cacheKey?: keyof AdminStoreType["lastUpdate"]) => void;
   resetStore: () => void;
 }

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     const filters = getQueryParams(req.url, ["status", "verified", "location"]);
 
     const _admin = getAdminClient();
-    
+
     let query = _admin
       .from("vigils")
       .select("*", { count: "exact" })
@@ -69,14 +69,18 @@ export async function GET(req: NextRequest) {
           .eq("vigil_id", vigil.id);
 
         const totalBookings = bookingsData?.length || 0;
-        const totalEarnings = bookingsData?.reduce((sum, booking) => sum + (booking.amount || 0), 0) || 0;
+        const totalEarnings =
+          bookingsData?.reduce(
+            (sum, booking) => sum + (booking.amount || 0),
+            0
+          ) || 0;
 
         return {
           ...vigil,
           total_services: servicesCount || 0,
           total_bookings: totalBookings,
           earnings: totalEarnings,
-          rating: 4.5 // Mock rating - da implementare sistema di rating
+          rating: 4.5, // Mock rating - da implementare sistema di rating
         };
       })
     );
@@ -87,7 +91,6 @@ export async function GET(req: NextRequest) {
       count,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin vigils error:", error);
     return jsonErrorResponse(500, {
@@ -120,9 +123,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    
+
     const updateData: any = {
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     if (status !== undefined) {
@@ -148,7 +151,6 @@ export async function PUT(req: NextRequest) {
       data,
       success: true,
     });
-
   } catch (error) {
     console.error("Admin vigil update error:", error);
     return jsonErrorResponse(500, {

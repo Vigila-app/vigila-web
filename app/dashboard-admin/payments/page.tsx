@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
 
 export default function AdminPaymentsPage() {
-  const { 
-    payments, 
-    paymentsLoading, 
-    getPayments 
-  } = useAdminStore();
-  
+  const { payments, paymentsLoading, getPayments } = useAdminStore();
+
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -18,19 +14,25 @@ export default function AdminPaymentsPage() {
     getPayments(filters);
   }, [filter, getPayments]);
 
-  const filteredPayments = payments.filter(payment => 
-    payment.consumer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    payment.vigil_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    payment.transaction_id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPayments = payments.filter(
+    (payment) =>
+      payment.consumer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.vigil_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.transaction_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-100 text-green-800";
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "failed": return "bg-red-100 text-red-800";
-      case "refunded": return "bg-blue-100 text-blue-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      case "refunded":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -46,7 +48,9 @@ export default function AdminPaymentsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Gestione Pagamenti</h1>
-        <p className="text-gray-600">Monitora tutti i pagamenti e le transazioni della piattaforma</p>
+        <p className="text-gray-600">
+          Monitora tutti i pagamenti e le transazioni della piattaforma
+        </p>
       </div>
 
       {/* Filtri e ricerca */}
@@ -88,16 +92,27 @@ export default function AdminPaymentsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">
-              €{payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
+              €
+              {payments
+                .filter((p) => p.status === "completed")
+                .reduce((sum, p) => sum + p.amount, 0)
+                .toFixed(2)}
             </p>
             <p className="text-sm text-gray-600">Revenue Totale</p>
-            <p className="text-xs text-gray-500">{payments.filter(p => p.status === 'completed').length} transazioni</p>
+            <p className="text-xs text-gray-500">
+              {payments.filter((p) => p.status === "completed").length}{" "}
+              transazioni
+            </p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-blue-600">
-              €{payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.commission, 0).toFixed(2)}
+              €
+              {payments
+                .filter((p) => p.status === "completed")
+                .reduce((sum, p) => sum + p.commission, 0)
+                .toFixed(2)}
             </p>
             <p className="text-sm text-gray-600">Commissioni Platform</p>
             <p className="text-xs text-gray-500">Guadagno piattaforma</p>
@@ -106,19 +121,33 @@ export default function AdminPaymentsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">
-              €{payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
+              €
+              {payments
+                .filter((p) => p.status === "pending")
+                .reduce((sum, p) => sum + p.amount, 0)
+                .toFixed(2)}
             </p>
             <p className="text-sm text-gray-600">In Attesa</p>
-            <p className="text-xs text-gray-500">{payments.filter(p => p.status === 'pending').length} transazioni</p>
+            <p className="text-xs text-gray-500">
+              {payments.filter((p) => p.status === "pending").length}{" "}
+              transazioni
+            </p>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-red-600">
-              €{payments.filter(p => p.status === 'refunded').reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
+              €
+              {payments
+                .filter((p) => p.status === "refunded")
+                .reduce((sum, p) => sum + p.amount, 0)
+                .toFixed(2)}
             </p>
             <p className="text-sm text-gray-600">Rimborsi</p>
-            <p className="text-xs text-gray-500">{payments.filter(p => p.status === 'refunded').length} transazioni</p>
+            <p className="text-xs text-gray-500">
+              {payments.filter((p) => p.status === "refunded").length}{" "}
+              transazioni
+            </p>
           </div>
         </div>
       </div>
@@ -170,12 +199,20 @@ export default function AdminPaymentsPage() {
                     {payment.transaction_id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{payment.consumer_name}</div>
-                    <div className="text-sm text-gray-500">Booking: {payment.booking_id.substring(0, 8)}...</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {payment.consumer_name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Booking: {payment.booking_id.substring(0, 8)}...
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{payment.vigil_name}</div>
-                    <div className="text-sm text-gray-500">ID: {payment.id.substring(0, 8)}...</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {payment.vigil_name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      ID: {payment.id.substring(0, 8)}...
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
@@ -190,11 +227,14 @@ export default function AdminPaymentsPage() {
                       €{payment.commission.toFixed(2)}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {((payment.commission / payment.amount) * 100).toFixed(1)}%
+                      {((payment.commission / payment.amount) * 100).toFixed(1)}
+                      %
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{payment.payment_method}</div>
+                    <div className="text-sm text-gray-900">
+                      {payment.payment_method}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
@@ -205,7 +245,11 @@ export default function AdminPaymentsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(payment.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        payment.status
+                      )}`}
+                    >
                       {payment.status}
                     </span>
                   </td>
@@ -215,30 +259,30 @@ export default function AdminPaymentsPage() {
                         className="text-blue-600 hover:text-blue-900 text-xs bg-blue-50 px-2 py-1 rounded"
                         onClick={() => {
                           // TODO: Implementare visualizzazione dettagli transazione
-                          console.log('View payment details:', payment.id);
+                          console.log("View payment details:", payment.id);
                         }}
                       >
                         Dettagli
                       </button>
-                      
-                      {payment.status === 'completed' && (
+
+                      {payment.status === "completed" && (
                         <button
                           className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
                           onClick={() => {
                             // TODO: Implementare processo di rimborso
-                            console.log('Process refund:', payment.id);
+                            console.log("Process refund:", payment.id);
                           }}
                         >
                           Rimborso
                         </button>
                       )}
 
-                      {payment.status === 'failed' && (
+                      {payment.status === "failed" && (
                         <button
                           className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                           onClick={() => {
                             // TODO: Implementare retry pagamento
-                            console.log('Retry payment:', payment.id);
+                            console.log("Retry payment:", payment.id);
                           }}
                         >
                           Riprova
@@ -249,7 +293,7 @@ export default function AdminPaymentsPage() {
                         className="text-purple-600 hover:text-purple-900 text-xs bg-purple-50 px-2 py-1 rounded"
                         onClick={() => {
                           // TODO: Implementare download ricevuta
-                          console.log('Download receipt:', payment.id);
+                          console.log("Download receipt:", payment.id);
                         }}
                       >
                         Ricevuta
@@ -266,35 +310,51 @@ export default function AdminPaymentsPage() {
       {/* Analisi finanziarie */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Metodi di Pagamento Più Usati</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Metodi di Pagamento Più Usati
+          </h3>
           <div className="space-y-3">
-            {Array.from(new Set(payments.map(p => p.payment_method)))
-              .map(method => ({
+            {Array.from(new Set(payments.map((p) => p.payment_method)))
+              .map((method) => ({
                 method,
-                count: payments.filter(p => p.payment_method === method).length,
-                total: payments.filter(p => p.payment_method === method).reduce((sum, p) => sum + p.amount, 0)
+                count: payments.filter((p) => p.payment_method === method)
+                  .length,
+                total: payments
+                  .filter((p) => p.payment_method === method)
+                  .reduce((sum, p) => sum + p.amount, 0),
               }))
               .sort((a, b) => b.count - a.count)
               .slice(0, 5)
               .map((methodData, index) => (
-                <div key={methodData.method} className="flex justify-between items-center">
+                <div
+                  key={methodData.method}
+                  className="flex justify-between items-center"
+                >
                   <div className="flex items-center">
                     <span className="text-sm font-medium text-gray-500 mr-3">
                       #{index + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{methodData.method}</p>
-                      <p className="text-xs text-gray-500">€{methodData.total.toFixed(2)} totale</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {methodData.method}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        €{methodData.total.toFixed(2)} totale
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-blue-600">{methodData.count} transazioni</p>
+                  <p className="text-sm font-bold text-blue-600">
+                    {methodData.count} transazioni
+                  </p>
                 </div>
               ))}
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Performance Mensile</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Performance Mensile
+          </h3>
           <div className="h-64 flex items-center justify-center text-gray-500">
             {/* TODO: Implementare grafico con Chart.js o Recharts */}
             Grafico performance pagamenti mensile
@@ -304,7 +364,9 @@ export default function AdminPaymentsPage() {
 
       {/* Azioni rapide */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Azioni Rapide</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Azioni Rapide
+        </h3>
         <div className="flex flex-wrap gap-4">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Export Pagamenti
