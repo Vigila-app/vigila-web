@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { ButtonLink, Divider } from "@/components";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const MenuMobile = () => {
   const pathname = usePathname();
@@ -62,22 +63,25 @@ const MenuMobile = () => {
         {isUserLogged ? (
           <>
             <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">{MenuLinkItem(Routes.dashboard)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.crm)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.checkins)}</li>
               <li className="block py-2">{MenuLinkItem(Routes.services)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.tickets)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.units)}</li>
+              <li className="block py-2">{MenuLinkItem(Routes.bookings)}</li>
             </ul>
             <Divider />
             <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">{MenuLinkItem(Routes.profile)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.account)}</li>
+              <li className="block py-2">
+                {MenuLinkItem(
+                  user.user_metadata?.role === RolesEnum.CONSUMER
+                    ? Routes.profileConsumer
+                    : user.user_metadata?.role === RolesEnum.VIGIL
+                    ? Routes.vigilProfile
+                    : Routes.admin
+                )}
+              </li>
             </ul>
             <Divider />
           </>
         ) : null}
-        <ul className="relative divide-y divide-gray-100">
+        <ul className="relative divide-y divide-gray-100 header-menu">
           {NavigationUtils.getHeaderMenu()
             .filter((route) => route?.menu?.mobile)
             .map((route) => (

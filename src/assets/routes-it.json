@@ -97,19 +97,6 @@
     "private": false,
     "roles": []
   },
-  "dashboard": {
-    "url": "/dashboard",
-    "label": "Dashboard",
-    "title": "Dashboard",
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
   "bookings": {
     "url": "/booking",
     "label": "Prenotazioni",
@@ -279,68 +266,6 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
-  "crm": {
-    "url": "/dashboard/crm",
-    "label": "CRM",
-    "title": "CRM",
-    "menu": {
-      "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "guests": {
-    "url": "/dashboard/crm/guests",
-    "label": "Guests",
-    "title": "Guests",
-    "parents": ["crm"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "guestDetails": {
-    "url": "/dashboard/crm/guests/:guestId",
-    "matchingUrl": "/crm/guests/",
-    "label": "Guest Details",
-    "title": "Guest Details",
-    "parents": ["crm", "guests"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "user": {
-    "url": "/dashboard/user",
-    "label": "Utente",
-    "title": "Utente",
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "profile": {
-    "url": "/dashboard/user/profile",
-    "label": "Profilo",
-    "title": "Profilo",
-    "private": true,
-    "roles": []
-  },
   "profileConsumer": {
     "url": "/user/profile",
     "label": "Profilo",
@@ -354,57 +279,6 @@
     "title": "Profilo",
     "private": true,
     "roles": ["VIGIL"]
-  },
-  "account": {
-    "url": "/dashboard/user/account",
-    "label": "Account",
-    "title": "Account",
-    "private": true,
-    "roles": []
-  },
-  "accountDetails": {
-    "url": "/dashboard/user/account/details",
-    "label": "Details",
-    "title": "Account Details",
-    "parents": ["account"],
-    "private": true,
-    "roles": []
-  },
-  "accountSecurity": {
-    "url": "/dashboard/user/account/security",
-    "label": "Sicurezza",
-    "title": "Sicurezza Account",
-    "parents": ["account"],
-    "private": true,
-    "roles": []
-  },
-  "sales": {
-    "url": "/dashboard/sales",
-    "label": "Sales",
-    "title": "Sales",
-    "menu": {
-      "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "saleDetails": {
-    "url": "/dashboard/sales/:saleId",
-    "matchingUrl": "/dashboard/sales",
-    "label": "Sale Details",
-    "title": "Sale Details",
-    "parents": ["sales"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
   },
   "services": {
     "url": "/services",
