@@ -125,8 +125,9 @@ export default function AdminConsumersPage() {
           <div className="text-center">
             <p className="text-3xl font-bold text-purple-600">
               €
-              {consumers.reduce((avg, c) => avg + c.total_spent, 0) /
-                consumers.length || 0}
+              {consumers.length > 0
+                ? consumers.reduce((avg, c) => avg + c.total_spent, 0) / consumers.length
+                : 0}
             </p>
             <p className="text-sm text-gray-600">Spesa Media</p>
           </div>
