@@ -150,8 +150,9 @@ export default function AdminVigilsPage() {
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600">
               €
-              {vigils.reduce((avg, v) => avg + v.total_earnings, 0) /
-                vigils.length || 0}
+              {vigils.length > 0
+                ? vigils.reduce((avg, v) => avg + v.total_earnings, 0) / vigils.length
+                : 0}
             </p>
             <p className="text-sm text-gray-600">Guadagno Medio</p>
           </div>
