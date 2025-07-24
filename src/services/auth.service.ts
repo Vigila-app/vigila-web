@@ -10,7 +10,6 @@ import { apiUser } from "@/src/constants/api.constants";
 import { useCartStore } from "@/src/store/cart/cart.store";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { isServer } from "@/src/utils/common.utils";
-import { useSalesStore } from "@/src/store/sales/sales.store";
 import { Session, User } from "@supabase/supabase-js";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
@@ -86,7 +85,6 @@ export const AuthService = {
         useVigilStore.getState().onLogout();
         useCartStore.getState().onLogout();
         useModalStore.getState().onLogout();
-        useSalesStore.getState().onLogout();
         useServicesStore.getState().onLogout();
         useUserStore.getState().onLogout();
       }

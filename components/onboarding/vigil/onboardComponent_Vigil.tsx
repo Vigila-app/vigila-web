@@ -166,7 +166,7 @@ const OnboardComponent = () => {
                     />
                   ))}
                   {errors.transportation && (
-                    <p className="text-red-500 text-sm">Seleziona un'opzione</p>
+                    <p className="text-red-500 text-sm">Seleziona un&apos;opzione</p>
                   )}
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { Routes } from "@/src/routes";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 const BookingPaymentComponent = dynamic(
   () => import("@/components/bookings/bookingPayment.component"),
@@ -15,7 +16,7 @@ const BookingPaymentComponent = dynamic(
   }
 );
 
-export default function BookingPaymentBookingPage() {
+function BookingPaymentContent() {
   const {
     params: { bookingId },
   } = useQueryParams();
@@ -29,5 +30,13 @@ export default function BookingPaymentBookingPage() {
       <ProgressBar percentage={80} />
       <BookingPaymentComponent bookingId={bookingId} />
     </div>
+  );
+}
+
+export default function BookingPaymentBookingPage() {
+  return (
+    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+      <BookingPaymentContent />
+    </Suspense>
   );
 }

@@ -10,9 +10,9 @@ import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function BookingPaymentResultPage() {
+function BookingPaymentResultContent() {
   const {
     params: { bookingId, payment_intent },
   } = useQueryParams();
@@ -188,5 +188,13 @@ export default function BookingPaymentResultPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function BookingPaymentResultPage() {
+  return (
+    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+      <BookingPaymentResultContent />
+    </Suspense>
   );
 }

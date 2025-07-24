@@ -4,12 +4,10 @@ import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
-import { SaleI } from "@/src/types/sales.types";
-import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { VigilDetailsType } from "../types/vigil.types";
-import { ConsumerDetailsType } from "../types/consumer.types";
+import { VigilDetailsType } from "@/src/types/vigil.types";
+import { ConsumerDetailsType } from "@/src/types/consumer.types";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -137,19 +135,6 @@ export const apiServices = {
   LIST: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
   DETAILS: (serviceId: ServiceI["id"], isMock?: boolean): string =>
     `${apiControllers.SERVICES(isMock)}/${isMock ? "service" : serviceId}`,
-};
-
-export const apiCostumers = {
-  CREATE: (isMock?: boolean): string => apiControllers.GUESTS(isMock),
-  LIST: (isMock?: boolean): string => apiControllers.GUESTS(isMock),
-  DETAILS: (guestId: GuestI["id"], isMock?: boolean): string =>
-    `${apiControllers.GUESTS(isMock)}/${isMock ? "costumer" : guestId}`,
-};
-
-export const apiSales = {
-  LIST: (isMock?: boolean): string => apiControllers.SALES(isMock),
-  DETAILS: (saleId: SaleI["id"], isMock?: boolean): string =>
-    `${apiControllers.SALES(isMock)}/${isMock ? "sale" : saleId}`,
 };
 
 export const apiBookings = {

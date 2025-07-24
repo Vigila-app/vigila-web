@@ -13,7 +13,7 @@ import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 const initUserStore: {
   lastUpdate?: UserStoreType["lastUpdate"];
-  user: UserStoreType["user"];
+  user?: UserStoreType["user"];
   userDetails?: UserStoreType["userDetails"];
   userDevices?: UserStoreType["userDevices"];
   userTerms?: UserStoreType["userTerms"];
@@ -60,7 +60,7 @@ export const useUserStore = create<UserStoreType>()(
                   const userDetailsStoreBE = await UserService.getUserDetails();
                   set(
                     () => ({
-                      userDetails: userDetailsStoreBE?.user_metadata,
+                      userDetails: userDetailsStoreBE,
                       lastUpdate: new Date(),
                     }),
                     false,

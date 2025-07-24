@@ -32,7 +32,7 @@ export const UserService = {
 
         const { user } = useUserStore.getState();
 
-        resolve(user);
+        resolve(user || null);
       } catch (error) {
         console.error("UserService getUser error", error);
         reject(error);

@@ -99,7 +99,8 @@ const Avatar = (props: AvatarI) => {
   };
 
   useEffect(() => {
-    if (!imgUrl) getProfilePic(userId || user?.id);
+    const finalUserId = userId || user?.id;
+    if (!imgUrl && finalUserId) getProfilePic(finalUserId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgUrl, user?.id, userId, lastUserUpdate]);
 

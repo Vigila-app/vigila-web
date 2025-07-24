@@ -9,7 +9,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 export async function GET(
   req: Request,
-  context: { params: { consumerId: string } }
+  context: { params: Promise<{ consumerId: string }> }
 ) {
   try {
     const { consumerId } = await context?.params;
