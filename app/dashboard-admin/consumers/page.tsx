@@ -135,8 +135,9 @@ export default function AdminConsumersPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-orange-600">
-              {consumers.reduce((avg, c) => avg + c.total_bookings, 0) /
-                consumers.length || 0}
+              {consumers.length > 0
+                ? consumers.reduce((avg, c) => avg + c.total_bookings, 0) / consumers.length
+                : 0}
             </p>
             <p className="text-sm text-gray-600">Prenotazioni Medie</p>
           </div>
