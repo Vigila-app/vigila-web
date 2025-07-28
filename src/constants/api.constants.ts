@@ -115,6 +115,10 @@ const apiControllers = {
   // region REVIEWS
   REVIEWS: (isMock?: boolean): string => `${apiBase.V1(isMock)}/reviews`,
   // endregion REVIEWS
+
+  // region EMAIL
+  EMAIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/email`,
+  // endregion EMAIL
 };
 
 export const apiUser = {
@@ -199,19 +203,26 @@ export const apiVigil = {
 };
 
 export const apiAdmin = {
-  ANALYTICS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/analytics`,
-  BOOKINGS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/bookings`,
-  VIGILS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/vigils`,
-  CONSUMERS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/consumers`,
-  SERVICES: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/services`,
-  PAYMENTS: (isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/payments`,
-  PROMOTE_USER: (userId: string, isMock?: boolean): string => `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
+  ANALYTICS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/analytics`,
+  BOOKINGS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/bookings`,
+  VIGILS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/vigils`,
+  CONSUMERS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/consumers`,
+  SERVICES: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/services`,
+  PAYMENTS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/payments`,
+  PROMOTE_USER: (userId: string, isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
 };
 
 export const apiReviews = {
   CREATE: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
   LIST: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
-  LIST_BY_VIGIL: (vigilId: string, isMock?: boolean): string => 
+  LIST_BY_VIGIL: (vigilId: string, isMock?: boolean): string =>
     `${apiControllers.REVIEWS(isMock)}/vigil/${vigilId}`,
   BY_BOOKING: (bookingId: string, isMock?: boolean): string =>
     `${apiControllers.REVIEWS(isMock)}/booking/${bookingId}`,
@@ -221,4 +232,8 @@ export const apiReviews = {
     `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
   DELETE: (reviewId: string, isMock?: boolean): string =>
     `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
+};
+
+export const apiEmail = {
+  SEND: (isMock?: boolean): string => apiControllers.EMAIL(isMock),
 };
