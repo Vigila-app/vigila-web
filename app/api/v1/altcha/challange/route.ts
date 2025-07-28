@@ -5,7 +5,7 @@ import altcha from "altcha-lib";
 
 export async function GET() {
   try {
-    console.log(`API GET altcha/challange`);
+    console.log(`API GET altcha/challenge`);
 
     const challenge = await altcha.createChallenge({
       hmacKey: process.env.ALTCHA_HMAC_KEY as string,
@@ -15,7 +15,7 @@ export async function GET() {
     return NextResponse.json(challenge, { status: 200 });
   } catch (error) {
     return jsonErrorResponse(500, {
-      code: ResponseCodesConstants.ALTCHA_CHALLANGE_ERROR.code,
+      code: ResponseCodesConstants.ALTCHA_CHALLENGE_ERROR.code,
       success: false,
       error,
       message: process.env.ALTCHA_HMAC_KEY || "unreadable_key",

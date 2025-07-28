@@ -1,23 +1,23 @@
 import { useState } from "react";
 
-type AltchaChallangeI = {
+type AltchaChallengeI = {
   payload: string;
   state: "verified" | string;
 };
 
 const useAltcha = () => {
-  const [altchaChallange, setAltchaChallange] = useState<AltchaChallangeI>({
+  const [altchaChallenge, setAltchaChallenge] = useState<AltchaChallengeI>({
     payload: "",
     state: "not_verified",
   });
 
-  const onStateChange = ({ detail }: CustomEvent<AltchaChallangeI>) => {
-    setAltchaChallange(detail);
+  const onStateChange = ({ detail }: CustomEvent<AltchaChallengeI>) => {
+    setAltchaChallenge(detail);
   };
 
   return {
-    challange: altchaChallange.payload,
-    isVerified: altchaChallange.state === "verified",
+    challenge: altchaChallenge.payload,
+    isVerified: altchaChallenge.state === "verified",
     onStateChange,
   };
 };

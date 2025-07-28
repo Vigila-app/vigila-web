@@ -1,8 +1,7 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
 import { HeadersEnum } from "@/src/enums/headers.enums";
 import { useAppStore } from "@/src/store/app/app.store";
-import { RecaptchaActionEnum } from "@/src/enums/common.enums";
-import { ApiService, RecaptchaService, UserService } from "@/src/services";
+import { ApiService, UserService } from "@/src/services";
 import { UserTermsType } from "@/src/types/user.types";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { useUserStore } from "@/src/store/user/user.store";

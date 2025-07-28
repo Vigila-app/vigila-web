@@ -6,16 +6,16 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
 
   // region ALTCHA
-  ALTCHA_CHALLANGE_SUCCESS: {
+  ALTCHA_CHALLENGE_SUCCESS: {
     code: 8001,
   },
-  ALTCHA_CHALLANGE_ERROR: {
+  ALTCHA_CHALLENGE_ERROR: {
     code: 8002,
   },
-  ALTCHA_CHALLANGE_BAD_REQUEST: {
+  ALTCHA_CHALLENGE_BAD_REQUEST: {
     code: 8003,
   },
-  ALTCHA_CHALLANGE_METHOD_NOT_ALLOWED: {
+  ALTCHA_CHALLENGE_METHOD_NOT_ALLOWED: {
     code: 8006,
   },
   ALTCHA_VALIDATE_SUCCESS: {

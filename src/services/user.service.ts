@@ -6,8 +6,7 @@ import {
   UserType,
 } from "@/src/types/user.types";
 import { useUserStore } from "@/src/store/user/user.store";
-import { ApiService, RecaptchaService } from "@/src/services";
-import { RecaptchaActionEnum } from "@/src/enums/common.enums";
+import { ApiService } from "@/src/services";
 import { apiUser } from "@/src/constants/api.constants";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
@@ -225,9 +224,9 @@ export const UserService = {
   resetPassword: async (email: string) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(
-          RecaptchaActionEnum.RESET_PASSWORD
-        );
+        // await RecaptchaService.checkAppToken(
+        //   RecaptchaActionEnum.RESET_PASSWORD
+        // );
         const { data, error } = await AuthInstance.auth.resetPasswordForEmail(
           email,
           {

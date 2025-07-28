@@ -140,8 +140,8 @@ export const apiUser = {
 };
 
 export const apiAltcha = {
-  CHALLANGE: (isMock?: boolean): string =>
-    `${apiControllers.ALTCHA(isMock)}/challange`,
+  CHALLENGE: (isMock?: boolean): string =>
+    `${apiControllers.ALTCHA(isMock)}/challenge`,
   VALIDATE: (isMock?: boolean): string =>
     `${apiControllers.ALTCHA(isMock)}/validate`,
 };

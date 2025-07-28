@@ -51,7 +51,7 @@ const SignupComponent = (props: SignupComponentI) => {
     showToast,
   } = useAppStore();
   const router = useRouter();
-  const { challange, isVerified, onStateChange } = useAltcha();
+  const { challenge, isVerified, onStateChange } = useAltcha();
   const {
     control,
     formState: { errors, isValid },
@@ -101,8 +101,8 @@ const SignupComponent = (props: SignupComponentI) => {
               terms[term.id] = Boolean(formData[term.id]);
             });
         }
-        if (challange) {
-          await AltchaService.verifyChallange(challange);
+        if (challenge) {
+          await AltchaService.verifyChallenge(challenge);
           await AuthService.signup(
             { email, password, name, surname, role },
             terms

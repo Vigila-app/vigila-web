@@ -56,7 +56,7 @@ const Altcha = forwardRef<{ value: string | null }, AltchaProps>(
           "--altcha-max-width": "10rem",
         }}
         floating={floating}
-        challengeurl={apiAltcha.CHALLANGE()}
+        challengeurl={apiAltcha.CHALLENGE()}
       ></altcha-widget>
     );
   }
