@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-sync-scripts */
 import "@/app/globals.css";
 import dynamic from "next/dynamic";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer, Header } from "@/components";
 import {
   PermitGuardComponent,
@@ -9,6 +10,7 @@ import {
 import { Metadata } from "next";
 import { AppConstants } from "@/src/constants";
 import HtmlDocument from "@/components/@core/htmlDocument/htmlDocument.component";
+import { isMocked } from "@/src/utils/envs.utils";
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
@@ -60,6 +62,7 @@ export default function RootLayout({
           <ToastManagerComponent />
           <ModalManagerComponent />
           <CookieBannerComponent />
+          {!isMocked ? <SpeedInsights /> : null}
         </>
       }
       footer={<Footer />}
