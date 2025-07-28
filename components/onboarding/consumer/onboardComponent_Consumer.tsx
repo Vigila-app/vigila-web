@@ -36,7 +36,6 @@ const OnboardComponent = () => {
 
   const onSubmit = async (formdata: OnboardFormI) => {
     try {
-      debugger;
       const { yourName, lovedOneName, lovedOneAge, relationship, city, cap } =
         formdata;
       const role = user?.user_metadata?.role as RolesEnum;
