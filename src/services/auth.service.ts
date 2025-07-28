@@ -31,7 +31,7 @@ export const AuthService = {
   ) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
+        // await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
         const { email, password, name, surname, role } = formData;
         const response = (await ApiService.post(apiUser.SIGNUP(), {
           email,
@@ -56,7 +56,7 @@ export const AuthService = {
   login: async (email: string, password: string) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(RecaptchaActionEnum.LOGIN);
+        // await RecaptchaService.checkAppToken(RecaptchaActionEnum.LOGIN);
         const { data: user, error } = await AppInstance.auth.signInWithPassword(
           {
             email,
