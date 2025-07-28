@@ -6,6 +6,7 @@ import {
   EmailResponseI,
 } from "@/src/types/email.types";
 import { isReleased } from "@/src/utils/envs.utils";
+import { text } from "stream/consumers";
 
 // Verifica che la API key sia configurata
 if (!process.env.RESEND_API_KEY) {
@@ -17,16 +18,54 @@ if (!process.env.RESEND_API_KEY) {
 // Istanza globale di Resend
 const ResendInstance = new Resend(process.env.RESEND_API_KEY);
 
+const calcSender = (from?: string) => {
+  if (from) {
+    return isReleased
+      ? from.trim()
+      : EmailConstants.devEmail.replace(
+          "delivered+${email}",
+          from.trim().replace("@", "--")
+        );
+  }
+  return isReleased
+    ? EmailConstants.defaultFrom
+    : `${EmailConstants.devEmail.replace(
+        "delivered+${email}",
+        EmailConstants.defaultFrom.replace("@", "--").replace(">", "")
+      )}>`;
+};
+
+const calcRecipient = (to: string | string[]) => {
+  if (Array.isArray(to)) {
+    return to
+      .map((recipient) =>
+        isReleased
+          ? recipient.trim()
+          : EmailConstants.devEmail.replace(
+              "${email}",
+              recipient.trim().replace("@", "--")
+            )
+      )
+      .join(", ");
+  }
+  return isReleased
+    ? to.trim()
+    : EmailConstants.devEmail.replace("${email}", to.trim().replace("@", "--"));
+};
+
 export const ResendService = {
   sendEmailWithTemplate: async (options: EmailWithTemplateI) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
         const body = {
-          from: options.from || EmailConstants.defaultFrom,
-          to: options.to,
+          from: calcSender(options.from),
+          to: calcRecipient(options.to),
           subject: options.subject,
           react: options.react,
           replyTo: options.replyTo,
+          text:
+            options.text ||
+            options.react?.props?.children?.toString()?.replace(/<[^>]*>/g, ""),
         };
         if (!isReleased) {
           console.log("Invio email con template:", body);
@@ -54,11 +93,11 @@ export const ResendService = {
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
         const body = {
-          from: options.from || EmailConstants.defaultFrom,
-          to: options.to,
+          from: calcSender(options.from),
+          to: calcRecipient(options.to),
           subject: options.subject,
           html: options.html,
-          text: options.text,
+          text: options.text || options.html.replace(/<[^>]*>/g, ""),
           replyTo: options.replyTo,
         };
         if (!isReleased) {

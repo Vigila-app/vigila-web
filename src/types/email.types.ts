@@ -9,6 +9,7 @@ export interface EmailI {
 
 export interface EmailWithTemplateI extends EmailI {
   react: React.ReactElement;
+  text?: string;
 }
 
 export interface EmailWithHtmlI extends EmailI {
@@ -49,6 +50,7 @@ export interface EmailResponseI {
 
 export interface EmailConfigI {
   defaultFrom: string;
+  devEmail: string;
   subjectPrefixes: {
     booking: string;
     notification: string;

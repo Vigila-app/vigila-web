@@ -8,6 +8,7 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function PUT(
   req: NextRequest,
@@ -103,6 +104,37 @@ export async function PUT(
     if (updateError) {
       throw updateError;
     }
+
+        // Invia email di aggiornamento stato se lo stato è cambiato
+        if (updatedBooking.status !== existingBooking.status) {
+          try {
+           const consumer = {
+            ...userObject,
+            email: userObject.email,
+            first_name:
+              userObject.user_metadata?.name || userObject.user_metadata?.firstName,
+            last_name:
+              userObject.user_metadata?.surname ||
+              userObject.user_metadata?.lastName,
+          };
+    
+            if (consumer?.email) {
+              await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+                updatedBooking,
+                consumer
+              );
+
+              // TODO notification for vigil
+              // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+              //   updatedBooking,
+              //   vigil
+              // );
+            }
+          } catch (emailError) {
+            // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
+            console.error('Errore invio email di aggiornamento stato:', emailError);
+          }
+        }
 
     return NextResponse.json(
       {
