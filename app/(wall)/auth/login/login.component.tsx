@@ -116,12 +116,12 @@ const LoginComponent = () => {
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Accedi con Google"
           />
-          <ProviderButton
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Accedi con Apple"
-          />
+          /> */}
         </div>
       </div>
 

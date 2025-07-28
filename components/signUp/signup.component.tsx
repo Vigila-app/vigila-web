@@ -296,12 +296,12 @@ const SignupComponent = (props: SignupComponentI) => {
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Registrati con Google"
           />
-          <ProviderButton
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Registrati con Apple"
-          />
+          /> */}
         </div>
       </div>
 
