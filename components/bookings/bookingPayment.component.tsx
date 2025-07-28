@@ -4,7 +4,6 @@ import { BookingI } from "@/src/types/booking.types";
 import { useEffect, useMemo, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useAppStore } from "@/src/store/app/app.store";
-import { Button } from "@/components";
 import { CheckoutForm } from "@/components/checkout";
 import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
@@ -53,10 +52,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     console.error("BookingPaymentComponent error:", error);
   }
 
-  const {
-    showLoader,
-    hideLoader,
-  } = useAppStore();
+  const { showLoader, hideLoader } = useAppStore();
 
   const loadBookingAndCreatePayment = async () => {
     try {
@@ -120,9 +116,8 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     try {
       showLoader();
       // Prima verifica lo stato del pagamento con Stripe
-      const paymentVerification = await PaymentService.verifyPaymentIntent(
-        paymentIntentId
-      );
+      const paymentVerification =
+        await PaymentService.verifyPaymentIntent(paymentIntentId);
 
       if (!paymentVerification.success) {
         throw new Error("Impossibile verificare lo stato del pagamento");
@@ -191,25 +186,8 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     // Errore già gestito dal CheckoutForm tramite toast
   };
 
-  const handleBackToBookings = () => {
-    router.push(Routes.bookings.url);
-  };
-
   if (error || !booking) {
-    return (
-      <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
-        <div className="text-center">
-          <h2 className="text-xl font-medium text-red-600 mb-4">Errore</h2>
-          <p className="text-gray-600 mb-6">
-            {error || "Prenotazione non trovata"}
-          </p>
-          <Button
-            label="Torna alle prenotazioni"
-            action={handleBackToBookings}
-          />
-        </div>
-      </div>
-    );
+    return <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />;
   }
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 
 const colors =
   "text-primary-600 text-secondary-600 text-gray-600 text-purple-600 text-sky-600 text-blue-600 text-green-600 text-red-600 text-yellow-600";
@@ -23,9 +23,13 @@ const Undraw = (props: UndrawI) => {
     size = "xs",
   } = props;
 
-  const LazyIcon = lazy(() => {
-    return import(`@/src/assets${baseGraphicsURL}undraw_${graphic}.svg`);
-  });
+  const LazyIcon = useMemo(
+    () =>
+      lazy(() => {
+        return import(`@/src/assets${baseGraphicsURL}undraw_${graphic}.svg`);
+      }),
+    [graphic]
+  );
 
   return (
     <div
