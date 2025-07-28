@@ -14,6 +14,7 @@ import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
+import { EmailService } from "@/server/email.service";
 
 const verifyBookingAccess = async (
   bookingId: string,
@@ -287,6 +288,78 @@ export async function PUT(
       .single<BookingI>();
 
     if (error || !data) throw error;
+
+    // Invia email di aggiornamento stato se lo stato è cambiato
+    if (isStatusUpdate && updatedBooking.status !== booking.status) {
+      try {
+       const consumer = {
+        email: userObject.email,
+        first_name:
+          userObject.user_metadata?.name || userObject.user_metadata?.firstName,
+        last_name:
+          userObject.user_metadata?.surname ||
+          userObject.user_metadata?.lastName,
+      };
+
+        if (consumer?.email) {
+          const customerName = consumer.first_name
+          ? `${consumer.first_name} ${consumer.last_name || ""}`.trim()
+          : userObject.user_metadata?.displayName || "Cliente";
+
+          let statusText = '';
+          let content = '';
+
+          switch (updatedBooking.status) {
+            case BookingStatusEnum.CONFIRMED:
+              statusText = 'confermata';
+              content = `
+                <p>La tua prenotazione <strong>#${bookingId}</strong> è stata confermata.</p>
+                <p>Il Vigil ti contatterà a breve per i dettagli finali.</p>
+              `;
+              break;
+            case BookingStatusEnum.CANCELLED:
+              statusText = 'cancellata';
+              content = `
+                <p>La tua prenotazione <strong>#${bookingId}</strong> è stata cancellata.</p>
+                <p>Se hai domande, contattaci tramite l&apos;app.</p>
+              `;
+              break;
+            case BookingStatusEnum.COMPLETED:
+              statusText = 'completata';
+              content = `
+                <p>La tua prenotazione <strong>#${bookingId}</strong> è stata completata con successo.</p>
+                <p>Grazie per aver scelto Vigila! Ti invitiamo a lasciare una recensione.</p>
+              `;
+              break;
+            case BookingStatusEnum.IN_PROGRESS:
+              statusText = 'in corso';
+              content = `
+                <p>La tua prenotazione <strong>#${bookingId}</strong> è ora in corso.</p>
+                <p>Il servizio di vigilanza è attivo.</p>
+              `;
+              break;
+            default:
+              statusText = 'aggiornata';
+              content = `
+                <p>La tua prenotazione <strong>#${bookingId}</strong> è stata aggiornata.</p>
+                <p><strong>Nuovo stato:</strong> ${updatedBooking.status}</p>
+              `;
+          }
+
+          // Invia email di notifica
+          await EmailService.sendNotificationEmail({
+            to: consumer.email,
+            subject: `Prenotazione ${statusText}`,
+            content,
+          });
+
+          console.log(`Email di aggiornamento stato inviata per prenotazione ${bookingId}`);
+        }
+      } catch (emailError) {
+        // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
+        console.error('Errore invio email di aggiornamento stato:', emailError);
+      }
+    }
 
     return NextResponse.json(
       {

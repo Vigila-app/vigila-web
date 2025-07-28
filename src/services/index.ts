@@ -3,11 +3,9 @@ import { ApiService } from "./api.service";
 import { AuthService } from "./auth.service";
 import { BookingsService } from "./bookings.service";
 import { CmsService } from "./cms.service";
-import { EmailService } from "./email.service";
 import { MapsService } from "./maps.service";
 import { PaymentService } from "./payment.service";
 import { RecaptchaService } from "./recaptcha.service";
-import { ResendService } from "./resend.service";
 import { ReviewsService } from "./reviews.service";
 import { ServicesService } from "./services.service";
 import { UserService } from "./user.service";
@@ -18,11 +16,9 @@ export {
   AuthService,
   BookingsService,
   CmsService,
-  EmailService,
   MapsService,
   PaymentService,
   RecaptchaService,
-  ResendService,
   ReviewsService,
   ServicesService,
   UserService,

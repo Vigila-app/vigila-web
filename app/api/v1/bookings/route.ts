@@ -140,8 +140,8 @@ export async function POST(req: NextRequest) {
             (service.unit_type === "hours"
               ? body.quantity * (60000 * 60)
               : service.unit_type === "days"
-              ? body.quantity * (60000 * 60 * 60)
-              : body.quantity * 60000)
+                ? body.quantity * (60000 * 60 * 60)
+                : body.quantity * 60000)
         ),
       consumer_id: userObject.id,
       vigil_id: service.vigil_id,
