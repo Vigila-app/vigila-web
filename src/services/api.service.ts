@@ -10,36 +10,34 @@ export class ApiService {
     },
   };
 
-  public static delete = async <T>(
+  /**
+   * Helper per gestire errori con Sentry in modo centralizzato
+   */
+  private static async handleApiError(
+    error: Error,
+    method: string,
     url: string,
-    optInit?: RequestInit
-  ): Promise<T | undefined> => {
+    additionalContext?: Record<string, any>
+  ): Promise<void> {
     try {
-      optInit = await ApiService.requestMiddlewares(url, optInit);
-
-      const urlWithQuery = new URL(
-        url,
-        !isServer ? window.location.origin : undefined
-      );
-
-      return ApiService.responseMiddlewares<T>(
-        fetch(urlWithQuery.href, {
-          ...ApiService.init,
-          ...optInit,
-          method: "DELETE",
-        })
-      );
-    } catch (error) {
-      // TODO: add logger
-      console.error(error);
+      const { ApiSentryHelper } = await import("@/src/utils/api-sentry.helper");
+      await ApiSentryHelper.captureApiServiceError(error, method, url, additionalContext);
+    } catch (sentryError) {
+      // Silently fail - non bloccare mai l'app per errori di Sentry
     }
-  };
+    console.error(error);
+  }
 
-  public static get = async <T>(
+  /**
+   * Wrapper generico per le chiamate HTTP con error handling centralizzato
+   */
+  private static async executeHttpRequest<T>(
+    method: string,
     url: string,
-    queryParams?: Record<string, string>,
-    optInit?: RequestInit
-  ): Promise<T | undefined> => {
+    optInit?: RequestInit,
+    body?: Record<string, any>,
+    queryParams?: Record<string, string>
+  ): Promise<T | undefined> {
     try {
       optInit = await ApiService.requestMiddlewares(url, optInit);
 
@@ -52,17 +50,45 @@ export class ApiService {
         urlWithQuery.search = new URLSearchParams(queryParams).toString();
       }
 
+      if (body) {
+        optInit.body = JSON.stringify(body);
+      }
+
       return ApiService.responseMiddlewares<T>(
         fetch(urlWithQuery.href, {
           ...ApiService.init,
           ...optInit,
-          method: "GET",
-        })
+          method,
+        }),
+        method,
+        urlWithQuery.href
       );
     } catch (error) {
-      // TODO: add logger
-      console.error(error);
+      await ApiService.handleApiError(
+        error as Error,
+        method,
+        url,
+        {
+          hasBody: !!body,
+          queryParams,
+        }
+      );
     }
+  }
+
+  public static delete = async <T>(
+    url: string,
+    optInit?: RequestInit
+  ): Promise<T | undefined> => {
+    return ApiService.executeHttpRequest<T>("DELETE", url, optInit);
+  };
+
+  public static get = async <T>(
+    url: string,
+    queryParams?: Record<string, string>,
+    optInit?: RequestInit
+  ): Promise<T | undefined> => {
+    return ApiService.executeHttpRequest<T>("GET", url, optInit, undefined, queryParams);
   };
 
   public static put = async <T>(
@@ -70,29 +96,7 @@ export class ApiService {
     body?: Record<string, any>,
     optInit?: RequestInit
   ): Promise<T | undefined> => {
-    try {
-      optInit = await ApiService.requestMiddlewares(url, optInit);
-
-      const urlWithQuery = new URL(
-        url,
-        !isServer ? window.location.origin : undefined
-      );
-
-      if (body) {
-        optInit.body = JSON.stringify(body);
-      }
-
-      return ApiService.responseMiddlewares<T>(
-        fetch(urlWithQuery.href, {
-          ...ApiService.init,
-          ...optInit,
-          method: "PUT",
-        })
-      );
-    } catch (error) {
-      // TODO: add logger
-      console.error(error);
-    }
+    return ApiService.executeHttpRequest<T>("PUT", url, optInit, body);
   };
 
   public static post = async <T>(
@@ -100,28 +104,7 @@ export class ApiService {
     body?: Record<string, any>,
     optInit?: RequestInit
   ): Promise<T | undefined> => {
-    try {
-      optInit = await ApiService.requestMiddlewares(url, optInit);
-
-      const urlWithQuery = new URL(
-        url,
-        !isServer ? window.location.origin : undefined
-      );
-
-      if (body) {
-        optInit.body = JSON.stringify(body);
-      }
-
-      return ApiService.responseMiddlewares<T>(
-        fetch(urlWithQuery.href, {
-          ...ApiService.init,
-          ...optInit,
-          method: "POST",
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    return ApiService.executeHttpRequest<T>("POST", url, optInit, body);
   };
 
   private static requestMiddlewares = async (
@@ -160,7 +143,9 @@ export class ApiService {
   };
 
   private static responseMiddlewares = <T>(
-    response: Promise<Response>
+    response: Promise<Response>,
+    method?: string,
+    url?: string
   ): Promise<T> =>
     response
       .then(async (res: Response) => {
@@ -168,17 +153,56 @@ export class ApiService {
           if (!res.ok || Number(res.status) < 200 || Number(res.status) > 299) {
             const error = await res?.json();
             useAppStore.getState().setError(error);
+            
+            // Integrazione Sentry per errori HTTP usando helper
+            const { ApiSentryHelper } = await import("@/src/utils/api-sentry.helper");
+            await ApiSentryHelper.captureHttpError(
+              res,
+              method || 'UNKNOWN',
+              url || res.url,
+              error
+            );
+            
             throw new Error(`${res.status} ${res.statusText}`);
           } else {
             const parsed = await res?.json();
+            
+            // Breadcrumb per API call di successo usando helper
+            const { ApiSentryHelper } = await import("@/src/utils/api-sentry.helper");
+            await ApiSentryHelper.addSuccessBreadcrumb(
+              method || 'UNKNOWN',
+              url || res.url,
+              res.status
+            );
+            
             return parsed;
           }
         } catch (error) {
+          // Cattura errori di parsing usando helper
+          if (!(error instanceof Error && error.message.includes('HTTP'))) {
+            const { ApiSentryHelper } = await import("@/src/utils/api-sentry.helper");
+            await ApiSentryHelper.captureParsingError(
+              error as Error,
+              res,
+              method || 'UNKNOWN',
+              url || res.url
+            );
+          }
+          
           throw new Error(error?.toString());
         }
       })
-      .catch((error: string) => {
+      .catch(async (error: string) => {
         console.error(error);
+        
+        // Cattura errori di rete usando helper
+        const { ApiSentryHelper } = await import("@/src/utils/api-sentry.helper");
+        await ApiSentryHelper.captureNetworkError(
+          error,
+          method || 'UNKNOWN',
+          url || 'unknown'
+        );
+        
         throw new Error(error);
       });
 }

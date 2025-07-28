@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { withSentryConfig } from "@sentry/nextjs";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -69,3 +70,6 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|api/|public/).*)",
   ],
 };
+
+// Wrap the middleware with Sentry for automatic error tracking
+export default withSentryConfig(middleware);

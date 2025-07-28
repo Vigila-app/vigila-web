@@ -5,6 +5,7 @@ import { Footer, Header } from "@/components";
 import {
   PermitGuardComponent,
   SessionManagerComponent,
+  SentryErrorBoundary,
 } from "@/components/@core";
 import { Metadata } from "next";
 import { AppConstants } from "@/src/constants";
@@ -51,20 +52,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <HtmlDocument
-      otherBody={
-        <>
-          <PermitGuardComponent />
-          <SessionManagerComponent />
-          <GlobalLoaderManager />
-          <ToastManagerComponent />
-          <ModalManagerComponent />
-          <CookieBannerComponent />
-        </>
-      }
-      footer={<Footer />}
-      header={<Header />}>
-      {children}
-    </HtmlDocument>
+    <SentryErrorBoundary>
+      <HtmlDocument
+        otherBody={
+          <>
+            <PermitGuardComponent />
+            <SessionManagerComponent />
+            <GlobalLoaderManager />
+            <ToastManagerComponent />
+            <ModalManagerComponent />
+            <CookieBannerComponent />
+          </>
+        }
+        footer={<Footer />}
+        header={<Header />}>
+        {children}
+      </HtmlDocument>
+    </SentryErrorBoundary>
   );
 }

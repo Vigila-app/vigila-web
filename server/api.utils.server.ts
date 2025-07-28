@@ -72,6 +72,21 @@ export const verifyPaymentWithStripe = async (
     };
   } catch (error) {
     console.error("Stripe payment verification failed:", error);
+    
+    // Invia l'errore a Sentry con contesto server-side
+    try {
+      const { SentryUtils } = await import("@/src/utils/sentry.utils");
+      SentryUtils.captureError(error as Error, {
+        operation: "verifyStripePayment",
+        paymentId,
+        bookingId,
+        userId,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (sentryError) {
+      console.error("Failed to send error to Sentry:", sentryError);
+    }
+    
     throw error;
   }
 };

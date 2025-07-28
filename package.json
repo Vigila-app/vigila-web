@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "preview": "next start"
+    "preview": "next start",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT .next && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT .next"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
     "@onesignal/node-onesignal": "^5.0.0-alpha-01",
+    "@sentry/nextjs": "^9.42.0",
+    "@sentry/profiling-node": "^9.42.0",
+    "@sentry/react": "^9.42.0",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^3.3.0",
     "@supabase/supabase-js": "^2.48.1",

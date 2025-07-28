@@ -133,6 +133,15 @@ export const useAdminStore = create<AdminStoreType>()(
             }
           } catch (error) {
             console.error("useAdminStore getBookings error:", error);
+            
+            // Invia l'errore a Sentry con contesto
+            const { SentryUtils } = await import("@/src/utils/sentry.utils");
+            SentryUtils.captureError(error as Error, {
+              store: "adminStore",
+              operation: "getBookings",
+              timestamp: new Date().toISOString(),
+            });
+            
             set({ bookingsLoading: false });
           }
         },
@@ -149,6 +158,16 @@ export const useAdminStore = create<AdminStoreType>()(
             }
           } catch (error) {
             console.error("useAdminStore updateBookingStatus error:", error);
+            
+            // Invia l'errore a Sentry con contesto
+            const { SentryUtils } = await import("@/src/utils/sentry.utils");
+            SentryUtils.captureError(error as Error, {
+              store: "adminStore",
+              operation: "updateBookingStatus",
+              bookingId,
+              status,
+              timestamp: new Date().toISOString(),
+            });
           }
         },
 
@@ -175,6 +194,16 @@ export const useAdminStore = create<AdminStoreType>()(
             }
           } catch (error) {
             console.error("useAdminStore getVigils error:", error);
+            
+            // Invia l'errore a Sentry con contesto
+            const { SentryUtils } = await import("@/src/utils/sentry.utils");
+            SentryUtils.captureError(error as Error, {
+              store: "adminStore",
+              operation: "getVigils",
+              filters,
+              timestamp: new Date().toISOString(),
+            });
+            
             set({ vigilsLoading: false });
           }
         },
@@ -191,6 +220,16 @@ export const useAdminStore = create<AdminStoreType>()(
             }
           } catch (error) {
             console.error("useAdminStore updateVigilStatus error:", error);
+            
+            // Invia l'errore a Sentry con contesto
+            const { SentryUtils } = await import("@/src/utils/sentry.utils");
+            SentryUtils.captureError(error as Error, {
+              store: "adminStore",
+              operation: "updateVigilStatus",
+              vigilId,
+              status,
+              timestamp: new Date().toISOString(),
+            });
           }
         },
 
