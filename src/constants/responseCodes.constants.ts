@@ -5,6 +5,33 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 1001,
   },
 
+  // region ALTCHA
+  ALTCHA_CHALLENGE_SUCCESS: {
+    code: 8001,
+  },
+  ALTCHA_CHALLENGE_ERROR: {
+    code: 8002,
+  },
+  ALTCHA_CHALLENGE_BAD_REQUEST: {
+    code: 8003,
+  },
+  ALTCHA_CHALLENGE_METHOD_NOT_ALLOWED: {
+    code: 8006,
+  },
+  ALTCHA_VALIDATE_SUCCESS: {
+    code: 8011,
+  },
+  ALTCHA_VALIDATE_ERROR: {
+    code: 8012,
+  },
+  ALTCHA_VALIDATE_BAD_REQUEST: {
+    code: 8013,
+  },
+  ALTCHA_VALIDATE_METHOD_NOT_ALLOWED: {
+    code: 8016,
+  },
+  // endregion ALTCHA
+
   // region PAYMENT
   PAYMENT_INTENT_SUCCESS: {
     code: 8101,

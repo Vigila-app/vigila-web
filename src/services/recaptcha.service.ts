@@ -4,7 +4,7 @@ import { ApiService } from "@/src/services/api.service";
 import { isDev, isMocked } from "@/src/utils/envs.utils";
 import { apiRecaptcha } from "@/src/constants/api.constants";
 
-type RecaptchaChallangeI = {
+type RecaptchaChallengeI = {
   riskAnalysis: {
     reasons: string[];
     score: number;
@@ -36,31 +36,31 @@ export const RecaptchaService = {
         reject(error);
       }
     }),
-  evaluateChallange: async (
-    challange: RecaptchaChallangeI,
+  evaluateChallenge: async (
+    challenge: RecaptchaChallengeI,
     reqAction: RecaptchaActionEnum
   ) =>
     new Promise(async (resolve, reject) => {
       try {
-        const { tokenProperties, riskAnalysis } = challange;
+        const { tokenProperties, riskAnalysis } = challenge;
         const { action, valid = false } = tokenProperties;
         const { score = 0 } = riskAnalysis;
         if (valid && action === reqAction) {
           if (score >= 0.7) {
-            resolve(challange);
+            resolve(challenge);
           } else {
             console.error(
-              "RecaptchaService evaluateChallange score error",
+              "RecaptchaService evaluateChallenge score error",
               `Requested action: ${reqAction}`,
-              challange
+              challenge
             );
             reject();
           }
         } else {
           console.error(
-            "RecaptchaService evaluateChallange error",
+            "RecaptchaService evaluateChallenge error",
             `Requested action: ${reqAction}`,
-            challange
+            challenge
           );
           reject();
         }
@@ -82,11 +82,11 @@ export const RecaptchaService = {
               expectedAction: action,
             },
           })) as {
-            data: RecaptchaChallangeI;
+            data: RecaptchaChallengeI;
           };
           if (response?.data) {
             try {
-              await RecaptchaService.evaluateChallange(response.data, action);
+              await RecaptchaService.evaluateChallenge(response.data, action);
               resolve(response);
             } catch (error) {
               console.error(error);
@@ -100,11 +100,11 @@ export const RecaptchaService = {
             action
           )) as string;
           if (newToken) {
-            const challange = await RecaptchaService.checkAppToken(
+            const challenge = await RecaptchaService.checkAppToken(
               action,
               newToken
             );
-            resolve(challange);
+            resolve(challenge);
           } else {
             reject();
           }

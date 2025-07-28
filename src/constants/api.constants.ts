@@ -83,6 +83,10 @@ const apiControllers = {
     `${apiBase.V1(isMock)}/maps/address`,
   // endregion MAPS
 
+  // region ALTCHA
+  ALTCHA: (isMock?: boolean): string => `${apiBase.V1(isMock)}/altcha`,
+  // endregion reCAPTCHA
+
   // region reCAPTCHA
   VALIDATE_RECAPTCHA: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/validate-recaptcha`,
@@ -134,6 +138,14 @@ export const apiUser = {
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
 };
+
+export const apiAltcha = {
+  CHALLENGE: (isMock?: boolean): string =>
+    `${apiControllers.ALTCHA(isMock)}/challenge`,
+  VALIDATE: (isMock?: boolean): string =>
+    `${apiControllers.ALTCHA(isMock)}/validate`,
+};
+
 export const apiOnboard = {
   ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
