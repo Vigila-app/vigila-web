@@ -167,9 +167,9 @@ const BookingListComponent = () => {
     duration_hours: booking.quantity,
     duration_hoursValue: booking.quantity,
     total_amount: `${getService(booking.service_id)?.currency} ${amountDisplay(
-      booking.price * booking.quantity
+      booking.price
     )}`,
-    total_amountValue: booking.price * booking.quantity,
+    total_amountValue: booking.price,
     status: (
       <Badge
         label={capitalize(booking.status as string)}
@@ -185,19 +185,22 @@ const BookingListComponent = () => {
           <Button
             text
             label="Dettagli"
-            action={() => openModal("booking-details", { bookingId: booking.id })}
+            action={() =>
+              openModal("booking-details", { bookingId: booking.id })
+            }
           />
-          {booking.payment_status === PaymentStatusEnum.PENDING && isConsumer && (
-            <Button
-              text
-              label="Paga ora"
-              action={() =>
-                router.push(
-                  `${Routes.paymentBooking.url}?bookingId=${booking.id}`
-                )
-              }
-            />
-          )}
+          {booking.payment_status === PaymentStatusEnum.PENDING &&
+            isConsumer && (
+              <Button
+                text
+                label="Paga ora"
+                action={() =>
+                  router.push(
+                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+                  )
+                }
+              />
+            )}
           {booking.status === BookingStatusEnum.PENDING && isConsumer && (
             <Button
               text

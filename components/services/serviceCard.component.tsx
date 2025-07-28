@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
 import { replaceDynamicUrl } from "@/src/utils/common.utils";
+import { useMemo } from "react";
 
 type ServiceCardI = {
   service: ServiceI;
@@ -28,6 +29,13 @@ const ServiceCard = (props: ServiceCardI) => {
     }
   };
 
+  const avarageRating = useMemo(() => {
+    return (
+      vigilDetails?.averageRating ||
+      ReviewsUtils.calculateAverageRating(vigilDetails?.reviews || [])
+    );
+  }, [vigilDetails?.averageRating, vigilDetails?.reviews]);
+
   return (
     <article
       key={service.id}
@@ -41,15 +49,12 @@ const ServiceCard = (props: ServiceCardI) => {
             value={service.vigil?.displayName}
           />
           <span>{service.vigil?.displayName}</span>
-          <span className="inline-flex gap-1 items-center text-sm text-gray-500">
-            <StarIcon className="size-4 text-yellow-500 inline-block" />
-            <span>
-              {vigilDetails?.averageRating ||
-                ReviewsUtils.calculateAverageRating(
-                  vigilDetails?.reviews || []
-                )}
+          {avarageRating ? (
+            <span className="inline-flex gap-1 items-center text-sm text-gray-500">
+              <StarIcon className="size-4 text-yellow-500 inline-block" />
+              <span>{avarageRating}</span>
             </span>
-          </span>
+          ) : null}
         </div>
         <div className="flex-1">
           <h6 className="text-xl font-semibold">{service.name}</h6>
