@@ -6,7 +6,6 @@ import {
   EmailResponseI,
 } from "@/src/types/email.types";
 import { isReleased } from "@/src/utils/envs.utils";
-import { text } from "stream/consumers";
 
 // Verifica che la API key sia configurata
 if (!process.env.RESEND_API_KEY) {
