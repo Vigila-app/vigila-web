@@ -26,12 +26,10 @@ const requestHandler = async (req: Request) => {
           { ...body, format: "json" },
           {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; VigilaApp/1.0)'
-            }
+              "User-Agent": "Mozilla/5.0 (compatible; VigilaApp/1.0)",
+            },
           }
         );
-
-        console.log("Response from maps/address:", response);
 
         return NextResponse.json(
           {
@@ -42,7 +40,6 @@ const requestHandler = async (req: Request) => {
           { status: 200 }
         );
       } catch (error) {
-        console.error("Error in maps/address POST", JSON.stringify(error));
         return NextResponse.json(
           {
             code: ResponseCodesConstants.MAPS_ADDRESS_ERROR.code,

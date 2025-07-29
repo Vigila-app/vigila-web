@@ -165,7 +165,6 @@ export class ApiService {
     response
       .then(async (res: Response) => {
         try {
-          console.log("response", res);
           if (!res.ok || Number(res.status) < 200 || Number(res.status) > 299) {
             const error = await res?.json();
             useAppStore.getState().setError(error);
