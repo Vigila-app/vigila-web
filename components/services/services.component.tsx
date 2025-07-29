@@ -71,6 +71,7 @@ const ServicesComponent = () => {
         location
         role={RolesEnum.VIGIL}
         onSubmit={searchServices}
+        onChange={() => setShowServices(false)}
         label="Trova servizi in questa zona"
         placeholder="Inserisci indirizzo, città o CAP"
       />
