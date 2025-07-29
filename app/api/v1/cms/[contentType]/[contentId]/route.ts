@@ -36,31 +36,31 @@ const requestHandler = async (
   };
 
   switch (method) {
-    case "GET": {
-      try {
-        const response = await ApiService.get(
-          `${apiCms.CONTENT_SSR(`${getPathToContetType()}/${contentId}`)}`
-        );
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.CMS_CONTENT_SUCCESS.code,
-            data: response,
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.CMS_CONTENT_ERROR.code,
-            success: false,
-            show: true,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
+    // case "GET": {
+    //   try {
+    //     const response = await ApiService.get(
+    //       `${apiCms.CONTENT_SSR(`${getPathToContetType()}/${contentId}`)}`
+    //     );
+    //     return NextResponse.json(
+    //       {
+    //         code: ResponseCodesConstants.CMS_CONTENT_SUCCESS.code,
+    //         data: response,
+    //         success: true,
+    //       },
+    //       { status: 200 }
+    //     );
+    //   } catch (error) {
+    //     return NextResponse.json(
+    //       {
+    //         code: ResponseCodesConstants.CMS_CONTENT_ERROR.code,
+    //         success: false,
+    //         show: true,
+    //       },
+    //       { status: 500 }
+    //     );
+    //   }
+    //   break;
+    // }
     default: {
       return NextResponse.json(
         {
