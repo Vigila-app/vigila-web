@@ -37,7 +37,7 @@ export type UserClaimsType = {
 };
 
 export type UserType = {
-    created_at:string;
+    created_at: string;
   email: string;
   id: string;
   displayName?: string;
