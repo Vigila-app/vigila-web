@@ -22,14 +22,22 @@ import PanoramicaConsumerTab from "@/app/(consumer)/tabs/panoramicaConsumer";
 import PrenotazioniConsumerTabs from "@/app/(consumer)/tabs/prenotazioniConsumer";
 import Famiglia from "@/public/svg/Famiglia";
 import FamigliaTab from "@/app/(consumer)/tabs/famigliaTab";
+import InformazioniConsumerTab from "@/app/(consumer)/tabs/informazionicConsumerTab";
+import { useConsumerStore } from "@/src/store/consumer/consumer.store";
+import { dateDisplay } from "@/src/utils/date.utils";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
 
 const ProfileComponent = () => {
   const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
+  const { consumers,getConsumersDetails } = useConsumerStore();
+  const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const created_at = user?.created_at;
   const isConsumer = role === RolesEnum.CONSUMER;
+  const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
+  const vigil = vigils?.find((v) => v.id === user?.id);
 
   const formatRole = (role: string) => {
     if (!role) return "";
@@ -67,7 +75,6 @@ const ProfileComponent = () => {
       id: "informazioni",
     },
   ];
-
   const [selectedTab, setSelectedTab] = useState<TabI>(tabs[0]); //per avere tab attive
 
   const uploadProfilePic = async (
@@ -97,8 +104,8 @@ const ProfileComponent = () => {
     return (
       <div>
         <div className="max-w-7xl mx-auto">
-          <div className=" rounded-lg  bg-background-default shadow-sm py-6 px-8 mb-6">
-            <div className="flex  flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
+          <div className=" rounded-lg h-full bg-background-default shadow-sm py-6 px-8 mb-6">
+            <div className="flex flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
               <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
                 <div className="  flex items-center justify-center">
                   <Avatar
@@ -115,13 +122,13 @@ const ProfileComponent = () => {
                       {userDetails?.displayName}
                     </h1>
                     <span className="text-gray-500 font-medium flex items-center text-center">
-                    {formatRole(role)}
-                  </span>
-                    <div className="flex items-center gap-2  mb-3">
-                      <span>📍 TODO localizzazione</span>
+                      {formatRole(role)}
+                    </span>
+                    <div className="flex flex-col items-center gap-2  mb-3">
+                      <span>📍{consumer?.city}</span>
                       <span>
                         🗓️ Su Vigila da:
-                        {/* {created_at} */}
+                         {dateDisplay(created_at, "date")}
                       </span>
                     </div>
                   </section>
@@ -130,14 +137,13 @@ const ProfileComponent = () => {
               <TabGroup
                 role={role}
                 tabs={tabs}
-                
                 onTabChange={(tab) => setSelectedTab(tab)}
               />
               {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
               {selectedTab.id === "prenotazioni" && (
                 <PrenotazioniConsumerTabs />
               )}
-              {selectedTab.id === "informazioni" && <InformazioniTab />}
+              {selectedTab.id === "informazioni" && <InformazioniConsumerTab />}
               {selectedTab.id === "famiglia" && <FamigliaTab />}
               {selectedTab.id === "recensioni" && <RecensioniTab />}
             </div>
@@ -164,14 +170,16 @@ const ProfileComponent = () => {
               <div className="flex-1  ">
                 <section className="flex flex-col items-center ">
                   <h1 className="text-3xl font-bold mb-2 text-center">
-                    {userDetails?.displayName}
+                    {userDetails?.displayName}{}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
                   <div className="flex items-center gap-2  mb-3">
                     <span>📍 TODO localizzazione</span>
-                    <span>🗓️ Su Vigil da: {created_at}</span>
+                    <span>
+                      🗓️ Su Vigil da: {dateDisplay(created_at, "date")}
+                    </span>
                   </div>
                 </section>
               </div>

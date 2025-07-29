@@ -7,7 +7,7 @@ import { useModalStore } from "@/src/store/modal/modal.store";
 import { Input, Select, TextArea, InputQuantity } from "@/components/form";
 import { Avatar, Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingsService } from "@/src/services";
+import { BookingsService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useEffect, useMemo, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
@@ -79,13 +79,23 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedDuration = watch("quantity");
   const watchedAddress = watch("address");
 
-  useEffect(() => {
-    if (serviceId) {
-      getServiceDetails(serviceId);
-      setValue("service_id", serviceId as never);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId]);
+  // useEffect(() => {
+    // if (serviceId) {
+    //   // prova a trovare nel su service id uguali 
+    //   const existing = services.find((s) => s.id === serviceId);
+    //   if (existing) {
+    //     setSelectedService(existing);
+    //     setValue("service_id", existing.id as never);
+    //   
+  //   }
+  // }, [serviceId, services]);
+  // useEffect(() => {
+  //   if (serviceId) {
+  //     getServiceDetails(serviceId);
+  //     setValue("service_id", serviceId as never);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [serviceId]);
 
   useEffect(() => {
     if (vigilId) getVigilsDetails([vigilId], true);
@@ -121,16 +131,22 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService]);
 
+  useEffect(() => {
+    if (selectedService && selectedService.id !== serviceId) {
+      console.log("⚠️ selectedService non corrisponde a serviceId");
+    }
+  }, [selectedService, serviceId]);
+
   const submitForm = async (formData: BookingFormI) => {
     if (isValid) {
       try {
         showLoader();
         const newBooking = await BookingsService.createBooking(formData);
 
-        // showToast({
-        //   message: "Prenotazione creata!",
-        //   type: ToastStatusEnum.SUCCESS,
-        // });
+        showToast({
+          message: "Prenotazione creata!",
+          type: ToastStatusEnum.SUCCESS,
+        });
 
         onSubmit(newBooking);
 
@@ -178,7 +194,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           </p>
         </div>
 
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-consumer-light-blue border border-consumer-blue p-3">
+        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange border border-vigil-light-orange p-3">
           <Avatar
             size="big"
             userId={vigilDetails?.id}
@@ -236,19 +252,33 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   ? new Date(field.value).toISOString().slice(0, 16)
                   : ""
               }
+              onChange={(value) => {
+                const local = new Date(value as string);
+                const utc = new Date(
+                  Date.UTC(
+                    local.getFullYear(),
+                    local.getMonth(),
+                    local.getDate(),
+                    local.getHours(),
+                    local.getMinutes()
+                  )
+                );
+                field.onChange(utc.toISOString()); // salva in UTC
+              }}
               // set min to today and max to 3 months from today
               min={new Date(
                 new Date(
-                  new Date().setHours(new Date().getHours() + 1)
-                ).setMinutes(0)
+                  new Date().setUTCHours(new Date().getUTCHours() + 1)
+                ).setUTCMinutes(0)
               )
                 .toISOString()
                 .slice(0, 16)}
-              max={new Date(new Date().setMonth(new Date().getMonth() + 3))
+              max={new Date(
+                new Date().setUTCMonth(new Date().getUTCMonth() + 3)
+              )
                 .toISOString()
                 .slice(0, 16)}
               step={1800} // 30 minutes
-              onChange={(value) => field.onChange(new Date(value as string))}
             />
           )}
         />

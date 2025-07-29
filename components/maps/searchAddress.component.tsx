@@ -30,18 +30,20 @@ const SearchAddress = (props: {
     minLength = 3,
     label = "Search Address",
     location = false,
-    isForm,
+    role,
     placeholder = "Inserisci città",
   } = props;
   const { currentLocation } = useCurrentLocation({
     onRender: location,
   });
   const [autocompleteResults, setAutocompleteResults] = useState<any[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { user } = useUserStore();
 
-  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
+  
   const {
     control,
     formState: { errors, isValid },
@@ -117,6 +119,7 @@ const SearchAddress = (props: {
     try {
       if (watch().search?.length >= minLength) {
         setIsLoading(true);
+        setHasSearched(true); 
         const results = await MapsService.autocompleteAddress(watch().search);
         if (results.length > 1) {
           setAutocompleteResults(results);
@@ -155,14 +158,15 @@ const SearchAddress = (props: {
     console.log("Input corrente:", watch().search);
     setSubmitted(false);
     setAutocompleteResults([]);
+    setHasSearched(false); 
     debouncedAutocomplete();
+    console.log("risultati", autocompleteResults);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch()?.search]);
 
-
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="my-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="my-1">
         <Controller
           name="search"
           control={control}
@@ -175,12 +179,11 @@ const SearchAddress = (props: {
               placeholder={placeholder}
               type="text"
               required
-              isForm={isForm}
-              isLoading={isLoading}
               role={role}
+              isLoading={isLoading}
               aria-invalid={!!errors.search}
               error={errors.search}
-              icon={<MagnifyingGlassIcon className="size-4 text-gray-500" />}
+              // icon={<MagnifyingGlassIcon className="size-4 text-gray-500 bg-transparent" />}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -192,16 +195,16 @@ const SearchAddress = (props: {
       </form>
       {!submitted && autocompleteResults?.length > 1 ? (
         <div>
-          <ul className="list-disc pl-5">
+          <ul>
             {autocompleteResults.map((result, index) => (
-              <li key={index} className="my-2">
+              <li key={index} className="my-2 ">
                 <button
                   onClick={() => {
                     setValue("search", result.display_name || result.name);
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline">
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  ">
                   {result.display_name}
                 </button>
               </li>
@@ -211,7 +214,7 @@ const SearchAddress = (props: {
       ) : null}
       {submitted && !autocompleteResults.length ? (
         <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
-      ) : !autocompleteResults.length && !isLoading ? (
+      ) : hasSearched &&!autocompleteResults.length && !isLoading ? (
         <div className="text-gray-500">Nessun risultato trovato</div>
       ) : null}
     </>

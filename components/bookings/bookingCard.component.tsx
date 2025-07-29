@@ -23,9 +23,10 @@ import { dateDisplay } from "@/src/utils/date.utils";
 import Button from "../button/button";
 import Prenotazioni from "@/public/svg/Prenotazioni";
 import Orologio from "@/public/svg/Orologio";
-import { MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon, MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { BookingsService } from "@/src/services";
 import Cestino from "@/public/svg/cestino";
+import clsx from "clsx";
 
 type BookingCardComponentI = {
   bookingId: BookingI["id"];
@@ -47,7 +48,6 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
-
 
   const booking = bookings.find((b) => b.id === bookingId);
   const service = services.find((s) => s.id === booking?.service_id);
@@ -143,7 +143,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       setLoading(false);
     }
   };
-console.log(service?.name);
+  // console.log(service?.name);
   const getStatusColor = (status: BookingStatusEnum) => {
     switch (status) {
       case BookingStatusEnum.PENDING:
@@ -179,160 +179,139 @@ console.log(service?.name);
       </div>
     );
   }
-  if (isConsumer) {
-    if (props.context === "profile") {
-      return (
-        <Card>
-          <div className="flex flex-col gap-2 mb-1">
-            <div className="flex justify-between items-start">
-              <div className="flex items-start gap-2">
-                <Avatar
-                  size="big"
-                  userId={vigil?.id}
-                  value={vigil?.displayName}
-                />
-                <div className="flex flex-col">
-                  <p className="font-semibold text-[16]">
-                    {consumer?.lovedOneName}{" "}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {consumer?.lovedOneAge} anni
-                  </p>
-                </div>
-              </div>
-              <Button
-                label={<Cestino />}
-                className=" flex items-center justify-center "
-                action={handleCancelBooking}
-              />
-            </div>
-            <div className="flex justify-between">
-              <p className="font-semibold text-[12px] text-consumer-blue">
-                {service?.name}
-              </p>
+  const getUserInfo = () => {
+    switch (user?.user_metadata?.role) {
+      case RolesEnum.CONSUMER:
+        return vigil;
 
-              <span className="font-semibold text-[12px] text-vigil-orange">
-                {service?.currency}
-                {amountDisplay(booking?.price * booking?.quantity)}
+        break;
+      case RolesEnum.VIGIL:
+        return consumer;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <Card>
+      <div
+        className={clsx(
+          isVigil && "flex flex-col gap-1",
+          isConsumer && "flex gap-1 "
+        )}>
+        <div
+          className={clsx(
+            isVigil && "flex items-start gap-2",
+            isConsumer && "inline-flex items-center flex-nowrap gap-2"
+          )}>
+          <Avatar
+            size="big"
+            userId={getUserInfo()?.id}
+            value={getUserInfo()?.displayName}
+          />
+          {isVigil && (
+            <div className="flex flex-col">
+              <p className="font-semibold text-[16]">
+                {consumer?.lovedOneName} 
+              </p>
+              <p className="text-sm text-gray-600">
+                {consumer?.lovedOneAge} anni
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* presente in entrambe servizio nome e price servizio*/}
+        {isVigil && (
+          <div className="flex justify-between">
+            <p className="font-semibold text-[12px] text-consumer-blue">
+              {service?.name}
+            </p>
+            <p className="font-semibold text-[12px] text-vigil-orange">
+              {booking?.price}
+              {service?.currency}
+            </p>
+          </div>
+        )}
+
+        {isConsumer && (
+          <div className="flex flex-col justify-between flex-grow-1">
+            <div className="flex justify-start text-[16px] font-semibold items-center">
+              <span>{vigil?.displayName}</span>
+            </div>
+            <p className="font-semibold items-center text-[12px] text-consumer-blue">
+              {service?.name}
+            </p>
+            <div className="flex gap-2 text-[10px] font-normal text-gray-600">
+              <span className="flex items-center justify-center gap-1">
+                <CalendarIcon className="w-4 h-4" /> {dateDisplay(booking.startDate, "date")}
+              </span>
+              <span className="flex items-center justify-center gap-1">
+                <Orologio /> {dateDisplay(booking.startDate, "time")}
               </span>
             </div>
+          </div>
+        )}
+        {/* presente i entrambe data e orario */}
 
-            <div className="flex ">
-              <span className="flex items-center justify-center gap-1 font font-normal text-sm">
-                <Prenotazioni /> {formatBookingDate(booking?.startDate)}
+        {isVigil && (
+          <div>
+            <div className="flex gap-4 text-[10px] font-normal text-gray-600">
+              <span className="flex items-center justify-center gap-1">
+                <CalendarIcon  className="w-4 h-4"/> {dateDisplay(booking.startDate, "date")}
+              </span>
+              <span className="flex items-center justify-center gap-1">
+                <Orologio /> {dateDisplay(booking.startDate, "time")}
               </span>
             </div>
             <div className="flex items-start space-x-2 text-sm">
-              <MapPinIcon className="w-4 h-4  mt-0.5" />
+              <MapPinIcon className="w-8 h-8  mt-0.5" />
               <span className="text-gray-600">{booking?.address}</span>
             </div>
-            {booking?.note && (
-              <div className="flex flex-col">
-                <p className="text-[10px] font-semibold text-consumer-blue">
-                  Note
-                </p>
-                <p className="text-[10px] font-normal">{booking?.note}</p>
-              </div>
-            )}
           </div>
-        </Card>
-      );
-    } else {
-      return (
-        <Card>
-          <div className="flex gap-2 ">
-            <div className="">
-              <div className="inline-flex items-center flex-nowrap gap-2">
-                <Avatar
-                  size="big"
-                  userId={consumer?.id}
-                  value={consumer?.displayName}
-                />
-              </div>
-            </div>
-            <div className=" text-[10px]">
-              <p>{service?.name}</p>
-              <p>{service?.description}</p>
-              <p>
-                <span className="font-medium text-[10px]">
-                  Data del Servizio:
-                </span>
-                {dateDisplay(booking.startDate)}
-              </p>
-            </div>
-            <div className="flex justify-between items-center">
-              <Badge
-                label={capitalize(booking.status as string)}
-                color={getStatusColor(booking.status as BookingStatusEnum)}
-              />
-            </div>
+        )}
+        {isConsumer && (
+          <div className="flex flex-col justify-center items-center gap-1">
+            <span className="text-[20px] font-semibold text-vigil-orange"> {booking?.price}{service?.currency}</span>
+            <Badge
+              label={capitalize(booking.status as string)}
+              color={getStatusColor(booking.status as BookingStatusEnum)}
+            />
           </div>
-        </Card>
-      );
-    }
-  }
-  return (
-    <Card>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-start gap-2">
-          <Avatar size="big" userId={vigil?.id} value={vigil?.displayName} />
-          <div className="flex flex-col">
-            <p className="font-semibold text-[16]">{consumer?.lovedOneName} </p>
-            <p className="text-sm text-gray-600">
-              {consumer?.lovedOneAge} anni
-            </p>
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <p className="font-semibold text-[12px] text-consumer-blue">
-            {service?.name}
-          </p>
-          <p className="font-semibold text-[12px] text-vigil-orange">
-            €{service?.unit_price}{" "}
-          </p>
-          {/* <p>{service?.adress}</p> */}
-        </div>
-        <div className="flex gap-2">
-          <span className="flex items-center justify-center gap-1">
-            <Prenotazioni /> date
-          </span>
-          <span className="flex items-center justify-center gap-1">
-            <Orologio /> time
-          </span>
-        </div>
-        <div className="flex items-start space-x-2 text-sm">
-          <MapPinIcon className="w-4 h-4  mt-0.5" />
-          <span className="text-gray-600">{booking?.address}</span>
-        </div>
-        {booking?.note && (
+        )}
+
+        {isVigil && booking?.note && (
           <div className="bg-gray-100 p-3 rounded-2xl">
             <p className="text-[10px] ">{booking?.note}</p>
           </div>
         )}
-        <div className="flex justify-center gap-3">
-          {accepted === null ? (
-            <>
-              <Button
-                customclass="!px-6 !py-2"
-                role={RolesEnum.CONSUMER}
-                label="Accetta"
-                action={handleAccepted}
-              />
-              <Button
-                customclass="!px-6 !py-2"
-                role={RolesEnum.VIGIL}
-                action={handleRefused}
-                label="Rifiuta"
-              />
-            </>
-          ) : accepted === true ? (
-            <Button label="Accettata" disabled />
-          ) : (
-            <Button label="Rifiutata" disabled />
-          )}
-        </div>
+        {isVigil && (
+          <div className="flex justify-center gap-3 mt-2">
+            {accepted === null ? (
+              <>
+                <Button
+                  customclass="!px-6 !py-2"
+                  role={RolesEnum.CONSUMER}
+                  label="Accetta"
+                  action={handleAccepted}
+                />
+                <Button
+                  customclass="!px-6 !py-2"
+                  role={RolesEnum.VIGIL}
+                  action={handleRefused}
+                  label="Rifiuta"
+                />
+              </>
+            ) : accepted === true ? (
+              <Button label="Accettata" disabled />
+            ) : (
+              <Button label="Rifiutata" disabled />
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );
 };
+
 export default BookingCardComponent;

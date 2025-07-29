@@ -7,7 +7,8 @@ import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
 import { useEffect, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
-import ServiceCard from "./serviceCard.component";
+import ServiceCard from "@/components/services/serviceCard.component";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const ServicesComponent = () => {
   const { showLoader, hideLoader } = useAppStore();
@@ -54,12 +55,12 @@ const ServicesComponent = () => {
 
   return (
     <div className="container mx-auto px-4 py-4">
-      <h1 className="text-2xl font-bold mb-4">Servizi</h1>
       <SearchAddress
         location
+        role={RolesEnum.VIGIL}
         onSubmit={searchServices}
-        label="Trova servizi in questa zona:"
-        placeholder="Inserisci indirizzo, città o codice postale"
+        label="Trova servizi in questa zona"
+        placeholder="Inserisci indirizzo, città o CAP"
       />
       <div className="my-4">
         {services.map((service) => (

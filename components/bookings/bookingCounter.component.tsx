@@ -26,18 +26,18 @@ const BookingCounterComponent = () => {
   return (
     <div className="flex flex-col p-4">
       <Card>
-        <div className="flex gap-4 justify-center items-center">
-          <span className="text-4xl text-consumer-blue font-semibold_">
+        <div className="flex gap-4 justify-start items-center">
+          <span className="text-4xl text-consumer-blue font-semibold">
             {numeroPrenotazioniConfermate}
           </span>
-          <span className="font-semibold text-sm ">
-            Prenotazioni Confermate{" "}
+          <span className="font-semibold  text-sm ">
+            Prenotazioni Confermate
           </span>
         </div>
       </Card>
       <Card>
-        <div className="flex gap-4 justify-center items-center">
-          <span className="text-4xl text-vigil-orange font-semibold_">
+        <div className="flex gap-4 justify-start items-center">
+          <span className="text-4xl text-vigil-orange font-semibold">
             {numeroPrenotazioni}
           </span>
           <span className="font-semibold text-sm ">Totale Prenotazioni </span>
