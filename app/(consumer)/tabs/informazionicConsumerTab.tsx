@@ -13,12 +13,9 @@ import { Controller, useForm } from "react-hook-form";
 const InformazioniConsumerTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
-   const { consumers, getConsumersDetails } = useConsumerStore();
-  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
-  const email: string = user?.email || "";
-  const birthday: string = user?.user_metadata?.birthday;
-  const phone: string = user?.user_metadata?.phone;
-const consumer=consumers.find((c)=>c.id===user.id)
+  const { consumers, getConsumersDetails } = useConsumerStore();
+  const { role, email, birthday, phone } = user?.user_metadata || {};
+  const consumer = consumers.find((c) => c.id === user?.id);
   //esempio di editing dinamico
   const [isEditing, setIsEditing] = useState(true);
 
@@ -132,15 +129,13 @@ const consumer=consumers.find((c)=>c.id===user.id)
             </div>
           </div>
 
-
-
           <div className="space-y-2">
             <label className="text-sm font-medium text-vigil-orange">
               Email
             </label>
             <p>{user?.email}</p>
             <p className="text-xs text-gray-500">
-              Per modificare l'email contatta il supporto
+              Per modificare l&apos;email contatta il supporto
             </p>
           </div>
 
@@ -153,7 +148,7 @@ const consumer=consumers.find((c)=>c.id===user.id)
           </div>
         </div>
       </Card>
-       <Card>
+      <Card>
         <div>
           <div className="font-semibold ">Informazioni del familiare</div>
         </div>
@@ -188,10 +183,7 @@ const consumer=consumers.find((c)=>c.id===user.id)
               Telefono
             </label>
             <p>{consumer?.lovedOnePhone}</p>
-            
           </div>
-
-          
         </div>
       </Card>
 
@@ -237,7 +229,6 @@ const consumer=consumers.find((c)=>c.id===user.id)
         )}
       </Card> */}
     </div>
-    
   );
 };
 export default InformazioniConsumerTab;

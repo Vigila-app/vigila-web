@@ -1,15 +1,12 @@
 "use client";
 
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
-
 import { useUserStore } from "@/src/store/user/user.store";
-
 import { useEffect } from "react";
-
 import Card from "../card/card";
 
 const BookingCounterComponent = () => {
-  const { bookings, getBookings} = useBookingsStore();
+  const { bookings, getBookings } = useBookingsStore();
 
   const { user } = useUserStore();
 
@@ -17,6 +14,7 @@ const BookingCounterComponent = () => {
     if (user?.id) {
       getBookings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const confirmedBookings = bookings.filter((b) => b.status === "confirmed");

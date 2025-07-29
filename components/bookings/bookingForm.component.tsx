@@ -7,7 +7,7 @@ import { useModalStore } from "@/src/store/modal/modal.store";
 import { Input, Select, TextArea, InputQuantity } from "@/components/form";
 import { Avatar, Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingsService, ServicesService } from "@/src/services";
+import { BookingsService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useEffect, useMemo, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
@@ -21,9 +21,11 @@ import dynamic from "next/dynamic";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
-  { 
+  {
     ssr: false,
-    loading: () => <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
   }
 );
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -87,13 +89,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedAddress = watch("address");
 
   // useEffect(() => {
-    // if (serviceId) {
-    //   // prova a trovare nel su service id uguali 
-    //   const existing = services.find((s) => s.id === serviceId);
-    //   if (existing) {
-    //     setSelectedService(existing);
-    //     setValue("service_id", existing.id as never);
-    //   
+  // if (serviceId) {
+  //   // prova a trovare nel su service id uguali
+  //   const existing = services.find((s) => s.id === serviceId);
+  //   if (existing) {
+  //     setSelectedService(existing);
+  //     setValue("service_id", existing.id as never);
+  //
   //   }
   // }, [serviceId, services]);
   // useEffect(() => {
@@ -315,7 +317,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
         <SearchAddress
           location
-          isForm={true}
           onSubmit={(address) =>
             address?.display_name
               ? setValue("address", address.display_name)

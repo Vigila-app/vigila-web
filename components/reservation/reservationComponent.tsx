@@ -118,13 +118,13 @@ export default function Reservation() {
         {accepted === null ? (
           <>
             <Button
-              customclass="!px-6 !py-2"
+              customClass="!px-6 !py-2"
               role={RolesEnum.CONSUMER}
               label="Accetta"
               action={handleAccepted}
             />
             <Button
-              customclass="!px-6 !py-2"
+              customClass="!px-6 !py-2"
               role={RolesEnum.VIGIL}
               action={handleRefused}
               label="Rifiuta"

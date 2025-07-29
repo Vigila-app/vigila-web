@@ -1,16 +1,15 @@
 "use client";
 
-import { Button, Undraw } from "@/components";
+import { Button } from "@/components";
 import { Input, TextArea } from "@/components/form";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
-
 import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import SearchAddress from "@/components/maps/searchAddress.component";
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
 import { useEffect, useState } from "react";
@@ -19,7 +18,6 @@ import MapsComponent from "@/components/maps/maps.component";
 import clsx from "clsx";
 import Card from "@/components/card/card";
 import ServiceOboard from "./VigilOnbordComp/ServiceOnboard";
-
 import { ServiceI } from "@/src/types/services.types";
 
 type OnboardFormI = {
@@ -43,7 +41,7 @@ const transportationOptions = [
 ];
 
 const OnboardComponent = () => {
-  const { showLoader, hideLoader, showToast } = useAppStore();
+  const { showToast } = useAppStore();
   const { user } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
@@ -64,6 +62,7 @@ const OnboardComponent = () => {
 
   useEffect(() => {
     setValue("addresses", addresses);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses]);
 
   const onSubmit = async (formData: OnboardFormI) => {
@@ -134,7 +133,8 @@ const OnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-8 p-4">
+            className="w-full mx-auto max-w-lg space-y-8 p-4"
+          >
             <Controller
               name="birthday"
               control={control}
@@ -208,7 +208,7 @@ const OnboardComponent = () => {
               render={() => (
                 <div>
                   <SearchAddress
-                  role={RolesEnum.VIGIL}
+                    role={RolesEnum.VIGIL}
                     onSubmit={(address) => {
                       console.log("testo", address);
                       setAddresses((prev) => {
@@ -273,7 +273,8 @@ const OnboardComponent = () => {
                       "block font-medium mb-1",
                       role === RolesEnum.VIGIL && "text-vigil-orange",
                       role === RolesEnum.CONSUMER && "text-consumer-blue"
-                    )}>
+                    )}
+                  >
                     Mezzo di trasporto
                   </label>
                   <div className="space-y-2">
@@ -288,7 +289,7 @@ const OnboardComponent = () => {
                     ))}
                     {errors.transportation && (
                       <p className="text-red-500 text-sm">
-                        Seleziona un'opzione
+                        Seleziona un&apos;opzione
                       </p>
                     )}
                   </div>

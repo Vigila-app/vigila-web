@@ -9,23 +9,16 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Card from "../card/card";
 import Avatar from "../avatar/avatar";
 import Badge from "../badge/badge.component";
-import {
-  amountDisplay,
-  capitalize,
-  formatBookingDate,
-} from "@/src/utils/common.utils";
+import { capitalize } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import Button from "../button/button";
-import Prenotazioni from "@/public/svg/Prenotazioni";
 import Orologio from "@/public/svg/Orologio";
-import { CalendarIcon, MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { BookingsService } from "@/src/services";
-import Cestino from "@/public/svg/cestino";
 import clsx from "clsx";
 
 type BookingCardComponentI = {
@@ -36,11 +29,8 @@ type BookingCardComponentI = {
 
 const BookingCardComponent = (props: BookingCardComponentI) => {
   const { bookingId, onUpdate = () => ({}) } = props;
-  const router = useRouter();
   const {
     showToast,
-    showLoader,
-    hideLoader,
     loader: { isLoading },
   } = useAppStore();
   const { bookings, getBookings, getBookingDetails } = useBookingsStore();
@@ -94,7 +84,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   const handleAccepted = async () => {
     setLoading(true);
     // try {
-    await // TODO SERVICE PER I BOOKING BookingService.updateStatus(
+    // await // TODO SERVICE PER I BOOKING BookingService.updateStatus(
     //             ...,true,
     //           );
     console.log("successo");
@@ -198,12 +188,14 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
         className={clsx(
           isVigil && "flex flex-col gap-1",
           isConsumer && "flex gap-1 "
-        )}>
+        )}
+      >
         <div
           className={clsx(
             isVigil && "flex items-start gap-2",
             isConsumer && "inline-flex items-center flex-nowrap gap-2"
-          )}>
+          )}
+        >
           <Avatar
             size="big"
             userId={getUserInfo()?.id}
@@ -212,7 +204,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           {isVigil && (
             <div className="flex flex-col">
               <p className="font-semibold text-[16]">
-                {consumer?.lovedOneName} 
+                {consumer?.lovedOneName}
               </p>
               <p className="text-sm text-gray-600">
                 {consumer?.lovedOneAge} anni
@@ -244,7 +236,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
             </p>
             <div className="flex gap-2 text-[10px] font-normal text-gray-600">
               <span className="flex items-center justify-center gap-1">
-                <CalendarIcon className="w-4 h-4" /> {dateDisplay(booking.startDate, "date")}
+                <CalendarIcon className="w-4 h-4" />{" "}
+                {dateDisplay(booking.startDate, "date")}
               </span>
               <span className="flex items-center justify-center gap-1">
                 <Orologio /> {dateDisplay(booking.startDate, "time")}
@@ -258,7 +251,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           <div>
             <div className="flex gap-4 text-[10px] font-normal text-gray-600">
               <span className="flex items-center justify-center gap-1">
-                <CalendarIcon  className="w-4 h-4"/> {dateDisplay(booking.startDate, "date")}
+                <CalendarIcon className="w-4 h-4" />{" "}
+                {dateDisplay(booking.startDate, "date")}
               </span>
               <span className="flex items-center justify-center gap-1">
                 <Orologio /> {dateDisplay(booking.startDate, "time")}
@@ -272,7 +266,11 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
         )}
         {isConsumer && (
           <div className="flex flex-col justify-center items-center gap-1">
-            <span className="text-[20px] font-semibold text-vigil-orange"> {booking?.price}{service?.currency}</span>
+            <span className="text-[20px] font-semibold text-vigil-orange">
+              {" "}
+              {booking?.price}
+              {service?.currency}
+            </span>
             <Badge
               label={capitalize(booking.status as string)}
               color={getStatusColor(booking.status as BookingStatusEnum)}
@@ -290,13 +288,13 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
             {accepted === null ? (
               <>
                 <Button
-                  customclass="!px-6 !py-2"
+                  customClass="!px-6 !py-2"
                   role={RolesEnum.CONSUMER}
                   label="Accetta"
                   action={handleAccepted}
                 />
                 <Button
-                  customclass="!px-6 !py-2"
+                  customClass="!px-6 !py-2"
                   role={RolesEnum.VIGIL}
                   action={handleRefused}
                   label="Rifiuta"

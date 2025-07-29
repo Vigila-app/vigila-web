@@ -1,17 +1,12 @@
 "use client";
 
 import { Avatar, TabGroup } from "@/components";
-import {
-  ReviewStatsComponent,
-  ReviewListComponent,
-} from "@/components/reviews";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { TabI } from "@/components/tabGroup/tabGroup";
 import PanoramicaTab from "@/app/vigil/tabs/panoramica";
 import Profile from "@/public/svg/Profile";
@@ -32,37 +27,18 @@ import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 
-// Add reviews tab for vigils
-const getTabsForRole = (role: RolesEnum): TabI[] => {
-  const baseTabs = [...tabs];
-
-  if (role === RolesEnum.VIGIL) {
-    baseTabs.splice(1, 0, {
-      label: "Recensioni",
-    });
-  }
-
-  return baseTabs;
-};
-
 const ProfileComponent = () => {
   const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
   const { consumers, getConsumersDetails } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
-  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
-  const userTabs = getTabsForRole(role);
-  const [selectedTab, setSelectedTab] = useState<TabI>(userTabs[0]); //per avere tab attive
+  const role = user?.user_metadata?.role as RolesEnum;
   const created_at = user?.created_at;
   const isConsumer = role === RolesEnum.CONSUMER;
   const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === user?.id);
 
-  const formatRole = (role: string) => {
-    if (!role) return "";
-    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-  };
   const tabs: TabI[] = [
     {
       label: <Profile />,
@@ -95,7 +71,27 @@ const ProfileComponent = () => {
       id: "informazioni",
     },
   ];
-  const [selectedTab, setSelectedTab] = useState<TabI>(tabs[0]); //per avere tab attive
+
+  // Add reviews tab for vigils
+  const getTabsForRole = (role: RolesEnum): TabI[] => {
+    const baseTabs = [...tabs];
+
+    if (role === RolesEnum.VIGIL) {
+      baseTabs.splice(1, 0, {
+        label: "Recensioni",
+      });
+    }
+
+    return baseTabs;
+  };
+
+  const userTabs = getTabsForRole(role);
+  const [selectedTab, setSelectedTab] = useState<TabI>(userTabs[0]); //per avere tab attive
+
+  const formatRole = (role: string) => {
+    if (!role) return "";
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  };
 
   const uploadProfilePic = async (
     file: string | ArrayBuffer | File,

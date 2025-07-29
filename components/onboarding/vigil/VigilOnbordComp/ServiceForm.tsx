@@ -1,17 +1,17 @@
 "use client";
 import Button from "@/components/button/button";
 import { Input, TextArea } from "@/components/form";
-import { Service } from "@/src/types/offeredService";
 import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { ServiceI } from "@/src/types/services.types";
 
 type ServiceFormProps = {
   isOpen?: boolean;
   onClose?: () => void;
-  onSave?: (service: Service) => void;
-  initialData?: Service | null;
+  onSave?: (service: ServiceI) => void;
+  initialData?: ServiceI | null;
 };
 type FormValues = {
   name: string;
@@ -29,17 +29,15 @@ export default function ServiceForm({
   initialData,
 }: ServiceFormProps) {
   const {
-    register,
     handleSubmit,
     setValue,
-    watch,
     control,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
-      price: initialData?.price || "0",
+      price: initialData?.unit_price?.toString() || "0",
       duration: initialData?.duration || "",
     },
   });
@@ -49,9 +47,11 @@ export default function ServiceForm({
   useEffect(() => {
     if (initialData) {
       setValue("name", initialData.name);
-      setValue("description", initialData.description);
-      setValue("price", initialData.price);
-      setValue("duration", initialData.duration);
+      initialData?.description &&
+        setValue("description", initialData?.description);
+      initialData?.unit_price &&
+        setValue("price", initialData?.unit_price?.toString());
+      initialData?.duration && setValue("duration", initialData?.duration);
     }
   }, [initialData, setValue]);
 
@@ -66,26 +66,28 @@ export default function ServiceForm({
   }, [isOpen]);
 
   const onSubmit = (data: FormValues) => {
-    const newService: Service = {
-      id: initialData?.id, // aggiungere id al momento è undefined
+    const newService: Partial<ServiceI> = {
       name: data.name,
       description: data.description,
-      price: data.price,
+      unit_price: parseFloat(data.price),
       duration: data.duration,
     };
+    if (initialData?.id) newService.id = initialData.id;
     console.log(newService);
-    onSave?.(newService);
+    onSave?.(newService as ServiceI);
     onClose?.();
   };
 
   return (
     <div
       className={`fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50
-      ${!isOpen ? "hidden" : ""}`}>
+      ${!isOpen ? "hidden" : ""}`}
+    >
       <div className="bg-background-default m-4 rounded-2xl">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="sm:max-w-[425px] md:max-w-[600px] p-6">
+          className="sm:max-w-[425px] md:max-w-[600px] p-6"
+        >
           <div>
             <h2 className="text-lg font-semibold ">
               {initialData ? "Modifica Servizio" : "Aggiungi un nuovo servizio"}
@@ -169,7 +171,8 @@ export default function ServiceForm({
                     </label>
                     <select
                       {...field}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                       <option value="">Seleziona una durata</option>
                       {DURATIONS.map((d) => (
                         <option key={d} value={d}>

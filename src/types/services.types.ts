@@ -19,6 +19,7 @@ export type ServiceI = {
   vigil?: {
     displayName: string;
   };
+  duration?: string;
 };
 
 export type ServicesStoreType = {

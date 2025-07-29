@@ -12,7 +12,7 @@ const LoaderSpinner = dynamic(
 
 type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   action?: () => void;
-  customclass?: string;
+  customClass?: string;
   danger?: boolean;
   icon?: React.ReactNode;
   label: string | React.ReactNode;
@@ -29,7 +29,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 const Button = (props: ButtonI) => {
   const {
     action = () => ({}),
-    customclass,
+    customClass,
     label,
     icon,
     primary = true,
@@ -70,12 +70,12 @@ const Button = (props: ButtonI) => {
         isLoading && ButtonStyle.loadingBtnStyle,
         full && ButtonStyle.fullBtnStyle,
         props.disabled && "cursor-not-allowed",
-        customclass
+        customClass
       )}
       {...{
         ...props,
         action: undefined,
-        customclass: undefined,
+        customClass: undefined,
         primary: undefined,
         secondary: undefined,
         danger: undefined,

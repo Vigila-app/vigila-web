@@ -1,4 +1,4 @@
-import { Button, ButtonLink } from "@/components";
+import { Button } from "@/components";
 import Card from "@/components/card/card";
 import { Input } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -9,7 +9,7 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-const informazioniTab = () => {
+const InformazioniTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
@@ -144,7 +144,7 @@ const informazioniTab = () => {
             </label>
             <p>{userDetails?.email}</p>
             <p className="text-xs text-gray-500">
-              Per modificare l'email contatta il supporto
+              Per modificare l&apos;email contatta il supporto
             </p>
           </div>
 
@@ -298,4 +298,4 @@ const informazioniTab = () => {
     // </Card>
   );
 };
-export default informazioniTab;
+export default InformazioniTab;
