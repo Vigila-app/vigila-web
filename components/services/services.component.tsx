@@ -28,7 +28,7 @@ const ServicesComponent = () => {
 
   const searchServices = async ({ address }: AddressI) => {
     try {
-      if (address?.postCode || address?.postalCode || address?.postcode ||address?.cap) {
+      if (address?.postCode || address?.postalCode || address?.postcode || address?.cap) {
         showLoader();
         const services = await ApiService.get<{ data: ServiceI[] }>(
           apiServices.LIST(),
