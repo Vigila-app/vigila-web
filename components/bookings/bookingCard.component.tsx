@@ -133,7 +133,6 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       setLoading(false);
     }
   };
-  // console.log(service?.name);
   const getStatusColor = (status: BookingStatusEnum) => {
     switch (status) {
       case BookingStatusEnum.PENDING:
