@@ -42,7 +42,7 @@ export type UserType = {
   id: string;
   displayName?: string;
   photoURL?: string;
-      phone:string;
+      phone: string;
   user_metadata?: UserMetadata;
 };
 
