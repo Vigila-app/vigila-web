@@ -19,7 +19,6 @@ const apiRoot = {
       ? "http://localhost:3000"
       : AppConstants.hostUrl
     : `${window.location.origin}`,
-  FIRESTORE_DB: `https://firestore.googleapis.com/v1/projects/${SupabaseConstants.projectId}/databases/(default)/documents`,
 };
 
 const getEnv = (isMock: boolean) => {
@@ -188,8 +187,6 @@ export const apiCms = {
     contentId: string,
     isMock?: boolean
   ): string => apiControllers.CONTENT(contentType, contentId, isMock),
-  CONTENT_SSR: (pathToDocument: string) =>
-    `${apiRoot.FIRESTORE_DB}/${pathToDocument}`,
 };
 
 export const apiMaps = {
