@@ -35,6 +35,7 @@ const requestHandler = async (req: Request) => {
           { status: 200 }
         );
       } catch (error) {
+        console.error("Error in maps/address POST", error);
         return NextResponse.json(
           {
             code: ResponseCodesConstants.MAPS_ADDRESS_ERROR.code,
