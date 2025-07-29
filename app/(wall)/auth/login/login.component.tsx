@@ -12,6 +12,14 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ProviderEnum } from "@/src/enums/common.enums";
 import ProviderButton from "@/components/button/providerButton";
 import { FormFieldType } from "@/src/constants/form.constants";
+import dynamic from "next/dynamic";
+import useAltcha from "@/src/hooks/useAltcha";
+import { AltchaService } from "@/src/services/altcha.service";
+import { useEffect } from "react";
+
+const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
+  ssr: !!false,
+});
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 type LoginFormI = {
@@ -22,6 +30,7 @@ type LoginFormI = {
 const LoginComponent = () => {
   const { showLoader, hideLoader, showToast } = useAppStore();
   const router = useRouter();
+  const { challenge, isVerified, onStateChange } = useAltcha();
   const {
     control,
     formState: { errors, isValid },
@@ -38,8 +47,11 @@ const LoginComponent = () => {
       const { email, password } = formData;
       try {
         showLoader();
-        await AuthService.login(email, password);
-        redirectHome();
+        if (challenge) {
+          await AltchaService.verifyChallenge(challenge);
+          await AuthService.login(email, password);
+          redirectHome();
+        }
       } catch (error) {
         console.error("Error authenticating user", error);
         setError("email", { type: "validate" });
@@ -53,6 +65,13 @@ const LoginComponent = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (isVerified) {
+      handleSubmit(onSubmit)();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVerified]);
 
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
@@ -108,6 +127,7 @@ const LoginComponent = () => {
           )}
         />
         <Button type="submit" primary full role={RolesEnum.CONSUMER} label={Routes.login.label} />
+        <Altcha floating onStateChange={onStateChange} />
       </form>
 
       <div className="login-methods">
@@ -119,12 +139,12 @@ const LoginComponent = () => {
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Accedi con Google"
           />
-          <ProviderButton
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Accedi con Apple"
-          />
+          /> */}
         </div>
       </div>
 

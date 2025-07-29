@@ -7,7 +7,7 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { deepMerge } from "@/src/utils/common.utils";
 
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id: userId } = await context?.params;
 

@@ -1,11 +1,22 @@
 "use client";
 import { ProgressBar } from "@/components";
-import { BookingPaymentComponent } from "@/components/bookings";
 import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { Routes } from "@/src/routes";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default function PaymentBookingPage() {
+const BookingPaymentComponent = dynamic(
+  () => import("@/components/bookings/bookingPayment.component"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
+  }
+);
+
+function BookingPaymentContent() {
   const {
     params: { bookingId },
   } = useQueryParams();
@@ -19,5 +30,13 @@ export default function PaymentBookingPage() {
       <ProgressBar percentage={80} />
       <BookingPaymentComponent bookingId={bookingId} />
     </div>
+  );
+}
+
+export default function BookingPaymentBookingPage() {
+  return (
+    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+      <BookingPaymentContent />
+    </Suspense>
   );
 }

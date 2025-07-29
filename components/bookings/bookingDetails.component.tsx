@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService } from "@/src/services";
 import { Button, Badge, Avatar } from "@/components";
+import { ReviewButtonComponent } from "@/components/reviews";
 import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
-import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import {
+  amountDisplay,
+  capitalize,
+  replaceDynamicUrl,
+} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
@@ -22,6 +27,9 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { BookingUtils } from "@/src/utils/booking.utils";
+import Link from "next/link";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -133,24 +141,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   };
 
-  const getStatusColor = (status: BookingStatusEnum) => {
-    switch (status) {
-      case BookingStatusEnum.PENDING:
-        return "yellow";
-      case BookingStatusEnum.CONFIRMED:
-        return "blue";
-      case BookingStatusEnum.IN_PROGRESS:
-        return "purple";
-      case BookingStatusEnum.COMPLETED:
-        return "green";
-      case BookingStatusEnum.CANCELLED:
-      case BookingStatusEnum.REFUNDED:
-        return "red";
-      default:
-        return "gray";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -180,7 +170,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         </div>
         <Badge
           label={capitalize(booking.status as string)}
-          color={getStatusColor(booking.status as BookingStatusEnum)}
+          color={BookingUtils.getStatusColor(
+            booking.status as BookingStatusEnum
+          )}
         />
       </div>
 
@@ -223,8 +215,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>{" "}
-                {booking.currency}{" "}
-                {amountDisplay(booking.price * booking.quantity)}
+                {amountDisplay(booking.price, booking.currency as CurrencyEnum)}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>{" "}
@@ -244,15 +235,30 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
                     <Avatar userId={vigil?.id} value={vigil?.displayName} />
-                    <span className="font-medium flex-1">
-                      {vigil?.displayName}
-                    </span>
+                    <div className="flex-1">
+                      <div className="font-medium">{vigil?.displayName}</div>
+                      {vigil?.id && (
+                        <Link
+                          href={replaceDynamicUrl(
+                            Routes.vigilDetails.url,
+                            ":vigilId",
+                            vigil.id
+                          )}
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          Vedi profilo completo
+                        </Link>
+                      )}
+                    </div>
                   </p>
                 </>
               ) : (
                 <>
                   <p className="inline-flex items-center flex-nowrap gap-2">
-                    <Avatar userId={consumer?.id} value={consumer?.displayName} />
+                    <Avatar
+                      userId={consumer?.id}
+                      value={consumer?.displayName}
+                    />
                     <span className="font-medium flex-1">
                       {consumer?.displayName}
                     </span>
@@ -316,6 +322,20 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         <Button secondary label="Chiudi" action={closeModal} />
       </div>
+
+      {/* Review Section - Only for completed bookings */}
+      {booking.status === BookingStatusEnum.COMPLETED && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <ReviewButtonComponent
+            booking={booking}
+            vigilName={vigil?.displayName}
+            onReviewCreated={() => {
+              // Optionally refresh booking details or show success message
+              console.log("Review created/updated");
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

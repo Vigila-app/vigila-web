@@ -9,12 +9,12 @@ export type UserDetailsType = {
   surname?: string;
   email?: string;
   email_verified?: boolean;
-  host_id?: string;
   username?: string;
   birthday?: string;
   gender?: GenderEnum;
   phone?:string;
   other?: { [key: string]: string | number };
+  role?: RolesEnum;
 };
 
 export type UserDevicesType = {
@@ -59,7 +59,7 @@ export type UserSignupType = UserType & {
 export type UserStoreType = {
   onLogout: () => void;
   lastUpdate?: Date;
-  user: UserType;
+  user?: UserType;
   userDetails?: UserDetailsType;
   userDevices?: UserDevicesType;
   userTerms?: UserTermsType;

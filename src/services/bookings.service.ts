@@ -1,7 +1,16 @@
 import { ApiService } from "@/src/services";
 import { apiBookings } from "@/src/constants/api.constants";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+
+export type UpdateBookingPaymentRequest = {
+  payment_id: string;
+  payment_status: PaymentStatusEnum;
+  status: BookingStatusEnum;
+};
 
 export const BookingsService = {
   createBooking: async (newBooking: BookingFormI) =>
@@ -21,9 +30,9 @@ export const BookingsService = {
   getBookings: async () =>
     new Promise<BookingI[]>(async (resolve, reject) => {
       try {
-        const result = (await ApiService.get(
-          apiBookings.LIST()
-        )) as { data: BookingI[] };
+        const result = (await ApiService.get(apiBookings.LIST())) as {
+          data: BookingI[];
+        };
         const { data: response = [] } = result;
         resolve(response);
       } catch (error) {
@@ -45,7 +54,10 @@ export const BookingsService = {
       }
     }),
 
-  updateBookingStatus: async (bookingId: BookingI["id"], status: BookingStatusEnum) =>
+  updateBookingStatus: async (
+    bookingId: BookingI["id"],
+    status: BookingStatusEnum
+  ) =>
     new Promise<BookingI>(async (resolve, reject) => {
       try {
         if (!bookingId) reject();
@@ -68,6 +80,27 @@ export const BookingsService = {
         resolve(true);
       } catch (error) {
         console.error("BookingsService cancelBooking error", error);
+        reject(error);
+      }
+    }),
+
+  updateBookingPaymentStatus: async (
+    bookingId: BookingI["id"],
+    paymentData: UpdateBookingPaymentRequest
+  ) =>
+    new Promise<BookingI>(async (resolve, reject) => {
+      try {
+        if (!bookingId) reject();
+        const { data: result } = (await ApiService.put(
+          apiBookings.UPDATE_PAYMENT(bookingId),
+          paymentData
+        )) as { data: BookingI };
+        resolve(result);
+      } catch (error) {
+        console.error(
+          "BookingsService updateBookingPaymentStatus error",
+          error
+        );
         reject(error);
       }
     }),

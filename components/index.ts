@@ -20,6 +20,9 @@ import Toast from "./toast/toast";
 import Tooltip from "./tooltip/tooltip";
 import Undraw from "./undraw/undraw";
 
+// Reviews components
+export * from "./reviews";
+
 export {
   Accordion,
   Avatar,

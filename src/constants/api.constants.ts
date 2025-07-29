@@ -4,12 +4,10 @@ import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
-import { SaleI } from "@/src/types/sales.types";
-import { GuestI } from "@/src/types/crm.types";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { VigilDetailsType } from "../types/vigil.types";
-import { ConsumerDetailsType } from "../types/consumer.types";
+import { VigilDetailsType } from "@/src/types/vigil.types";
+import { ConsumerDetailsType } from "@/src/types/consumer.types";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
   (isMock || isMocked) && !isReleased;
@@ -39,6 +37,21 @@ const apiBase = {
 };
 
 const apiControllers = {
+  // region ADMIN
+  ADMIN: (isMock?: boolean): string => `${apiBase.V1(isMock)}/admin`,
+  // endregion ADMIN
+
+  // region PAYMENT
+  CREATE_PAYMENT_INTENT: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/create-payment-intent`,
+  VERIFY_PAYMENT_INTENT: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/verify-payment-intent`,
+  PAYMENT_INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/payment/intent${
+      paymentIntentId ? `/${paymentIntentId}` : ""
+    }`,
+  // endregion PAYMENT
+
   // region CHECKOUT
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/payment/intent${
@@ -70,6 +83,10 @@ const apiControllers = {
     `${apiBase.V1(isMock)}/maps/address`,
   // endregion MAPS
 
+  // region ALTCHA
+  ALTCHA: (isMock?: boolean): string => `${apiBase.V1(isMock)}/altcha`,
+  // endregion reCAPTCHA
+
   // region reCAPTCHA
   VALIDATE_RECAPTCHA: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/validate-recaptcha`,
@@ -98,6 +115,14 @@ const apiControllers = {
   // region VIGIL
   VIGIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/vigil`,
   // endregion VIGIL
+
+  // region REVIEWS
+  REVIEWS: (isMock?: boolean): string => `${apiBase.V1(isMock)}/reviews`,
+  // endregion REVIEWS
+
+  // region EMAIL
+  EMAIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/email`,
+  // endregion EMAIL
 };
 
 export const apiUser = {
@@ -113,6 +138,14 @@ export const apiUser = {
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
 };
+
+export const apiAltcha = {
+  CHALLENGE: (isMock?: boolean): string =>
+    `${apiControllers.ALTCHA(isMock)}/challenge`,
+  VALIDATE: (isMock?: boolean): string =>
+    `${apiControllers.ALTCHA(isMock)}/validate`,
+};
+
 export const apiOnboard = {
   ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
@@ -124,24 +157,24 @@ export const apiServices = {
     `${apiControllers.SERVICES(isMock)}/${isMock ? "service" : serviceId}`,
 };
 
-export const apiCostumers = {
-  CREATE: (isMock?: boolean): string => apiControllers.GUESTS(isMock),
-  LIST: (isMock?: boolean): string => apiControllers.GUESTS(isMock),
-  DETAILS: (guestId: GuestI["id"], isMock?: boolean): string =>
-    `${apiControllers.GUESTS(isMock)}/${isMock ? "costumer" : guestId}`,
-};
-
-export const apiSales = {
-  LIST: (isMock?: boolean): string => apiControllers.SALES(isMock),
-  DETAILS: (saleId: SaleI["id"], isMock?: boolean): string =>
-    `${apiControllers.SALES(isMock)}/${isMock ? "sale" : saleId}`,
-};
-
 export const apiBookings = {
   CREATE: (isMock?: boolean): string => apiControllers.BOOKINGS(isMock),
   LIST: (isMock?: boolean): string => apiControllers.BOOKINGS(isMock),
   DETAILS: (bookingId: BookingI["id"], isMock?: boolean): string =>
     `${apiControllers.BOOKINGS(isMock)}/${isMock ? "booking" : bookingId}`,
+  UPDATE_PAYMENT: (bookingId: BookingI["id"], isMock?: boolean): string =>
+    `${apiControllers.BOOKINGS(isMock)}/${
+      isMock ? "booking" : bookingId
+    }/payment`,
+};
+
+export const apiPayment = {
+  CREATE_INTENT: (isMock?: boolean): string =>
+    apiControllers.CREATE_PAYMENT_INTENT(isMock),
+  VERIFY_INTENT: (isMock?: boolean): string =>
+    apiControllers.VERIFY_PAYMENT_INTENT(isMock),
+  INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
+    apiControllers.PAYMENT_INTENT(paymentIntentId, isMock),
 };
 
 export const apiRecaptcha = {
@@ -179,4 +212,40 @@ export const apiConsumer = {
 export const apiVigil = {
   DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
+};
+
+export const apiAdmin = {
+  ANALYTICS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/analytics`,
+  BOOKINGS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/bookings`,
+  VIGILS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/vigils`,
+  CONSUMERS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/consumers`,
+  SERVICES: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/services`,
+  PAYMENTS: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/payments`,
+  PROMOTE_USER: (userId: string, isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
+};
+
+export const apiReviews = {
+  CREATE: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
+  LIST: (isMock?: boolean): string => apiControllers.REVIEWS(isMock),
+  LIST_BY_VIGIL: (vigilId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/vigil/${vigilId}`,
+  BY_BOOKING: (bookingId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/booking/${bookingId}`,
+  VIGIL_STATS: (vigilId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/vigil/${vigilId}/stats`,
+  UPDATE: (reviewId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
+  DELETE: (reviewId: string, isMock?: boolean): string =>
+    `${apiControllers.REVIEWS(isMock)}/${reviewId}`,
+};
+
+export const apiEmail = {
+  SEND: (isMock?: boolean): string => apiControllers.EMAIL(isMock),
 };

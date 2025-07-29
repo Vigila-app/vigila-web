@@ -18,6 +18,7 @@ type SearchMapFormI = {
 
 const SearchAddress = (props: {
   onSubmit: (address: AddressI) => void;
+  onChange?: (search?: string) => void;
   minLength?: number;
   label?: string;
   role?: RolesEnum;
@@ -27,6 +28,7 @@ const SearchAddress = (props: {
 }) => {
   const {
     onSubmit: eOnSubmit,
+    onChange,
     minLength = 3,
     label = "Search Address",
     location = false,
@@ -121,6 +123,7 @@ const SearchAddress = (props: {
         setIsLoading(true);
         setHasSearched(true); 
         const results = await MapsService.autocompleteAddress(watch().search);
+        setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
           console.log(results);
@@ -161,6 +164,7 @@ const SearchAddress = (props: {
     setHasSearched(false); 
     debouncedAutocomplete();
     console.log("risultati", autocompleteResults);
+    onChange?.(watch()?.search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch()?.search]);
 
@@ -215,7 +219,9 @@ const SearchAddress = (props: {
       {submitted && !autocompleteResults.length ? (
         <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
       ) : hasSearched &&!autocompleteResults.length && !isLoading ? (
-        <div className="text-gray-500">Nessun risultato trovato</div>
+        <div className="text-gray-500">
+          Nessun risultato trovato, perfavore perfeziona la ricerca
+        </div>
       ) : null}
     </>
   );

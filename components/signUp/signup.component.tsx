@@ -17,6 +17,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import dynamic from "next/dynamic";
+import useAltcha from "@/src/hooks/useAltcha";
+import { useEffect } from "react";
+import { AltchaService } from "@/src/services/altcha.service";
+
+const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
+  ssr: !!false,
+});
 
 const LocalLoaderId = "signup-progress";
 
@@ -43,6 +51,7 @@ const SignupComponent = (props: SignupComponentI) => {
     showToast,
   } = useAppStore();
   const router = useRouter();
+  const { challenge, isVerified, onStateChange } = useAltcha();
   const {
     control,
     formState: { errors, isValid },
@@ -92,11 +101,14 @@ const SignupComponent = (props: SignupComponentI) => {
               terms[term.id] = Boolean(formData[term.id]);
             });
         }
-        await AuthService.signup(
-          { email, password, name, surname, role },
-          terms
-        );
-        redirectOnboard();
+        if (challenge) {
+          await AltchaService.verifyChallenge(challenge);
+          await AuthService.signup(
+            { email, password, name, surname, role },
+            terms
+          );
+          redirectOnboard();
+        }
       } catch (error: any) {
         console.error("Error registering user", error);
         if (error) {
@@ -117,6 +129,13 @@ const SignupComponent = (props: SignupComponentI) => {
       });
     }
   };
+
+  useEffect(() => {
+    if (isVerified) {
+      handleSubmit(onSubmit)();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVerified]);
 
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
@@ -262,14 +281,16 @@ const SignupComponent = (props: SignupComponentI) => {
             <Link
               href={Routes.termsConditions.url}
               target="blank"
-              className="text-gray-700 underline">
+              className="text-gray-700 underline"
+            >
               termini & condizioni
             </Link>
             &nbsp;e la&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
-              className="text-gray-700 underline">
+              className="text-gray-700 underline"
+            >
               privacy policy
             </Link>
             .
@@ -284,6 +305,7 @@ const SignupComponent = (props: SignupComponentI) => {
             label="Crea un account"
             isLoading={isLoading}
           />
+          <Altcha floating onStateChange={onStateChange} />
         </div>
       </form>
 
@@ -296,12 +318,12 @@ const SignupComponent = (props: SignupComponentI) => {
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Registrati con Google"
           />
-          <ProviderButton
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Registrati con Apple"
-          />
+          /> */}
         </div>
       </div>
 

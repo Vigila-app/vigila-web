@@ -8,9 +8,10 @@ import {
 } from "@/components/@core";
 import { Metadata } from "next";
 import { AppConstants } from "@/src/constants";
-import { calcDelay } from "@/src/utils/common.utils";
-import { FrequencyEnum } from "@/src/enums/common.enums";
 import HtmlDocument from "@/components/@core/htmlDocument/htmlDocument.component";
+import { isMocked } from "@/src/utils/envs.utils";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
@@ -40,8 +41,8 @@ export const metadata: Metadata = {
   },
 };
 
-// cache revalidation
-export const revalidate = calcDelay(4, FrequencyEnum.HOURS);
+// cache revalidation - 4 hours
+export const revalidate = 14400;
 
 export default function RootLayout({
   children,
@@ -57,6 +58,12 @@ export default function RootLayout({
           <GlobalLoaderManager />
           <ToastManagerComponent />
           <CookieBannerComponent />
+          {!isMocked ? (
+            <>
+              <SpeedInsights />
+              <Analytics />
+            </>
+          ) : null}
         </>
       }
       footer={<Footer />}

@@ -19,13 +19,18 @@ const getHeaderMenu = (privateRoutes: boolean = false) => {
 
 const getRouteByUrl = (routeUrl: RouteI["url"]) => {
   return Object.values(Routes).find(
-    ({ matchingUrl, private: isPrivate, url }) =>
-      url.includes(routeUrl) ||
-      (isPrivate && matchingUrl ? routeUrl?.includes(matchingUrl) : false)
+    ({ matchingUrl, url }) =>
+      url === routeUrl ||
+      (matchingUrl ? routeUrl?.includes(matchingUrl) : false)
   );
 };
 
 const getRouteByKey = (routeKey: string) => {
   return Routes[routeKey];
 };
-export const NavigationUtils = { getFooterMenu, getHeaderMenu, getRouteByUrl, getRouteByKey };
+export const NavigationUtils = {
+  getFooterMenu,
+  getHeaderMenu,
+  getRouteByUrl,
+  getRouteByKey,
+};

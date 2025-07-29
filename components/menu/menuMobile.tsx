@@ -63,28 +63,25 @@ const role:RolesEnum=  user?.user_metadata?.role as RolesEnum;
         {isUserLogged ? (
           <>
             <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">{MenuLinkItem(Routes.dashboard)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.crm)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.checkins)}</li>
               <li className="block py-2">{MenuLinkItem(Routes.services)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.tickets)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.units)}</li>
+              <li className="block py-2">{MenuLinkItem(Routes.bookings)}</li>
             </ul>
             <Divider />
             <ul className="relative divide-y divide-gray-100">
-               <li className="block py-2">
+              <li className="block py-2">
                 {MenuLinkItem(
-                  role === RolesEnum.CONSUMER
+                  user.user_metadata?.role === RolesEnum.CONSUMER
                     ? Routes.profileConsumer
-                    : Routes.profileVigil
+                    : user.user_metadata?.role === RolesEnum.VIGIL
+                    ? Routes.vigilProfile
+                    : Routes.admin
                 )}
               </li>
-              <li className="block py-2">{MenuLinkItem(Routes.account)}</li>
             </ul>
             <Divider />
           </>
         ) : null}
-        <ul className="relative divide-y divide-gray-100">
+        <ul className="relative divide-y divide-gray-100 header-menu">
           {NavigationUtils.getHeaderMenu()
             .filter((route) => route?.menu?.mobile)
             .map((route) => (

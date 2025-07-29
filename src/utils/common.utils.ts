@@ -1,4 +1,4 @@
-import { FrequencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ToastI } from "@/src/types/toast.type";
@@ -157,11 +157,11 @@ export const getUUID = (root = "") =>
 export const amountFormatter = (amount: number) =>
   Math.round((amount + Number.EPSILON) * 100) / 100;
 
-export const amountDisplay = (amount: number) =>
-  amountFormatter(amount).toLocaleString(undefined, {
+export const amountDisplay = (amount: number, currency?: CurrencyEnum) =>
+  `${currency || ""}${amountFormatter(amount).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
+  })}`;
 
 export const timestampToDate = (timestamp: any) => {
   try {
@@ -228,4 +228,17 @@ export const debounce = (callback: (...args: any) => void, delay = 500) => {
       callback(...args);
     }, delay);
   };
+};
+
+export const getCurrency = (currency: CurrencyEnum) => {
+  switch (currency) {
+    case CurrencyEnum.EURO:
+      return "eur";
+    case CurrencyEnum.US_DOLLAR:
+      return "usd";
+    case CurrencyEnum.GB_POUND:
+      return "gbp";
+    default:
+      return (currency as string).toLowerCase();
+  }
 };

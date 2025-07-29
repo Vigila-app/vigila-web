@@ -1,6 +1,6 @@
 "use client";
 
-import { Controller, Form, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useModalStore } from "@/src/store/modal/modal.store";
@@ -15,10 +15,17 @@ import { amountDisplay } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { FormFieldType } from "@/src/constants/form.constants";
-import { SearchAddress } from "../maps";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
+import dynamic from "next/dynamic";
+
+const SearchAddress = dynamic(
+  () => import("@/components/maps/searchAddress.component"),
+  { 
+    ssr: false,
+    loading: () => <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+  }
+);
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 type BookingFormComponentI = {

@@ -3,6 +3,7 @@
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { ModalPortalComponent } from "@/components/@core";
 import { BookingFormComponent, BookingDetailsComponent } from "@/components/bookings";
+import { ReviewFormComponent } from "@/components/reviews";
 import { BookingI } from "@/src/types/booking.types";
 import { ServiceI } from "@/src/types/services.types";
 
@@ -28,6 +29,28 @@ const ModalManagerComponent = () => {
         return (
           <BookingDetailsComponent
             bookingId={payload?.bookingId as BookingI["id"]}
+          />
+        );
+
+      case "review-form":
+        return (
+          <ReviewFormComponent
+            isModal
+            bookingId={payload?.bookingId as string}
+            vigilName={payload?.vigilName as string}
+            onSuccess={payload?.onSuccess as (() => void) | undefined}
+          />
+        );
+
+      case "review-edit":
+        return (
+          <ReviewFormComponent
+            isModal
+            bookingId={payload?.bookingId as string}
+            vigilName={payload?.vigilName as string}
+            onSuccess={payload?.onSuccess as (() => void) | undefined}
+            // For editing, we could pass initial data
+            initialData={payload?.initialData as { rating: number; comment: string } | undefined}
           />
         );
       

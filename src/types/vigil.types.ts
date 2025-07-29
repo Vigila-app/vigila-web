@@ -1,3 +1,5 @@
+import { ReviewI } from "@/src/types/review.types";
+
 export type VigilDetailsType = {
   displayName?: string;
   photoURL?: string;
@@ -9,6 +11,8 @@ export type VigilDetailsType = {
   information?:string;
   username?: string;
   other?: { [key: string]: string | number };
+  reviews?: ReviewI[];
+  averageRating?: number;
 };
 
 export type ViglStoreType = {

@@ -36,7 +36,7 @@ const verifyServiceAccess = async (serviceId: string) => {
 
 export async function DELETE(
   req: Request,
-  context: { params: { serviceId: string } }
+  context: { params: Promise<{ serviceId: string }> }
 ) {
   try {
     const { serviceId } = await context?.params;
@@ -93,7 +93,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: { serviceId: string } }
+  context: { params: Promise<{ serviceId: string }> }
 ) {
   try {
     const { serviceId } = await context?.params;
@@ -143,7 +143,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: { serviceId: string } }
+  context: { params: Promise<{ serviceId: string }> }
 ) {
   try {
     const { data: updatedService } = await req.json();

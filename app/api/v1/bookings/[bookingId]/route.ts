@@ -3,30 +3,39 @@ import {
   jsonErrorResponse,
   authenticateUser,
   getAdminClient,
+  verifyPaymentWithStripe,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
-const verifyBookingAccess = async (bookingId: string, userId: string, userRole: string) => {
+const verifyBookingAccess = async (
+  bookingId: string,
+  userId: string,
+  userRole: string
+) => {
   const _admin = getAdminClient();
   const { data, error } = await _admin
     .from("bookings")
     .select("*")
     .eq("id", bookingId)
     .single();
-    
+
   if (error)
     throw jsonErrorResponse(500, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
       success: false,
       error,
     });
-    
-  if (!data) 
+
+  if (!data)
     throw jsonErrorResponse(404, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_NOT_FOUND.code,
       success: false,
@@ -39,20 +48,20 @@ const verifyBookingAccess = async (bookingId: string, userId: string, userRole: 
       success: false,
     });
   }
-  
+
   if (userRole === RolesEnum.VIGIL && data.vigil_id !== userId) {
     throw jsonErrorResponse(403, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
       success: false,
     });
   }
-  
+
   return data;
 };
 
 export async function DELETE(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -64,22 +73,29 @@ export async function DELETE(
         success: false,
       });
     }
-    
+
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER)
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    )
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_UNAUTHORIZED.code,
         success: false,
       });
 
-    await verifyBookingAccess(bookingId, userObject.id, userObject.user_metadata?.role);
+    await verifyBookingAccess(
+      bookingId,
+      userObject.id,
+      userObject.user_metadata?.role
+    );
     const _admin = getAdminClient();
 
     const { error } = await _admin
       .from("bookings")
       .delete()
       .eq("id", bookingId);
-      
+
     if (error) throw error;
 
     return NextResponse.json(
@@ -101,7 +117,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -115,7 +131,7 @@ export async function GET(
         success: false,
       });
     }
-    
+
     const userObject = await authenticateUser(req);
     if (!userObject?.id)
       return jsonErrorResponse(403, {
@@ -157,10 +173,10 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: { bookingId: string } }
+  context: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const { data: updatedBooking } = await req.json();
+    const updatedBooking = await req.json();
     const { bookingId } = await context?.params;
     console.log(`API PUT bookings/${bookingId}`, updatedBooking);
 
@@ -170,7 +186,7 @@ export async function PUT(
         success: false,
       });
     }
-    
+
     const userObject = await authenticateUser(req);
     if (!userObject?.id)
       return jsonErrorResponse(401, {
@@ -178,23 +194,59 @@ export async function PUT(
         success: false,
       });
 
-    if (
-      !updatedBooking?.id ||
-      updatedBooking?.id !== bookingId
-    ) {
+    if (!updatedBooking?.id || updatedBooking?.id !== bookingId) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_BAD_REQUEST.code,
         success: false,
       });
     }
 
-    const booking = await verifyBookingAccess(
+    const booking = (await verifyBookingAccess(
       bookingId,
       userObject.id,
       userObject.user_metadata?.role
-    ) as BookingI;
+    )) as BookingI;
 
     const _admin = getAdminClient();
+
+    // Verifica specifica del pagamento se si sta tentando di aggiornare lo stato del pagamento
+    const isPaymentStatusUpdate =
+      updatedBooking.payment_status === PaymentStatusEnum.PAID;
+    const isStatusUpdate =
+      updatedBooking.status && updatedBooking.status !== booking.status;
+    const requiresPaymentVerification =
+      isPaymentStatusUpdate ||
+      (isStatusUpdate && updatedBooking.status === BookingStatusEnum.CONFIRMED);
+
+    if (requiresPaymentVerification && updatedBooking.payment_id) {
+      try {
+        console.log(
+          `Verifying payment for booking ${bookingId} with payment ID ${updatedBooking.payment_id}`
+        );
+
+        await verifyPaymentWithStripe(
+          updatedBooking.payment_id,
+          userObject.id,
+          bookingId
+        );
+
+        console.log(`Payment verification successful for booking ${bookingId}`);
+      } catch (paymentError) {
+        console.error(
+          `Payment verification failed for booking ${bookingId}:`,
+          paymentError
+        );
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
+          success: false,
+          error: `Payment verification failed: ${
+            paymentError instanceof Error
+              ? paymentError.message
+              : "Unknown error"
+          }`,
+        });
+      }
+    }
 
     // Only allow certain fields to be updated based on user role
     let allowedUpdates = {};
@@ -205,6 +257,16 @@ export async function PUT(
           service_date: updatedBooking.service_date,
           duration_hours: updatedBooking.duration_hours,
           notes: updatedBooking.notes,
+        };
+      }
+
+      // Consumers can also update payment-related fields after payment completion
+      if (isPaymentStatusUpdate && updatedBooking.payment_id) {
+        allowedUpdates = {
+          ...allowedUpdates,
+          payment_id: updatedBooking.payment_id,
+          payment_status: updatedBooking.payment_status,
+          status: updatedBooking.status || BookingStatusEnum.CONFIRMED,
         };
       }
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
@@ -222,16 +284,48 @@ export async function PUT(
         updated_at: getPostgresTimestamp(),
       })
       .eq("id", updatedBooking.id)
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
+      .select("*")
       .single<BookingI>();
 
     if (error || !data) throw error;
+
+    // Invia email di aggiornamento stato se lo stato è cambiato
+    if (isStatusUpdate && updatedBooking.status !== booking.status) {
+      try {
+        const consumer = {
+          ...userObject,
+          email: userObject.email,
+          first_name:
+            userObject.user_metadata?.name ||
+            userObject.user_metadata?.firstName,
+          last_name:
+            userObject.user_metadata?.surname ||
+            userObject.user_metadata?.lastName,
+        };
+
+        if (consumer?.email) {
+          const customerName = consumer.first_name
+            ? `${consumer.first_name} ${consumer.last_name || ""}`.trim()
+            : userObject.user_metadata?.displayName || "Cliente";
+
+          if (consumer?.email) {
+            await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+              updatedBooking,
+              consumer
+            );
+
+            // TODO notification for vigil
+            // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+            //   updatedBooking,
+            //   vigil
+            // );
+          }
+        }
+      } catch (emailError) {
+        // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
+        console.error("Errore invio email di aggiornamento stato:", emailError);
+      }
+    }
 
     return NextResponse.json(
       {

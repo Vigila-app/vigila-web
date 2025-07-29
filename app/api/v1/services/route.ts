@@ -16,11 +16,7 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, [
-      "page",
-      "pageSize",
-      "vigil_id",
-    ]);
+    const filters = getQueryParams(url, ["page", "pageSize", "vigil_id"]);
     const { orderBy = "created_at", orderDirection = "DESC" } = filters;
 
     console.log(`API GET services`, filters, pagination);
@@ -43,7 +39,13 @@ export async function GET(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
-    let db_query = _admin.from("services").select("*", { count: "exact" });
+    let db_query = _admin.from("services").select(
+      `
+        *,
+        vigil:vigils(displayName)
+      `,
+      { count: "exact" }
+    );
 
     if (Object.keys(filters).length) {
       Object.keys(filters).forEach((key) => {

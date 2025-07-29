@@ -14,9 +14,9 @@ export const ServicesUtils = {
   getServiceUnitType: (unitType: string) => {
     switch (unitType) {
       case "hours":
-        return "ora";
+        return "ore";
       case "days":
-        return "giorno";
+        return "giorni";
       default:
         return unitType;
     }

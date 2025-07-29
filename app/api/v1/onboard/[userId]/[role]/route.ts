@@ -52,7 +52,7 @@ export async function GET() {
 
 export async function POST(
   req: Request,
-  context: { params: { userId: string; role: RolesEnum } }
+  context: { params: Promise<{ userId: string; role: RolesEnum }> }
 ) {
   try {
     const { userId, role } = await context?.params;

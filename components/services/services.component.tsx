@@ -1,19 +1,30 @@
 "use client";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { SearchAddress } from "@/components/maps";
 import { AddressI } from "@/src/types/maps.types";
 import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
 import { useEffect, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
 import ServiceCard from "@/components/services/serviceCard.component";
+import dynamic from "next/dynamic";
+
+const SearchAddress = dynamic(
+  () => import("@/components/maps/searchAddress.component"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
+  }
+);
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 const ServicesComponent = () => {
   const { showLoader, hideLoader } = useAppStore();
   const { getVigilsDetails } = useVigilStore();
   const [services, setServices] = useState<ServiceI[]>([]);
+  const [showServices, setShowServices] = useState(false);
 
   const searchServices = async ({ address }: AddressI) => {
     try {
@@ -31,6 +42,7 @@ const ServicesComponent = () => {
           throw new Error("No services found for the provided postal code.");
         }
         setServices(services.data);
+        setShowServices(true);
       } else {
         throw new Error("Postal code is required to search for services.");
       }
@@ -63,9 +75,15 @@ const ServicesComponent = () => {
         placeholder="Inserisci indirizzo, città o CAP"
       />
       <div className="my-4">
-        {services.map((service) => (
-          <ServiceCard service={service} key={service.id} />
-        ))}
+        {showServices ? (
+          services.length ? (
+            services.map((service) => (
+              <ServiceCard service={service} key={service.id} />
+            ))
+          ) : (
+            <div>Nessun servizio trovato</div>
+          )
+        ) : null}
       </div>
     </div>
   );

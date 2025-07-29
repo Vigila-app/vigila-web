@@ -1,0 +1,41 @@
+/* Stripe Payment Element Custom Styles */
+.payment-element-container {
+  margin-bottom: 1rem;
+}
+
+/* Customize Stripe Elements appearance */
+.StripeElement {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.StripeElement--focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.StripeElement--invalid {
+  border-color: #ef4444;
+}
+
+.StripeElement--complete {
+  border-color: #22c55e;
+}
+
+/* Loading state */
+.StripeElement--loading {
+  opacity: 0.6;
+}
+
+/* Error messages */
+.stripe-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Success messages */
+.stripe-success {
+  color: #22c55e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

@@ -26,6 +26,8 @@ const requestHandler = async (req: Request) => {
           { ...body, format: "json" }
         );
 
+        console.log("Response from maps/address:", response);
+
         return NextResponse.json(
           {
             code: ResponseCodesConstants.MAPS_ADDRESS_SUCCESS.code,
@@ -35,6 +37,7 @@ const requestHandler = async (req: Request) => {
           { status: 200 }
         );
       } catch (error) {
+        console.error("Error in maps/address POST", JSON.stringify(error));
         return NextResponse.json(
           {
             code: ResponseCodesConstants.MAPS_ADDRESS_ERROR.code,

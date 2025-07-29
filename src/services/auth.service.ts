@@ -1,8 +1,7 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
 import { HeadersEnum } from "@/src/enums/headers.enums";
 import { useAppStore } from "@/src/store/app/app.store";
-import { RecaptchaActionEnum } from "@/src/enums/common.enums";
-import { ApiService, RecaptchaService, UserService } from "@/src/services";
+import { ApiService, UserService } from "@/src/services";
 import { UserTermsType } from "@/src/types/user.types";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -10,7 +9,6 @@ import { apiUser } from "@/src/constants/api.constants";
 import { useCartStore } from "@/src/store/cart/cart.store";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { isServer } from "@/src/utils/common.utils";
-import { useSalesStore } from "@/src/store/sales/sales.store";
 import { Session, User } from "@supabase/supabase-js";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
@@ -32,7 +30,7 @@ export const AuthService = {
   ) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
+        // await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
         const { email, password, name, surname, role } = formData;
         const response = (await ApiService.post(apiUser.SIGNUP(), {
           email,
@@ -57,7 +55,7 @@ export const AuthService = {
   login: async (email: string, password: string) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(RecaptchaActionEnum.LOGIN);
+        // await RecaptchaService.checkAppToken(RecaptchaActionEnum.LOGIN);
         const { data: user, error } = await AppInstance.auth.signInWithPassword(
           {
             email,
@@ -86,7 +84,6 @@ export const AuthService = {
         useVigilStore.getState().onLogout();
         useCartStore.getState().onLogout();
         useModalStore.getState().onLogout();
-        useSalesStore.getState().onLogout();
         useServicesStore.getState().onLogout();
         useUserStore.getState().onLogout();
       }

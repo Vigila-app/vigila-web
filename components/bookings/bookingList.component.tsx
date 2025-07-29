@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { BookingI } from "@/src/types/booking.types";
-import { Table, Button, Badge, LastUpdate } from "@/components";
+import { Button, Badge, LastUpdate, Table } from "@/components";
+import { ReviewButtonComponent } from "@/components/reviews";
 import { TableColsI } from "@/components/table/table.components";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import {
@@ -166,9 +167,9 @@ const BookingListComponent = () => {
     duration_hours: booking.quantity,
     duration_hoursValue: booking.quantity,
     total_amount: `${getService(booking.service_id)?.currency} ${amountDisplay(
-      booking.price * booking.quantity
+      booking.price
     )}`,
-    total_amountValue: booking.price * booking.quantity,
+    total_amountValue: booking.price,
     status: (
       <Badge
         label={capitalize(booking.status as string)}
@@ -179,28 +180,41 @@ const BookingListComponent = () => {
     vigil_name: getVigil(booking.vigil_id)?.displayName || "Unknown",
     consumer_name: getConsumer(booking.consumer_id)?.displayName || "Unknown",
     actions: (
-      <div className="flex gap-2">
-        <Button
-          text
-          label="Dettagli"
-          action={() => openModal("booking-details", { bookingId: booking.id })}
-        />
-        {booking.payment_status === PaymentStatusEnum.PENDING && isConsumer && (
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-2">
           <Button
             text
-            label="Paga ora"
+            label="Dettagli"
             action={() =>
-              router.push(
-                `${Routes.paymentBooking.url}?bookingId=${booking.id}`
-              )
+              openModal("booking-details", { bookingId: booking.id })
             }
           />
-        )}
-        {booking.status === BookingStatusEnum.PENDING && isConsumer && (
-          <Button
-            text
-            label="Edit"
-            action={() => openModal("booking-form", { booking })}
+          {booking.payment_status === PaymentStatusEnum.PENDING &&
+            isConsumer && (
+              <Button
+                text
+                label="Paga ora"
+                action={() =>
+                  router.push(
+                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+                  )
+                }
+              />
+            )}
+          {booking.status === BookingStatusEnum.PENDING && isConsumer && (
+            <Button
+              text
+              label="Edit"
+              action={() => openModal("booking-form", { booking })}
+            />
+          )}
+        </div>
+        {/* Review button for completed bookings */}
+        {booking.status === BookingStatusEnum.COMPLETED && isConsumer && (
+          <ReviewButtonComponent
+            booking={booking}
+            vigilName={getVigil(booking.vigil_id)?.displayName}
+            onReviewCreated={() => handleGetBookings(true)}
           />
         )}
       </div>
