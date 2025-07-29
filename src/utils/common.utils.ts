@@ -175,6 +175,7 @@ export const timestampToDate = (timestamp: any) => {
     console.error("transformTimestamp error:", error);
   }
 };
+
 export const formatBookingDate = (dateString: string): string => {
   const date = new Date(dateString);
 
@@ -182,8 +183,8 @@ export const formatBookingDate = (dateString: string): string => {
     year: "numeric",
     month: "long",
     day: "numeric",
-     hour: "2-digit",   
-    minute: "2-digit", 
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(date);
 };
 
@@ -221,13 +222,10 @@ export const deepMerge = (target: any, source: any) => {
 
 let timeout: NodeJS.Timeout;
 export const debounce = (callback: (...args: any) => void, delay = 500) => {
-  let timeout: ReturnType<typeof setTimeout>;
-  return (...args: any[]) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  };
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    callback();
+  }, delay);
 };
 
 export const getCurrency = (currency: CurrencyEnum) => {
