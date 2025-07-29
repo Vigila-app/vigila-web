@@ -11,6 +11,7 @@ import { AppConstants } from "@/src/constants";
 import HtmlDocument from "@/components/@core/htmlDocument/htmlDocument.component";
 import { isMocked } from "@/src/utils/envs.utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
@@ -57,11 +58,17 @@ export default function RootLayout({
           <GlobalLoaderManager />
           <ToastManagerComponent />
           <CookieBannerComponent />
-          {!isMocked ? <SpeedInsights /> : null}
+          {!isMocked ? (
+            <>
+              <SpeedInsights />
+              <Analytics />
+            </>
+          ) : null}
         </>
       }
       footer={<Footer />}
-      header={<Header />}>
+      header={<Header />}
+    >
       {children}
     </HtmlDocument>
   );
