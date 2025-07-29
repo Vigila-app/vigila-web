@@ -31,6 +31,11 @@ export const dateDisplay = (
       return date?.toLocaleDateString() as unknown as string;
     case "dateType":
       return date as unknown as string;
+    case "time":
+      // Show only hours and minutes
+      return date
+        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "";
   }
 };
 
@@ -72,8 +77,8 @@ export const isDateInRange = (
   return cDate <= lDate && cDate >= fDate;
 };
 
-export const getPostgresTimestamp = (date = new Date()) => {  
-  const pad = (num: number, size: number) => num.toString().padStart(size, '0');
+export const getPostgresTimestamp = (date = new Date()) => {
+  const pad = (num: number, size: number) => num.toString().padStart(size, "0");
 
   const year = date.getFullYear();
   const month = pad(date.getMonth() + 1, 2);
@@ -82,7 +87,7 @@ export const getPostgresTimestamp = (date = new Date()) => {
   const minutes = pad(date.getMinutes(), 2);
   const seconds = pad(date.getSeconds(), 2);
   const milliseconds = pad(date.getMilliseconds(), 6);
-  
+
   const offsetMinutes = date.getTimezoneOffset();
   const sign = offsetMinutes > 0 ? "-" : "+";
   const offsetHours = pad(Math.floor(Math.abs(offsetMinutes) / 60), 2);
@@ -90,4 +95,4 @@ export const getPostgresTimestamp = (date = new Date()) => {
   const timezone = `${sign}${offsetHours}:${offsetMins}`;
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}${timezone}`;
-}
+};

@@ -37,12 +37,12 @@ const Input = (props: InputI) => {
       <label
         htmlFor={name || label}
         className={clsx(
-          "pointer-events-none start-2.5  bg-white p-0.5 ",
+          "pointer-events-none start-2.5  bg-white my-4",
           isForm === true && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
           role === RolesEnum.VIGIL && " text-vigil-orange",
           error && "text-red-500",
-          disabled && "!bg-gray-100"
+          disabled && "cursor-not-allowed",
         )}>
         {label}
         {required && <>*</>}

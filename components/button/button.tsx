@@ -15,7 +15,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   customclass?: string;
   danger?: boolean;
   icon?: React.ReactNode;
-  label: string |  React.ReactNode;
+  label: string | React.ReactNode;
   primary?: boolean;
   secondary?: boolean;
   small?: boolean;

@@ -13,7 +13,7 @@ const disabledBtnStyle = "opacity-50";
 const loadingBtnStyle = "cursor-wait";
 const fullBtnStyle = "w-full justify-center";
 const tabBtnStyle = "bg-white text-black";
- const smallBtnStyle=" px-6 py-2"
+const smallBtnStyle=" w-15 h-8 flex items-center justify-center text-xs";
 
 const vigilBtnStyle =
   "shadow border-vigil-orange rounded-4xl bg-vigil-orange text-white hover:text-vigil-orange hover:bg-vigil-light-orange focus-within:border-vigil-orange focus-within:ring-1 focus-within:ring-vigil-orange";

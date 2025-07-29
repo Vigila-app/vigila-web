@@ -1,11 +1,11 @@
 import Card from "@/components/card/card";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useVigilStore } from "@/src/store/vigil/vigil.store";
+
 import { useEffect } from "react";
 
 const PanoramicaConsumerTab = () => {
-//   const { vigils, getVigilsDetails } = useVigilStore();
+
   const{consumers,getConsumersDetails}= useConsumerStore();
   const { user, userDetails } = useUserStore();
 
@@ -16,7 +16,6 @@ const PanoramicaConsumerTab = () => {
   }, [user?.id]);
 
   const consumer = consumers.find((c) => c.id === user?.id);
-
   return (
     <section className="py-4  bg-gray-100 rounded-b-2xl">
       <Card>
@@ -42,7 +41,7 @@ const PanoramicaConsumerTab = () => {
 
         <div>
           <p className="font-medium leading-relaxed text-[13px]">
-        family informazioni
+       {consumer?.information }
           </p>
         </div>
       </Card>
@@ -93,7 +92,7 @@ const PanoramicaConsumerTab = () => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>email@com</span>
+            <span>{user?.email}</span>
           </div>
           <div className="flex items-center gap-2">
             <svg
@@ -117,7 +116,7 @@ const PanoramicaConsumerTab = () => {
               </defs>
             </svg>
 
-            <span>+39 333 123 4567</span>
+            <span>{consumer?.lovedOnePhone}</span>
           </div>
           <div className="flex items-center gap-2">
             <svg
@@ -139,7 +138,7 @@ const PanoramicaConsumerTab = () => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>lovedOneAdress</span>
+            <span>{consumer?.city}</span>
           </div>
         </div>
       </Card>
