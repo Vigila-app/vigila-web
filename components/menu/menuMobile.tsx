@@ -17,7 +17,7 @@ const MenuMobile = () => {
   const pathname = usePathname();
   const { user } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
-const role:RolesEnum=  user?.user_metadata?.role as RolesEnum;
+const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
