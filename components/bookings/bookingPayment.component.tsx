@@ -256,7 +256,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         <div className="my-6 p-4 bg-white rounded-lg shadow">
           <h3 className="font-medium text-gray-900 mb-3">Pagamento</h3>
           <CheckoutForm
-            returnUrl={`${AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}
+            returnUrl={`${window?.location?.origin || AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
             // onCancel={handleBackToBookings}

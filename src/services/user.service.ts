@@ -208,7 +208,7 @@ export const UserService = {
           type: "signup",
           email: user.email,
           options: {
-            emailRedirectTo: `${AppConstants.hostUrl}/${Routes.confirmEmail.url}`,
+            emailRedirectTo: `${window?.location?.origin || AppConstants.hostUrl}/${Routes.confirmEmail.url}`,
           },
         });
 
@@ -230,7 +230,7 @@ export const UserService = {
         const { data, error } = await AuthInstance.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${AppConstants.hostUrl}/${Routes.updatePassword.url}`,
+            redirectTo: `${window?.location?.origin || AppConstants.hostUrl}/${Routes.updatePassword.url}`,
           }
         );
 
