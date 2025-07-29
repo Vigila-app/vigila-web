@@ -129,7 +129,7 @@ const ProfileComponent = () => {
                     size="big"
                     withUpload
                     onFileUpload={uploadProfilePic}
-                    value={userDetails?.displayName || ""}
+                    value={userDetails?.displayName}
                   />
                 </div>
                 <div className="flex-1  ">
@@ -182,7 +182,7 @@ const ProfileComponent = () => {
                   size="big"
                   withUpload
                   onFileUpload={uploadProfilePic}
-                  value={userDetails?.displayName || ""}
+                  value={userDetails?.displayName}
                 />
               </div>
               <div className="flex-1  ">
