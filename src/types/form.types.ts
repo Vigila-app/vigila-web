@@ -16,8 +16,11 @@ export interface ConsumerFormData {
   lovedOneName: string;
   lovedOneAge: string;
   relationship: string;
+  lovedOneBirthday:string;
+  lovedOnePhone:string;
   city: string;
   cap: string;
+  information?: string;
   yourName: string;
 }
 export type AddressData = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Undraw } from "@/components";
-import { Input } from "@/components/form";
+import { Input, TextArea } from "@/components/form";
 import Checkbox from "@/components/form/checkbox";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { OnboardService } from "@/src/services/onboard.service";
@@ -17,9 +17,12 @@ type OnboardFormI = {
   yourName: string;
   lovedOneName: string;
   lovedOneAge: string;
+  lovedOneBirthday: string;
+  lovedOnePhone: string;
   relationship: string;
   city: string;
   cap: string;
+  information: string;
 };
 
 const relationships = ["Figlio/a", "Nipote", "Parente", "Amico/a", "Badante"];
@@ -39,9 +42,18 @@ const OnboardComponent = () => {
 
   const onSubmit = async (formdata: OnboardFormI) => {
     try {
-      debugger;
-      const { yourName, lovedOneName, lovedOneAge, relationship, city, cap } =
-        formdata;
+      
+      const {
+        yourName,
+        lovedOneName,
+        lovedOneAge,
+        lovedOneBirthday,
+        relationship,
+        city,
+        cap,
+        information,
+        lovedOnePhone,
+      } = formdata;
       const role = user?.user_metadata?.role as RolesEnum;
       const userId = user?.id;
       console.log(formdata);
@@ -59,9 +71,12 @@ const OnboardComponent = () => {
           yourName,
           lovedOneName,
           lovedOneAge,
+          lovedOneBirthday,
+          lovedOnePhone,
           relationship,
           city,
           cap,
+          information,
         },
       });
 
@@ -70,7 +85,7 @@ const OnboardComponent = () => {
         type: ToastStatusEnum.SUCCESS,
       });
 
-      router.replace(Routes.home.url);
+      router.replace(Routes.homeConsumer.url);
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({
@@ -84,7 +99,7 @@ const OnboardComponent = () => {
     <div className="w-full p-6">
       <Card>
         <div className="p-4">
-          <section className="flex flex-col items-center gap-1">
+          <section className="flex flex-col items-center gap-1 mb-4">
             <h1 className="font-semibold text-[26px]">Iniziamo a conoscerci</h1>
             <span className="font-normal text-[15px]">
               Raccontaci tutto sulla tua persona cara
@@ -145,7 +160,38 @@ const OnboardComponent = () => {
                 />
               )}
             />
-
+            <Controller
+              name="lovedOneBirthday"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  label="Data di nascita della persona cara"
+                  placeholder="15/06/1960"
+                  required
+                  type="date"
+                  role={role}
+                  error={errors.lovedOneBirthday}
+                />
+              )}
+            />
+            <Controller
+              name="lovedOnePhone"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  label="Cellulare della persona cara"
+                  placeholder="377 1234567"
+                  required
+                  type="tel"
+                  role={role}
+                  error={errors.lovedOnePhone}
+                />
+              )}
+            />
             <div>
               <p className="font-medium mb-2">
                 Che rapporto hai con la persona cara?
@@ -181,6 +227,7 @@ const OnboardComponent = () => {
                   label="Città della persona cara"
                   placeholder="Es. Milano"
                   required
+                  type="text"
                   role={role}
                   error={errors.city}
                 />
@@ -197,8 +244,24 @@ const OnboardComponent = () => {
                   label="CAP della città"
                   placeholder="Es. 20100"
                   required
+                  type="number"
                   role={role}
                   error={errors.cap}
+                />
+              )}
+            />
+            <Controller
+              name="information"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextArea
+                  {...field}
+                  label="informazioni aggiuntive"
+                  placeholder="Dicci qualcosa sulla tua persona cara"
+                  required
+                  role={role}
+                  error={errors.information}
                 />
               )}
             />

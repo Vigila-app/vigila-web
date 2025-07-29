@@ -209,7 +209,7 @@ const PanoramicaTab = () => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span>email@com</span>
+            <span>{user?.email}</span>
           </div>
           <div className="flex items-center gap-2">
             <svg
@@ -233,7 +233,7 @@ const PanoramicaTab = () => {
               </defs>
             </svg>
 
-            <span>+39 333 123 4567</span>
+            <span>{vigil?.phone}</span>
           </div>
           <div className="flex items-center gap-2">
             <svg

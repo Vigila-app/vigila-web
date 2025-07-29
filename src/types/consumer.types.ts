@@ -8,6 +8,11 @@ export type ConsumerDetailsType = {
   username?: string;
   lovedOneName?:string;
   lovedOneAge?:string;
+  lovedOneBirthday?:string;
+  lovedOnePhone?:string;
+  information?: string;
+  city?: string;
+  created_at?: string;
   other?: { [key: string]: string | number };
 };
 

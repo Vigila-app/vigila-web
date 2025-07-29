@@ -208,6 +208,7 @@ const OnboardComponent = () => {
               render={() => (
                 <div>
                   <SearchAddress
+                  role={RolesEnum.VIGIL}
                     onSubmit={(address) => {
                       console.log("testo", address);
                       setAddresses((prev) => {
@@ -312,12 +313,11 @@ const OnboardComponent = () => {
             />
             {/* TODo chiedere se si deve collegare il field e aggiornare il form con onchange  */}
             <Controller
-            name="services"
-            control={control}
-             render={({})=>(
-              <ServiceOboard />
-            )}/>
-            
+              name="services"
+              control={control}
+              render={({}) => <ServiceOboard />}
+            />
+
             <div className="flex items-center justify-end">
               <Button
                 type="submit"
