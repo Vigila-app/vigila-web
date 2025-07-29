@@ -43,15 +43,11 @@ const ServiceCard = (props: ServiceCardI) => {
       key={service.id}
       className="border w-full p-4 mb-4 rounded-lg shadow-sm space-y-4">
       <div className="flex flex-nowrap flex-col gap-2">
-        <div className="flex gap-2 items-center" className="flex flex-col items-center">
+        <div className="flex gap-2 items-center">
           <Avatar
-           
             size="medium"
-           
             userId={service.vigil_id}
-           
             value={service.vigil?.displayName}
-         
           />
           <span className=" flex flex-grow items-center font-semibold text-lg ">
             {service.vigil?.displayName}
@@ -79,15 +75,15 @@ const ServiceCard = (props: ServiceCardI) => {
       </div>
       <div className="inline-flex w-full items-center justify-center gap-4">
         <ButtonLink
-          secondary
           label="Vedi Profilo Vigil"
+          small
           href={replaceDynamicUrl(
             Routes.vigilDetails.url,
             ":vigilId",
             service.vigil_id
           )}
         />
-        <Button label="Prenota ora" action={goToBooking} />
+        <Button small label="Prenota ora" action={goToBooking} />
       </div>
     </article>
   );

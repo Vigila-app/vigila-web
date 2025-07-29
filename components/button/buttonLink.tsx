@@ -9,6 +9,7 @@ type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   label: string;
   primary?: boolean;
   secondary?: boolean;
+  small?: boolean;
   full?: boolean;
   role?: RolesEnum;
   text?: boolean;
@@ -19,7 +20,7 @@ type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 const ButtonLink = (props: ButtonLinkI) => {
   const {
     customClass,
-
+    small = false,
     label,
     href = "/",
     primary = true,
@@ -37,13 +38,14 @@ const ButtonLink = (props: ButtonLinkI) => {
     text
       ? ButtonStyle.textBtnStyle
       : secondary
-      ? ButtonStyle.secondaryBtnStyle
-      : primary
-      ? ButtonStyle.primaryBtnStyle
-      : "",
+        ? ButtonStyle.secondaryBtnStyle
+        : primary
+          ? ButtonStyle.primaryBtnStyle
+          : "",
     role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
     role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle,
-    full && ButtonStyle.fullBtnStyle
+    full && ButtonStyle.fullBtnStyle,
+     small && ButtonStyle.smallBtnStyle,
   );
 
   return (

@@ -1,7 +1,10 @@
 "use client";
 
 import { Avatar, TabGroup } from "@/components";
-import { ReviewStatsComponent, ReviewListComponent } from "@/components/reviews";
+import {
+  ReviewStatsComponent,
+  ReviewListComponent,
+} from "@/components/reviews";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -32,19 +35,19 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 // Add reviews tab for vigils
 const getTabsForRole = (role: RolesEnum): TabI[] => {
   const baseTabs = [...tabs];
-  
+
   if (role === RolesEnum.VIGIL) {
     baseTabs.splice(1, 0, {
       label: "Recensioni",
     });
   }
-  
+
   return baseTabs;
 };
 
 const ProfileComponent = () => {
   const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
-  const { consumers,getConsumersDetails } = useConsumerStore();
+  const { consumers, getConsumersDetails } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
@@ -143,10 +146,12 @@ const ProfileComponent = () => {
                     </span>
                     <div className="flex flex-col items-center gap-2  mb-3">
                       <span>📍{consumer?.city}</span>
-                      <span>
-                        🗓️ Su Vigila da:
-                         {dateDisplay(created_at, "date")}
-                      </span>
+                      {created_at && (
+                        <span>
+                          🗓️ Su Vigila da:
+                          {dateDisplay(created_at, "date")}
+                        </span>
+                      )}
                     </div>
                   </section>
                 </div>
@@ -187,16 +192,19 @@ const ProfileComponent = () => {
               <div className="flex-1  ">
                 <section className="flex flex-col items-center ">
                   <h1 className="text-3xl font-bold mb-2 text-center">
-                    {userDetails?.displayName}{}
+                    {userDetails?.displayName}
+                    {}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
                   <div className="flex items-center gap-2  mb-3">
                     <span>📍 TODO localizzazione</span>
-                    <span>
-                      🗓️ Su Vigil da: {dateDisplay(created_at, "date")}
-                    </span>
+                    {created_at && (
+                      <span>
+                        🗓️ Su Vigil da: {dateDisplay(created_at, "date")}
+                      </span>
+                    )}
                   </div>
                 </section>
               </div>
