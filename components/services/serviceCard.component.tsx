@@ -144,7 +144,8 @@ const ServiceCard = (props: ServiceCardI) => {
           customClass="!p-3"
         />
         <Button
-          disabled={!!"TODO feature missing"}
+          // TODO feature missing
+          disabled
           secondary
           full
           label="Salva"
