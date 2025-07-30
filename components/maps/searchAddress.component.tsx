@@ -27,10 +27,10 @@ const SearchAddress = (props: {
     onSubmit: eOnSubmit,
     onChange,
     minLength = 3,
-    label = "Search Address",
+    label,
     location = false,
     role,
-    placeholder = "Inserisci città",
+    placeholder = "Inserisci CAP",
   } = props;
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(

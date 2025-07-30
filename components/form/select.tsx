@@ -12,8 +12,8 @@ type Option = {
   disabled?: boolean;
 };
 
-type CustomSelectProps = {
-  label: string;
+type SelectProps = {
+  label?: string;
   placeholder?: string;
   error?: FieldError;
   options: Option[];
@@ -24,7 +24,7 @@ type CustomSelectProps = {
   disabled?: boolean;
 };
 
-const CustomSelect = ({
+const Select = ({
   label,
   placeholder,
   error,
@@ -34,14 +34,17 @@ const CustomSelect = ({
   role,
   required = false,
   disabled = false,
-}: CustomSelectProps) => {
+}: SelectProps) => {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const selected = options.find((opt) => opt.value === value);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -50,24 +53,27 @@ const CustomSelect = ({
   }, []);
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative w-full">
       {/* Label */}
-      <span
-        className={clsx(
-          "pointer-events-none start-2.5 rounded bg-white p-0.5",
-          role === RolesEnum.CONSUMER && "text-consumer-blue",
-          role === RolesEnum.VIGIL && "text-vigil-orange",
-          error && "text-red-500",
-          disabled && "!bg-gray-100"
-        )}
-      >
-        {label}
-        {required && <>*</>}
-      </span>
+      {label ? (
+        <label
+          className={clsx(
+            "pointer-events-none start-2.5 rounded bg-white p-0.5",
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
+            role === RolesEnum.VIGIL && "text-vigil-orange",
+            error && "text-red-500",
+            disabled && "!bg-gray-100"
+          )}
+        >
+          {label}
+          {required && <>*</>}
+        </label>
+      ) : null}
 
       {/* Trigger Button */}
       <button
         type="button"
+        role="select"
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={clsx(
@@ -86,16 +92,14 @@ const CustomSelect = ({
 
       {/* Dropdown Options */}
       {open && (
-        <ul
-          className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-60 overflow-auto"
-        >
+        <ul className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-60 overflow-auto">
           {options.map((option) => (
             <li
               key={option.value}
               className={clsx(
                 "cursor-pointer px-4 py-2 text-sm text-vigil-orange hover:bg-gray-100",
                 option.disabled && "text-gray-400 cursor-not-allowed",
-               
+                option.value === value && "font-semibold"
               )}
               onClick={() => {
                 if (option.disabled) return;
@@ -119,4 +123,4 @@ const CustomSelect = ({
   );
 };
 
-export default CustomSelect;
+export default Select;

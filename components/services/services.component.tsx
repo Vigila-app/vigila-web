@@ -10,6 +10,8 @@ import ServiceCard from "@/components/services/serviceCard.component";
 import dynamic from "next/dynamic";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { Card } from "@/components";
+import { Select } from "../form";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -80,9 +82,20 @@ const ServicesComponent = () => {
           role={RolesEnum.VIGIL}
           onSubmit={searchServices}
           onChange={() => setShowServices(false)}
-          label="Trova servizi in questa zona"
           placeholder="Inserisci indirizzo, città o CAP"
         />
+        <div className="my-4 inline-flex items-center gap-4 w-full">
+          <Select
+            options={[
+              { label: "Opzione 1", value: "1" },
+              { label: "Opzione 2", value: "2" },
+            ]}
+            role={RolesEnum.VIGIL}
+          />
+          <button>
+            <AdjustmentsHorizontalIcon className="size-6 text-vigil-orange cursor-pointer" />
+          </button>
+        </div>
       </Card>
 
       <div className="my-4">

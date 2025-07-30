@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { FieldError } from "react-hook-form";
 
 type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+  label?: string;
   icon?: React.ReactElement;
   error?: FieldError;
   onChange?: (value: string | number) => void;
@@ -34,20 +34,22 @@ const Input = (props: InputI) => {
 
   return (
     <div className="relative w-full">
-      <label
-        htmlFor={name || label}
-        className={clsx(
-          "pointer-events-none start-2.5  bg-white my-4",
-          isForm && "text-vigil-orange",
-          role === RolesEnum.CONSUMER && "text-consumer-blue",
-          role === RolesEnum.VIGIL && " text-vigil-orange",
-          error && "text-red-500",
-          disabled && "cursor-not-allowed"
-        )}
-      >
-        {label}
-        {required && <>*</>}
-      </label>
+      {label ? (
+        <label
+          htmlFor={name || label}
+          className={clsx(
+            "pointer-events-none start-2.5  bg-white my-4",
+            isForm && "text-vigil-orange",
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
+            role === RolesEnum.VIGIL && " text-vigil-orange",
+            error && "text-red-500",
+            disabled && "cursor-not-allowed"
+          )}
+        >
+          {label}
+          {required ? <>*</> : null}
+        </label>
+      ) : null}
 
       <div
         className={clsx(

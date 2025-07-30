@@ -28,12 +28,12 @@ export default function HomeConsumer() {
   }, []);
 
   return (
-    <div className="my-6">
+    <div className="my-6 md:max-w-3xl mx-auto">
       <section className="space-y-4 flex flex-col gap-4 m-4">
         <div className="flex items-center gap-1">
           <MagnifyingGlassIcon className="w-6 h-6 text-vigil-orange" />
           <span className="text-lg font-semibold">
-            Cerca vigil e servizi nella tua zona
+            Cerca il Vigil adatto a te
           </span>
         </div>
         <ServicesComponent />

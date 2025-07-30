@@ -36,6 +36,14 @@ export const dateDisplay = (
       return date
         ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
+        case "monthYearLiteral":
+      // Show month and year in a more readable format
+      return date
+        ? new Intl.DateTimeFormat("it-IT", {
+            year: "numeric",
+            month: "long",
+          }).format(date)
+        : "";
   }
 };
 

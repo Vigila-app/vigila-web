@@ -1,7 +1,7 @@
 const baseBtnStyle =
-  "inline-flex items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition";
+  "inline-flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition";
 const primaryBtnStyle =
-  "shadow border-primary-600 bg-primary-600 text-white hover:bg-white hover:text-primary-600 ";
+  "shadow border-primary-600 bg-primary-600 text-white hover:bg-white hover:text-primary-600";
 const secondaryBtnStyle =
   "shadow border-primary-600 bg-white text-primary-600 hover:bg-secondary-600 hover:border-secondary-600 hover:text-white";
 const textBtnStyle =
@@ -13,7 +13,7 @@ const disabledBtnStyle = "opacity-50";
 const loadingBtnStyle = "cursor-wait";
 const fullBtnStyle = "w-full justify-center";
 const tabBtnStyle = "bg-white text-black";
-const smallBtnStyle=" w-15 h-8 flex items-center justify-center text-xs";
+const smallBtnStyle = "w-15 h-8 flex items-center justify-center text-xs";
 
 const vigilBtnStyle =
   "shadow border-vigil-orange rounded-4xl bg-vigil-orange text-white hover:text-vigil-orange hover:bg-vigil-light-orange focus-within:border-vigil-orange focus-within:ring-1 focus-within:ring-vigil-orange";
@@ -32,5 +32,5 @@ export const ButtonStyle = {
   loadingBtnStyle,
   fullBtnStyle,
   tabBtnStyle,
-   smallBtnStyle,
+  smallBtnStyle,
 };
