@@ -7,6 +7,7 @@ import {
 } from "@/src/types/consumer.types";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
+import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
@@ -18,13 +19,16 @@ const initConsumerStore: {
   consumers: [],
 };
 
+// Crea il debouncer per lo store consumer
+const { createDebouncedAction } = createStoreDebouncer('consumer-store');
+
 export const useConsumerStore = create<ConsumerStoreType>()(
   devtools(
     persist(
       (set, get) => ({
         ...initConsumerStore,
-        getConsumersDetails: async (consumers, force = false) =>
-          new Promise(async (resolve, reject) => {
+        getConsumersDetails: async (consumers: string[], force = false) => {
+          const action = async () => {
             try {
               const getConsumersDetailsBE = async () => {
                 try {
@@ -48,23 +52,25 @@ export const useConsumerStore = create<ConsumerStoreType>()(
                       )
                     );
                   if (!promises?.length) {
-                    throw new Error("No consumers to fetch details for");
+                    return get().consumers.filter(c => consumers.includes(c.id));
                   }
                   const consumersDetailsStoreBE = await Promise.all(promises);
                   if (!consumersDetailsStoreBE?.length) {
                     throw new Error("No consumer details found");
                   } else {
+                    const newConsumers = consumersDetailsStoreBE
+                      .filter(
+                        (item): item is { data: ConsumerDetailsType } =>
+                          item !== undefined
+                      )
+                      .map(({ data }) => data);
+                    
                     set(
                       () => ({
                         consumers: Array.from(
                           new Set([
                             ...get().consumers,
-                            ...consumersDetailsStoreBE
-                              .filter(
-                                (item): item is { data: ConsumerDetailsType } =>
-                                  item !== undefined
-                              )
-                              .map(({ data }) => data),
+                            ...newConsumers,
                           ])
                         ),
                         lastUpdate: new Date(),
@@ -72,30 +78,23 @@ export const useConsumerStore = create<ConsumerStoreType>()(
                       false,
                       { type: "getConsumersDetails" }
                     );
-                    resolve(
-                      consumersDetailsStoreBE
-                        .filter(
-                          (item): item is { data: ConsumerDetailsType } =>
-                            item !== undefined
-                        )
-                        .map(({ data }) => data)
-                    );
+                    return newConsumers;
                   }
                 } catch (error) {
-                  reject(error);
+                  throw error;
                 }
               };
-              // TODO retrieve consumers details from BE
-              const consumersDetailsStoreBE =
-                (await getConsumersDetailsBE()) as unknown as ConsumerDetailsType[];
-              if (consumersDetailsStoreBE) {
-                resolve(consumersDetailsStoreBE);
-              }
-              reject();
+              
+              return await getConsumersDetailsBE();
             } catch (error) {
-              reject(error);
+              console.error("useConsumerStore getConsumersDetails error:", error);
+              throw error;
             }
-          }),
+          };
+
+          const uniqueKey = consumers.sort().join(',');
+          return createDebouncedAction('getConsumersDetails', action, force, uniqueKey);
+        },
         onLogout: () => {
           set(initConsumerStore, false, { type: "onLogout" });
         },

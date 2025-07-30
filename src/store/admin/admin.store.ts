@@ -3,6 +3,7 @@ import { AdminService } from "@/src/services/admin.service";
 import { AdminStoreType } from "@/src/types/admin.types";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
+import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
@@ -47,6 +48,9 @@ const initAdminStore: {
   servicesLoading: false,
   paymentsLoading: false,
 };
+
+// Crea il debouncer per lo store admin
+const { createDebouncedAction } = createStoreDebouncer('admin-store');
 
 export const useAdminStore = create<AdminStoreType>()(
   devtools(
@@ -111,30 +115,35 @@ export const useAdminStore = create<AdminStoreType>()(
         },
 
         getBookings: async (filters?: Record<string, string>, force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate.bookings;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              set({ bookingsLoading: true });
-              const bookings = await AdminService.getBookings(filters);
-              if (bookings) {
-                set({
-                  bookings,
-                  lastUpdate: {
-                    ...get().lastUpdate,
-                    bookings: new Date(),
-                  },
-                  bookingsLoading: false,
-                });
+          const action = async () => {
+            try {
+              const lastUpdate = get().lastUpdate.bookings;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                set({ bookingsLoading: true });
+                const bookings = await AdminService.getBookings(filters);
+                if (bookings) {
+                  set({
+                    bookings,
+                    lastUpdate: {
+                      ...get().lastUpdate,
+                      bookings: new Date(),
+                    },
+                    bookingsLoading: false,
+                  });
+                }
               }
+            } catch (error) {
+              console.error("useAdminStore getBookings error:", error);
+              set({ bookingsLoading: false });
             }
-          } catch (error) {
-            console.error("useAdminStore getBookings error:", error);
-            set({ bookingsLoading: false });
-          }
+          };
+
+          const filterKey = filters ? JSON.stringify(filters) : 'all';
+          return createDebouncedAction('getBookings', action, force, filterKey);
         },
 
         updateBookingStatus: async (bookingId: string, status: string) => {
@@ -153,30 +162,35 @@ export const useAdminStore = create<AdminStoreType>()(
         },
 
         getVigils: async (filters?: Record<string, string>, force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate.vigils;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              set({ vigilsLoading: true });
-              const vigils = await AdminService.getVigils(filters);
-              if (vigils) {
-                set({
-                  vigils,
-                  lastUpdate: {
-                    ...get().lastUpdate,
-                    vigils: new Date(),
-                  },
-                  vigilsLoading: false,
-                });
+          const action = async () => {
+            try {
+              const lastUpdate = get().lastUpdate.vigils;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                set({ vigilsLoading: true });
+                const vigils = await AdminService.getVigils(filters);
+                if (vigils) {
+                  set({
+                    vigils,
+                    lastUpdate: {
+                      ...get().lastUpdate,
+                      vigils: new Date(),
+                    },
+                    vigilsLoading: false,
+                  });
+                }
               }
+            } catch (error) {
+              console.error("useAdminStore getVigils error:", error);
+              set({ vigilsLoading: false });
             }
-          } catch (error) {
-            console.error("useAdminStore getVigils error:", error);
-            set({ vigilsLoading: false });
-          }
+          };
+
+          const filterKey = filters ? JSON.stringify(filters) : 'all';
+          return createDebouncedAction('getVigils', action, force, filterKey);
         },
 
         updateVigilStatus: async (vigilId: string, status: string) => {
@@ -195,30 +209,35 @@ export const useAdminStore = create<AdminStoreType>()(
         },
 
         getConsumers: async (filters?: Record<string, string>, force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate.consumers;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              set({ consumersLoading: true });
-              const consumers = await AdminService.getConsumers(filters);
-              if (consumers) {
-                set({
-                  consumers,
-                  lastUpdate: {
-                    ...get().lastUpdate,
-                    consumers: new Date(),
-                  },
-                  consumersLoading: false,
-                });
+          const action = async () => {
+            try {
+              const lastUpdate = get().lastUpdate.consumers;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                set({ consumersLoading: true });
+                const consumers = await AdminService.getConsumers(filters);
+                if (consumers) {
+                  set({
+                    consumers,
+                    lastUpdate: {
+                      ...get().lastUpdate,
+                      consumers: new Date(),
+                    },
+                    consumersLoading: false,
+                  });
+                }
               }
+            } catch (error) {
+              console.error("useAdminStore getConsumers error:", error);
+              set({ consumersLoading: false });
             }
-          } catch (error) {
-            console.error("useAdminStore getConsumers error:", error);
-            set({ consumersLoading: false });
-          }
+          };
+
+          const filterKey = filters ? JSON.stringify(filters) : 'all';
+          return createDebouncedAction('getConsumers', action, force, filterKey);
         },
 
         getServices: async (filters?: Record<string, string>, force: boolean = false) => {
