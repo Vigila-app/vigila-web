@@ -15,10 +15,10 @@
     "url": "/home",
     "label": "Home Consumer",
     "menu": {
-      "mobile": true,
-      "desktop": true,
-      "header": true,
-      "footer": true
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
     },
     "private": true,
     "roles": ["CONSUMER"]
@@ -116,8 +116,8 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
-      "footer": false
+      "header": false,
+      "footer": true
     },
     "private": true,
     "roles": ["CONSUMER", "VIGIL"]
@@ -321,7 +321,7 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": true
     },
     "private": true,
@@ -347,7 +347,7 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": true
     },
     "private": false,
