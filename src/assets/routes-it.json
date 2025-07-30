@@ -11,7 +11,7 @@
     "private": false,
     "roles": []
   },
-   "homeConsumer": {
+  "homeConsumer": {
     "url": "/home",
     "label": "Home Consumer",
     "menu": {
@@ -120,7 +120,21 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["CONSUMER", "VIGIL"]
+  },
+  "bookingDetails": {
+    "url": "/booking/:bookingId",
+    "label": "Dettagli Prenotazione",
+    "title": "Dettagli Prenotazione",
+    "matchingUrl": "/booking/",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "admin": {
     "url": "/dashboard-admin",

@@ -3,7 +3,7 @@
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useEffect } from "react";
-import Card from "../card/card";
+import { Card } from "@/components";
 
 const BookingCounterComponent = () => {
   const { bookings, getBookings } = useBookingsStore();
@@ -15,7 +15,7 @@ const BookingCounterComponent = () => {
       getBookings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user?.id]);
 
   const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
   const numeroPrenotazioniConfermate = confirmedBookings.length;
@@ -38,7 +38,7 @@ const BookingCounterComponent = () => {
           <span className="text-4xl text-vigil-orange font-semibold">
             {numeroPrenotazioni}
           </span>
-          <span className="font-semibold text-sm ">Totale Prenotazioni </span>
+          <span className="font-semibold text-sm ">Totale Prenotazioni</span>
         </div>
       </Card>
     </div>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
-import { BookingsService } from "@/src/services";
-import { Button, Badge, Avatar } from "@/components";
+import { Button, Badge, Avatar, Card } from "@/components";
 import { ReviewButtonComponent } from "@/components/reviews";
 import {
   BookingStatusEnum,
@@ -34,10 +33,11 @@ import Link from "next/link";
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
   onUpdate?: (booking: BookingI) => void;
+  isModal?: boolean;
 };
 
 const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
-  const { bookingId, onUpdate = () => ({}) } = props;
+  const { bookingId, onUpdate = () => ({}), isModal = false } = props;
   const router = useRouter();
   const {
     showToast,
@@ -46,58 +46,90 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     loader: { isLoading },
   } = useAppStore();
   const { bookings, getBookingDetails } = useBookingsStore();
-  const { consumers, getConsumersDetails } = useConsumerStore();
-  const { vigils, getVigilsDetails } = useVigilStore();
-  const { services, getServiceDetails } = useServicesStore();
+  const { consumers } = useConsumerStore();
+  const { vigils } = useVigilStore();
+  const { services } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
 
-  const booking = bookings.find((b) => b.id === bookingId);
-  const service = services.find((s) => s.id === booking?.service_id);
-  const vigil = vigils.find((v) => v.id === booking?.vigil_id);
-  const consumer = consumers.find((c) => c.id === booking?.consumer_id);
+  const [canCancel, setCanCancel] = useState<boolean>(false);
 
-  const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
-  const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
+  const isConsumer = useMemo(() => {
+    return user?.user_metadata?.role === RolesEnum.CONSUMER;
+  }, [user]);
+
+  const isVigil = useMemo(() => {
+    return user?.user_metadata?.role === RolesEnum.VIGIL;
+  }, [user]);
+
+  const booking = useMemo(() => {
+    return bookings.find((b) => b.id === bookingId);
+  }, [bookings, bookingId]);
+
+  const service = useMemo(() => {
+    return (
+      booking?.service || services.find((s) => s.id === booking?.service_id)
+    );
+  }, [services, booking]);
+
+  const vigil = useMemo(() => {
+    return booking?.vigil || vigils.find((v) => v.id === booking?.vigil_id);
+  }, [vigils, booking]);
+
+  const consumer = useMemo(() => {
+    return (
+      booking?.consumer || consumers.find((c) => c.id === booking?.consumer_id)
+    );
+  }, [consumers, booking]);
+
+  console.log("Booking Details Component", booking)
+
+  const checkCancellation = useCallback(async () => {
+    if (!booking) {
+      setCanCancel(false);
+      return;
+    }
+
+    try {
+      const canCancelBooking = await BookingUtils.canCancelBooking(booking);
+      setCanCancel(canCancelBooking);
+    } catch (error) {
+      console.error(
+        "Errore nel verificare la possibilità di cancellazione:",
+        error
+      );
+      setCanCancel(false);
+    }
+  }, [booking]);
 
   useEffect(() => {
     if (bookingId) getBookingDetails(bookingId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
+  // Effetto per verificare se la cancellazione è possibile
   useEffect(() => {
-    if (booking?.vigil_id && user?.user_metadata?.role === RolesEnum.CONSUMER)
-      getVigilsDetails([booking?.vigil_id]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking?.vigil_id]);
-
-  useEffect(() => {
-    if (booking?.service_id) getServiceDetails(booking?.service_id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking?.service_id]);
-
-  useEffect(() => {
-    if (booking?.consumer_id && user?.user_metadata?.role === RolesEnum.VIGIL)
-      getConsumersDetails([booking?.consumer_id]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking?.consumer_id]);
+    checkCancellation();
+  }, [checkCancellation]);
 
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
     if (!booking) return;
 
     try {
       showLoader();
-      const updatedBooking = await BookingsService.updateBookingStatus(
-        booking.id,
+      const updatedBooking = await BookingUtils.handleStatusUpdate(
+        booking,
         status
       );
-      getBookingDetails(bookingId, true);
-      onUpdate(updatedBooking);
+      if (updatedBooking) {
+        getBookingDetails(bookingId, true);
+        onUpdate(updatedBooking);
 
-      showToast({
-        message: "Prenotazione aggiornata con successo",
-        type: ToastStatusEnum.SUCCESS,
-      });
+        showToast({
+          message: "Prenotazione aggiornata con successo",
+          type: ToastStatusEnum.SUCCESS,
+        });
+      }
     } catch (error) {
       console.error("Error updating booking status", error);
       showToast({
@@ -107,37 +139,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       });
     } finally {
       hideLoader();
-    }
-  };
-
-  const handleCancelBooking = async () => {
-    if (!booking) return;
-
-    if (
-      confirm(
-        "Sei sicuro di voler procedere alla cancellazione della prenotazione?"
-      )
-    ) {
-      try {
-        showLoader();
-        await BookingsService.cancelBooking(booking.id);
-
-        showToast({
-          message: "Prenotazione cancellata con successo",
-          type: ToastStatusEnum.SUCCESS,
-        });
-
-        closeModal();
-      } catch (error) {
-        console.error("Error cancelling booking", error);
-        showToast({
-          message:
-            "Si è verificato un errore durante la cancellazione della prenotazione",
-          type: ToastStatusEnum.ERROR,
-        });
-      } finally {
-        hideLoader();
-      }
     }
   };
 
@@ -182,10 +183,12 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             <h3 className="font-medium text-gray-900">Servizio prenotato</h3>
             <div className="mt-2 space-y-2 text-sm">
               <p>{service?.name}</p>
-              <p>
-                <span className="font-medium">Descrizione:</span>&nbsp;
-                {service?.description}
-              </p>
+              {service?.description && (
+                <p>
+                  <span className="font-medium">Descrizione:</span>&nbsp;
+                  {service.description}
+                </p>
+              )}
               <p>
                 <span className="font-medium">
                   Prezzo per&nbsp;
@@ -232,38 +235,38 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             </h3>
             <div className="mt-2 space-y-2 text-sm">
               {isConsumer ? (
-                <>
-                  <p className="inline-flex items-center flex-nowrap gap-2">
-                    <Avatar userId={vigil?.id} value={vigil?.displayName} />
-                    <div className="flex-1">
-                      <div className="font-medium">{vigil?.displayName}</div>
-                      {vigil?.id && (
-                        <Link
-                          href={replaceDynamicUrl(
-                            Routes.vigilDetails.url,
-                            ":vigilId",
-                            vigil.id
-                          )}
-                          className="text-xs text-blue-600 hover:text-blue-800 underline"
-                        >
-                          Vedi profilo completo
-                        </Link>
-                      )}
+                <Link
+                  href={
+                    vigil?.id
+                      ? replaceDynamicUrl(
+                          Routes.vigilDetails.url,
+                          ":vigilId",
+                          vigil?.id
+                        )
+                      : "#"
+                  }
+                >
+                  <Card className="p-4 bg-vigil-light-orange border border-vigil-orange rounded-full shadow">
+                    <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+                      <Avatar userId={vigil?.id} value={vigil?.displayName} />
+                      <div className="flex-1">
+                        <div className="font-medium">{vigil?.displayName}</div>
+                      </div>
                     </div>
-                  </p>
-                </>
+                  </Card>
+                </Link>
               ) : (
-                <>
-                  <p className="inline-flex items-center flex-nowrap gap-2">
+                <Card className="p-4 bg-consumer-light-blue border border-consumer-blue rounded-full shadow">
+                  <div className="inline-flex items-center flex-nowrap gap-2 w-full">
                     <Avatar
                       userId={consumer?.id}
                       value={consumer?.displayName}
                     />
-                    <span className="font-medium flex-1">
-                      {consumer?.displayName}
-                    </span>
-                  </p>
-                </>
+                    <div className="flex-1">
+                      <div className="font-medium">{consumer?.displayName}</div>
+                    </div>
+                  </div>
+                </Card>
               )}
             </div>
           </div>
@@ -302,13 +305,14 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           />
         )}
 
-        {isConsumer && booking.status === BookingStatusEnum.PENDING && (
+        {canCancel && (
           <Button
             danger
             label="Annulla Prenotazione"
-            action={handleCancelBooking}
+            action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
           />
         )}
+
         {isConsumer && booking.payment_status === PaymentStatusEnum.PENDING && (
           <Button
             label="Paga Prenotazione"
@@ -320,7 +324,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           />
         )}
 
-        <Button secondary label="Chiudi" action={closeModal} />
+        {isModal && <Button secondary label="Chiudi" action={closeModal} />}
       </div>
 
       {/* Review Section - Only for completed bookings */}

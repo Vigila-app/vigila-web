@@ -3,6 +3,7 @@ import Avatar from "./avatar/avatar";
 import Badge from "./badge/badge.component";
 import Button from "./button/button";
 import ButtonLink from "./button/buttonLink";
+import Card from "./card/card";
 import Divider from "./divider/divider";
 import FloatingBanner from "./floatingBanner/floatingBanner";
 import Footer from "./footer/footer";
@@ -29,6 +30,7 @@ export {
   Badge,
   Button,
   ButtonLink,
+  Card,
   Divider,
   FloatingBanner,
   Footer,

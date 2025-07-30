@@ -33,7 +33,15 @@ export async function GET(req: NextRequest) {
       });
 
     const _admin = getAdminClient();
-    let db_query = _admin.from("bookings").select("*", { count: "exact" });
+    let db_query = _admin.from("bookings").select(
+      `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `,
+      { count: "exact" }
+    );
 
     // Filter based on user role
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
