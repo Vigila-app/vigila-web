@@ -28,7 +28,7 @@ export default function HomeConsumer() {
   }, []);
 
   return (
-    <div className="my-6 bg-gray-50">
+    <div className="my-6">
       <section className="space-y-4 flex flex-col gap-4 m-4">
         <div className="flex items-center gap-1">
           <MagnifyingGlassIcon className="w-6 h-6 text-vigil-orange" />

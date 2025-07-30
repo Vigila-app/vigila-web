@@ -1,5 +1,6 @@
 import { CmsService } from "@/src/services";
 import HomeComponent from "./home.component";
+import RedirectHandler from "./redirect-handler.component";
 import { CmsPageI } from "@/src/types/cms.types";
 import { cache } from "react";
 
@@ -20,6 +21,7 @@ export default async function Home() {
   const { ["main-hero"]: mainHero } = data;
   return (
     <>
+      <RedirectHandler />
       <HomeComponent hero={mainHero} />
     </>
   );
