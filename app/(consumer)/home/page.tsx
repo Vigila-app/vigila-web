@@ -36,11 +36,7 @@ export default function HomeConsumer() {
             Cerca vigil e servizi nella tua zona
           </span>
         </div>
-        <Card>
-          <div className="px-4">
-            <ServicesComponent />
-          </div>
-        </Card>
+        <ServicesComponent />
       </section>
       <BookingCounterComponent />
       <Card>

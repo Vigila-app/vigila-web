@@ -1,17 +1,17 @@
 "use client";
 
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { useServicesStore } from "@/src/store/services/services.store";
 import { ServiceI } from "@/src/types/services.types";
 import { ServicesUtils } from "@/src/utils/services.utils";
-import { Avatar, Button, ButtonLink } from "@/components";
+import { Avatar, Badge, Button, ButtonLink, Card } from "@/components";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
-import { replaceDynamicUrl } from "@/src/utils/common.utils";
+import { amountDisplay, replaceDynamicUrl } from "@/src/utils/common.utils";
 import { useMemo } from "react";
-import { RolesEnum } from "@/src/enums/roles.enums";
+import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 type ServiceCardI = {
   service: ServiceI;
@@ -39,53 +39,93 @@ const ServiceCard = (props: ServiceCardI) => {
   }, [vigilDetails?.averageRating, vigilDetails?.reviews]);
 
   return (
-    <article
-      key={service.id}
-      className="border w-full p-4 mb-4 rounded-lg shadow-sm space-y-4">
-      <div className="flex flex-nowrap flex-col gap-2">
-        <div className="flex gap-2 items-center">
-          <Avatar
-            size="medium"
-            userId={service.vigil_id}
-            value={service.vigil?.displayName}
-          />
-          <span className=" flex flex-grow items-center font-semibold text-lg ">
-            {service.vigil?.displayName}
-          </span>
-          {avarageRating ? (
-            <span className="inline-flex gap-1 items-center text-sm text-gray-500">
-              <StarIcon className="size-4 text-yellow-500 inline-block" />
-              <span>{avarageRating}</span>
-            </span>
-          ) : null}
+    <Card customClass="p-4" containerClass="space-y-2">
+      <div className="inline-flex flex-nowrap gap-4 w-full">
+        <Avatar
+          className="flex-shrink-0 min-w-16"
+          size="big"
+          userId={service.vigil_id}
+          value={service.vigil?.displayName}
+        />
+        <div className="space-y-1 flex-1 text-xs">
+          <div className="inline-flex items-baseline flex-nowrap gap-4 w-full">
+            <h6 className="text-base font-semibold">
+              {service.vigil?.displayName}
+            </h6>
+            <span>(età)</span>
+          </div>
+          <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+            <Badge label="Verificato" color="green" />
+            {service?.vigil?.occupation ? (
+              <Badge label={service?.vigil?.occupation} color="blue" />
+            ) : null}
+            {/* TODO attributes list */}
+          </div>
+          <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+            {service.vigil?.addresses?.length ? (
+              <div className="inline-flex items-center flex-nowrap gap-1">
+                <MapPinIcon className="size-3" />
+                <span>
+                  {service.vigil?.addresses?.map((a) => a.name)?.join(", ")}
+                </span>
+              </div>
+            ) : null}
+            {service.vigil?.created_at ? (
+              <div className="inline-flex items-center flex-nowrap gap-1">
+                <CalendarIcon className="size-3" />
+                <span>
+                  su Vigila da {dateDisplay(service.vigil?.created_at, "date")}
+                </span>
+              </div>
+            ) : null}
+          </div>
+          <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+            {avarageRating ? (
+              <div className="inline-flex items-center flex-nowrap gap-1">
+                <StarIcon className="size-3 text-yellow-500" />
+                <span>
+                  {avarageRating}
+                  {vigilDetails?.reviews?.length &&
+                    ` (${vigilDetails?.reviews?.length} recensioni)`}
+                </span>
+              </div>
+            ) : null}
+          </div>
         </div>
-        <div className="flex gap-1 ">
-          <span className="text-sm font-semibold flex-1 items-center">
-            {service.name}
-          </span>
-          <p className="text-sm text-gray-500 flex items-center">
-            {service?.currency}
-            {service?.unit_price} /
-            {ServicesUtils.getServiceUnitType(service.unit_type)}
-          </p>
-        </div>
-        {service?.description && (
-          <p className="flex items-center text-xs">{service?.description}</p>
-        )}
       </div>
-      <div className="inline-flex w-full items-center justify-center gap-4">
+      {service?.vigil?.information ? (
+        <div>{service?.vigil?.information}</div>
+      ) : null}
+      {/* TODO add categories <div>categorie</div> */}
+      <div className="inline-flex items-center flex-nowrap gap-4 w-full">
+        <Button customClass="flex-1" label="Prenota ora" action={goToBooking} />
+        <div className="inline-flex flex-col items-end">
+          <span className="text-consumer-blue font-bold">
+            {amountDisplay(service?.unit_price, service?.currency)}
+          </span>
+          &nbsp;a&nbsp;
+          {ServicesUtils.getServiceUnitType(service.unit_type)}
+        </div>
+      </div>
+      <div className="inline-flex items-center justify-between flex-nowrap gap-4 w-full">
         <ButtonLink
           label="Vedi Profilo Vigil"
-          small
+          secondary
           href={replaceDynamicUrl(
             Routes.vigilDetails.url,
             ":vigilId",
             service.vigil_id
           )}
         />
-        <Button small label="Prenota ora" action={goToBooking} />
+        <Button
+          disabled={!!"TODO feature missing"}
+          label="Salva"
+          action={() => {
+            // TODO add to favorites
+          }}
+        />
       </div>
-    </article>
+    </Card>
   );
 };
 

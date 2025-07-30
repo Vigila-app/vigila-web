@@ -16,7 +16,12 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, ["page", "pageSize", "vigil_id"]);
+    const filters = getQueryParams(url, [
+      "page",
+      "pageSize",
+      "vigil_id",
+      "active",
+    ]);
     const { orderBy = "created_at", orderDirection = "DESC" } = filters;
 
     console.log(`API GET services`, filters, pagination);
@@ -42,7 +47,7 @@ export async function GET(req: NextRequest) {
     let db_query = _admin.from("services").select(
       `
         *,
-        vigil:vigils(displayName)
+        vigil:vigils(*)
       `,
       { count: "exact" }
     );
@@ -57,6 +62,10 @@ export async function GET(req: NextRequest) {
           db_query = db_query.eq(key, filters[key]);
         }
       });
+    }
+
+    if (filters.active === undefined) {
+      db_query = db_query.eq("active", true);
     }
 
     if (

@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
 import ServiceCard from "@/components/services/serviceCard.component";
 import dynamic from "next/dynamic";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { Card } from "@/components";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -18,7 +20,6 @@ const SearchAddress = dynamic(
     ),
   }
 );
-import { RolesEnum } from "@/src/enums/roles.enums";
 
 const ServicesComponent = () => {
   const { showLoader, hideLoader } = useAppStore();
@@ -28,14 +29,20 @@ const ServicesComponent = () => {
 
   const searchServices = async ({ address }: AddressI) => {
     try {
-      if (address?.postCode || address?.postalCode || address?.postcode || address?.cap) {
+      if (
+        address?.postCode ||
+        address?.postalCode ||
+        address?.postcode ||
+        address?.cap
+      ) {
         showLoader();
         const services = await ApiService.get<{ data: ServiceI[] }>(
           apiServices.LIST(),
           {
             postalCode: (address.postCode ||
               address.postalCode ||
-              address.postcode || address.cap) as string,
+              address.postcode ||
+              address.cap) as string,
           }
         );
         if (!services?.data) {
@@ -66,15 +73,18 @@ const ServicesComponent = () => {
   }, [services]);
 
   return (
-    <div className="container mx-auto px-4 py-4">
-      <SearchAddress
-        location
-        role={RolesEnum.VIGIL}
-        onSubmit={searchServices}
-        onChange={() => setShowServices(false)}
-        label="Trova servizi in questa zona"
-        placeholder="Inserisci indirizzo, città o CAP"
-      />
+    <>
+      <Card>
+        <SearchAddress
+          location
+          role={RolesEnum.VIGIL}
+          onSubmit={searchServices}
+          onChange={() => setShowServices(false)}
+          label="Trova servizi in questa zona"
+          placeholder="Inserisci indirizzo, città o CAP"
+        />
+      </Card>
+
       <div className="my-4">
         {showServices ? (
           services.length ? (
@@ -86,7 +96,7 @@ const ServicesComponent = () => {
           )
         ) : null}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import { CurrencyEnum } from "@/src/enums/common.enums";
 import { UserType } from "@/src/types/user.types";
+import { VigilDetailsType } from "@/src/types/vigil.types";
 
 export type ServiceI = {
   active: boolean;
@@ -16,9 +17,7 @@ export type ServiceI = {
   max_unit?: number;
   info?: Record<string, any>;
   postalCode: string[];
-  vigil?: {
-    displayName: string;
-  };
+  vigil?: Partial<VigilDetailsType>;
   duration?: string;
 };
 
@@ -28,6 +27,6 @@ export type ServicesStoreType = {
   lastUpdate?: Date;
   getServices: (force?: boolean, vigilId?: ServiceI["vigil_id"]) => void;
   getServiceDetails: (serviceId: ServiceI["id"], force?: boolean) => void;
-  deleteService: (serviceId: ServiceI["id"]) => void; 
+  deleteService: (serviceId: ServiceI["id"]) => void;
   resetLastUpdate: () => void;
 };

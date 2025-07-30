@@ -14,6 +14,7 @@ type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   hoverable?: boolean;
   full?: boolean;
   role?: RolesEnum;
+  containerClass?: string;
 };
 
 const Card = ({
@@ -25,6 +26,7 @@ const Card = ({
   shadow = true,
   hoverable = false,
   full = false,
+  containerClass,
   role,
   ...rest
 }: CardProps) => {
@@ -43,7 +45,7 @@ const Card = ({
     <div className={cardClass} {...rest}>
       {title && <h3 className={CardStyle.titleStyle}>{title}</h3>}
       {subtitle && <p className={CardStyle.subtitleStyle}>{subtitle}</p>}
-      <div>{children}</div>
+      <div className={containerClass}>{children}</div>
     </div>
   );
 };
