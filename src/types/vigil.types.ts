@@ -9,6 +9,7 @@ export type VigilDetailsType = {
   id: string;
   phone?: string;
   information?: string;
+  occupation?: string;
   username?: string;
   other?: { [key: string]: string | number };
   reviews?: ReviewI[];
