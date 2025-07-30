@@ -220,12 +220,35 @@ export const deepMerge = (target: any, source: any) => {
   return merged;
 };
 
-let timeout: NodeJS.Timeout;
-export const debounce = (callback: (...args: any) => void, delay = 500) => {
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
+// Map per gestire multiple chiamate debounced con chiavi diverse
+const timeouts = new Map<string, NodeJS.Timeout>();
+
+export const debounce = (
+  key: string,
+  callback: (...args: any) => void,
+  delay = 500
+) => {
+  // Cancella il timeout precedente per questa chiave specifica
+  const existingTimeout = timeouts.get(key);
+  if (existingTimeout) {
+    clearTimeout(existingTimeout);
+  }
+  
+  // Imposta un nuovo timeout
+  const newTimeout = setTimeout(() => {
     callback();
+    timeouts.delete(key); // Pulisce la mappa dopo l'esecuzione
   }, delay);
+  
+  timeouts.set(key, newTimeout);
+};
+
+// Funzione per creare un debouncer con chiave automatica
+export const createDebouncer = (baseKey: string, delay = 500) => {
+  return (callback: (...args: any) => void, suffix = '') => {
+    const key = suffix ? `${baseKey}_${suffix}` : baseKey;
+    debounce(key, callback, delay);
+  };
 };
 
 export const getCurrency = (currency: CurrencyEnum) => {

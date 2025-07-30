@@ -2,7 +2,7 @@
 
 import { FormFieldType } from "@/src/constants/form.constants";
 import { MapsService } from "@/src/services";
-import { debounce } from "@/src/utils/common.utils";
+import { useDebouncedSearch } from "@/src/hooks/useDebouncedSearch";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
@@ -32,6 +32,13 @@ const SearchAddress = (props: {
     role,
     placeholder = "Inserisci città",
   } = props;
+
+  const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
+    "",
+    500,
+    "searchAddress"
+  );
+
   const { currentLocation } = useCurrentLocation({
     onRender: location,
   });
@@ -43,7 +50,6 @@ const SearchAddress = (props: {
     control,
     formState: { errors, isValid },
     handleSubmit,
-    watch,
     setValue,
   } = useForm<SearchMapFormI>();
 
@@ -96,7 +102,9 @@ const SearchAddress = (props: {
         q: `${locationAddress.lat}, ${locationAddress.lon}`,
       });
       if (address) {
-        setValue("search", address.display_name || address.city || "");
+        const displayName = address.display_name || address.city || "";
+        setValue("search", displayName);
+        setSearchTerm(displayName); // Sincronizza con il nostro hook
         return address;
       } else {
         throw new Error("Address not found for the given coordinates");
@@ -109,15 +117,18 @@ const SearchAddress = (props: {
 
   const autocompleteAdress = async () => {
     try {
-      if (watch().search?.length >= minLength) {
+      if (debouncedSearchTerm?.length >= minLength) {
         setIsLoading(true);
-        const results = await MapsService.autocompleteAddress(watch().search);
+        const results =
+          await MapsService.autocompleteAddress(debouncedSearchTerm);
         setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
         } else if (results.length === 1) {
           const address = results[0];
-          setValue("search", address.display_name || address.city || "");
+          const displayName = address.display_name || address.city || "";
+          setValue("search", displayName);
+          setSearchTerm(displayName);
           submit(address);
           setSubmitted(false);
         }
@@ -141,11 +152,11 @@ const SearchAddress = (props: {
 
   useEffect(() => {
     setSubmitted(false);
-    debounce(autocompleteAdress);
+    autocompleteAdress();
     setAutocompleteResults([]);
-    onChange?.(watch()?.search);
+    onChange?.(debouncedSearchTerm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch()?.search]);
+  }, [debouncedSearchTerm]);
 
   return (
     <>
@@ -157,6 +168,11 @@ const SearchAddress = (props: {
           render={({ field }) => (
             <Input
               {...field}
+              onChange={(value) => {
+                field.onChange(value);
+                setSearchTerm(value as string);
+              }}
+              value={searchTerm}
               autoFocus
               label={label}
               placeholder={placeholder}
@@ -177,11 +193,15 @@ const SearchAddress = (props: {
               <li key={index} className="my-2 ">
                 <button
                   onClick={() => {
-                    setValue("search", result.display_name || result.name);
+                    const displayName =
+                      result.display_name || result.name || "";
+                    setValue("search", displayName);
+                    setSearchTerm(displayName);
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  ">
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  "
+                >
                   {result.display_name}
                 </button>
               </li>
