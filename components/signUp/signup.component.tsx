@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ButtonLink, Divider } from "@/components";
+import { Button, Divider } from "@/components";
 import ProviderButton from "@/components/button/providerButton";
 import { Input } from "@/components/form";
 import { SupabaseErrors } from "@/src/constants/supabase.constants";
@@ -181,10 +181,10 @@ const SignupComponent = (props: SignupComponentI) => {
               href={
                 role === RolesEnum.CONSUMER
                   ? Routes.registrationVigil.url
-                  : Routes.registration.url
+                  : Routes.registrationConsumer.url
               }
               className={clsx(
-                "",
+                "hover:font-semibold transition",
                 role === RolesEnum.CONSUMER
                   ? "text-vigil-orange"
                   : "text-consumer-blue"
@@ -370,6 +370,7 @@ const SignupComponent = (props: SignupComponentI) => {
             full
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
+            customClass="rounded-full shadow"
           />
           {/* <ProviderButton
             provider={ProviderEnum.APPLE}
@@ -380,15 +381,21 @@ const SignupComponent = (props: SignupComponentI) => {
         </div>
       </div>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
-        Hai già un account?&nbsp;
-        <ButtonLink
-          inline
-          text
-          label={Routes.login.label}
-          href={Routes.login.url}
-        />
-      </p>
+      <div className="space-y-2 mt-6">
+        <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
+          Hai già un account?&nbsp;
+          <Link
+            href={Routes.login.url}
+            className={clsx(
+              role === RolesEnum.CONSUMER
+                ? "text-consumer-blue"
+                : "text-vigil-orange"
+            )}
+          >
+            {Routes.login.label}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

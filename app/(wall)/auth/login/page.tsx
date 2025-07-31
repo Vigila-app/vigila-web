@@ -1,7 +1,6 @@
 import { CmsService } from "@/src/services/cms.service";
 import LoginComponent from "./login.component";
 import { CmsPageI } from "@/src/types/cms.types";
-import { SimplePage } from "@/components";
 import { cache } from "react";
 
 // cache revalidation - 1 hour
@@ -22,8 +21,7 @@ export default async function Login() {
   return (
     <section className="py-4">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between">
-        <SimplePage title={title} text={text} />
-        <LoginComponent />
+        <LoginComponent title={title} text={text} />
       </div>
     </section>
   );

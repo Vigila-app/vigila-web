@@ -16,18 +16,20 @@ import dynamic from "next/dynamic";
 import useAltcha from "@/src/hooks/useAltcha";
 import { AltchaService } from "@/src/services/altcha.service";
 import { useEffect } from "react";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import Link from "next/link";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
 });
-import { RolesEnum } from "@/src/enums/roles.enums";
 
 type LoginFormI = {
   email: string;
   password: string;
 };
 
-const LoginComponent = () => {
+const LoginComponent = (props: { title?: string; text?: string }) => {
+  const { title, text } = props;
   const { showLoader, hideLoader, showToast } = useAppStore();
   const router = useRouter();
   const { challenge, isVerified, onStateChange } = useAltcha();
@@ -75,14 +77,16 @@ const LoginComponent = () => {
 
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {title || text ? (
         <div>
-          <h2 className="text-center font-medium">Login</h2>
-          <p className="text-center text-sm text-gray-500 mt-2">
-            Inserisci le tue credenziali per accedere
-          </p>
+          {title && <h2 className="text-center font-medium">{title}</h2>}
+          {text && (
+            <p className="text-center text-sm text-gray-500 mt-2">{text}</p>
+          )}
         </div>
-        <Undraw graphic="login" />
+      ) : null}
+      <Undraw graphic="login" />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Controller
           name="email"
           control={control}
@@ -103,30 +107,46 @@ const LoginComponent = () => {
             />
           )}
         />
-        <Controller
-          name="password"
-          control={control}
-          rules={{
-            required: true,
-            minLength: FormFieldType.PASSWORD.minLength,
-            maxLength: FormFieldType.PASSWORD.maxLength,
-          }}
-          render={({ field }) => (
-            <Input
-              {...field}
-              label="Password"
-              placeholder="Inserisci password"
-              type="password"
-              required
-              role={RolesEnum.CONSUMER}
-              autoComplete="current-password"
-              aria-invalid={!!errors.password}
-              error={errors.password}
-              icon={<EyeIcon className="size-4 text-gray-500" />}
-            />
-          )}
+        <div>
+          <Controller
+            name="password"
+            control={control}
+            rules={{
+              required: true,
+              minLength: FormFieldType.PASSWORD.minLength,
+              maxLength: FormFieldType.PASSWORD.maxLength,
+            }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                label="Password"
+                placeholder="Inserisci password"
+                type="password"
+                required
+                role={RolesEnum.CONSUMER}
+                autoComplete="current-password"
+                aria-invalid={!!errors.password}
+                error={errors.password}
+                icon={<EyeIcon className="size-4 text-gray-500" />}
+              />
+            )}
+          />
+          <div className="text-right my-2">
+            <Link
+              href={Routes.resetPassword.url}
+              className="text-consumer-blue text-xs"
+            >
+              Password dimenticata?
+            </Link>
+          </div>
+        </div>
+        <Button
+          type="submit"
+          primary
+          full
+          role={RolesEnum.CONSUMER}
+          label={Routes.login.label}
         />
-        <Button type="submit" primary full role={RolesEnum.CONSUMER} label={Routes.login.label} />
         <Altcha floating onStateChange={onStateChange} />
       </form>
 
@@ -138,6 +158,7 @@ const LoginComponent = () => {
             full
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
+            customClass="rounded-full shadow"
           />
           {/* <ProviderButton
             provider={ProviderEnum.APPLE}
@@ -149,22 +170,11 @@ const LoginComponent = () => {
       </div>
 
       <div className="space-y-2 mt-6">
-        <p className="text-center text-sm text-gray-500">
-          <ButtonLink
-            inline
-            text
-            label="Password dimenticata?"
-            href={Routes.resetPassword.url}
-          />
-        </p>
-        <p className="text-center text-sm text-gray-500">
+        <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
           Non hai un account?&nbsp;
-          <ButtonLink
-            inline
-            text
-            label={Routes.registration.label}
-            href={Routes.registration.url}
-          />
+          <Link href={Routes.registration.url} className="text-consumer-blue">
+            {Routes.registration.label}
+          </Link>
         </p>
       </div>
     </div>

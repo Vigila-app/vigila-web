@@ -26,5 +26,6 @@ export type CmsPageI = {
   text?: string;
   "main-hero"?: CmsPageHeroI;
   html?: string;
+  main?: CmsPageI;
   form?: CmsPageFormI;
 };

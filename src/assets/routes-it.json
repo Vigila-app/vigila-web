@@ -42,12 +42,25 @@
     "title": "Sign up",
     "menu": {
       "mobile": false,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["CONSUMER"]
+    "roles": []
+  },
+  "registrationConsumer": {
+    "url": "/auth/registration/consumer",
+    "label": "Sign up",
+    "title": "Sign up",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
   },
   "registrationVigil": {
     "url": "/auth/registration/vigil",
@@ -55,7 +68,7 @@
     "title": "Sign up vigil",
     "menu": {
       "mobile": true,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },

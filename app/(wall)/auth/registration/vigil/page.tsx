@@ -16,7 +16,7 @@ const getCmsData = cache(async () => {
   }
 });
 
-export default async function Registration() {
+export default async function VigilRegistration() {
   const data = (await getCmsData()) as CmsPageI;
   const { form: staticData } = data;
   return (
