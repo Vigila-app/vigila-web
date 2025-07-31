@@ -14,11 +14,12 @@ import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
 import { useEffect, useState } from "react";
 import { AddressI } from "@/src/types/maps.types";
-import MapsComponent from "@/components/maps/maps.component";
 import clsx from "clsx";
 import Card from "@/components/card/card";
 import ServiceOboard from "./VigilOnbordComp/ServiceOnboard";
 import { ServiceI } from "@/src/types/services.types";
+import { FormFieldType } from "@/src/constants/form.constants";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
 type OnboardFormI = {
   birthday: string;
@@ -50,8 +51,6 @@ const OnboardComponent = () => {
     control,
     formState: { errors, isValid },
     handleSubmit,
-    setError,
-    reset,
     setValue,
   } = useForm<OnboardFormI>();
   const redirectHome = () => {
@@ -126,9 +125,9 @@ const OnboardComponent = () => {
       <Card>
         <div className="p-4 ">
           <section className="flex flex-col items-center gap-1">
-            <h1 className="font-semibold text-[26px]">Iniziamo a conoscerci</h1>
-            <span className="font-normal text-[15px] break-normal whitespace-normal">
-              Raccontaci tutto di te per iniziare questa bella avventura insieme
+            <h1 className="font-semibold text-xl">Iniziamo a conoscerti</h1>
+            <span className="font-normal text-lg break-normal whitespace-normal">
+              Raccontaci qualcosa di te per iniziare questa bella avventura
             </span>
           </section>
           <form
@@ -138,17 +137,43 @@ const OnboardComponent = () => {
             <Controller
               name="birthday"
               control={control}
-              rules={{ required: true, minLength: 6, maxLength: 10 }} //TODO controllo migliore
+              rules={{
+                required: true,
+                min: new Date(
+                  new Date().setFullYear(new Date().getFullYear() - 80)
+                )
+                  .toISOString()
+                  .split("T")[0],
+                max: new Date(
+                  new Date().setFullYear(new Date().getFullYear() - 18)
+                )
+                  .toISOString()
+                  .split("T")[0],
+              }}
               render={({ field }) => (
                 <Input
                   {...field}
                   label="Data di nascita"
-                  placeholder="15/06/2000"
                   type="date"
+                  min={
+                    new Date(
+                      new Date().setFullYear(new Date().getFullYear() - 80)
+                    )
+                      .toISOString()
+                      .split("T")[0]
+                  }
+                  max={
+                    new Date(
+                      new Date().setFullYear(new Date().getFullYear() - 18)
+                    )
+                      .toISOString()
+                      .split("T")[0]
+                  }
                   required
                   role={role}
-                  autoComplete="given-date" //chiedere
+                  autoComplete="given-date"
                   error={errors.birthday}
+                  aria-invalid={!!errors.birthday}
                 />
               )}
             />
@@ -160,8 +185,8 @@ const OnboardComponent = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="Cellulare"
-                  placeholder="cellulare"
+                  label="Telefono"
+                  placeholder="Inserisci il tuo numero di telefono"
                   type="text"
                   required
                   role={role}
@@ -170,6 +195,8 @@ const OnboardComponent = () => {
                 />
               )}
             />
+
+            {/* TODO change into Select */}
             <Controller
               name="occupation"
               control={control}
@@ -182,21 +209,26 @@ const OnboardComponent = () => {
                   placeholder="Es. Studente, Impiegato..."
                   required
                   error={errors.occupation}
+                  aria-invalid={!!errors.occupation}
                 />
               )}
             />
+
             <Controller
               name="cap"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: true, ...FormFieldType.CAP }}
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="Cap"
+                  label="CAP"
                   role={role}
-                  placeholder="00000"
+                  placeholder="Inserisci il tuo CAP di residenza"
                   required
                   error={errors.cap}
+                  minLength={FormFieldType.CAP.minLength}
+                  maxLength={FormFieldType.CAP.maxLength}
+                  aria-invalid={!!errors.cap}
                 />
               )}
             />
@@ -221,37 +253,37 @@ const OnboardComponent = () => {
                         return [...prev, address];
                       });
                     }}
-                    label="Cerca gli indirizzi dove vuoi lavorare"
+                    placeholder="Inserisci la città con il CAP"
+                    label="Scegli le zone in cui vorresti offrire i tuoi servizi"
                   />
-                  {addresses.length > 0 && (
-                    <ul className="mt-2 list-disc pl-5 text-sm text-gray-700">
+                  {addresses.length ? (
+                    <ul className="mt-2 pl-4 text-sm text-gray-700 space-y-1">
                       {addresses.map((addr, i) => (
-                        <li key={i} className="text-black text-xs">
-                          {`${addr.display_name} `}
+                        <li
+                          key={i}
+                          className="w-full inline-flex items-center gap-2 text-black text-xs"
+                        >
+                          <span>
+                            {(addr?.address
+                              ? `${addr.address.city || addr.address.town || addr.address.village}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode}`
+                              : null) || addr.display_name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAddresses((prev) =>
+                                prev.filter((_, index) => index !== i)
+                              );
+                            }}
+                            className="text-red-500 hover:text-red-700 font-bold"
+                            aria-label="Rimuovi indirizzo"
+                          >
+                            <XCircleIcon className="size-3" />
+                          </button>
                         </li>
                       ))}
                     </ul>
-                  )}
-                  {addresses.length > 0 &&
-                    addresses[addresses.length - 1]?.lat &&
-                    addresses[addresses.length - 1]?.lon && (
-                      <div className="mt-4">
-                        <MapsComponent
-                          center={[
-                            +addresses[addresses.length - 1].lat!,
-                            +addresses[addresses.length - 1].lon!,
-                          ]}
-                          marker={[
-                            +addresses[addresses.length - 1].lat!,
-                            +addresses[addresses.length - 1].lon!,
-                          ]}
-                          markerName={
-                            addresses[addresses.length - 1]?.extended ||
-                            addresses[addresses.length - 1]?.city
-                          }
-                        />
-                      </div>
-                    )}
+                  ) : null}
 
                   {errors.addresses && (
                     <p className="text-red-500 text-sm">
@@ -299,12 +331,12 @@ const OnboardComponent = () => {
             <Controller
               name="information"
               control={control}
-              rules={{ required: true, maxLength: 600 }} //TODO controllo migliore
+              rules={{ required: true, maxLength: 400 }}
               render={({ field }) => (
                 <TextArea
                   {...field}
-                  label="Informazioni"
-                  placeholder="Scrivi qualcosa per farti conoscere..."
+                  label="La tua esperienza"
+                  placeholder="Raccontaci se hai mai avuto nonni, parenti anziani, o se è la tua prima volta..."
                   type="text"
                   required
                   role={role}
@@ -312,7 +344,7 @@ const OnboardComponent = () => {
                 />
               )}
             />
-            {/* TODo chiedere se si deve collegare il field e aggiornare il form con onchange  */}
+            {/* TODO chiedere se si deve collegare il field e aggiornare il form con onchange  */}
             <Controller
               name="services"
               control={control}
