@@ -25,8 +25,8 @@
   },
   "login": {
     "url": "/auth/login",
-    "label": "Login",
-    "title": "Login",
+    "label": "Accedi",
+    "title": "Accedi",
     "menu": {
       "mobile": true,
       "desktop": true,
