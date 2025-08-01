@@ -40,7 +40,7 @@ const transportationOptions = [
   { label: "Trasporto pubblico", value: "public" },
 ];
 
-const OnboardComponent = () => {
+const VigilOnboardComponent = () => {
   const {
     showToast,
     showLoader,
@@ -256,7 +256,6 @@ const OnboardComponent = () => {
                   <SearchAddress
                     role={RolesEnum.VIGIL}
                     onSubmit={(address) => {
-                      console.log("testo", address);
                       setAddresses((prev) => {
                         if (
                           prev.some(
@@ -389,4 +388,4 @@ const OnboardComponent = () => {
   );
 };
 
-export default OnboardComponent;
+export default VigilOnboardComponent;

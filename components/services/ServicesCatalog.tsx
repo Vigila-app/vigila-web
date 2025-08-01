@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "@/components";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { CurrencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { ServicesService } from "@/src/services/services.service";
 import clsx from "clsx";
 import { XCircleIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
@@ -73,7 +73,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
       name: catalogService.name,
       description: catalogService.description,
       unit_price: catalogService.recommended_hourly_rate,
-      unit_type: "hour",
+      unit_type: FrequencyEnum.HOURS,
       min_unit: catalogService.minimum_duration_hours,
       currency: CurrencyEnum.EURO,
       selectedExtras: [],

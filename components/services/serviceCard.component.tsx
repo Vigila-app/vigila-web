@@ -110,6 +110,7 @@ const ServiceCard = (props: ServiceCardI) => {
           </div>
         </div>
       </div>
+      {service?.name ? <div>{service?.name}</div> : null}
       {service?.vigil?.information ? (
         <div>{service?.vigil?.information}</div>
       ) : null}

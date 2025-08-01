@@ -1,3 +1,5 @@
+import { AddressI } from "@/src/types/maps.types";
+
 export type ConsumerDetailsType = {
   displayName?: string;
   photoURL?: string;
@@ -10,10 +12,12 @@ export type ConsumerDetailsType = {
   lovedOneAge?:string;
   lovedOneBirthday?:string;
   lovedOnePhone?:string;
+  phone?: string;
   information?: string;
   city?: string;
   created_at?: string;
   other?: { [key: string]: string | number };
+  address?: AddressI;
 };
 
 export type ConsumerStoreType = {

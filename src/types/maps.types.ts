@@ -20,4 +20,5 @@ export type AddressI = {
   q?:string
   display_name?: string;
   address?: AddressI;
+  name?: string;
 };

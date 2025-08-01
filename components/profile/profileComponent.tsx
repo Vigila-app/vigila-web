@@ -29,7 +29,7 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 
 const ProfileComponent = () => {
-  const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
+  const { user, forceUpdate: forceUserUpdate } = useUserStore();
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
@@ -120,32 +120,40 @@ const ProfileComponent = () => {
     return (
       <div>
         <div className="max-w-7xl mx-auto">
-          <div className=" rounded-lg h-full bg-background-default shadow-sm py-6 px-8 mb-6">
-            <div className="flex flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
-              <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
-                <div className="  flex items-center justify-center">
+          <div className="rounded-lg h-full bg-background-default shadow-sm py-6 px-8 mb-6">
+            <div className="flex flex-col items-center justify-between pt-5 bg-gray-100 rounded-2xl">
+              <div className="flex flex-col items-center rounded-2xl border-2 bg-white p-5">
+                <div className="flex items-center justify-center">
                   <Avatar
                     size="big"
                     withUpload
                     onFileUpload={uploadProfilePic}
-                    value={userDetails?.displayName}
+                    value={consumer?.displayName}
+                    userId={consumer?.id}
                   />
                 </div>
                 <div className="flex-1  ">
                   <section className="flex flex-col items-center ">
                     <h1 className="text-3xl font-bold mb-2 text-center">
-                      {userDetails?.displayName}
+                      {consumer?.displayName}
                     </h1>
                     <span className="text-gray-500 font-medium flex items-center text-center">
                       {formatRole(role)}
                     </span>
                     <div className="flex flex-col items-center gap-2  mb-3">
-                      <span>📍{consumer?.city}</span>
-                      {user?.created_at && (
+                      {consumer?.address?.name ? (
+                      <div className="inline-flex items-center flex-nowrap gap-1">
+                        <MapPinIcon className="size-4" />
+                        <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
+                          {consumer?.address?.name}
+                        </span>
+                      </div>
+                    ) : null}
+                      {consumer?.created_at && (
                         <span>
                           🗓️ Su Vigila da:&nbsp;
                           <span className="capitalize">
-                            {dateDisplay(user.created_at, "monthYearLiteral")}
+                            {dateDisplay(consumer.created_at, "monthYearLiteral")}
                           </span>
                         </span>
                       )}
@@ -182,13 +190,14 @@ const ProfileComponent = () => {
                   size="big"
                   withUpload
                   onFileUpload={uploadProfilePic}
-                  value={userDetails?.displayName}
+                  value={vigil?.displayName}
+                  userId={vigil?.id}
                 />
               </div>
               <div className="flex-1">
                 <section className="flex flex-col items-center ">
                   <h1 className="text-3xl font-bold mb-2 text-center">
-                    {userDetails?.displayName}
+                    {vigil?.displayName}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
@@ -203,11 +212,11 @@ const ProfileComponent = () => {
                       </div>
                     ) : null}
                     <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24"></span>
-                    {user?.created_at && (
+                    {vigil?.created_at && (
                       <span>
                         🗓️ Su Vigil da:&nbsp;
                         <span className="capitalize">
-                          {dateDisplay(user.created_at, "monthYearLiteral")}
+                          {dateDisplay(vigil.created_at, "monthYearLiteral")}
                         </span>
                       </span>
                     )}

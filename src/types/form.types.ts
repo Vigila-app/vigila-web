@@ -18,10 +18,9 @@ export interface ConsumerFormData {
   relationship: string;
   lovedOneBirthday: string;
   lovedOnePhone: string;
-  city: string;
   cap: string;
+  address: AddressI
   information?: string;
-  yourName: string;
 }
 export type AddressData = {
   label?: string;

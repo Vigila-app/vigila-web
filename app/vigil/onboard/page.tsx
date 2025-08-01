@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const OnboardComponent = dynamic(
+const VigilOnboardComponent = dynamic(
   () => import("@/components/onboarding/vigil/onboardComponent_Vigil"),
   { ssr: !!false }
 );
@@ -30,7 +30,7 @@ export default function Profile() {
 
   return (
     <section id="onboard-vigil">
-      <OnboardComponent />
+      <VigilOnboardComponent />
     </section>
   );
 }

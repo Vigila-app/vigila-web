@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export default function FamigliaTab() {
   const { consumers, getConsumersDetails } = useConsumerStore();
-  const { user, userDetails } = useUserStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     if (user?.id) {
@@ -21,36 +21,35 @@ export default function FamigliaTab() {
   const handleCancelFamily = async () => {
     console.log("familiare eliminato");
   };
+
   return (
     <Card full>
       <div className="flex flex-col gap-2 mb-1 px-4">
         <div className="flex justify-between items-start">
           <div className="flex items-start gap-2">
-            <Avatar
-              size="big"
-              userId={consumer?.id}
-              value={consumer?.displayName}
-            />
+            <Avatar size="big" value={consumer?.lovedOneName} />
             <div className="flex flex-col">
               <p className="font-semibold text-[16]">
-                {consumer?.lovedOneName}{" "}
+                {consumer?.lovedOneName}
               </p>
               <p className="text-sm text-gray-600">
-                {consumer?.lovedOneAge} anni
+                {consumer?.lovedOneAge}&nbsp;anni
               </p>
             </div>
           </div>
           <Button
             label={<Cestino />}
-            className=" flex items-center justify-center "
+            className="flex items-center justify-center"
             action={handleCancelFamily}
           />
         </div>
 
-        <div className="flex items-start space-x-2 text-sm">
-          <MapPinIcon className="w-4 h-4  mt-0.5" />
-          <span className="text-gray-600">adress del consumer</span>
-        </div>
+        {consumer?.address?.name && (
+          <div className="flex items-start space-x-2 text-sm">
+            <MapPinIcon className="w-4 h-4  mt-0.5" />
+            <span className="text-gray-600">{consumer?.address?.name}</span>
+          </div>
+        )}
       </div>
     </Card>
   );

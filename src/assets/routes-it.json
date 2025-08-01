@@ -38,7 +38,7 @@
   },
   "registration": {
     "url": "/auth/registration",
-    "label": "Sign up",
+    "label": "Registrati",
     "title": "Sign up",
     "menu": {
       "mobile": false,

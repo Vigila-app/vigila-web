@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
 
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       db_query = db_query.contains("postalCode", [filters.postalCode]);
-      db_query = db_query.eq("vigil(status)", "active");
+      db_query = db_query.eq("vigils.status", "active");
     }
 
     if (orderBy) {

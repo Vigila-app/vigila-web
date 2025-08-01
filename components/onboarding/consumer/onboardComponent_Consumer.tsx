@@ -12,69 +12,70 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import { Controller, useForm } from "react-hook-form";
 import Card from "@/components/card/card";
+import { AuthService } from "@/src/services";
+import { FormFieldType } from "@/src/constants/form.constants";
+import SearchAddress from "@/components/maps/searchAddress.component";
+import { AddressI } from "@/src/types/maps.types";
+import { useState, useEffect } from "react";
 
 type OnboardFormI = {
-  yourName: string;
   lovedOneName: string;
   lovedOneAge: string;
   lovedOneBirthday: string;
   lovedOnePhone: string;
   relationship: string;
-  city: string;
-  cap: string;
+  address: AddressI;
   information: string;
 };
 
 const relationships = ["Figlio/a", "Nipote", "Parente", "Amico/a", "Badante"];
 
-const OnboardComponent = () => {
+const ConsumerOnboardComponent = () => {
   const { showToast } = useAppStore();
   const { user } = useUserStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
 
   const router = useRouter();
 
+  const [address, setAddress] = useState<AddressI | null>(null);
+
   const {
     control,
     formState: { errors },
     handleSubmit,
+    setValue,
   } = useForm<OnboardFormI>();
+
+  useEffect(() => {
+    if (address) {
+      setValue("address", address);
+    }
+  }, [address, setValue]);
 
   const onSubmit = async (formdata: OnboardFormI) => {
     try {
-      
       const {
-        yourName,
         lovedOneName,
         lovedOneAge,
         lovedOneBirthday,
         relationship,
-        city,
-        cap,
+        address,
         information,
         lovedOnePhone,
       } = formdata;
-      const role = user?.user_metadata?.role as RolesEnum;
-      const userId = user?.id;
-      console.log(formdata);
-      if (!userId || !role) {
-        showToast({
-          message: "Utente non identificato. Fai login e riprova.",
-          type: ToastStatusEnum.ERROR,
-        });
-        return;
-      }
 
-      await OnboardService.update(userId, {
+      // Estrai city e cap dall'address
+      const cap = address?.address?.postcode || address?.address?.postalCode || address?.address?.cap || '';
+
+      await OnboardService.update({
         role: RolesEnum.CONSUMER,
         data: {
-          yourName,
           lovedOneName,
           lovedOneAge,
           lovedOneBirthday,
           lovedOnePhone,
           relationship,
-          city,
+          address,
           cap,
           information,
         },
@@ -84,6 +85,7 @@ const OnboardComponent = () => {
         message: "Profilo aggiornato con successo",
         type: ToastStatusEnum.SUCCESS,
       });
+      AuthService.renewAuthentication();
 
       router.replace(Routes.homeConsumer.url);
     } catch (err) {
@@ -111,33 +113,20 @@ const OnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-w-lg mx-auto space-y-8">
-            <Controller
-              name="yourName"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  label="Il tuo nome"
-                  role={role}
-                  placeholder="Es. Mario Rossi"
-                  required
-                  error={errors.yourName}
-                />
-              )}
-            />
-
+            className="max-w-lg mx-auto space-y-8"
+          >
             <Controller
               name="lovedOneName"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: true, ...FormFieldType.NAME }}
               render={({ field }) => (
                 <Input
                   {...field}
                   label="Nome della persona cara"
                   placeholder="Es. Giovanni Bianchi"
                   required
+                  minLength={FormFieldType.NAME.minLength}
+                  maxLength={FormFieldType.NAME.maxLength}
                   role={role}
                   error={errors.lovedOneName}
                 />
@@ -154,6 +143,8 @@ const OnboardComponent = () => {
                   label="Età della persona cara"
                   placeholder="Es. 85"
                   type="number"
+                  min={18}
+                  max={120}
                   required
                   role={role}
                   error={errors.lovedOneAge}
@@ -179,13 +170,15 @@ const OnboardComponent = () => {
             <Controller
               name="lovedOnePhone"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: true, ...FormFieldType.PHONE }}
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="Cellulare della persona cara"
-                  placeholder="377 1234567"
+                  label="Telefono di contatto"
+                  placeholder="es. 3331234567"
                   required
+                  minLength={FormFieldType.PHONE.minLength}
+                  maxLength={FormFieldType.PHONE.maxLength}
                   type="tel"
                   role={role}
                   error={errors.lovedOnePhone}
@@ -218,48 +211,48 @@ const OnboardComponent = () => {
             </div>
 
             <Controller
-              name="city"
+              name="address"
               control={control}
               rules={{ required: true }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  label="Città della persona cara"
-                  placeholder="Es. Milano"
-                  required
-                  type="text"
-                  role={role}
-                  error={errors.city}
-                />
+              render={() => (
+                <div>
+                  <SearchAddress
+                    role={RolesEnum.CONSUMER}
+                    onSubmit={(selectedAddress) => {
+                      setAddress(selectedAddress);
+                    }}
+                    placeholder="Inserisci la città e il CAP della persona cara"
+                    label="Indirizzo della persona cara"
+                  />
+                  {address && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                      <span className="text-gray-700">
+                        {(address?.address
+                          ? `${address.address.city || address.address.town || address.address.village || address.address.suburb}${address.address.city !== address.address.county ? ` (${address.address.county})` : ""}, ${address.address.postcode || ""}`
+                          : null) || address.display_name}
+                      </span>
+                    </div>
+                  )}
+                  {errors.address && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Seleziona un indirizzo
+                    </p>
+                  )}
+                </div>
               )}
             />
 
             <Controller
-              name="cap"
-              control={control}
-              rules={{ required: true, minLength: 5, maxLength: 5 }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  label="CAP della città"
-                  placeholder="Es. 20100"
-                  required
-                  type="number"
-                  role={role}
-                  error={errors.cap}
-                />
-              )}
-            />
-            <Controller
               name="information"
               control={control}
-              rules={{ required: true }}
+              rules={{ required: true, ...FormFieldType.NOTE }}
               render={({ field }) => (
                 <TextArea
                   {...field}
-                  label="informazioni aggiuntive"
+                  label="Informazioni aggiuntive"
+                  minLength={FormFieldType.NOTE.minLength}
+                  maxLength={FormFieldType.NOTE.maxLength}
                   placeholder="Dicci qualcosa sulla tua persona cara"
-                  required
                   role={role}
                   error={errors.information}
                 />
@@ -276,4 +269,4 @@ const OnboardComponent = () => {
   );
 };
 
-export default OnboardComponent;
+export default ConsumerOnboardComponent;

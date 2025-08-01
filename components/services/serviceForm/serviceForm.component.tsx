@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { FormFieldType } from "@/src/constants/form.constants";
 import { Input, Select, TextArea, Toggle } from "@/components/form";
 import { Button, Tooltip } from "@/components";
-import { CurrencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { ServiceI } from "@/src/types/services.types";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { ServicesService } from "@/src/services";
@@ -184,9 +184,9 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               role={RolesEnum.VIGIL}
               error={errors.unit_type}
               options={[
-                { label: "Minuti", value: "minutes" },
-                { label: "Ore", value: "hours" },
-                { label: "Giorni", value: "days" },
+                { label: "Minuti", value: FrequencyEnum.MINUTES },
+                { label: "Ore", value: FrequencyEnum.HOURS },
+                { label: "Giorni", value: FrequencyEnum.DAYS },
               ]}
             />
           )}
