@@ -1,16 +1,14 @@
 "use client";
 
 import Card from "@/components/card/card";
-import { RolesEnum } from "@/src/enums/roles.enums";
+import { ReviewCard } from "@/components/reviews";
 import { useReviewsStore } from "@/src/store/reviews/reviews.store";
 import { useUserStore } from "@/src/store/user/user.store";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function RecensioniTab() {
   const { user } = useUserStore();
-  const { reviews, getReviews, vigilStats } = useReviewsStore();
-
-  const role = user?.user_metadata?.role;
+  const { reviews, getReviews } = useReviewsStore();
 
   useEffect(() => {
     getReviews(true);
@@ -18,24 +16,32 @@ export default function RecensioniTab() {
   }, []);
 
   return (
-    <div>
-      {role === RolesEnum.VIGIL && vigilStats?.average_rating ? (
+    <div className="space-y-4">
+      {/* {role === RolesEnum.VIGIL &&
+      user?.id &&
+      vigilStats[user.id]?.average_rating ? (
         <Card>
-          <p>Valutazione Media {vigilStats.average_rating}</p>
+          <p>Valutazione Media {vigilStats[user.id].average_rating}</p>
         </Card>
-      ) : null}
-      <Card>
+      ) : null} */}
+
+      <div className="space-y-3">
         {reviews.length ? (
           reviews.map((review) => (
-            <div key={review.id}>
-              <p>{review.comment}</p>
-              <p>Valutazione: {review.rating}</p>
-            </div>
+            <ReviewCard
+              key={review.id}
+              review={review}
+              currentUser={user}
+              isEditable={true}
+              showEditInline={true}
+            />
           ))
         ) : (
-          <p>Nessuna recensione trovata</p>
+          <Card>
+            <p>Nessuna recensione trovata</p>
+          </Card>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
