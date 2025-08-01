@@ -5,6 +5,7 @@ import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
+import { useBookingsStore } from "../store/bookings/bookings.store";
 
 export type UpdateBookingPaymentRequest = {
   payment_id: string;
@@ -65,6 +66,7 @@ export const BookingsService = {
           apiBookings.DETAILS(bookingId),
           { id: bookingId, status }
         )) as { data: BookingI };
+        useBookingsStore.getState().getBookingDetails(bookingId, true);
         resolve(result);
       } catch (error) {
         console.error("BookingsService updateBookingStatus error", error);

@@ -3,10 +3,10 @@ import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useEffect } from "react";
 
 const PrenotazioniConsumerTabs = () => {
-  const { bookings, getBookings, getBookingDetails } = useBookingsStore();
+  const { bookings, getBookings } = useBookingsStore();
 
   useEffect(() => {
-    getBookings();
+    getBookings(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

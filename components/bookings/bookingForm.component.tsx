@@ -60,7 +60,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     showToast,
   } = useAppStore();
   const { closeModal } = useModalStore();
-  const { services, getServiceDetails } = useServicesStore();
+  const { services, getServiceDetails, getServices } = useServicesStore();
   const { user } = useUserStore();
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
@@ -119,7 +119,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       } else {
         setSelectedService(service || null);
       }
+    } else if (!services?.length) {
+      if (watchedServiceId || serviceId) {
+        getServiceDetails((watchedServiceId || serviceId) as string, true);
+      } else {
+        getServices(true, vigilId);
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedServiceId, services?.length]);
 

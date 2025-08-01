@@ -2,7 +2,7 @@ import { BookingCardComponent } from "@/components/bookings";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 export default function TabInattesa() {
-  const { bookings, getBookings, getBookingDetails } = useBookingsStore();
+  const { bookings } = useBookingsStore();
   const pendingBookings = bookings.filter((b) => b.status === "pending");
 
   return (

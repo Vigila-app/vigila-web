@@ -17,6 +17,7 @@ export default function RedirectHandler() {
       switch (user?.user_metadata?.status) {
         case "active":
         default:
+          router.replace(Routes.profileVigil.url);
           break;
         case "pending":
           router.replace(Routes.onBoardVigil.url);
