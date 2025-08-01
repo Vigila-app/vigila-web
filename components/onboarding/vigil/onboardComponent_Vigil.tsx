@@ -12,14 +12,14 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import Checkbox from "@/components/form/checkbox";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AddressI } from "@/src/types/maps.types";
 import clsx from "clsx";
 import Card from "@/components/card/card";
-import ServiceOboard from "./VigilOnbordComp/ServiceOnboard";
+import { ServicesCatalog } from "@/components";
 import { ServiceI } from "@/src/types/services.types";
-import { FormFieldType } from "@/src/constants/form.constants";
 import { XCircleIcon } from "@heroicons/react/24/outline";
+import { AuthService } from "@/src/services";
 
 type OnboardFormI = {
   birthday: string;
@@ -29,9 +29,8 @@ type OnboardFormI = {
   information: string;
   phone: string;
   transportation: string;
-  cap: string;
-  services: ServiceI[]; // Ora è un array di oggetti Service
-  // TODO add other detail fields
+  // cap: string;
+  services: ServiceI[];
 };
 
 const transportationOptions = [
@@ -42,7 +41,12 @@ const transportationOptions = [
 ];
 
 const OnboardComponent = () => {
-  const { showToast } = useAppStore();
+  const {
+    showToast,
+    showLoader,
+    hideLoader,
+    loader: { isLoading },
+  } = useAppStore();
   const { user } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
@@ -53,11 +57,19 @@ const OnboardComponent = () => {
     handleSubmit,
     setValue,
   } = useForm<OnboardFormI>();
+
   const redirectHome = () => {
-    router.replace(Routes.home.url);
+    router.replace(Routes.profileVigil.url);
   };
 
   const [addresses, setAddresses] = useState<AddressI[]>([]);
+
+  const handleServicesChange = useCallback(
+    (services: ServiceI[]) => {
+      setValue("services", services);
+    },
+    [setValue]
+  );
 
   useEffect(() => {
     setValue("addresses", addresses);
@@ -67,59 +79,60 @@ const OnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
+      showLoader();
       const {
         birthday,
         addresses,
         occupation,
         transportation,
-        cap,
         information,
         phone,
         services,
       } = formData;
 
-      {
-        const role = user?.user_metadata?.role as RolesEnum;
+      const caps = Array.from(
+        new Set(addresses.map((addr) => addr.address?.postcode).filter(Boolean))
+      );
 
-        const userId = user?.id;
+      const servicesWithCaps = services.map((service) => ({
+        ...service,
+        postalCode: caps,
+        id: undefined,
+        vigil_id: undefined,
+      }));
 
-        if (!userId || !role) {
-          showToast({
-            message: "Utente non identificato. Fai login e riprova.",
-            type: ToastStatusEnum.ERROR,
-          });
-          return;
-        }
-        await OnboardService.update(userId, {
+      await OnboardService.update(
+        {
           role: RolesEnum.VIGIL,
           data: {
             birthday,
             addresses,
-            cap: [cap],
+            cap: caps as string[],
             occupation,
             transportation,
             information,
             phone,
-            services,
           },
-        });
-        //TODO {qui aggiungi i campi modificati } );
-        showToast({
-          message: "Informazioni registrate con successo",
-          type: ToastStatusEnum.SUCCESS,
-        });
-
-        redirectHome();
-      }
+        },
+        servicesWithCaps as unknown as ServiceI[]
+      );
+      showToast({
+        message: "Profilo aggiornato con successo",
+        type: ToastStatusEnum.SUCCESS,
+      });
+      AuthService.renewAuthentication();
+      redirectHome();
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({
         message: "Sorry, something went wrong",
         type: ToastStatusEnum.ERROR,
       });
+    } finally {
+      hideLoader();
     }
   };
-  console.log(addresses);
+
   return (
     <div className="w-full p-6">
       <Card>
@@ -155,6 +168,7 @@ const OnboardComponent = () => {
                   {...field}
                   label="Data di nascita"
                   type="date"
+                  autoFocus
                   min={
                     new Date(
                       new Date().setFullYear(new Date().getFullYear() - 80)
@@ -214,7 +228,7 @@ const OnboardComponent = () => {
               )}
             />
 
-            <Controller
+            {/* <Controller
               name="cap"
               control={control}
               rules={{ required: true, ...FormFieldType.CAP }}
@@ -231,7 +245,7 @@ const OnboardComponent = () => {
                   aria-invalid={!!errors.cap}
                 />
               )}
-            />
+            /> */}
             {/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
             <Controller
               name="addresses"
@@ -265,7 +279,7 @@ const OnboardComponent = () => {
                         >
                           <span>
                             {(addr?.address
-                              ? `${addr.address.city || addr.address.town || addr.address.village}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode}`
+                              ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
                               : null) || addr.display_name}
                           </span>
                           <button
@@ -348,15 +362,24 @@ const OnboardComponent = () => {
             <Controller
               name="services"
               control={control}
-              render={({}) => <ServiceOboard />}
+              defaultValue={[]}
+              render={({ field }) => (
+                <ServicesCatalog
+                  role={role}
+                  selectedServices={field.value || []}
+                  onServicesChange={handleServicesChange}
+                />
+              )}
             />
 
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-center">
               <Button
                 type="submit"
                 primary
                 role={role}
-                label="Update profile"
+                isLoading={isLoading}
+                disabled={isLoading}
+                label="Completa la registrazione"
               />
             </div>
           </form>

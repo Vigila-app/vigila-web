@@ -18,11 +18,11 @@ const getCmsData = cache(async () => {
 
 export default async function Home() {
   const data = (await getCmsData()) as CmsPageI;
-  const { ["main-hero"]: mainHero } = data;
+  const { ["main-hero"]: mainHero, ["section-cta"]: sectionCta } = data;
   return (
     <>
       <RedirectHandler />
-      <HomeComponent hero={mainHero} />
+      <HomeComponent hero={mainHero} sectionCta={sectionCta} />
     </>
   );
 }

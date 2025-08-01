@@ -14,6 +14,7 @@ import LastUpdate from './lastUpdate/lastUpdate.component';
 import LoaderSpinner from "./loaderSpinner/loaderSpinner";
 import Logo from "./logo/logo";
 import ProgressBar from "./progressBar/progressBar.component";
+import ServicesCatalog from "./services/ServicesCatalog";
 import SimplePage from "./simplePage/simplePage";
 import TabGroup from "./tabGroup/tabGroup";
 import Table from "./table/table.components";
@@ -41,6 +42,7 @@ export {
   LoaderSpinner,
   Logo,
   ProgressBar,
+  ServicesCatalog,
   SimplePage,
   TabGroup,
   Table,

@@ -1,6 +1,11 @@
 import Card from "@/components/card/card";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useUserStore } from "@/src/store/user/user.store";
+import {
+  EnvelopeIcon,
+  MapPinIcon,
+  PhoneIcon,
+} from "@heroicons/react/24/outline";
 
 import { useEffect } from "react";
 
@@ -75,74 +80,17 @@ const PanoramicaConsumerTab = () => {
         </div>
         <div className="space-y-2 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-2">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M13.3333 2.66667H2.66665C1.93027 2.66667 1.33331 3.26363 1.33331 4V12C1.33331 12.7364 1.93027 13.3333 2.66665 13.3333H13.3333C14.0697 13.3333 14.6666 12.7364 14.6666 12V4C14.6666 3.26363 14.0697 2.66667 13.3333 2.66667Z"
-                stroke="#A5A5A5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M14.6666 4.66667L8.68665 8.46667C8.48083 8.59562 8.24286 8.66401 7.99998 8.66401C7.7571 8.66401 7.51913 8.59562 7.31331 8.46667L1.33331 4.66667"
-                stroke="#A5A5A5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <EnvelopeIcon className="size-4" />
             <span>{user?.email}</span>
           </div>
+          {(consumer?.lovedOnePhone || consumer?.phone) && (
+            <div className="flex items-center gap-2">
+              <PhoneIcon className="size-4" />
+              <span>{consumer?.lovedOnePhone || consumer?.phone}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clipPath="url(#clip0_126_1271)">
-                <path
-                  d="M14.6666 11.28V13.28C14.6674 13.4657 14.6294 13.6494 14.555 13.8196C14.4806 13.9897 14.3715 14.1424 14.2347 14.2679C14.0979 14.3934 13.9364 14.489 13.7605 14.5485C13.5846 14.608 13.3982 14.63 13.2133 14.6133C11.1619 14.3904 9.19131 13.6894 7.45998 12.5667C5.84919 11.5431 4.48353 10.1774 3.45998 8.56667C2.33329 6.82747 1.63214 4.84733 1.41331 2.78667C1.39665 2.60231 1.41856 2.41651 1.47764 2.24108C1.53673 2.06566 1.63169 1.90446 1.75649 1.76775C1.88128 1.63103 2.03318 1.5218 2.2025 1.44701C2.37183 1.37222 2.55487 1.33351 2.73998 1.33333H4.73998C5.06351 1.33015 5.37717 1.44472 5.62248 1.65569C5.8678 1.86666 6.02803 2.15963 6.07331 2.48C6.15772 3.12004 6.31428 3.74848 6.53998 4.35333C6.62967 4.59195 6.64908 4.85127 6.59591 5.10059C6.54274 5.3499 6.41922 5.57874 6.23998 5.76L5.39331 6.60667C6.34235 8.2757 7.72428 9.65763 9.39331 10.6067L10.24 9.76C10.4212 9.58076 10.6501 9.45723 10.8994 9.40406C11.1487 9.35089 11.408 9.3703 11.6466 9.46C12.2515 9.6857 12.8799 9.84225 13.52 9.92667C13.8438 9.97235 14.1396 10.1355 14.351 10.385C14.5624 10.6345 14.6748 10.953 14.6666 11.28Z"
-                  stroke="#A5A5A5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_126_1271">
-                  <rect width="16" height="16" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-
-            <span>{consumer?.lovedOnePhone}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M13.3334 6.66666C13.3334 10.6667 8.00002 14.6667 8.00002 14.6667C8.00002 14.6667 2.66669 10.6667 2.66669 6.66666C2.66669 5.25217 3.22859 3.89562 4.22878 2.89543C5.22898 1.89523 6.58553 1.33333 8.00002 1.33333C9.41451 1.33333 10.7711 1.89523 11.7713 2.89543C12.7714 3.89562 13.3334 5.25217 13.3334 6.66666Z"
-                stroke="#A5A5A5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M8 8.66667C9.10457 8.66667 10 7.77124 10 6.66667C10 5.5621 9.10457 4.66667 8 4.66667C6.89543 4.66667 6 5.5621 6 6.66667C6 7.77124 6.89543 8.66667 8 8.66667Z"
-                stroke="#A5A5A5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <MapPinIcon className="size-4" />
             <span>{consumer?.city}</span>
           </div>
         </div>

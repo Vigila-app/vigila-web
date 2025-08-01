@@ -1,5 +1,9 @@
 export type AddressI = {
   city?: string;
+  town?: string;
+  village?: string;
+  suburb?: string;
+  county?: string;
   street?: string;
   state?: string;
   quarter?: string;

@@ -16,8 +16,8 @@ export interface ConsumerFormData {
   lovedOneName: string;
   lovedOneAge: string;
   relationship: string;
-  lovedOneBirthday:string;
-  lovedOnePhone:string;
+  lovedOneBirthday: string;
+  lovedOnePhone: string;
   city: string;
   cap: string;
   information?: string;
@@ -44,7 +44,6 @@ export interface VigilFormData {
   information?: string;
   addresses: AddressI[];
   cap: string[];
-  services:ServiceI[]
 }
 export type RoleBasedFormData =
   | { role: RolesEnum.VIGIL; data: VigilFormData }

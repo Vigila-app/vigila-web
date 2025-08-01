@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
         if (
           key !== "orderBy" &&
           key !== "orderDirection" &&
-          key !== "postalCode"
+          key !== "postalCode" &&
+          key !== "vigil_id"
         ) {
           db_query = db_query.eq(key, filters[key]);
         }
@@ -68,15 +69,18 @@ export async function GET(req: NextRequest) {
       db_query = db_query.eq("active", true);
     }
 
-    if (
-      userObject.user_metadata?.role === RolesEnum.VIGIL &&
-      !filters.vigil_id
-    ) {
+    if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
+    } else if (
+      userObject.user_metadata?.role === RolesEnum.CONSUMER &&
+      filters.vigil_id
+    ) {
+      db_query = db_query.eq("vigil_id", filters.vigil_id);
     }
 
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       db_query = db_query.contains("postalCode", [filters.postalCode]);
+      db_query = db_query.eq("vigil(status)", "active");
     }
 
     if (orderBy) {
@@ -85,7 +89,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    if (from !== undefined && to !== undefined) {
+    if (
+      from !== undefined &&
+      to !== undefined &&
+      from >= 0 &&
+      to > from &&
+      to <= 49
+    ) {
       db_query = db_query.range(from, to);
     }
 

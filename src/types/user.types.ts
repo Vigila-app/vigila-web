@@ -37,12 +37,12 @@ export type UserClaimsType = {
 };
 
 export type UserType = {
-    created_at: string;
+  created_at: string;
   email: string;
   id: string;
   displayName?: string;
   photoURL?: string;
-      phone: string;
+  phone: string;
   user_metadata?: UserMetadata;
 };
 

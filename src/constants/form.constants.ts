@@ -16,6 +16,7 @@ export const RegexType = {
   WEBSITE: new RegExp(
     /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi
   ),
+  CAP: new RegExp(/^[0-9]{5}$/),
 };
 
 const FormAnagraphicBase: FormFieldRegex[string] = {
@@ -55,6 +56,11 @@ export const FormFieldType: FormFieldRegex = {
     min: 0.0,
     max: 9999.99,
     pattern: RegexType.NUMBER,
+  },
+  CAP: {
+    minLength: 5,
+    maxLength: 5,
+    pattern: RegexType.CAP,
   },
   ADDRESS: {
     minLength: 2,

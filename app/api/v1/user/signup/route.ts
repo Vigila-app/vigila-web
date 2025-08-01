@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   // return requestHandler(req);
   try {
     const body: UserSignupType = await req.json();
-    console.log(`API POST user/signup`, {...body, password: "******"});
+    console.log(`API POST user/signup`, { ...body, password: "******" });
 
     const { authToken, user: authUser } = AuthService.getAuthHeaders(
       req.headers
@@ -81,6 +81,12 @@ export async function POST(req: NextRequest) {
         terms,
         role,
         level,
+        status:
+          role === RolesEnum.CONSUMER
+            ? "active"
+            : role === RolesEnum.VIGIL
+              ? "pending"
+              : undefined,
       },
     });
 
@@ -94,13 +100,18 @@ export async function POST(req: NextRequest) {
           role === RolesEnum.CONSUMER
             ? "consumers"
             : role === RolesEnum.VIGIL
-            ? "vigils"
-            : ""
+              ? "vigils"
+              : ""
         )
         .insert({
           id: data.user.id,
           displayName: `${name} ${surname}`,
-          status: "active",
+          status:
+            role === RolesEnum.CONSUMER
+              ? "active"
+              : role === RolesEnum.VIGIL
+                ? "pending"
+                : undefined,
         })
         .select()
         .maybeSingle();

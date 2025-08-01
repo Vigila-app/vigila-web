@@ -26,14 +26,14 @@ import InformazioniConsumerTab from "@/app/(consumer)/tabs/informazionicConsumer
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 
 const ProfileComponent = () => {
   const { user, userDetails, forceUpdate: forceUserUpdate } = useUserStore();
-  const { consumers, getConsumersDetails } = useConsumerStore();
+  const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
   const role = user?.user_metadata?.role as RolesEnum;
-  const created_at = user?.created_at;
   const isConsumer = role === RolesEnum.CONSUMER;
   const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
@@ -125,7 +125,6 @@ const ProfileComponent = () => {
               <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
                 <div className="  flex items-center justify-center">
                   <Avatar
-                    label=""
                     size="big"
                     withUpload
                     onFileUpload={uploadProfilePic}
@@ -142,10 +141,12 @@ const ProfileComponent = () => {
                     </span>
                     <div className="flex flex-col items-center gap-2  mb-3">
                       <span>📍{consumer?.city}</span>
-                      {created_at && (
+                      {user?.created_at && (
                         <span>
-                          🗓️ Su Vigila da:
-                          {dateDisplay(created_at, "date")}
+                          🗓️ Su Vigila da:&nbsp;
+                          <span className="capitalize">
+                            {dateDisplay(user.created_at, "monthYearLiteral")}
+                          </span>
                         </span>
                       )}
                     </div>
@@ -178,27 +179,36 @@ const ProfileComponent = () => {
             <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
               <div className="  flex items-center justify-center">
                 <Avatar
-                  label=""
                   size="big"
                   withUpload
                   onFileUpload={uploadProfilePic}
                   value={userDetails?.displayName}
                 />
               </div>
-              <div className="flex-1  ">
+              <div className="flex-1">
                 <section className="flex flex-col items-center ">
                   <h1 className="text-3xl font-bold mb-2 text-center">
                     {userDetails?.displayName}
-                    {}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
-                  <div className="flex items-center gap-2  mb-3">
-                    <span>📍 TODO localizzazione</span>
-                    {created_at && (
+                  <div className="flex items-center gap-2 mb-3">
+                    {vigil?.addresses?.length ? (
+                      <div className="inline-flex items-center flex-nowrap gap-1">
+                        <MapPinIcon className="size-4" />
+                        <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
+                          {vigil?.addresses?.map((a) => a.name)?.join(", ")}
+                        </span>
+                      </div>
+                    ) : null}
+                    <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24"></span>
+                    {user?.created_at && (
                       <span>
-                        🗓️ Su Vigil da: {dateDisplay(created_at, "date")}
+                        🗓️ Su Vigil da:&nbsp;
+                        <span className="capitalize">
+                          {dateDisplay(user.created_at, "monthYearLiteral")}
+                        </span>
                       </span>
                     )}
                   </div>

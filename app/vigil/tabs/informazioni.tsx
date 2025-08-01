@@ -12,7 +12,6 @@ import { Controller, useForm } from "react-hook-form";
 const InformazioniTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
-  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const email: string = user?.email || "";
   const birthday: string = user?.user_metadata?.birthday;
   const phone: string = user?.user_metadata?.phone;
