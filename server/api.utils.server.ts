@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { ErrorI } from "@/src/types/error.types";
 import { NextURL } from "next/dist/server/web/next-url";
 import Stripe from "stripe";
+import { PaginationI } from "@/src/types/app.types";
 
 // Inizializzazione Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -99,7 +100,7 @@ export const getPagination = (
   nextUrl: NextURL,
   pageSize?: number,
   limit = 25
-): { from: number; to: number; page: number; itemPerPage: number } => {
+): PaginationI => {
   const page = parseInt(nextUrl?.searchParams?.get("page") || "") || 1;
   const itemPerPage = Math.min(
     pageSize || parseInt(nextUrl?.searchParams?.get("pageSize") || "") || 10,

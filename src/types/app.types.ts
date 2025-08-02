@@ -6,6 +6,14 @@ export type LoaderI = {
   isLoading: boolean;
 };
 
+export type PaginationI = {
+  from: number;
+  to: number;
+  page: number;
+  itemPerPage: number;
+  count?: number;
+};
+
 export type AppStoreType = {
   onLogout: () => void;
 
