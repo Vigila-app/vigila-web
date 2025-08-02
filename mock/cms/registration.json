@@ -1,20 +1,24 @@
 {
-    "form": {
-        "title": "Sign up",
-        "text": "Insert the requested data to create a new account",
-        "fields": [
-            {
-                "id": "marketing-1",
-                "label": "I agree to receive notification about events, product updates and company announcements.",
-                "required": true,
-                "type": "term"
-            },
-            {
-                "id": "marketing-2",
-                "label": "I agree to share my data with 3rd parties partners to gain more advantages.",
-                "required": false,
-                "type": "term"
-            }
-        ]
-    }
+  "main": {
+    "title": "Unisciti a Vigila!",
+    "text": "Crea il tuo account ed inizia subito"
+  },
+  "form": {
+    "title": "Unisciti a Vigila!",
+    "text": "Crea il tuo account ed inizia subito",
+    "fields": [
+      {
+        "id": "marketing-1",
+        "label": "Accetto di ricevere notifiche su eventi, aggiornamenti dei prodotti e annunci aziendali.",
+        "required": false,
+        "type": "term"
+      },
+      {
+        "id": "marketing-2",
+        "label": "Accetto di condividere i miei dati con partner di terze parti per ottenere maggiori vantaggi.",
+        "required": false,
+        "type": "term"
+      }
+    ]
+  }
 }

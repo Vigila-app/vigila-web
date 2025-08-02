@@ -3,6 +3,7 @@ import Avatar from "./avatar/avatar";
 import Badge from "./badge/badge.component";
 import Button from "./button/button";
 import ButtonLink from "./button/buttonLink";
+import Card from "./card/card";
 import Divider from "./divider/divider";
 import FloatingBanner from "./floatingBanner/floatingBanner";
 import Footer from "./footer/footer";
@@ -13,6 +14,7 @@ import LastUpdate from './lastUpdate/lastUpdate.component';
 import LoaderSpinner from "./loaderSpinner/loaderSpinner";
 import Logo from "./logo/logo";
 import ProgressBar from "./progressBar/progressBar.component";
+import ServicesCatalog from "./services/ServicesCatalog";
 import SimplePage from "./simplePage/simplePage";
 import TabGroup from "./tabGroup/tabGroup";
 import Table from "./table/table.components";
@@ -29,6 +31,7 @@ export {
   Badge,
   Button,
   ButtonLink,
+  Card,
   Divider,
   FloatingBanner,
   Footer,
@@ -39,6 +42,7 @@ export {
   LoaderSpinner,
   Logo,
   ProgressBar,
+  ServicesCatalog,
   SimplePage,
   TabGroup,
   Table,

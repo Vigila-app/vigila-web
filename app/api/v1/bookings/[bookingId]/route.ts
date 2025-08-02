@@ -148,7 +148,14 @@ export async function GET(
     const _admin = getAdminClient();
     const { data: booking, error } = await _admin
       .from("bookings")
-      .select("*")
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `
+      )
       .eq("id", bookingId)
       .single<BookingI>();
 
@@ -284,7 +291,14 @@ export async function PUT(
         updated_at: getPostgresTimestamp(),
       })
       .eq("id", updatedBooking.id)
-      .select("*")
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `
+      )
       .single<BookingI>();
 
     if (error || !data) throw error;

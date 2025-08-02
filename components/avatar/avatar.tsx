@@ -66,6 +66,7 @@ type AvatarI = {
   ) => void;
   value?: string;
   userId?:string;
+  className?: string;
 };
 
 const AvatarSize = {
@@ -85,6 +86,7 @@ const Avatar = (props: AvatarI) => {
     onFileUpload,
     value,
     userId,
+    className,
   } = props;
   const { user, lastUpdate: lastUserUpdate } = useUserStore();
   const [profilePic, setProfilePic] = useState<string | undefined>();
@@ -115,7 +117,8 @@ const Avatar = (props: AvatarI) => {
     <div
       className={clsx(
         "relative items-center",
-        inline ? "inline-flex gap-1" : "flex flex-col gap-1"
+        inline ? "inline-flex gap-1" : "flex flex-col gap-1",
+        className
       )}
     >
       {imgUrl || profilePic ? (

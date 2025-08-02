@@ -16,7 +16,12 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, ["page", "pageSize", "vigil_id"]);
+    const filters = getQueryParams(url, [
+      "page",
+      "pageSize",
+      "vigil_id",
+      "active",
+    ]);
     const { orderBy = "created_at", orderDirection = "DESC" } = filters;
 
     console.log(`API GET services`, filters, pagination);
@@ -42,7 +47,7 @@ export async function GET(req: NextRequest) {
     let db_query = _admin.from("services").select(
       `
         *,
-        vigil:vigils(displayName)
+        vigil:vigils(*)
       `,
       { count: "exact" }
     );
@@ -52,22 +57,30 @@ export async function GET(req: NextRequest) {
         if (
           key !== "orderBy" &&
           key !== "orderDirection" &&
-          key !== "postalCode"
+          key !== "postalCode" &&
+          key !== "vigil_id"
         ) {
           db_query = db_query.eq(key, filters[key]);
         }
       });
     }
 
-    if (
-      userObject.user_metadata?.role === RolesEnum.VIGIL &&
-      !filters.vigil_id
-    ) {
+    if (filters.active === undefined) {
+      db_query = db_query.eq("active", true);
+    }
+
+    if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
+    } else if (
+      userObject.user_metadata?.role === RolesEnum.CONSUMER &&
+      filters.vigil_id
+    ) {
+      db_query = db_query.eq("vigil_id", filters.vigil_id);
     }
 
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       db_query = db_query.contains("postalCode", [filters.postalCode]);
+      db_query = db_query.eq("vigils.status", "active");
     }
 
     if (orderBy) {
@@ -76,7 +89,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    if (from !== undefined && to !== undefined) {
+    if (
+      from !== undefined &&
+      to !== undefined &&
+      from >= 0 &&
+      to > from &&
+      to <= 49
+    ) {
       db_query = db_query.range(from, to);
     }
 

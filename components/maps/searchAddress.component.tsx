@@ -2,13 +2,13 @@
 
 import { FormFieldType } from "@/src/constants/form.constants";
 import { MapsService } from "@/src/services";
-import { debounce } from "@/src/utils/common.utils";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useDebouncedSearch } from "@/src/hooks/useDebouncedSearch";
 import { useEffect, useState } from "react";
-import { Controller, set, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
 import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type SearchMapFormI = {
   search: string;
@@ -19,6 +19,7 @@ const SearchAddress = (props: {
   onChange?: (search?: string) => void;
   minLength?: number;
   label?: string;
+  role?: RolesEnum;
   location?: boolean;
   placeholder?: string;
 }) => {
@@ -26,10 +27,18 @@ const SearchAddress = (props: {
     onSubmit: eOnSubmit,
     onChange,
     minLength = 3,
-    label = "Search Address",
+    label,
     location = false,
-    placeholder = "Inserisci città",
+    role,
+    placeholder = "Inserisci CAP",
   } = props;
+
+  const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
+    "",
+    500,
+    "searchAddress"
+  );
+
   const { currentLocation } = useCurrentLocation({
     onRender: location,
   });
@@ -41,7 +50,6 @@ const SearchAddress = (props: {
     control,
     formState: { errors, isValid },
     handleSubmit,
-    watch,
     setValue,
   } = useForm<SearchMapFormI>();
 
@@ -94,7 +102,9 @@ const SearchAddress = (props: {
         q: `${locationAddress.lat}, ${locationAddress.lon}`,
       });
       if (address) {
-        setValue("search", address.display_name || address.city || "");
+        const displayName = address.display_name || address.city || "";
+        setValue("search", displayName);
+        setSearchTerm(displayName); // Sincronizza con il nostro hook
         return address;
       } else {
         throw new Error("Address not found for the given coordinates");
@@ -107,15 +117,18 @@ const SearchAddress = (props: {
 
   const autocompleteAdress = async () => {
     try {
-      if (watch().search?.length >= minLength) {
+      if (debouncedSearchTerm?.length >= minLength) {
         setIsLoading(true);
-        const results = await MapsService.autocompleteAddress(watch().search);
+        const results =
+          await MapsService.autocompleteAddress(debouncedSearchTerm);
         setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
         } else if (results.length === 1) {
           const address = results[0];
-          setValue("search", address.display_name || address.city || "");
+          const displayName = address.display_name || address.city || "";
+          setValue("search", displayName);
+          setSearchTerm(displayName);
           submit(address);
           setSubmitted(false);
         }
@@ -139,15 +152,15 @@ const SearchAddress = (props: {
 
   useEffect(() => {
     setSubmitted(false);
-    debounce(autocompleteAdress);
+    autocompleteAdress();
     setAutocompleteResults([]);
-    onChange?.(watch()?.search);
+    onChange?.(debouncedSearchTerm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch()?.search]);
+  }, [debouncedSearchTerm]);
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="my-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="my-1">
         <Controller
           name="search"
           control={control}
@@ -155,31 +168,39 @@ const SearchAddress = (props: {
           render={({ field }) => (
             <Input
               {...field}
+              onChange={(value) => {
+                field.onChange(value);
+                setSearchTerm(value as string);
+              }}
+              value={searchTerm}
               autoFocus
               label={label}
               placeholder={placeholder}
               type="text"
               required
+              role={role}
               isLoading={isLoading}
               aria-invalid={!!errors.search}
               error={errors.search}
-              icon={<MagnifyingGlassIcon className="size-4 text-gray-500" />}
             />
           )}
         />
       </form>
       {!submitted && autocompleteResults?.length > 1 ? (
         <div>
-          <ul className="list-disc pl-5">
+          <ul>
             {autocompleteResults.map((result, index) => (
-              <li key={index} className="my-2">
+              <li key={index} className="my-2 ">
                 <button
                   onClick={() => {
-                    setValue("search", result.display_name || result.name);
+                    const displayName =
+                      result.display_name || result.name || "";
+                    setValue("search", displayName);
+                    setSearchTerm(displayName);
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  "
                 >
                   {result.display_name}
                 </button>

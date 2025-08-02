@@ -1,11 +1,17 @@
 export type AddressI = {
   city?: string;
+  town?: string;
+  village?: string;
+  suburb?: string;
+  county?: string;
   street?: string;
   state?: string;
+  quarter?: string;
   country?: string;
   postCode?: string;
-  postcode?: string;
   postalCode?: string;
+  postcode?: string;
+  cap?: string;
   intercom?: string;
   note?: string;
   lat?: string | number;
@@ -14,4 +20,5 @@ export type AddressI = {
   q?:string
   display_name?: string;
   address?: AddressI;
+  name?: string;
 };

@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import { ReviewsService } from "@/src/services";
-import { ReviewI, ReviewFormI, ReviewStatsI, ReviewStoreType } from "@/src/types/review.types";
+import { ReviewFormI, ReviewStoreType } from "@/src/types/review.types";
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
 
 const initReviewsStore: {
   reviews: ReviewStoreType["reviews"];
@@ -18,6 +19,9 @@ const initReviewsStore: {
   lastUpdate: undefined,
 };
 
+// Crea il debouncer per lo store delle recensioni
+const { createDebouncedAction } = createStoreDebouncer('reviews-store');
+
 export const useReviewsStore = create<ReviewStoreType>()(
   devtools(
     persist(
@@ -25,93 +29,105 @@ export const useReviewsStore = create<ReviewStoreType>()(
         ...initReviewsStore,
 
         getReviews: async (force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              const response = await ReviewsService.getReviews();
-              if (response) {
-                set(
-                  () => ({
-                    reviews: response,
-                    lastUpdate: new Date(),
-                  }),
-                  false,
-                  { type: "getReviews" }
-                );
+          const action = async () => {
+            try {
+              const lastUpdate = get().lastUpdate;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                const response = await ReviewsService.getReviews();
+                if (response) {
+                  set(
+                    () => ({
+                      reviews: response,
+                      lastUpdate: new Date(),
+                    }),
+                    false,
+                    { type: "getReviews" }
+                  );
+                }
+                return response;
               }
-              return response;
+              return get().reviews;
+            } catch (error) {
+              console.error("useReviewsStore getReviews error:", error);
+              throw error;
             }
-            return get().reviews;
-          } catch (error) {
-            console.error("useReviewsStore getReviews error:", error);
-            throw error;
-          }
+          };
+
+          return createDebouncedAction('getReviews', action, force);
         },
 
         getReviewsByVigil: async (vigilId: string, force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              const response = await ReviewsService.getReviewsByVigil(vigilId);
-              if (response) {
-                // Update only the reviews for this vigil
-                const otherReviews = get().reviews.filter(r => r.vigil_id !== vigilId);
-                set(
-                  () => ({
-                    reviews: [...otherReviews, ...response],
-                    lastUpdate: new Date(),
-                  }),
-                  false,
-                  { type: "getReviewsByVigil", vigilId }
-                );
+          const action = async () => {
+            try {
+              const lastUpdate = get().lastUpdate;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                const response = await ReviewsService.getReviewsByVigil(vigilId);
+                if (response) {
+                  // Update only the reviews for this vigil
+                  const otherReviews = get().reviews.filter(r => r.vigil_id !== vigilId);
+                  set(
+                    () => ({
+                      reviews: [...otherReviews, ...response],
+                      lastUpdate: new Date(),
+                    }),
+                    false,
+                    { type: "getReviewsByVigil", vigilId }
+                  );
+                }
+                return response;
               }
-              return response;
+              return get().reviews.filter(r => r.vigil_id === vigilId);
+            } catch (error) {
+              console.error("useReviewsStore getReviewsByVigil error:", error);
+              throw error;
             }
-            return get().reviews.filter(r => r.vigil_id === vigilId);
-          } catch (error) {
-            console.error("useReviewsStore getReviewsByVigil error:", error);
-            throw error;
-          }
+          };
+
+          return createDebouncedAction('getReviewsByVigil', action, force, vigilId);
         },
 
         getVigilStats: async (vigilId: string, force: boolean = false) => {
-          try {
-            const existingStats = get().vigilStats[vigilId];
-            if (
-              force ||
-              !existingStats ||
-              !get().lastUpdate ||
-              dateDiff(new Date(), get().lastUpdate!, FrequencyEnum.MINUTES) > 5
-            ) {
-              const response = await ReviewsService.getVigilStats(vigilId);
-              if (response) {
-                set(
-                  (state) => ({
-                    vigilStats: {
-                      ...state.vigilStats,
-                      [vigilId]: response,
-                    },
-                    lastUpdate: new Date(),
-                  }),
-                  false,
-                  { type: "getVigilStats", vigilId }
-                );
+          const action = async () => {
+            try {
+              const existingStats = get().vigilStats[vigilId];
+              if (
+                force ||
+                !existingStats ||
+                !get().lastUpdate ||
+                dateDiff(new Date(), get().lastUpdate!, FrequencyEnum.MINUTES) > 5
+              ) {
+                const response = await ReviewsService.getVigilStats(vigilId);
+                if (response) {
+                  set(
+                    (state) => ({
+                      vigilStats: {
+                        ...state.vigilStats,
+                        [vigilId]: response,
+                      },
+                      lastUpdate: new Date(),
+                    }),
+                    false,
+                    { type: "getVigilStats", vigilId }
+                  );
+                }
+                return response;
               }
-              return response;
+              return existingStats;
+            } catch (error) {
+              console.error("useReviewsStore getVigilStats error:", error);
+              throw error;
             }
-            return existingStats;
-          } catch (error) {
-            console.error("useReviewsStore getVigilStats error:", error);
-            throw error;
-          }
+          };
+
+          return createDebouncedAction('getVigilStats', action, force, vigilId);
         },
 
         getReviewByBooking: async (bookingId: string) => {

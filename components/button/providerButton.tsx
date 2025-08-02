@@ -18,6 +18,7 @@ type ProviderButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isLoading?: boolean;
   full?: boolean;
   provider: ProviderEnum;
+  customClass?: string;
 };
 
 const ProviderButton = (props: ProviderButtonI) => {
@@ -27,6 +28,7 @@ const ProviderButton = (props: ProviderButtonI) => {
     isLoading = false,
     full = false,
     provider,
+    customClass,
   } = props;
 
   const isDisabled = isLoading || props.disabled;
@@ -41,7 +43,8 @@ const ProviderButton = (props: ProviderButtonI) => {
         baseBtnStyle,
         isDisabled && disabledBtnStyle,
         isLoading && loadingBtnStyle,
-        full && fullBtnStyle
+        full && fullBtnStyle,
+        customClass,
       )}
       {...{
         ...props,

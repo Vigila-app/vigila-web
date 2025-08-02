@@ -1,12 +1,14 @@
+export type CmsPageCtaI = {
+    label?: string;
+    url?: string;
+    type?: string;
+  }
+
 export type CmsPageHeroI = {
   title?: string;
   subtitle?: string;
   payoff?: string;
-  cta?: {
-    label?: string;
-    url?: string;
-    type?: string;
-  }[];
+  cta?: CmsPageCtaI[];
 };
 
 export type CmsPageFormI = {
@@ -26,5 +28,8 @@ export type CmsPageI = {
   text?: string;
   "main-hero"?: CmsPageHeroI;
   html?: string;
+  main?: CmsPageI;
   form?: CmsPageFormI;
+  cta?: CmsPageCtaI[];
+  "section-cta"?: CmsPageI;
 };

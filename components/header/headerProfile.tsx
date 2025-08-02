@@ -41,7 +41,7 @@ const HeaderProfile = () => {
           {userDetails?.role !== RolesEnum.ADMIN ? (
             <Avatar
               inline
-              label={userDetails?.displayName || Routes.profile.label}
+              label={userDetails?.displayName || Routes.profileConsumer.label}
               value={userDetails?.displayName || ""}
             />
           ) : (

@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { FormFieldType } from "@/src/constants/form.constants";
 import { Input, Select, TextArea, Toggle } from "@/components/form";
 import { Button, Tooltip } from "@/components";
-import { CurrencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { ServiceI } from "@/src/types/services.types";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { ServicesService } from "@/src/services";
@@ -59,6 +59,16 @@ const ServiceFormComponent = (props: ServiceFormI) => {
       if (isValid) {
         showLoader();
         const newService = await ServicesUtils.createNewService(formData);
+        if (isModal) {
+          onSubmit?.(newService);
+          showToast({
+            message: "Servizio aggiunto alla lista temporanea!",
+            type: ToastStatusEnum.SUCCESS,
+          });
+          reset();
+          closeModal();
+          return;
+        }
         let result: ServiceI;
         if (service?.id) {
           // Edit service
@@ -89,14 +99,12 @@ const ServiceFormComponent = (props: ServiceFormI) => {
   return (
     <div
       className={clsx(
-        "bg-white w-full mx-auto rounded-lg",
+        "bg-white w-full mx-auto rounded-lg p-4 mt-2",
         isModal ? "!p-0 mb-0" : /*"shadow-lg"*/ ""
-      )}
-    >
+      )}>
       <form
         onSubmit={handleSubmit(handleOnSubmit)}
-        className="space-y-6 text-black"
-      >
+        className="space-y-6 text-black">
         {title || text ? (
           <div>
             {title ? (
@@ -118,6 +126,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               label="Nome"
               placeholder="Nome del servizio"
               type="text"
+              role={RolesEnum.VIGIL}
               required
               aria-invalid={!!errors.name}
               error={errors.name}
@@ -133,6 +142,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
             <TextArea
               {...field}
               label="Descrizione"
+              role={RolesEnum.VIGIL}
               placeholder="Descrivi il servizio che vuoi offrire"
               aria-invalid={!!errors.description}
               error={errors.description}
@@ -152,7 +162,8 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               placeholder="Inserisci il prezzo unitario"
               type="number"
               required
-              step=".01"
+              role={RolesEnum.VIGIL}
+              step=".5"
               aria-invalid={!!errors.unit_price}
               error={errors.unit_price}
               onChange={(v) => field.onChange(Number(v))}
@@ -170,11 +181,12 @@ const ServiceFormComponent = (props: ServiceFormI) => {
               label="Unità"
               placeholder="Seleziona unità"
               required
+              role={RolesEnum.VIGIL}
               error={errors.unit_type}
               options={[
-                { label: "Minuti", value: "minutes" },
-                { label: "Ore", value: "hours" },
-                { label: "Giorni", value: "days" },
+                { label: "Minuti", value: FrequencyEnum.MINUTES },
+                { label: "Ore", value: FrequencyEnum.HOURS },
+                { label: "Giorni", value: FrequencyEnum.DAYS },
               ]}
             />
           )}
@@ -196,6 +208,7 @@ const ServiceFormComponent = (props: ServiceFormI) => {
                   {...field}
                   label="Active"
                   withIcon
+                  role={RolesEnum.VIGIL}
                   aria-invalid={!!errors.active}
                   value="active"
                   checked={field.value}

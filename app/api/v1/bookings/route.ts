@@ -13,6 +13,7 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
+import { FrequencyEnum } from "@/src/enums/common.enums";
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,7 +34,15 @@ export async function GET(req: NextRequest) {
       });
 
     const _admin = getAdminClient();
-    let db_query = _admin.from("bookings").select("*", { count: "exact" });
+    let db_query = _admin.from("bookings").select(
+      `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `,
+      { count: "exact" }
+    );
 
     // Filter based on user role
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
@@ -137,11 +146,11 @@ export async function POST(req: NextRequest) {
         body.endDate ||
         new Date(
           new Date(body.startDate).getTime() +
-            (service.unit_type === "hours"
+            (service.unit_type === FrequencyEnum.HOURS
               ? body.quantity * (60000 * 60)
-              : service.unit_type === "days"
-                ? body.quantity * (60000 * 60 * 60)
-                : body.quantity * 60000)
+              : service.unit_type === FrequencyEnum.DAYS
+              ? body.quantity * (60000 * 60 * 60)
+              : body.quantity * 60000)
         ),
       consumer_id: userObject.id,
       vigil_id: service.vigil_id,

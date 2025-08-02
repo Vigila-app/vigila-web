@@ -1,11 +1,19 @@
 {
-    "main-hero": {
-        "title": "Un ponte tra generazioni",
-        "subtitle": "L'assistenza del tuo quartiere a portata di click ",
-        "payoff": "Con Vigila trovi in pochi secondi un Vigil di fiducia, proprio nella tua zona",
-        "cta": [{
-            "label": "Get Started",
-            "url": "/wall"
-        }]
-    }
+  "main-hero": {
+    "title": "Un ponte tra generazioni",
+    "subtitle": "L'assistenza del tuo quartiere a portata di click ",
+    "payoff": "Con Vigila trovi in pochi secondi un Vigil di fiducia, proprio nella tua zona"
+  },
+  "section-cta": {
+    "cta": [
+      {
+        "label": "Trova un Vigil vicino a te",
+        "url": "/auth/registration/consumer"
+      },
+      {
+        "label": "Diventa un Vigil",
+        "url": "/auth/registration/vigil"
+      }
+    ]
+  }
 }

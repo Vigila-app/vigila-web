@@ -8,28 +8,29 @@ import { CurrencyEnum } from "@/src/enums/common.enums";
 import { BookingUtils } from "@/src/utils/booking.utils";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { Badge } from "@/components";
+import { useDebouncedSearch, createTextFilter } from "@/src/hooks/useDebouncedSearch";
 
 export default function AdminBookingsPage() {
   const { bookings, bookingsLoading, getBookings, updateBookingStatus } =
     useAdminStore();
 
   const [filter, setFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch('', 300, 'adminBookings');
 
   useEffect(() => {
     const filters = filter !== "all" ? { status: filter } : undefined;
     getBookings(filters);
   }, [filter, getBookings]);
 
-  const filteredBookings = bookings.filter(
-    (booking) =>
-      booking.consumers?.displayName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      booking.vigils?.displayName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      booking.services?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Crea il filtro di testo per la ricerca
+  const textFilter = createTextFilter(debouncedSearchTerm);
+
+  const filteredBookings = bookings.filter(booking =>
+    textFilter(booking, [
+      'consumers.displayName',
+      'vigils.displayName', 
+      'services.name'
+    ])
   );
 
   const handleStatusUpdate = async (bookingId: string, newStatus: string) => {

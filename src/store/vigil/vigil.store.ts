@@ -1,9 +1,10 @@
 import { apiVigil } from "@/src/constants/api.constants";
 import { FrequencyEnum } from "@/src/enums/common.enums";
-import { ApiService, UserService } from "@/src/services";
+import { ApiService } from "@/src/services";
 import { VigilDetailsType, ViglStoreType } from "@/src/types/vigil.types";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
+import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
@@ -15,13 +16,16 @@ const initVigilStore: {
   vigils: [],
 };
 
+// Crea il debouncer per lo store dei vigil
+const { createDebouncedAction } = createStoreDebouncer('vigil-store');
+
 export const useVigilStore = create<ViglStoreType>()(
   devtools(
     persist(
       (set, get) => ({
         ...initVigilStore,
-        getVigilsDetails: async (vigils, force = false) =>
-          new Promise(async (resolve, reject) => {
+        getVigilsDetails: async (vigils: string[], force = false) => {
+          const action = async () => {
             try {
               const getVigilsDetailsBE = async () => {
                 try {
@@ -43,23 +47,25 @@ export const useVigilStore = create<ViglStoreType>()(
                       )
                     );
                   if (!promises?.length) {
-                    throw new Error("No vigils to fetch details for");
+                    return get().vigils.filter(v => vigils.includes(v.id));
                   }
                   const vigilsDetailsStoreBE = await Promise.all(promises);
                   if (!vigilsDetailsStoreBE?.length) {
                     throw new Error("No vigils details found");
                   } else {
+                    const newVigils = vigilsDetailsStoreBE
+                      .filter(
+                        (item): item is { data: VigilDetailsType } =>
+                          item !== undefined
+                      )
+                      .map(({ data }) => data);
+                    
                     set(
                       () => ({
                         vigils: Array.from(
                           new Set([
                             ...get().vigils,
-                            ...vigilsDetailsStoreBE
-                              .filter(
-                                (item): item is { data: VigilDetailsType } =>
-                                  item !== undefined
-                              )
-                              .map(({ data }) => data),
+                            ...newVigils,
                           ])
                         ),
                         lastUpdate: new Date(),
@@ -67,30 +73,23 @@ export const useVigilStore = create<ViglStoreType>()(
                       false,
                       { type: "getVigilsDetails" }
                     );
-                    resolve(
-                      vigilsDetailsStoreBE
-                        .filter(
-                          (item): item is { data: VigilDetailsType } =>
-                            item !== undefined
-                        )
-                        .map(({ data }) => data)
-                    );
+                    return newVigils;
                   }
                 } catch (error) {
-                  reject(error);
+                  throw error;
                 }
               };
-              // TODO retrieve vigils details from BE
-              const vigilsDetailsStoreBE =
-                (await getVigilsDetailsBE()) as unknown as VigilDetailsType[];
-              if (vigilsDetailsStoreBE) {
-                resolve(vigilsDetailsStoreBE);
-              }
-              reject();
+              
+              return await getVigilsDetailsBE();
             } catch (error) {
-              reject(error);
+              console.error("useVigilStore getVigilsDetails error:", error);
+              throw error;
             }
-          }),
+          };
+
+          const uniqueKey = vigils.sort().join(',');
+          return createDebouncedAction('getVigilsDetails', action, force, uniqueKey);
+        },
         onLogout: () => {
           set(initVigilStore, false, { type: "onLogout" });
         },

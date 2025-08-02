@@ -15,10 +15,11 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   customClass?: string;
   danger?: boolean;
   icon?: React.ReactNode;
-  label: string;
+  label: string | React.ReactNode;
   primary?: boolean;
   secondary?: boolean;
-
+  small?: boolean;
+  tab?: boolean;
   text?: boolean;
   isLoading?: boolean;
   full?: boolean;
@@ -34,27 +35,13 @@ const Button = (props: ButtonI) => {
     primary = true,
     secondary = false,
     role,
+    small = false,
+    tab = false,
     text = false,
     danger = false,
     isLoading = false,
     full = false,
   } = props;
-
-  // const btnClass = `${ButtonStyle.baseBtnStyle} ${
-  //   danger
-  //     ? ButtonStyle.dangerBtnStyle
-  //     : vigil
-  //     ? ButtonStyle.vigilBtnStyle
-  //     : consumer
-  //     ? ButtonStyle.consumerBtnStyle
-  //     : text
-  //     ? ButtonStyle.textBtnStyle
-  //     : secondary
-  //     ? ButtonStyle.secondaryBtnStyle
-  //     : primary
-  //     ? ButtonStyle.primaryBtnStyle
-  //     : ""
-  // }`;
 
   const btnClass = clsx(
     ButtonStyle.baseBtnStyle,
@@ -64,6 +51,8 @@ const Button = (props: ButtonI) => {
       ? ButtonStyle.textBtnStyle
       : secondary
       ? ButtonStyle.secondaryBtnStyle
+      : tab
+      ? ButtonStyle.tabBtnStyle
       : primary
       ? ButtonStyle.primaryBtnStyle
       : "",
@@ -76,6 +65,7 @@ const Button = (props: ButtonI) => {
     <button
       className={clsx(
         btnClass,
+        small && ButtonStyle.smallBtnStyle,
         isDisabled && ButtonStyle.disabledBtnStyle,
         isLoading && ButtonStyle.loadingBtnStyle,
         full && ButtonStyle.fullBtnStyle,
@@ -90,7 +80,9 @@ const Button = (props: ButtonI) => {
         secondary: undefined,
         danger: undefined,
         text: undefined,
+        tab: undefined,
         icon: undefined,
+        small: undefined,
         isLoading: undefined,
         full: undefined,
       }}

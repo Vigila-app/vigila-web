@@ -4,6 +4,7 @@ import { BookingI, BookingStoreType, BookingFormI } from "@/src/types/booking.ty
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
+import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
 import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
@@ -15,6 +16,9 @@ const initBookingsStore: {
   lastUpdate: undefined,
 };
 
+// Creazione del debouncer per lo store bookings
+const { createDebouncedAction } = createStoreDebouncer('bookings', 300);
+
 export const useBookingsStore = create<BookingStoreType>()(
   devtools(
     persist(
@@ -22,94 +26,98 @@ export const useBookingsStore = create<BookingStoreType>()(
         ...initBookingsStore,
         
         getBookings: async (force: boolean = false) => {
-          try {
-            const lastUpdate = get().lastUpdate;
-            if (
-              force ||
-              !lastUpdate ||
-              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
-            ) {
-              const response = await BookingsService.getBookings();
-              if (response) {
-                set(
-                  () => ({
-                    bookings: response,
-                    lastUpdate: new Date(),
-                  }),
-                  false,
-                  { type: "getBookings" }
-                );
+          return createDebouncedAction('getBookings', async () => {
+            try {
+              const lastUpdate = get().lastUpdate;
+              if (
+                force ||
+                !lastUpdate ||
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+              ) {
+                const response = await BookingsService.getBookings();
+                if (response) {
+                  set(
+                    () => ({
+                      bookings: response,
+                      lastUpdate: new Date(),
+                    }),
+                    false,
+                    { type: "getBookings" }
+                  );
+                }
               }
+            } catch (error) {
+              console.error("useBookingsStore getBookings error:", error);
             }
-          } catch (error) {
-            console.error("useBookingsStore getBookings error:", error);
-          }
+          }, force);
         },
 
         getBookingDetails: async (bookingId: BookingI["id"], force = false) =>
           new Promise<BookingI>(async (resolve, reject) => {
-            try {
-              const getBookingDetailsBE = async () => {
-                try {
-                  const bookingStoreBE = await BookingsService.getBookingDetails(bookingId);
-                  if (get().bookings.some((b) => b.id === bookingStoreBE.id)) {
-                    set(
-                      () => ({
-                        bookings: get().bookings.map((booking) => {
-                          if (booking.id === bookingId) {
-                            return bookingStoreBE;
-                          }
-                          return booking;
+            return createDebouncedAction('getBookingDetails', async () => {
+              try {
+                const getBookingDetailsBE = async () => {
+                  try {
+                    const bookingStoreBE = await BookingsService.getBookingDetails(bookingId);
+                    if (get().bookings.some((b) => b.id === bookingStoreBE.id)) {
+                      set(
+                        () => ({
+                          bookings: get().bookings.map((booking) => {
+                            if (booking.id === bookingId) {
+                              return bookingStoreBE;
+                            }
+                            return booking;
+                          }),
+                          lastUpdate: new Date(),
                         }),
-                        lastUpdate: new Date(),
-                      }),
-                      false,
-                      { type: "getBookingDetails", bookingId }
-                    );
-                  } else {
-                    set(
-                      () => ({
-                        bookings: [...get().bookings, bookingStoreBE],
-                        lastUpdate: new Date(),
-                      }),
-                      false,
-                      { type: "getBookingDetails", bookingId }
-                    );
+                        false,
+                        { type: "getBookingDetails", bookingId }
+                      );
+                    } else {
+                      set(
+                        () => ({
+                          bookings: [...get().bookings, bookingStoreBE],
+                          lastUpdate: new Date(),
+                        }),
+                        false,
+                        { type: "getBookingDetails", bookingId }
+                      );
+                    }
+                    resolve(bookingStoreBE);
+                  } catch (error) {
+                    reject(error);
                   }
-                  resolve(bookingStoreBE);
-                } catch (error) {
-                  reject(error);
-                }
-              };
+                };
 
-              if (
-                force ||
-                !get().lastUpdate ||
-                dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
-              ) {
-                const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
-                if (bookingStoreBE?.id) {
-                  resolve(bookingStoreBE);
-                }
-                reject();
-              } else {
-                const bookingStore = get().bookings.find(
-                  (booking) => booking.id === bookingId
-                );
-                if (bookingStore?.id) {
-                  resolve(bookingStore);
-                } else {
+                if (
+                  force ||
+                  !get().lastUpdate ||
+                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
+                ) {
                   const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
                   if (bookingStoreBE?.id) {
                     resolve(bookingStoreBE);
                   }
                   reject();
+                } else {
+                  const bookingStore = get().bookings.find(
+                    (booking) => booking.id === bookingId
+                  );
+                  if (bookingStore?.id) {
+                    resolve(bookingStore);
+                  } else {
+                    const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
+                    if (bookingStoreBE?.id) {
+                      resolve(bookingStoreBE);
+                    }
+                    reject();
+                  }
                 }
+              } catch (error) {
+                console.error("useBookingsStore getBookingDetails error:", error);
+                reject(error);
               }
-            } catch (error) {
-              console.error("useBookingsStore getBookingDetails error:", error);
-              reject(error);
-            }
+            }, force, bookingId).catch(reject);
           }),
 
         createBooking: async (booking: BookingFormI) =>

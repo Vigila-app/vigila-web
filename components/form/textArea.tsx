@@ -23,56 +23,61 @@ const TextArea = (props: TextAreaI) => {
     name,
     required = false,
     resize = false,
-    rows = 3,
+    rows = 8,
   } = props;
 
   return (
-    <label
-      htmlFor={name || label}
-      className={clsx(
-        "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600",
-        error && "border-red-500",
-        disabled && "!bg-gray-100 cursor-not-allowed"
-      )}>
-      <textarea
-        {...{
-          ...props,
-          error: undefined,
-          icon: undefined,
-          resize: undefined,
-          role,
-          rows,
-        }}
-        id={id || name || label}
-        className={clsx(
-          "w-full peer border-none bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
-          disabled && "cursor-not-allowed",
-          role === RolesEnum.CONSUMER && " border-consumer-blue",
-          role === RolesEnum.VIGIL && " border-vigil-orange"
-        )}
-        style={{ resize: resize ? "block" : "none" }}
-      />
-
+    <div>
       <span
         className={clsx(
-          "pointer-events-none absolute start-2.5 top-0 -translate-y-1/2 rounded bg-white p-0.5 text-xs transition-all peer-placeholder-shown:top-0 peer-placeholder-shown:text-sm peer-focus:top-0 peer-focus:text-xs",
-          error && "text-red-500",
-          disabled && "!bg-gray-100",
+          "pointer-events-none start-2.5  rounded bg-white p-0.5  ",
           role === RolesEnum.CONSUMER && " text-consumer-blue",
-          role === RolesEnum.VIGIL && " text-vigil-orange"
+          role === RolesEnum.VIGIL && " text-vigil-orange",
+          error && "text-red-500",
+          disabled && "!bg-gray-100"
         )}>
         {label}
         {required && <>*</>}
       </span>
+      <label
+        htmlFor={name || label}
+        className={clsx(
+          "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          role === RolesEnum.CONSUMER &&
+            "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue ",
+          role === RolesEnum.VIGIL &&
+            " text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange",
+          error && "border-red-500",
+          disabled && "!bg-gray-100 cursor-not-allowed"
+        )}>
+        <textarea
+          {...{
+            ...props,
+            error: undefined,
+            icon: undefined,
+            resize: undefined,
+            role,
+            rows,
+          }}
+          id={id || name || label}
+          className={clsx(
+            "w-full whitespace-pre-wrap  border-none bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
+            disabled && "cursor-not-allowed",
+            role === RolesEnum.CONSUMER && " border-consumer-blue",
+            role === RolesEnum.VIGIL && " border-vigil-orange"
+          )}
+          style={{ resize: resize ? "block" : "none" }}
+        />
 
-      {error ? (
-        <p
-          role="alert"
-          className="absolute start-2.5 -bottom-4 text-xs text-red-500">
-          {FormUtils.getErrorByType(error)}
-        </p>
-      ) : null}
-    </label>
+        {error ? (
+          <p
+            role="alert"
+            className="absolute start-2.5 -bottom-4 text-xs text-red-500">
+            {FormUtils.getErrorByType(error)}
+          </p>
+        ) : null}
+      </label>
+    </div>
   );
 };
 

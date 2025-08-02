@@ -3,7 +3,6 @@ import { ApiService } from "@/src/services";
 import { apiMaps } from "@/src/constants/api.constants";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
-import { LatLngExpression } from "leaflet";
 
 export const MapsService = {
   validateAddress: async (address: AddressI): Promise<AddressI | null> =>
@@ -49,10 +48,12 @@ export const MapsService = {
                 (((result.addresstype === "road" ||
                   result.addresstype === "village" ||
                   result.addresstype === "town" ||
-                  result.addresstype === "suburb") &&
+                  result.addresstype === "suburb" ||
+                  result.addresstype === "neighbourhood") &&
                   result.importance > 0.03) ||
                   result.addresstype === "place") &&
-                result.address?.country_code === "it"
+                result.address?.country_code === "it" &&
+                result.address?.postcode
             )
             .sort((a, b) => {
               if (a.importance > b.importance) {

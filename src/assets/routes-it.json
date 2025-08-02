@@ -11,10 +11,22 @@
     "private": false,
     "roles": []
   },
+  "homeConsumer": {
+    "url": "/home",
+    "label": "Home Consumer",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "login": {
     "url": "/auth/login",
-    "label": "Login",
-    "title": "Login",
+    "label": "Accedi",
+    "title": "Accedi",
     "menu": {
       "mobile": true,
       "desktop": true,
@@ -26,16 +38,29 @@
   },
   "registration": {
     "url": "/auth/registration",
-    "label": "Sign up",
+    "label": "Registrati",
     "title": "Sign up",
     "menu": {
       "mobile": false,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["CONSUMER"]
+    "roles": []
+  },
+  "registrationConsumer": {
+    "url": "/auth/registration/consumer",
+    "label": "Sign up",
+    "title": "Sign up",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
   },
   "registrationVigil": {
     "url": "/auth/registration/vigil",
@@ -43,7 +68,7 @@
     "title": "Sign up vigil",
     "menu": {
       "mobile": true,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },
@@ -104,11 +129,25 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
+      "footer": true
+    },
+    "private": true,
+    "roles": ["CONSUMER", "VIGIL"]
+  },
+  "bookingDetails": {
+    "url": "/booking/:bookingId",
+    "label": "Dettagli Prenotazione",
+    "title": "Dettagli Prenotazione",
+    "matchingUrl": "/booking/",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "admin": {
     "url": "/dashboard-admin",
@@ -295,7 +334,7 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": true
     },
     "private": true,
@@ -321,7 +360,7 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": true
     },
     "private": false,

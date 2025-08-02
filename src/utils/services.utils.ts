@@ -1,4 +1,5 @@
 import { ServiceI } from "@/src/types/services.types";
+import { FrequencyEnum } from "@/src/enums/common.enums";
 
 export const ServicesUtils = {
   createNewService: async (newService: ServiceI) => {
@@ -13,9 +14,9 @@ export const ServicesUtils = {
   },
   getServiceUnitType: (unitType: string) => {
     switch (unitType) {
-      case "hours":
+      case FrequencyEnum.HOURS:
         return "ore";
-      case "days":
+      case FrequencyEnum.DAYS:
         return "giorni";
       default:
         return unitType;

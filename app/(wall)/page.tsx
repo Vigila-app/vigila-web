@@ -1,5 +1,6 @@
 import { CmsService } from "@/src/services";
 import HomeComponent from "./home.component";
+import RedirectHandler from "./redirect-handler.component";
 import { CmsPageI } from "@/src/types/cms.types";
 import { cache } from "react";
 
@@ -17,10 +18,11 @@ const getCmsData = cache(async () => {
 
 export default async function Home() {
   const data = (await getCmsData()) as CmsPageI;
-  const { ["main-hero"]: mainHero } = data;
+  const { ["main-hero"]: mainHero, ["section-cta"]: sectionCta } = data;
   return (
     <>
-      <HomeComponent hero={mainHero} />
+      <RedirectHandler />
+      <HomeComponent hero={mainHero} sectionCta={sectionCta} />
     </>
   );
 }

@@ -12,6 +12,7 @@ export type UserDetailsType = {
   username?: string;
   birthday?: string;
   gender?: GenderEnum;
+  phone?: string;
   other?: { [key: string]: string | number };
   role?: RolesEnum;
 };
@@ -36,10 +37,12 @@ export type UserClaimsType = {
 };
 
 export type UserType = {
+  created_at: string;
   email: string;
   id: string;
   displayName?: string;
   photoURL?: string;
+  phone: string;
   user_metadata?: UserMetadata;
 };
 

@@ -7,11 +7,12 @@ import clsx from "clsx";
 import { FieldError } from "react-hook-form";
 
 type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+  label?: string;
   icon?: React.ReactElement;
   error?: FieldError;
   onChange?: (value: string | number) => void;
   role?: RolesEnum;
+  isForm?: boolean;
   isLoading?: boolean;
 };
 
@@ -23,6 +24,7 @@ const Input = (props: InputI) => {
     id,
     label,
     name,
+    isForm = false,
     role,
     onChange,
     required = false,
@@ -32,24 +34,28 @@ const Input = (props: InputI) => {
 
   return (
     <div className="relative w-full">
-      <label
-        htmlFor={name || label}
-        className={clsx(
-          "start-2.5 rounded bg-white p-0.5 text-xs ",
-
-          role === RolesEnum.CONSUMER && "text-consumer-blue",
-          role === RolesEnum.VIGIL && " text-vigil-orange",
-          error && "text-red-500",
-          disabled && "!bg-gray-100"
-        )}
-      >
-        {label}
-        {required && <>*</>}
-      </label>
+      {label ? (
+        <label
+          htmlFor={name || label}
+          className={clsx(
+            "pointer-events-none start-2.5  bg-white my-4",
+            isForm && "text-vigil-orange",
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
+            role === RolesEnum.VIGIL && " text-vigil-orange",
+            error && "text-red-500",
+            disabled && "cursor-not-allowed"
+          )}
+        >
+          {label}
+          {required ? <>*</> : null}
+        </label>
+      ) : null}
 
       <div
         className={clsx(
           "relative w-full inline-flex items-center p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          isForm &&
+            "text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
           role === RolesEnum.CONSUMER &&
             "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",
           role === RolesEnum.VIGIL &&

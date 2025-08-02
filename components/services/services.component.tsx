@@ -6,8 +6,12 @@ import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
 import { useEffect, useState } from "react";
 import { ServiceI } from "@/src/types/services.types";
-import ServiceCard from "./serviceCard.component";
+import ServiceCard from "@/components/services/serviceCard.component";
 import dynamic from "next/dynamic";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { Card } from "@/components";
+import { Select } from "../form";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -27,14 +31,20 @@ const ServicesComponent = () => {
 
   const searchServices = async ({ address }: AddressI) => {
     try {
-      if (address?.postCode || address?.postalCode || address?.postcode) {
+      if (
+        address?.postCode ||
+        address?.postalCode ||
+        address?.postcode ||
+        address?.cap
+      ) {
         showLoader();
         const services = await ApiService.get<{ data: ServiceI[] }>(
           apiServices.LIST(),
           {
             postalCode: (address.postCode ||
               address.postalCode ||
-              address.postcode) as string,
+              address.postcode ||
+              address.cap) as string,
           }
         );
         if (!services?.data) {
@@ -65,15 +75,29 @@ const ServicesComponent = () => {
   }, [services]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Servizi</h1>
-      <SearchAddress
-        location
-        onSubmit={searchServices}
-        onChange={() => setShowServices(false)}
-        label="Trova servizi in questa zona:"
-        placeholder="Inserisci indirizzo, città o codice postale"
-      />
+    <>
+      <Card>
+        <SearchAddress
+          location
+          role={RolesEnum.VIGIL}
+          onSubmit={searchServices}
+          onChange={() => setShowServices(false)}
+          placeholder="Inserisci indirizzo, città o CAP"
+        />
+        <div className="my-4 inline-flex items-center gap-4 w-full">
+          <Select
+            options={[
+              { label: "Opzione 1", value: "1" },
+              { label: "Opzione 2", value: "2" },
+            ]}
+            role={RolesEnum.VIGIL}
+          />
+          <button>
+            <AdjustmentsHorizontalIcon className="size-6 text-vigil-orange cursor-pointer" />
+          </button>
+        </div>
+      </Card>
+
       <div className="my-4">
         {showServices ? (
           services.length ? (
@@ -85,7 +109,7 @@ const ServicesComponent = () => {
           )
         ) : null}
       </div>
-    </div>
+    </>
   );
 };
 

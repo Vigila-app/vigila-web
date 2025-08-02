@@ -21,11 +21,14 @@ import dynamic from "next/dynamic";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
-  { 
+  {
     ssr: false,
-    loading: () => <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
   }
 );
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -57,7 +60,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     showToast,
   } = useAppStore();
   const { closeModal } = useModalStore();
-  const { services, getServiceDetails } = useServicesStore();
+  const { services, getServiceDetails, getServices } = useServicesStore();
   const { user } = useUserStore();
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
@@ -85,13 +88,23 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedDuration = watch("quantity");
   const watchedAddress = watch("address");
 
-  useEffect(() => {
-    if (serviceId) {
-      getServiceDetails(serviceId);
-      setValue("service_id", serviceId as never);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId]);
+  // useEffect(() => {
+  // if (serviceId) {
+  //   // prova a trovare nel su service id uguali
+  //   const existing = services.find((s) => s.id === serviceId);
+  //   if (existing) {
+  //     setSelectedService(existing);
+  //     setValue("service_id", existing.id as never);
+  //
+  //   }
+  // }, [serviceId, services]);
+  // useEffect(() => {
+  //   if (serviceId) {
+  //     getServiceDetails(serviceId);
+  //     setValue("service_id", serviceId as never);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [serviceId]);
 
   useEffect(() => {
     if (vigilId) getVigilsDetails([vigilId], true);
@@ -106,7 +119,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       } else {
         setSelectedService(service || null);
       }
+    } else if (!services?.length) {
+      if (watchedServiceId || serviceId) {
+        getServiceDetails((watchedServiceId || serviceId) as string, true);
+      } else {
+        getServices(true, vigilId);
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedServiceId, services?.length]);
 
@@ -127,16 +147,22 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService]);
 
+  useEffect(() => {
+    if (selectedService && selectedService.id !== serviceId) {
+      console.log("⚠️ selectedService non corrisponde a serviceId");
+    }
+  }, [selectedService, serviceId]);
+
   const submitForm = async (formData: BookingFormI) => {
     if (isValid) {
       try {
         showLoader();
         const newBooking = await BookingsService.createBooking(formData);
 
-        // showToast({
-        //   message: "Prenotazione creata!",
-        //   type: ToastStatusEnum.SUCCESS,
-        // });
+        showToast({
+          message: "Prenotazione creata!",
+          type: ToastStatusEnum.SUCCESS,
+        });
 
         onSubmit(newBooking);
 
@@ -184,7 +210,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           </p>
         </div>
 
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-blue-100 border border-blue-400 p-3">
+        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange border border-vigil-light-orange p-3">
           <Avatar
             size="big"
             userId={vigilDetails?.id}
@@ -217,6 +243,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 type="text"
                 disabled
                 required
+                role={RolesEnum.VIGIL}
                 error={errors.service_id}
                 value={selectedService?.name || ""}
               />
@@ -234,25 +261,40 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               label="Data"
               type="datetime-local"
               required
+              role={RolesEnum.VIGIL}
               error={errors.startDate}
               value={
                 field.value
                   ? new Date(field.value).toISOString().slice(0, 16)
                   : ""
               }
+              onChange={(value) => {
+                const local = new Date(value as string);
+                const utc = new Date(
+                  Date.UTC(
+                    local.getFullYear(),
+                    local.getMonth(),
+                    local.getDate(),
+                    local.getHours(),
+                    local.getMinutes()
+                  )
+                );
+                field.onChange(utc.toISOString()); // salva in UTC
+              }}
               // set min to today and max to 3 months from today
               min={new Date(
                 new Date(
-                  new Date().setHours(new Date().getHours() + 1)
-                ).setMinutes(0)
+                  new Date().setUTCHours(new Date().getUTCHours() + 1)
+                ).setUTCMinutes(0)
               )
                 .toISOString()
                 .slice(0, 16)}
-              max={new Date(new Date().setMonth(new Date().getMonth() + 3))
+              max={new Date(
+                new Date().setUTCMonth(new Date().getUTCMonth() + 3)
+              )
                 .toISOString()
                 .slice(0, 16)}
               step={1800} // 30 minutes
-              onChange={(value) => field.onChange(new Date(value as string))}
             />
           )}
         />
@@ -268,6 +310,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           render={({ field }) => (
             <InputQuantity
               {...field}
+              role={RolesEnum.VIGIL}
               label={`Durata (${ServicesUtils.getServiceUnitType(
                 selectedService?.unit_type as string
               )})`}
@@ -299,16 +342,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               label="Note"
               placeholder="Aggiungi eventuali note per il Vigil"
               rows={3}
+              role={RolesEnum.VIGIL}
               error={errors.note}
             />
           )}
         />
 
         {selectedService && (
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <h3 className="font-medium text-gray-900">
-              Riepilogo Prenotazione
-            </h3>
+          <div className="p-4 bg-vigil-light-orange rounded-lg border border-vigil-orange">
+            <h3 className="font-medium">Riepilogo Prenotazione</h3>
             <div className="mt-2 space-y-1 text-sm text-gray-600">
               <p>
                 Servizio: {selectedService.name}
@@ -325,7 +367,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 Quantità: {watchedDuration}&nbsp;
                 {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
               </p>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium">
                 Totale: {selectedService.currency} {amountDisplay(totalAmount)}
               </p>
             </div>
