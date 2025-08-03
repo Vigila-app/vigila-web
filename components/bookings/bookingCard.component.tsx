@@ -16,7 +16,7 @@ import {
   capitalize,
 } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
-import Orologio from "@/public/svg/Orologio";
+import Orologio from "@/components/svg/Orologio";
 import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { BookingUtils } from "@/src/utils/booking.utils";

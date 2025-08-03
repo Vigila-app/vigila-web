@@ -1,6 +1,6 @@
 import { Avatar, Button } from "@/components";
 import Card from "@/components/card/card";
-import Cestino from "@/public/svg/cestino";
+import Cestino from "@/components/svg/cestino";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { MapPinIcon } from "@heroicons/react/24/outline";
