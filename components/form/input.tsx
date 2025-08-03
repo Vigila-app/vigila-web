@@ -12,7 +12,7 @@ type InputI = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: FieldError;
   onChange?: (value: string | number) => void;
   role?: RolesEnum;
-  isForm?: boolean;
+
   isLoading?: boolean;
 };
 
@@ -24,7 +24,7 @@ const Input = (props: InputI) => {
     id,
     label,
     name,
-    isForm = false,
+
     role,
     onChange,
     required = false,
@@ -39,13 +39,12 @@ const Input = (props: InputI) => {
           htmlFor={name || label}
           className={clsx(
             "pointer-events-none start-2.5  bg-white my-4",
-            isForm && "text-vigil-orange",
+
             role === RolesEnum.CONSUMER && "text-consumer-blue",
             role === RolesEnum.VIGIL && " text-vigil-orange",
             error && "text-red-500",
             disabled && "cursor-not-allowed"
-          )}
-        >
+          )}>
           {label}
           {required ? <>*</> : null}
         </label>
@@ -54,16 +53,14 @@ const Input = (props: InputI) => {
       <div
         className={clsx(
           "relative w-full inline-flex items-center p-3 rounded-4xl border-1 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
-          isForm &&
-            "text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
+
           role === RolesEnum.CONSUMER &&
             "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue  focus-within:bg-consumer-light-blue",
           role === RolesEnum.VIGIL &&
             " text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange focus-within:bg-vigil-light-orange",
           error && "border-red-500 mb-4",
           disabled && "!bg-gray-100 cursor-not-allowed"
-        )}
-      >
+        )}>
         <input
           {...{ ...props, type, error: undefined, icon: undefined }}
           id={id || name || label}
@@ -87,8 +84,7 @@ const Input = (props: InputI) => {
         {error ? (
           <p
             role="alert"
-            className="absolute start-2.5 top-12 text-xs text-red-500"
-          >
+            className="absolute start-2.5 top-12 text-xs text-red-500">
             {FormUtils.getErrorByType(error)}
           </p>
         ) : null}

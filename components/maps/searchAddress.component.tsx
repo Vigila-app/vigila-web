@@ -177,6 +177,11 @@ const SearchAddress = (props: {
               label={label}
               placeholder={placeholder}
               type="text"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                }
+              }}
               required
               role={role}
               isLoading={isLoading}
@@ -200,8 +205,7 @@ const SearchAddress = (props: {
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  "
-                >
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl  ">
                   {result.display_name}
                 </button>
               </li>

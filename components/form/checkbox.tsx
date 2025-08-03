@@ -56,7 +56,9 @@ const Checkbox = (props: CheckboxI) => {
         <div>
           <span
             className={clsx(
-              "text-sm text-black",
+              "text-sm ",
+              role === RolesEnum.VIGIL && "checked:bg-vigil-orange ",
+              role === RolesEnum.CONSUMER && "checked:bg-consumer-blue ",
               error && "text-red-500",
               disabled && "!opacity-75 cursor-not-allowed"
             )}>

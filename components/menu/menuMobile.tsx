@@ -8,34 +8,57 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ButtonLink, Divider } from "@/components";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Avatar, ButtonLink, Divider } from "@/components";
+import {
+  ArrowLeftStartOnRectangleIcon,
+  Bars3Icon,
+  CalendarDaysIcon,
+  HomeIcon,
+  UserIcon,
+  UsersIcon,
+  WrenchScrewdriverIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import Profile from "../svg/Profile";
 
 const MenuMobile = () => {
   const pathname = usePathname();
-  const { user } = useUserStore();
+  const { user, userDetails } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
-const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
+  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
+
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
   const isUserLogged = !!user?.id;
 
-  const MenuLinkItem = (route: RouteI) => (
+  const MenuLinkItem = (route: RouteI, Icon?: React.ElementType) => (
     <Link
       className={clsx(
-        "block rounded px-4 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-700",
+        "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
         pathname === route?.url &&
           "active bg-gray-100 text-primary-500 hover:text-primary-600"
       )}
-      href={route?.url || ""}
-    >
+      href={route?.url || ""}>
+      {Icon && <Icon className=" w-6 h-6 text-current" />}
       {route?.label}
     </Link>
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -43,12 +66,11 @@ const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="rounded bg-transparent p-2"
-      >
+        className="rounded bg-transparent p-2">
         {isOpen ? (
-          <XMarkIcon className="h-6 w-6 text-gray-600 transition hover:text-gray-600/75" />
+          <XMarkIcon className="h-6 w-6 text-consumer-blue transition hover:text-gray-600/75" />
         ) : (
-          <Bars3Icon className="h-6 w-6 text-primary-600 transition hover:text-primary-600/75" />
+          <Bars3Icon className="h-6 w-6 text-consumer-blue transition hover:text-gray-600/75" />
         )}
       </button>
       <nav
@@ -56,48 +78,70 @@ const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
         id="MenuMobile"
         style={!isOpen ? { right: "-100vw" } : {}}
         className={clsx(
-          "absolute md:hidden transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
+          "absolute flex flex-col gap-8  md:hidden transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
           isOpen ? "block right-0" : "hidden"
-        )}
-      >
+        )}>
         {isUserLogged ? (
           <>
-            <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">{MenuLinkItem(Routes.services)}</li>
-              <li className="block py-2">{MenuLinkItem(Routes.bookings)}</li>
-            </ul>
-            <Divider />
-            <ul className="relative divide-y divide-gray-100">
-              <li className="block py-2">
+            <section className=" flex flex-col gap-2 justify-center items-center mb-12 mt-12">
+              <Avatar
+                userId={user.id}
+                value={userDetails?.displayName}
+                size="xxl"
+              />
+              <span className="font-semibold text-lg">
+                {userDetails?.displayName}
+              </span>
+              <span className="font-medium text-sm">
+                {user?.user_metadata?.role}
+              </span>
+            </section>
+            <ul className="flex flex-col gap-8 divide-y divide-gray-100 flex-1">
+              <li className="flex py-2 items-center ">
                 {MenuLinkItem(
                   user.user_metadata?.role === RolesEnum.CONSUMER
                     ? Routes.profileConsumer
                     : user.user_metadata?.role === RolesEnum.VIGIL
-                    ? Routes.vigilProfile
-                    : Routes.admin
+                      ? Routes.profileVigil
+                      : Routes.admin,
+                  UserIcon
                 )}
               </li>
+              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
+                <li className="block py-2">
+                  {MenuLinkItem(Routes.home, HomeIcon)}
+                </li>
+              )}
+              {user?.user_metadata?.role === RolesEnum.VIGIL && (
+                <li className="block py-2">
+                  {MenuLinkItem(Routes.services, WrenchScrewdriverIcon)}
+                </li>
+              
+              )}
+
+              <li className="block py-2">
+                {MenuLinkItem(Routes.bookings, CalendarDaysIcon)}
+              </li>
             </ul>
-            <Divider />
           </>
         ) : null}
-        <ul className="relative divide-y divide-gray-100 header-menu">
-          {NavigationUtils.getHeaderMenu()
-            .filter((route) => route?.menu?.mobile)
-            .map((route) => (
-              <li key={route.label} className="block py-2">
-                {MenuLinkItem(route)}
-              </li>
-            ))}
-          <div className="sticky bottom-0 py-2 w-full">
+        <div className="sticky bottom-0 py-2 w-full mt-auto ">
+          <ul className="relative divide-y divide-gray-100 header-menu">
+            {NavigationUtils.getHeaderMenu()
+              .filter((route) => route?.menu?.mobile)
+              .map((route) => (
+                <li key={route.label} className="block py-2">
+                  {MenuLinkItem(route)}
+                </li>
+              ))}
             {isUserLogged ? (
               <button
                 onClick={() => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="block w-full rounded px-4 py-2 text-sm font-medium text-gray-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-red-700"
-              >
+                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
+                <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>
             ) : (
@@ -106,8 +150,8 @@ const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
                 href={Routes.registration.url}
               />
             )}
-          </div>
-        </ul>
+          </ul>
+        </div>
       </nav>
     </>
   );

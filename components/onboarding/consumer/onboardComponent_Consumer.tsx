@@ -186,7 +186,7 @@ const ConsumerOnboardComponent = () => {
               )}
             />
             <div>
-              <p className="font-medium mb-2">
+              <p className="font-medium mb-2 text-consumer-blue">
                 Che rapporto hai con la persona cara?
               </p>
               <div className="space-y-2">
