@@ -16,7 +16,7 @@ import Disponbilità from "@/public/svg/Disponibilità";
 import Recensioni from "@/public/svg/Recensioni";
 import PrenotationTabs from "@/app/vigil/tabs/prenotazioni";
 import InformazioniTab from "@/app/vigil/tabs/informazioni";
-import DisponibilitàTab from "@/app/vigil/tabs/disponibilità";
+import DisponibilitàTab from "@/app/vigil/tabs/disponibilita";
 import RecensioniTab from "@/app/vigil/tabs/recensioni";
 import PanoramicaConsumerTab from "@/app/(consumer)/tabs/panoramicaConsumer";
 import PrenotazioniConsumerTabs from "@/app/(consumer)/tabs/prenotazioniConsumer";
