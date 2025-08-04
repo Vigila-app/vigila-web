@@ -9,6 +9,7 @@ import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { NextRequest, NextResponse } from "next/server";
 import { ServiceI } from "@/src/types/services.types";
+import { OrderDirectionEnum } from "@/src/types/app.types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,13 +17,9 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, [
-      "page",
-      "pageSize",
-      "vigil_id",
-      "active",
-    ]);
-    const { orderBy = "created_at", orderDirection = "DESC" } = filters;
+    const filters = getQueryParams(url, ["pageSize", "vigil_id", "search"]);
+    const { orderBy = "created_at", orderDirection = OrderDirectionEnum.DESC } =
+      filters;
 
     console.log(`API GET services`, filters, pagination);
 
@@ -58,12 +55,28 @@ export async function GET(req: NextRequest) {
           key !== "orderBy" &&
           key !== "orderDirection" &&
           key !== "postalCode" &&
-          key !== "vigil_id"
+          key !== "vigil_id" &&
+          key !== "minPrice" &&
+          key !== "maxPrice" &&
+          key !== "minRating" &&
+          key !== "search"
         ) {
           db_query = db_query.eq(key, filters[key]);
         }
       });
     }
+
+    if (filters.minPrice) {
+      db_query = db_query.gte("unit_price", parseFloat(filters.minPrice));
+    }
+
+    if (filters.maxPrice) {
+      db_query = db_query.lte("unit_price", parseFloat(filters.maxPrice));
+    }
+
+    // if (filters.minRating) {
+    //   db_query = db_query.gte("rating", parseFloat(filters.minRating));
+    // }
 
     if (filters.active === undefined) {
       db_query = db_query.eq("active", true);
@@ -84,8 +97,27 @@ export async function GET(req: NextRequest) {
     }
 
     if (orderBy) {
-      db_query = db_query.order(orderBy, {
-        ascending: orderDirection === "ASC" ? true : false,
+      let dbOrderBy = orderBy;
+      switch (orderBy) {
+        case "price":
+          dbOrderBy = "unit_price";
+          break;
+        // case "rating":
+        //   dbOrderBy = "rating";
+        //   break;
+        case "created":
+          dbOrderBy = "created_at";
+          break;
+        default:
+          dbOrderBy = orderBy;
+          break;
+      }
+
+      db_query = db_query.order(dbOrderBy, {
+        ascending:
+          orderDirection.toUpperCase() === OrderDirectionEnum.ASC
+            ? true
+            : false,
       });
     }
 
@@ -97,6 +129,8 @@ export async function GET(req: NextRequest) {
       to <= 49
     ) {
       db_query = db_query.range(from, to);
+    } else {
+      db_query = db_query.range(0, itemPerPage - 1);
     }
 
     const {
