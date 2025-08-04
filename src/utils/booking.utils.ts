@@ -24,9 +24,25 @@ export const BookingUtils = {
     }
   },
 
-  /**
-   * Formatta la data di una prenotazione in formato locale italiano
-   */
+  getStatusText: (status: BookingStatusEnum): string => {
+    switch (status) {
+      case BookingStatusEnum.PENDING:
+        return "In attesa";
+      case BookingStatusEnum.CONFIRMED:
+        return "Confermata";
+      case BookingStatusEnum.IN_PROGRESS:
+        return "In corso";
+      case BookingStatusEnum.COMPLETED:
+        return "Completata";
+      case BookingStatusEnum.CANCELLED:
+        return "Cancellata";
+      case BookingStatusEnum.REFUNDED:
+        return "Rimborsata";
+      default:
+        return status;
+    }
+  },
+
   formatBookingDate: (date: Date): string => {
     return new Date(date).toLocaleDateString("it-IT", {
       year: "numeric",

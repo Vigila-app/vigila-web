@@ -17,7 +17,15 @@ export async function GET(req: NextRequest) {
 
     const pagination = getPagination(nextUrl);
     const { from, to, page, itemPerPage } = pagination;
-    const filters = getQueryParams(url, ["pageSize", "vigil_id", "search"]);
+    const filters = getQueryParams(url, [
+      "page",
+      "itemPerPage",
+      "from",
+      "to",
+      "pageSize",
+      "vigil_id",
+      "search",
+    ]);
     const { orderBy = "created_at", orderDirection = OrderDirectionEnum.DESC } =
       filters;
 
@@ -126,7 +134,7 @@ export async function GET(req: NextRequest) {
       to !== undefined &&
       from >= 0 &&
       to > from &&
-      to <= 49
+      to - from <= 25
     ) {
       db_query = db_query.range(from, to);
     } else {

@@ -252,7 +252,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 {amountDisplay(booking?.price, service?.currency)}
               </span>
               <Badge
-                label={capitalize(booking.status as string)}
+                label={BookingUtils.getStatusText(booking.status as BookingStatusEnum)}
                 color={getStatusColor(booking.status as BookingStatusEnum)}
               />
             </div>

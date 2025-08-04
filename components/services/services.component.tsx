@@ -53,7 +53,6 @@ const ServicesComponent = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  // Hook e utilità
   const {
     filters: advancedFilters,
     showFilters: showAdvancedFilters,
@@ -69,22 +68,24 @@ const ServicesComponent = () => {
   const ratingOptions = useRatingOptions();
   const searchDebouncer = createDebouncer('services-search', 500);
 
-  // Caricamento catalogo servizi
   useEffect(() => {
     const catalog = ServicesService.getServicesCatalog();
     setServicesCatalog(catalog);
   }, []);
 
-  // Reset paginazione e risultati quando cambiano i filtri o il tipo
   useEffect(() => {
+    if (!lastSearchAddress) return;
     setHasMore(true);
     setServices([]);
     setPagination(defaultPagination);
     setShowServices(false);
     setErrorMsg("");
-  }, [selectedServiceType, lastSearchAddress, JSON.stringify(advancedFilters)]);
+    searchDebouncer(() => {
+      searchServices(lastSearchAddress);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(advancedFilters)]);
 
-  // Effetto infinite scroll
   useEffect(() => {
     if (!showServices || isInitialLoading) return;
     const handleScroll = () => {
@@ -104,10 +105,8 @@ const ServicesComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showServices, hasMore, isLoadingMore, lastSearchAddress, pagination, isInitialLoading]);
 
-  // Funzione per caricare la pagina successiva (infinite scroll)
   const loadMoreServices = async () => {
     if (isLoadingMore || !hasMore || !lastSearchAddress) return;
-    // Non caricare altre pagine se tutti i risultati sono già stati scaricati
     if (typeof pagination.count === "number" && services.length >= pagination.count) {
       setHasMore(false);
       return;
@@ -152,15 +151,6 @@ const ServicesComponent = () => {
     }
   };
 
-  // Ricerca servizi con loader iniziale e gestione errori
-  // ...nessun cambiamento qui, la funzione searchServices rimane una sola...
-
-
-  useEffect(() => {
-    const catalog = ServicesService.getServicesCatalog();
-    setServicesCatalog(catalog);
-  }, []);
-
   const serviceOptions = [
     { label: "Tutti i servizi", value: "" },
     ...servicesCatalog.map((service) => ({
@@ -171,6 +161,8 @@ const ServicesComponent = () => {
 
   const searchServices = async (addressData: AddressI) => {
     try {
+      setIsInitialLoading(true);
+      setErrorMsg("");
       showLoader();
       if (
         addressData.address?.postCode ||
@@ -185,41 +177,41 @@ const ServicesComponent = () => {
             addressData.address.postalCode ||
             addressData.address.postcode ||
             addressData.address.cap) as string,
+          page: defaultPagination.page,
+          itemPerPage: defaultPagination.itemPerPage,
         };
 
         const searchParamsWithFilters = getSearchParams(searchParams);
 
-        const services = await ApiService.get<{
+        const result = await ApiService.get<{
           data: ServiceI[];
           pagination: PaginationI;
         }>(apiServices.LIST(), searchParamsWithFilters);
 
-        if (!services?.data) {
+        if (!result?.data) {
           setServices([]);
           setPagination(defaultPagination);
           throw new Error("No services found for the provided postal code.");
         }
-        setServices(services.data);
-        setPagination(services.pagination);
+        setServices(result.data);
+        setPagination(result.pagination);
         setShowServices(true);
+        setHasMore(
+          typeof result.pagination.to === "number" &&
+          typeof result.pagination.count === "number" &&
+          result.pagination.to < result.pagination.count
+        );
       } else {
         throw new Error("Postal code is required to search for services.");
       }
     } catch (error) {
       console.error("Error searching services:", error);
+      setHasMore(false);
     } finally {
       hideLoader();
+      setIsInitialLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!lastSearchAddress || !showServices) return;
-    // Debounce vero della chiamata API usando il pattern del progetto
-    searchDebouncer(() => {
-      searchServices(lastSearchAddress);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(advancedFilters)]);
 
   useEffect(() => {
     updateFilter("type", selectedServiceType);
@@ -506,14 +498,13 @@ const ServicesComponent = () => {
                 {services.map((service) => (
                   <ServiceCard service={service} key={service.id} />
                 ))}
-                {/* Loader per infinite scroll */}
                 {isLoadingMore && (
                   <div className="flex justify-center py-4">
                     <span className="text-gray-400 text-sm">Caricamento altri risultati...</span>
                   </div>
                 )}
               </div>
-            ) : null}
+            ) : <div className="text-center py-4 text-gray-500">Nessun servizio trovato.</div>}
           </div>
         ) : null}
       </div>
