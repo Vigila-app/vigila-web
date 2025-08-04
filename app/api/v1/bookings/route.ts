@@ -14,6 +14,7 @@ import {
 } from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
 import { FrequencyEnum } from "@/src/enums/common.enums";
+import { OrderDirectionEnum } from "@/src/types/app.types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
 
     if (orderBy) {
       db_query = db_query.order(orderBy, {
-        ascending: orderDirection === "ASC" ? true : false,
+        ascending: orderDirection === OrderDirectionEnum.ASC ? true : false,
       });
     }
 

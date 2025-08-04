@@ -14,6 +14,11 @@ export type PaginationI = {
   count?: number;
 };
 
+export enum OrderDirectionEnum {
+  ASC = "ASC",
+  DESC = "DESC"
+};
+
 export type AppStoreType = {
   onLogout: () => void;
 

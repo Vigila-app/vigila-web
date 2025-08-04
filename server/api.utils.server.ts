@@ -47,7 +47,9 @@ export const verifyPaymentWithStripe = async (
 
     // Verifica che il payment intent appartenga all'utente autenticato
     if (userId && paymentIntent.metadata?.userId !== userId) {
-      throw new Error("Payment intent does not belong to the authenticated user");
+      throw new Error(
+        "Payment intent does not belong to the authenticated user"
+      );
     }
 
     // Verifica opzionale del booking ID se fornito
@@ -115,7 +117,10 @@ export const getPagination = (
   };
 };
 
-export const getQueryParams = (url: string, blacklist: string[] = []) => {
+export const getQueryParams = (
+  url: string,
+  blacklist: string[] = []
+): Record<string, any> => {
   const params = new URL(url).searchParams;
   const queryObject = Object.fromEntries(params.entries());
 
