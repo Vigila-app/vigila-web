@@ -1,20 +1,19 @@
-import { Button } from "@/components";
 import Card from "@/components/card/card";
-import { Input } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { UserService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 const InformazioniTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
-  const email: string = user?.email || "";
-  const birthday: string = user?.user_metadata?.birthday;
-  const phone: string = user?.user_metadata?.phone;
+  const role = user?.user_metadata?.role as RolesEnum;
+  const email = user?.email || "";
+  const birthday = user?.user_metadata?.birthday;
+  const phone = user?.user_metadata?.phone;
 
   //esempio di editing dinamico
   const [isEditing, setIsEditing] = useState(true);
@@ -54,7 +53,6 @@ const InformazioniTab = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails, isEditing, reset]);
-
   const onSubmit = async (formData: ProfileFormI) => {
     if (isValid) {
       try {
@@ -157,7 +155,7 @@ const InformazioniTab = () => {
         </div>
       </Card>
 
-      <Card>
+      {/* <Card>
         <p className="text-consumer-blue font-bold text-xl">Telefono</p>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
@@ -197,104 +195,8 @@ const InformazioniTab = () => {
             />
           </div>
         )}
-      </Card>
+      </Card> */}
     </div>
-    // <Card>
-    //   <h2 className="text-vigil-orange">Informazioni personali</h2>
-    //   <form onSubmit={handleSubmit(onSubmit)}>
-    //     <Controller
-    //       name="name"
-    //       control={control}
-    //       rules={{ required: true, minLength: 2, maxLength: 30 }}
-    //       render={({ field }) => (
-    //         <Input
-    //           {...field}
-    //           label="First name"
-    //           placeholder="Enter name"
-    //           type="text"
-    //           required
-    //           role={role}
-    //           autoComplete="given-name"
-    //           aria-invalid={!!errors.name}
-    //           error={errors.name}
-    //         />
-    //       )}
-    //     />
-    //     <Controller
-    //       name="surname"
-    //       control={control}
-    //       rules={{ required: true, minLength: 2, maxLength: 30 }}
-    //       render={({ field }) => (
-    //         <Input
-    //           {...field}
-    //           label="Last name"
-    //           placeholder="Enter last name"
-    //           type="text"
-    //           required
-    //           role={role}
-    //           autoComplete="family-name"
-    //           aria-invalid={!!errors.surname}
-    //           error={errors.surname}
-    //         />
-    //       )}
-    //     />
-    //     <Controller
-    //       name="birthday"
-    //       control={control}
-    //       rules={{ required: true, minLength: 2, maxLength: 30 }}
-    //       render={({ field }) => (
-    //         <Input
-    //           {...field}
-    //           label="Birthdate"
-    //           placeholder="La tua data di nascita"
-    //           type="text"
-    //           required
-    //           role={role}
-    //           aria-invalid={!!errors.birthday}
-    //           error={errors.birthday}
-    //         />
-    //       )}
-    //     />
-    //     <Controller
-    //       name="email"
-    //       control={control}
-    //       rules={{ required: true, minLength: 2, maxLength: 30 }}
-    //       render={({ field }) => (
-    //         <Input
-    //           {...field}
-    //           label="Email"
-    //           placeholder="la tua email"
-    //           type="text"
-    //           required
-    //           role={role}
-    //           autoComplete="email"
-    //           aria-invalid={!!errors.email}
-    //           error={errors.email}
-    //         />
-    //       )}
-    //     />
-    //     <Controller
-    //       name="phone"
-    //       control={control}
-    //       rules={{ required: true, minLength: 2, maxLength: 30 }}
-    //       render={({ field }) => (
-    //         <Input
-    //           {...field}
-    //           label="Cellulare"
-    //           placeholder="cellulare"
-    //           type="text"
-    //           required
-    //           role={role}
-    //           aria-invalid={!!errors.phone}
-    //           error={errors.phone}
-    //         />
-    //       )}
-    //     />
-    //     <div className="flex items-center justify-end pt-4">
-    //       <Button type="submit" primary role={role} label="Update profile" />
-    //     </div>
-    //   </form>
-    // </Card>
   );
 };
 export default InformazioniTab;

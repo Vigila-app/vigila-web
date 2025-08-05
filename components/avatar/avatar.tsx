@@ -56,7 +56,7 @@ const TEXT_COLORS = [
 
 type AvatarI = {
   imgUrl?: string | null;
-  size?: "small" | "standard" | "medium" | "big";
+  size?: "small" | "standard" | "medium" | "big"| "xxl";
   label?: string;
   inline?: boolean;
   withUpload?: boolean;
@@ -74,6 +74,7 @@ const AvatarSize = {
   standard: "size-8 text-sm",
   medium: "size-12 text-md",
   big: "size-16 text-lg",
+  xxl: "size-25 text-xl",
 };
 
 const Avatar = (props: AvatarI) => {

@@ -46,8 +46,12 @@ const ServicesComponent = () => {
   const [pagination, setPagination] = useState<PaginationI>(defaultPagination);
   const [showServices, setShowServices] = useState(false);
   const [selectedServiceType, setSelectedServiceType] = useState<string>("");
-  const [servicesCatalog, setServicesCatalog] = useState<ServiceCatalogItem[]>([]);
-  const [lastSearchAddress, setLastSearchAddress] = useState<AddressI | null>(null);
+  const [servicesCatalog, setServicesCatalog] = useState<ServiceCatalogItem[]>(
+    []
+  );
+  const [lastSearchAddress, setLastSearchAddress] = useState<AddressI | null>(
+    null
+  );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(false);
@@ -66,7 +70,7 @@ const ServicesComponent = () => {
   } = useAdvancedFilters();
   const sortOptions = useSortOptions();
   const ratingOptions = useRatingOptions();
-  const searchDebouncer = createDebouncer('services-search', 500);
+  const searchDebouncer = createDebouncer("services-search", 500);
 
   useEffect(() => {
     const catalog = ServicesService.getServicesCatalog();
@@ -103,11 +107,21 @@ const ServicesComponent = () => {
       window.removeEventListener("scroll", handleScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showServices, hasMore, isLoadingMore, lastSearchAddress, pagination, isInitialLoading]);
+  }, [
+    showServices,
+    hasMore,
+    isLoadingMore,
+    lastSearchAddress,
+    pagination,
+    isInitialLoading,
+  ]);
 
   const loadMoreServices = async () => {
     if (isLoadingMore || !hasMore || !lastSearchAddress) return;
-    if (typeof pagination.count === "number" && services.length >= pagination.count) {
+    if (
+      typeof pagination.count === "number" &&
+      services.length >= pagination.count
+    ) {
       setHasMore(false);
       return;
     }
@@ -120,7 +134,8 @@ const ServicesComponent = () => {
           lastSearchAddress.address.postCode ||
           lastSearchAddress.address.postalCode ||
           lastSearchAddress.address.postcode ||
-          lastSearchAddress.address.cap || "";
+          lastSearchAddress.address.cap ||
+          "";
       }
       const searchParams = {
         postalCode,
@@ -137,8 +152,8 @@ const ServicesComponent = () => {
         setPagination(result.pagination);
         setHasMore(
           typeof result.pagination.to === "number" &&
-          typeof result.pagination.count === "number" &&
-          result.pagination.to < result.pagination.count
+            typeof result.pagination.count === "number" &&
+            result.pagination.to < result.pagination.count
         );
       } else {
         setHasMore(false);
@@ -198,8 +213,8 @@ const ServicesComponent = () => {
         setShowServices(true);
         setHasMore(
           typeof result.pagination.to === "number" &&
-          typeof result.pagination.count === "number" &&
-          result.pagination.to < result.pagination.count
+            typeof result.pagination.count === "number" &&
+            result.pagination.to < result.pagination.count
         );
       } else {
         throw new Error("Postal code is required to search for services.");
@@ -270,7 +285,9 @@ const ServicesComponent = () => {
                 />
                 {(() => {
                   const activeCount = (
-                    Object.keys(advancedFilters) as Array<keyof typeof advancedFilters>
+                    Object.keys(advancedFilters) as Array<
+                      keyof typeof advancedFilters
+                    >
                   ).filter(
                     (k) =>
                       advancedFilters[k] !== "" &&
@@ -280,7 +297,12 @@ const ServicesComponent = () => {
                   return activeCount > 0 ? (
                     <span
                       className="absolute -top-2 -right-2 bg-vigil-orange text-white text-xs font-bold rounded-full px-1.5 py-0.5 shadow"
-                      style={{ minWidth: 18, minHeight: 18, lineHeight: '18px', textAlign: 'center' }}
+                      style={{
+                        minWidth: 18,
+                        minHeight: 18,
+                        lineHeight: "18px",
+                        textAlign: "center",
+                      }}
                     >
                       {activeCount}
                     </span>
@@ -500,11 +522,17 @@ const ServicesComponent = () => {
                 ))}
                 {isLoadingMore && (
                   <div className="flex justify-center py-4">
-                    <span className="text-gray-400 text-sm">Caricamento altri risultati...</span>
+                    <span className="text-gray-400 text-sm">
+                      Caricamento altri risultati...
+                    </span>
                   </div>
                 )}
               </div>
-            ) : <div className="text-center py-4 text-gray-500">Nessun servizio trovato.</div>}
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                Nessun servizio trovato.
+              </div>
+            )}
           </div>
         ) : null}
       </div>

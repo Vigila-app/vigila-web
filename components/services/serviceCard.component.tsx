@@ -9,8 +9,7 @@ import { useRouter } from "next/navigation";
 import { ShieldCheckIcon, StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
 import { amountDisplay, replaceDynamicUrl } from "@/src/utils/common.utils";
-import { useMemo } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CalendarIcon,
   EyeIcon,
@@ -46,7 +45,10 @@ const ServiceCard = (props: ServiceCardI) => {
   const { vigils } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === service.vigil_id);
   const { user } = useUserStore();
-  const role = useMemo(() => user?.user_metadata?.role, [user?.user_metadata?.role]);
+  const role = useMemo(
+    () => user?.user_metadata?.role,
+    [user?.user_metadata?.role]
+  );
 
   const goToBooking = () => {
     if (service?.id && service?.vigil_id) {

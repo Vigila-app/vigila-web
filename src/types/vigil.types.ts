@@ -17,6 +17,7 @@ export type VigilDetailsType = {
   created_at?: string;
   updated_at?: string;
   status: string;
+  birthday?: string;
   addresses?: {
     id: string;
     name: string;

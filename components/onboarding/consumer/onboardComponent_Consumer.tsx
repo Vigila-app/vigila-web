@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Undraw } from "@/components";
+import { Button } from "@/components";
 import { Input, TextArea } from "@/components/form";
 import Checkbox from "@/components/form/checkbox";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
@@ -65,7 +65,11 @@ const ConsumerOnboardComponent = () => {
       } = formdata;
 
       // Estrai city e cap dall'address
-      const cap = address?.address?.postcode || address?.address?.postalCode || address?.address?.cap || '';
+      const cap =
+        address?.address?.postcode ||
+        address?.address?.postalCode ||
+        address?.address?.cap ||
+        "";
 
       await OnboardService.update({
         role: RolesEnum.CONSUMER,
@@ -186,7 +190,7 @@ const ConsumerOnboardComponent = () => {
               )}
             />
             <div>
-              <p className="font-medium mb-2">
+              <p className="font-medium mb-2 text-consumer-blue">
                 Che rapporto hai con la persona cara?
               </p>
               <div className="space-y-2">

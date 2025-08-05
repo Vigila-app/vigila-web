@@ -14,9 +14,9 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
 import { useEffect, useMemo, useState } from "react";
 import { Avatar, Badge, Button, Card } from "@/components";
-import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import { amountDisplay } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
-import Orologio from "@/public/svg/Orologio";
+import Orologio from "@/components/svg/Orologio";
 import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { BookingUtils } from "@/src/utils/booking.utils";
@@ -243,7 +243,9 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 }
                 color={
                   booking?.payment_status === PaymentStatusEnum.PAID
-                    ? BookingUtils.getStatusColor(booking.status as BookingStatusEnum)
+                    ? BookingUtils.getStatusColor(
+                        booking.status as BookingStatusEnum
+                      )
                     : "yellow"
                 }
               />

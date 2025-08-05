@@ -1,13 +1,13 @@
 import { ButtonLink, Card } from "@/components";
 import { BaseHero } from "@/components/hero";
-import Automobile from "@/public/svg/Automobile";
-import CarrelloSpesa from "@/public/svg/CarrelloSpesa";
-import Casa from "@/public/svg/Casa";
-import Cuore from "@/public/svg/Cuore";
-import Euro from "@/public/svg/Euro";
-import Scudo from "@/public/svg/Scudo";
-import Smile from "@/public/svg/Smile";
-import Stetoscopio from "@/public/svg/Stetoscopio";
+import Automobile from "@/components/svg/Automobile";
+import CarrelloSpesa from "@/components/svg/CarrelloSpesa";
+import Casa from "@/components/svg/Casa";
+import Cuore from "@/components/svg/Cuore";
+import Euro from "@/components/svg/Euro";
+import Scudo from "@/components/svg/Scudo";
+import Smile from "@/components/svg/Smile";
+import Stetoscopio from "@/components/svg/Stetoscopio";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { CmsPageHeroI, CmsPageI } from "@/src/types/cms.types";
 
