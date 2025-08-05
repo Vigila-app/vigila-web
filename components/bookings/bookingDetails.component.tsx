@@ -226,7 +226,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>&nbsp;
-                {amountDisplay(booking.price, booking.service?.currency as CurrencyEnum)}
+                {amountDisplay(
+                  booking.price,
+                  booking.service?.currency as CurrencyEnum
+                )}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>&nbsp;
