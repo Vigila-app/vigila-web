@@ -1,24 +1,20 @@
-import { Button } from "@/components";
 import Card from "@/components/card/card";
-import { Input } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { UserService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 const InformazioniTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
-const{vigils}=useVigilStore();
-  const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
-  const email: string = user?.email || "";
-  const birthday: string = user?.user_metadata?.birthday;
-  const phone: string = user?.user_metadata?.phone;
-  const vigil =vigils.find((v)=> v.id === user?.id);
+  const role = user?.user_metadata?.role as RolesEnum;
+  const email = user?.email || "";
+  const birthday = user?.user_metadata?.birthday;
+  const phone = user?.user_metadata?.phone;
+
   //esempio di editing dinamico
   const [isEditing, setIsEditing] = useState(true);
 
@@ -57,7 +53,6 @@ const{vigils}=useVigilStore();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails, isEditing, reset]);
-console.log("userDetails", userDetails);
   const onSubmit = async (formData: ProfileFormI) => {
     if (isValid) {
       try {
@@ -121,7 +116,7 @@ console.log("userDetails", userDetails);
                 Nome
               </label>
 
-              <p>{user?.user_metadata?.name}</p>
+              <p>{userDetails?.name}</p>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium  text-vigil-orange">
@@ -137,14 +132,14 @@ console.log("userDetails", userDetails);
               Data di nascita
             </label>
 
-            <p>{vigil?.birthday}</p>
+            <p>{userDetails?.birthday}</p>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-vigil-orange">
               Email
             </label>
-            <p>{vigil?.email}</p>
+            <p>{userDetails?.email}</p>
             <p className="text-xs text-gray-500">
               Per modificare l&apos;email contatta il supporto
             </p>
@@ -155,7 +150,7 @@ console.log("userDetails", userDetails);
               Telefono
             </label>
 
-            <p>{vigil?.phone}</p>
+            <p>{userDetails?.phone}</p>
           </div>
         </div>
       </Card>
@@ -202,7 +197,6 @@ console.log("userDetails", userDetails);
         )}
       </Card> */}
     </div>
-    
   );
 };
 export default InformazioniTab;

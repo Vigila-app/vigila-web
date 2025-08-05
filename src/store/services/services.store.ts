@@ -16,7 +16,7 @@ const initServicesStore: {
 };
 
 // Crea il debouncer per lo store dei servizi
-const { createDebouncedAction } = createStoreDebouncer('services-store');
+const { createDebouncedAction } = createStoreDebouncer("services-store");
 
 export const useServicesStore = create<ServicesStoreType>()(
   devtools(
@@ -25,7 +25,8 @@ export const useServicesStore = create<ServicesStoreType>()(
         ...initServicesStore,
         getServices: async (
           force: boolean = false,
-          vigil_id?: ServiceI["vigil_id"]
+          vigil_id?: ServiceI["vigil_id"],
+          filters: Record<string, any> = {}
         ) => {
           const action = async () => {
             try {
@@ -36,7 +37,8 @@ export const useServicesStore = create<ServicesStoreType>()(
                 dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
               ) {
                 const response = await ServicesService.getServices(
-                  vigil_id as string
+                  vigil_id as string,
+                  filters
                 );
                 if (response) {
                   set(
@@ -54,17 +56,16 @@ export const useServicesStore = create<ServicesStoreType>()(
             }
           };
 
-          const uniqueKey = vigil_id ? `vigil_${vigil_id}` : 'all';
-          return createDebouncedAction('getServices', action, force, uniqueKey);
+          const uniqueKey = vigil_id ? `vigil_${vigil_id}` : "all";
+          return createDebouncedAction("getServices", action, force, uniqueKey);
         },
         getServiceDetails: async (serviceId: ServiceI["id"], force = false) => {
           const action = async () => {
             try {
               const getServiceDetailsBE = async () => {
                 try {
-                  const serviceStoreBE = await ServicesService.getServiceDetails(
-                    serviceId
-                  );
+                  const serviceStoreBE =
+                    await ServicesService.getServiceDetails(serviceId);
                   if (get().services?.length) {
                     set(
                       () => ({
@@ -98,7 +99,8 @@ export const useServicesStore = create<ServicesStoreType>()(
               if (
                 force ||
                 !get().lastUpdate ||
-                dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
+                dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) >
+                  5
               ) {
                 // TODO retrieve service details from BE
                 const serviceStoreBE = await getServiceDetailsBE();
@@ -126,7 +128,12 @@ export const useServicesStore = create<ServicesStoreType>()(
             }
           };
 
-          return createDebouncedAction('getServiceDetails', action, force, serviceId);
+          return createDebouncedAction(
+            "getServiceDetails",
+            action,
+            force,
+            serviceId
+          );
         },
         deleteService: async (serviceId: ServiceI["id"]) => {
           try {

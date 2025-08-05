@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { ErrorI } from "@/src/types/error.types";
 import { NextURL } from "next/dist/server/web/next-url";
 import Stripe from "stripe";
+import { PaginationI } from "@/src/types/app.types";
 
 // Inizializzazione Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -46,7 +47,9 @@ export const verifyPaymentWithStripe = async (
 
     // Verifica che il payment intent appartenga all'utente autenticato
     if (userId && paymentIntent.metadata?.userId !== userId) {
-      throw new Error("Payment intent does not belong to the authenticated user");
+      throw new Error(
+        "Payment intent does not belong to the authenticated user"
+      );
     }
 
     // Verifica opzionale del booking ID se fornito
@@ -99,7 +102,7 @@ export const getPagination = (
   nextUrl: NextURL,
   pageSize?: number,
   limit = 25
-): { from: number; to: number; page: number; itemPerPage: number } => {
+): PaginationI => {
   const page = parseInt(nextUrl?.searchParams?.get("page") || "") || 1;
   const itemPerPage = Math.min(
     pageSize || parseInt(nextUrl?.searchParams?.get("pageSize") || "") || 10,
@@ -114,7 +117,10 @@ export const getPagination = (
   };
 };
 
-export const getQueryParams = (url: string, blacklist: string[] = []) => {
+export const getQueryParams = (
+  url: string,
+  blacklist: string[] = []
+): Record<string, any> => {
   const params = new URL(url).searchParams;
   const queryObject = Object.fromEntries(params.entries());
 

@@ -23,6 +23,7 @@ export type ServiceCatalogItem = {
   minimum_duration_hours: number;
   extra: ServiceCatalogExtraOption[];
   tags: string[];
+  fee: number;
 };
 
 export type ServiceCatalog = {
@@ -53,7 +54,11 @@ export type ServicesStoreType = {
   onLogout: () => void;
   services: ServiceI[];
   lastUpdate?: Date;
-  getServices: (force?: boolean, vigilId?: ServiceI["vigil_id"]) => void;
+  getServices: (
+    force?: boolean,
+    vigilId?: ServiceI["vigil_id"],
+    filters?: Record<string, any>
+  ) => void;
   getServiceDetails: (serviceId: ServiceI["id"], force?: boolean) => void;
   deleteService: (serviceId: ServiceI["id"]) => void;
   resetLastUpdate: () => void;

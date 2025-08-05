@@ -1,4 +1,5 @@
 "use client";
+import { OrderDirectionEnum } from "@/src/types/app.types";
 import {
   BarsArrowDownIcon,
   BarsArrowUpIcon,
@@ -26,7 +27,7 @@ type TableI = {
   onPageChange?: (newPage: number) => void;
   order?: {
     field: string;
-    direction: "asc" | "desc";
+    direction: OrderDirectionEnum;
   };
 };
 
@@ -38,11 +39,14 @@ const Table = (props: TableI) => {
     pageSize = 25,
     pages: ePages,
     onPageChange = () => ({}),
-    order: orderExt = { field: cols[0].field, direction: "desc" },
+    order: orderExt = {
+      field: cols[0].field,
+      direction: OrderDirectionEnum.DESC,
+    },
   } = props;
   const [order, setOrder] = useState<{
     field: String;
-    direction: "asc" | "desc";
+    direction: OrderDirectionEnum;
   }>(orderExt);
 
   const [currentPage, setCurrentPage] = useState(page);
@@ -62,9 +66,10 @@ const Table = (props: TableI) => {
       setOrder({
         field: col.field,
         direction:
-          order.field === col.field && order.direction === "desc"
-            ? "asc"
-            : "desc",
+          order.field === col.field &&
+          order.direction === OrderDirectionEnum.DESC
+            ? OrderDirectionEnum.ASC
+            : OrderDirectionEnum.DESC,
       });
     }
   };
@@ -85,8 +90,8 @@ const Table = (props: TableI) => {
                     col.size === "sm"
                       ? "max-w-12"
                       : col.size === "lg"
-                      ? "max-w-48"
-                      : "max-w-24"
+                        ? "max-w-48"
+                        : "max-w-24"
                   )}
                   onClick={() => col.sortable && orderBy(col)}
                 >
@@ -96,7 +101,7 @@ const Table = (props: TableI) => {
                     </span>
                     {col.sortable && order.field === col.field ? (
                       <>
-                        {order.direction === "asc" ? (
+                        {order.direction === OrderDirectionEnum.ASC ? (
                           <BarsArrowUpIcon className="size-4" />
                         ) : (
                           <BarsArrowDownIcon className="size-4" />
@@ -112,7 +117,7 @@ const Table = (props: TableI) => {
             <tbody className="bg-gray-100/25 divide-y divide-gray-200">
               {rows
                 .sort((a, b) => {
-                  if (order.direction === "asc") {
+                  if (order.direction === OrderDirectionEnum.ASC) {
                     return (a[`${order.field}Value`] ||
                       a[order.field as string]?.toLowerCase?.()) >
                       (b[`${order.field}Value`] ||
@@ -153,8 +158,8 @@ const Table = (props: TableI) => {
                             size === "sm"
                               ? "max-w-12	"
                               : size === "lg"
-                              ? "max-w-48"
-                              : "max-w-24"
+                                ? "max-w-48"
+                                : "max-w-24"
                           )}
                         >
                           {row[field] || "-"}

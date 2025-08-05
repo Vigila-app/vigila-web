@@ -1,4 +1,7 @@
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService, UserService } from "@/src/services";
@@ -6,27 +9,62 @@ import { Routes } from "@/src/routes";
 import { replaceDynamicUrl } from "@/src/utils/common.utils";
 
 export const BookingUtils = {
-  getStatusColor: (status: BookingStatusEnum) => {
+  getStatusColor: (status: BookingStatusEnum | PaymentStatusEnum) => {
     switch (status) {
       case BookingStatusEnum.PENDING:
+      case PaymentStatusEnum.PENDING:
         return "yellow";
       case BookingStatusEnum.CONFIRMED:
         return "blue";
       case BookingStatusEnum.IN_PROGRESS:
+      case PaymentStatusEnum.REFUNDED:
         return "purple";
       case BookingStatusEnum.COMPLETED:
+      case PaymentStatusEnum.PAID:
         return "green";
       case BookingStatusEnum.CANCELLED:
       case BookingStatusEnum.REFUNDED:
+      case PaymentStatusEnum.FAILED:
         return "red";
       default:
         return "gray";
     }
   },
 
-  /**
-   * Formatta la data di una prenotazione in formato locale italiano
-   */
+  getStatusText: (status: BookingStatusEnum): string => {
+    switch (status) {
+      case BookingStatusEnum.PENDING:
+        return "In attesa";
+      case BookingStatusEnum.CONFIRMED:
+        return "Confermata";
+      case BookingStatusEnum.IN_PROGRESS:
+        return "In corso";
+      case BookingStatusEnum.COMPLETED:
+        return "Completata";
+      case BookingStatusEnum.CANCELLED:
+        return "Cancellata";
+      case BookingStatusEnum.REFUNDED:
+        return "Rimborsata";
+      default:
+        return status;
+    }
+  },
+
+  getPaymentStatusText: (status: PaymentStatusEnum): string => {
+    switch (status) {
+      case PaymentStatusEnum.PENDING:
+        return "Da pagare";
+      case PaymentStatusEnum.PAID:
+        return "Pagato";
+      case PaymentStatusEnum.FAILED:
+        return "Fallito";
+      case PaymentStatusEnum.REFUNDED:
+        return "Rimborsato";
+      default:
+        return status;
+    }
+  },
+
   formatBookingDate: (date: Date): string => {
     return new Date(date).toLocaleDateString("it-IT", {
       year: "numeric",

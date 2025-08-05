@@ -35,20 +35,26 @@ export default async function Registration() {
               ) : null}
             </div>
           ) : null}
-          <h3 className="font-semibold text-sm my-4">Come vuoi unirti a Vigila?</h3>
+          <h3 className="font-semibold text-sm my-4">
+            Come vuoi unirti a Vigila?
+          </h3>
           <div className="space-y-4 my-4">
             <Link href={Routes.registrationConsumer.url}>
               <Card containerClass="text-consumer-blue flex flex-col items-center justify-center p-4 hover:scale-95 transition">
                 <HeartIcon className="size-6" />
                 <h4 className="font-bold">Hai bisogno di aiuto?</h4>
-                <p className="text-gray-500 text-[12px]">Trova un Vigil di fiducia nella tua zona</p>
+                <p className="text-gray-500 text-[12px]">
+                  Trova un Vigil di fiducia nella tua zona
+                </p>
               </Card>
             </Link>
             <Link href={Routes.registrationVigil.url}>
               <Card containerClass="text-vigil-orange flex flex-col items-center justify-center p-4 hover:scale-95 transition">
                 <FaceSmileIcon className="size-6" />
                 <h4 className="font-bold">Vuoi lavorare con noi?</h4>
-                <p className="text-gray-500 text-[12px]">Lavoro flessibile, retribuito e valido per CFU</p>
+                <p className="text-gray-500 text-[12px]">
+                  Lavoro flessibile, retribuito e valido per CFU
+                </p>
               </Card>
             </Link>
           </div>

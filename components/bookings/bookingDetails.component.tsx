@@ -82,8 +82,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     );
   }, [consumers, booking]);
 
-  console.log("Booking Details Component", booking)
-
   const checkCancellation = useCallback(async () => {
     if (!booking) {
       setCanCancel(false);
@@ -162,19 +160,29 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Dettagli della Prenotazione
-          </h2>
-          <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
-        </div>
-        <Badge
-          label={capitalize(booking.status as string)}
-          color={BookingUtils.getStatusColor(
-            booking.status as BookingStatusEnum
-          )}
-        />
+      <div className="relative pr-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Dettagli della Prenotazione
+        </h2>
+        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
+        <span className="absolute top-0 right-0">
+          <Badge
+            label={
+              booking?.payment_status === PaymentStatusEnum.PAID
+                ? BookingUtils.getStatusText(
+                    booking.status as BookingStatusEnum
+                  )
+                : "Da pagare"
+            }
+            color={
+              booking?.payment_status === PaymentStatusEnum.PAID
+                ? BookingUtils.getStatusColor(
+                    booking.status as BookingStatusEnum
+                  )
+                : "yellow"
+            }
+          />
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -189,7 +197,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                   {service.description}
                 </p>
               )}
-              <p>
+              {/* <p>
                 <span className="font-medium">
                   Prezzo per&nbsp;
                   {ServicesUtils.getServiceUnitType(
@@ -200,7 +208,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 &nbsp;
                 {service?.currency}
                 {amountDisplay(service?.unit_price || 0)}
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -208,8 +216,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             <h3 className="font-medium text-gray-900">Ulteriori dettagli:</h3>
             <div className="mt-2 space-y-2 text-sm">
               <p>
-                <span className="font-medium">Data del Servizio:</span>{" "}
-                {dateDisplay(booking.startDate)}
+                <span className="font-medium">Data del Servizio:</span>&nbsp;
+                {dateDisplay(booking.startDate, "dateTime")}
               </p>
               <p>
                 <span className="font-medium">Durata:</span> {booking.quantity}
@@ -217,12 +225,19 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
               <p>
-                <span className="font-medium">Prezzo Totale:</span>{" "}
-                {amountDisplay(booking.price, booking.currency as CurrencyEnum)}
+                <span className="font-medium">Prezzo Totale:</span>&nbsp;
+                {amountDisplay(booking.price, booking.service?.currency as CurrencyEnum)}
               </p>
               <p>
-                <span className="font-medium">Stato del pagamento:</span>{" "}
-                {capitalize(booking.payment_status as string)}
+                <span className="font-medium">Stato del pagamento:</span>&nbsp;
+                <Badge
+                  label={BookingUtils.getPaymentStatusText(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                  color={BookingUtils.getStatusColor(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                />
               </p>
             </div>
           </div>

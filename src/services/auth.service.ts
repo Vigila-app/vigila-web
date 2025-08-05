@@ -6,7 +6,6 @@ import { UserTermsType } from "@/src/types/user.types";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { apiUser } from "@/src/constants/api.constants";
-import { useCartStore } from "@/src/store/cart/cart.store";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { isServer } from "@/src/utils/common.utils";
 import { Session, User } from "@supabase/supabase-js";
@@ -82,7 +81,6 @@ export const AuthService = {
         useBookingsStore.getState().onLogout();
         useConsumerStore.getState().onLogout();
         useVigilStore.getState().onLogout();
-        useCartStore.getState().onLogout();
         useModalStore.getState().onLogout();
         useServicesStore.getState().onLogout();
         useUserStore.getState().onLogout();

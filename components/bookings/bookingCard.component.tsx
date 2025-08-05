@@ -1,6 +1,9 @@
 "use client";
 
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
@@ -11,10 +14,7 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
 import { useEffect, useMemo, useState } from "react";
 import { Avatar, Badge, Button, Card } from "@/components";
-import {
-  amountDisplay,
-  capitalize,
-} from "@/src/utils/common.utils";
+import { amountDisplay } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import Orologio from "@/components/svg/Orologio";
 import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
@@ -108,24 +108,6 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       });
     } finally {
       hideLoader();
-    }
-  };
-
-  const getStatusColor = (status: BookingStatusEnum) => {
-    switch (status) {
-      case BookingStatusEnum.PENDING:
-        return "yellow";
-      case BookingStatusEnum.CONFIRMED:
-        return "blue";
-      case BookingStatusEnum.IN_PROGRESS:
-        return "purple";
-      case BookingStatusEnum.COMPLETED:
-        return "green";
-      case BookingStatusEnum.CANCELLED:
-      case BookingStatusEnum.REFUNDED:
-        return "red";
-      default:
-        return "gray";
     }
   };
 
@@ -252,8 +234,20 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 {amountDisplay(booking?.price, service?.currency)}
               </span>
               <Badge
-                label={capitalize(booking.status as string)}
-                color={getStatusColor(booking.status as BookingStatusEnum)}
+                label={
+                  booking?.payment_status === PaymentStatusEnum.PAID
+                    ? BookingUtils.getStatusText(
+                        booking.status as BookingStatusEnum
+                      )
+                    : "Da pagare"
+                }
+                color={
+                  booking?.payment_status === PaymentStatusEnum.PAID
+                    ? BookingUtils.getStatusColor(
+                        booking.status as BookingStatusEnum
+                      )
+                    : "yellow"
+                }
               />
             </div>
           )}

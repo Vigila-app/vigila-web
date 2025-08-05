@@ -7,11 +7,12 @@ import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 const convertCatalogData = (jsonData: any): ServiceCatalogItem[] => {
   return jsonData.services_catalog.map((item: any) => ({
     ...item,
-    type: item.type as ServiceCatalogTypeEnum
+    type: item.type as ServiceCatalogTypeEnum,
   }));
 };
 
-const servicesCatalogData: ServiceCatalogItem[] = convertCatalogData(servicesCatalogJson);
+const servicesCatalogData: ServiceCatalogItem[] =
+  convertCatalogData(servicesCatalogJson);
 
 export const ServicesService = {
   createService: (newService: ServiceI) =>
@@ -52,12 +53,15 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getServices: (vigil_id: ServiceI["vigil_id"]) =>
+  getServices: (
+    vigil_id: ServiceI["vigil_id"],
+    filters: Record<string, any> = {}
+  ) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
           apiServices.LIST(),
-          { vigil_id }
+          { vigil_id, ...filters }
         )) as { data: ServiceI[] };
         resolve(response);
       } catch (error) {
@@ -83,17 +87,19 @@ export const ServicesService = {
   },
 
   getServiceCatalogById: (id: number): ServiceCatalogItem | undefined => {
-    return servicesCatalogData.find(service => service.id === id);
+    return servicesCatalogData.find((service) => service.id === id);
   },
 
   getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem[] => {
-    return servicesCatalogData.filter(service => service.type === type);
+    return servicesCatalogData.filter((service) => service.type === type);
   },
 
   searchServicesByTag: (tag: string): ServiceCatalogItem[] => {
     const lowerCaseTag = tag.toLowerCase();
-    return servicesCatalogData.filter(service =>
-      service.tags.some(serviceTag => serviceTag.toLowerCase().includes(lowerCaseTag))
+    return servicesCatalogData.filter((service) =>
+      service.tags.some((serviceTag) =>
+        serviceTag.toLowerCase().includes(lowerCaseTag)
+      )
     );
-  }
+  },
 };

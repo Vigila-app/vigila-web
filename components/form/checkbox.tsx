@@ -33,9 +33,11 @@ const Checkbox = (props: CheckboxI) => {
         role === RolesEnum.CONSUMER && "text-consumer-blue",
         error && "!border-red-500",
         disabled && "opacity-75 !cursor-not-allowed"
-      )}>
+      )}
+    >
       <div
-        className={clsx("flex items-center", disabled && "cursor-not-allowed")}>
+        className={clsx("flex items-center", disabled && "cursor-not-allowed")}
+      >
         &#8203;
         <input
           {...{ ...props, type: "checkbox", error: undefined, icon: undefined }}
@@ -56,12 +58,13 @@ const Checkbox = (props: CheckboxI) => {
         <div>
           <span
             className={clsx(
-              "text-sm ",
-              role === RolesEnum.VIGIL && "checked:bg-vigil-orange ",
-              role === RolesEnum.CONSUMER && "checked:bg-consumer-blue ",
+              "text-sm",
+              role === RolesEnum.VIGIL && "checked:bg-vigil-orange",
+              role === RolesEnum.CONSUMER && "checked:bg-consumer-blue",
               error && "text-red-500",
               disabled && "!opacity-75 cursor-not-allowed"
-            )}>
+            )}
+          >
             {label}
             {required && <>*</>}
           </span>

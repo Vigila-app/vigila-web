@@ -89,9 +89,9 @@ export async function PUT(
       updateData.payment_status = payment_status;
     }
 
-    if (status && Object.values(BookingStatusEnum).includes(status)) {
-      updateData.status = status;
-    }
+    // if (status && Object.values(BookingStatusEnum).includes(status)) {
+    //   updateData.status = status;
+    // }
 
     // Aggiorna la prenotazione
     const { data: updatedBooking, error: updateError } = await _admin

@@ -14,6 +14,8 @@ import {
 } from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
 import { FrequencyEnum } from "@/src/enums/common.enums";
+import { OrderDirectionEnum } from "@/src/types/app.types";
+import { ServicesService } from "@/src/services";
 
 export async function GET(req: NextRequest) {
   try {
@@ -49,6 +51,7 @@ export async function GET(req: NextRequest) {
       db_query = db_query.eq("consumer_id", userObject.id);
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
+      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID);
     }
 
     if (Object.keys(filters).length) {
@@ -61,7 +64,7 @@ export async function GET(req: NextRequest) {
 
     if (orderBy) {
       db_query = db_query.order(orderBy, {
-        ascending: orderDirection === "ASC" ? true : false,
+        ascending: orderDirection === OrderDirectionEnum.ASC ? true : false,
       });
     }
 
@@ -137,26 +140,63 @@ export async function POST(req: NextRequest) {
         success: false,
       });
     }
+    const serviceCatalog = ServicesService.getServiceCatalogById(
+      service.info.catalog_id
+    );
 
-    const price = service.unit_price * body.quantity;
+    if (!serviceCatalog?.id) {
+      return jsonErrorResponse(500, {
+        code: ResponseCodesConstants.BOOKINGS_CREATE_ERROR.code,
+        success: false,
+      });
+    }
+
+    const price = (service.unit_price + serviceCatalog.fee) * body.quantity;
+
+    const formatDate = (date: Date) => {
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        "T" +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes()) +
+        ":" +
+        pad(date.getSeconds())
+      );
+    };
+
+    const startDateObj = new Date(
+      body.startDate.toString().replace("T", " ").replace("Z", "")
+    );
+    const startDate = formatDate(startDateObj);
+
+    const calculatedEndDateObj = body.endDate
+      ? new Date(body.endDate.toString().replace("T", " ").replace("Z", ""))
+      : new Date(
+          startDateObj.getTime() +
+            (service.unit_type === FrequencyEnum.HOURS
+              ? body.quantity * 60 * 60 * 1000
+              : service.unit_type === FrequencyEnum.DAYS
+                ? body.quantity * 24 * 60 * 60 * 1000
+                : body.quantity * 60 * 1000)
+        );
+    const endDate = formatDate(calculatedEndDateObj);
 
     const newBooking = {
       ...body,
-      endDate:
-        body.endDate ||
-        new Date(
-          new Date(body.startDate).getTime() +
-            (service.unit_type === FrequencyEnum.HOURS
-              ? body.quantity * (60000 * 60)
-              : service.unit_type === FrequencyEnum.DAYS
-              ? body.quantity * (60000 * 60 * 60)
-              : body.quantity * 60000)
-        ),
+      startDate,
+      endDate,
       consumer_id: userObject.id,
       vigil_id: service.vigil_id,
       status: BookingStatusEnum.PENDING,
       payment_status: PaymentStatusEnum.PENDING,
       price,
+      fee: serviceCatalog.fee * body.quantity,
     };
 
     const { data, error } = await _admin
