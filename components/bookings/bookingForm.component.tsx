@@ -7,10 +7,10 @@ import { useModalStore } from "@/src/store/modal/modal.store";
 import { Input, Select, TextArea, InputQuantity } from "@/components/form";
 import { Avatar, Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingsService } from "@/src/services";
+import { BookingsService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useEffect, useMemo, useState } from "react";
-import { ServiceI } from "@/src/types/services.types";
+import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
@@ -62,6 +62,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const { closeModal } = useModalStore();
   const { services, getServiceDetails, getServices } = useServicesStore();
   const { user } = useUserStore();
+  const role = useMemo(
+    () => user?.user_metadata?.role,
+    [user?.user_metadata?.role]
+  );
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
 
@@ -87,6 +91,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedServiceId = watch("service_id");
   const watchedDuration = watch("quantity");
   const watchedAddress = watch("address");
+
+  const serviceCatalog: ServiceCatalogItem = useMemo(
+    () =>
+      selectedService?.info?.catalog_id &&
+      ServicesService.getServiceCatalogById(selectedService.info.catalog_id),
+    [selectedService]
+  );
 
   // useEffect(() => {
   // if (serviceId) {
@@ -132,9 +143,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
   useEffect(() => {
     if (selectedService && watchedDuration) {
-      setTotalAmount(selectedService.unit_price * watchedDuration);
+      setTotalAmount(
+        (selectedService.unit_price +
+          (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)) *
+          watchedDuration
+      );
     }
-  }, [selectedService, watchedDuration]);
+  }, [selectedService, watchedDuration, serviceCatalog, role]);
 
   useEffect(() => {
     if (services?.length === 1) {
@@ -361,7 +376,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
                 :&nbsp;
                 {selectedService.currency}
-                {amountDisplay(selectedService.unit_price)}
+                {amountDisplay(
+                  selectedService.unit_price +
+                    (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)
+                )}
               </p>
               <p>
                 Quantità: {watchedDuration}&nbsp;

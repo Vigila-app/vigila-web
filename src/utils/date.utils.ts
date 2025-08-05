@@ -31,12 +31,22 @@ export const dateDisplay = (
       return date?.toLocaleDateString() as unknown as string;
     case "dateType":
       return date as unknown as string;
+    case "dateTime":
+      return date
+        ? new Intl.DateTimeFormat("it-IT", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(date)
+        : "";
     case "time":
       // Show only hours and minutes
       return date
         ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
-        case "monthYearLiteral":
+    case "monthYearLiteral":
       // Show month and year in a more readable format
       return date
         ? new Intl.DateTimeFormat("it-IT", {

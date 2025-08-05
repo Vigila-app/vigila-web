@@ -23,7 +23,7 @@ const initialAvailability: WeeklyAvailability = {
   Domenica: { morning: false, afternoon: false, evening: false },
 };
 
-export default function DisponibilitàTab() {
+export default function DisponibilitaTab() {
   const [availability, setAvailability] =
     useState<WeeklyAvailability>(initialAvailability);
   const [isEditing, setIsEditing] = useState(false);

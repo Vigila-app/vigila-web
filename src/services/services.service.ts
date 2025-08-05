@@ -52,12 +52,12 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getServices: (vigil_id: ServiceI["vigil_id"]) =>
+  getServices: (vigil_id: ServiceI["vigil_id"], filters: Record<string, any> = {}) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
           apiServices.LIST(),
-          { vigil_id }
+          { vigil_id, ...filters }
         )) as { data: ServiceI[] };
         resolve(response);
       } catch (error) {

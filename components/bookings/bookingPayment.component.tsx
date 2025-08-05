@@ -197,8 +197,9 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
           Completa prenotazione
         </h2>
         <p className="text-center text-sm text-gray-500 mt-2">
-          Per completare la prenotazione, procedi al pagamento. Una volta
-          effettuato il pagamento, riceverai una conferma via email.
+          Per completare la prenotazione, procedi al pagamento.
+          <br />
+          Una volta effettuato il pagamento, riceverai una conferma via email.
         </p>
       </div>
 
@@ -210,7 +211,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>ID Prenotazione:</span>
-            <span className="font-mono text-xs">{booking.id}</span>
+            <span className="text-xs">{booking.id}</span>
           </div>
           {service?.id && (
             <div className="flex justify-between">
@@ -226,11 +227,11 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
           )}
           <div className="flex justify-between">
             <span>Quando:</span>
-            <span>{dateDisplay(booking.startDate)}</span>
+            <span>{dateDisplay(booking.startDate, "dateTime")}</span>
           </div>
           <div className="flex justify-between">
             <span>Indirizzo:</span>
-            <span>{booking.address}</span>
+            <span className="max-w-3/4 text-right">{booking.address}</span>
           </div>
           <div className="flex justify-between">
             <span>Quantità:</span>

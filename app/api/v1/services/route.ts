@@ -67,7 +67,8 @@ export async function GET(req: NextRequest) {
           key !== "minPrice" &&
           key !== "maxPrice" &&
           key !== "minRating" &&
-          key !== "search"
+          key !== "search" &&
+          key !== "active"
         ) {
           db_query = db_query.eq(key, filters[key]);
         }
@@ -88,6 +89,8 @@ export async function GET(req: NextRequest) {
 
     if (filters.active === undefined) {
       db_query = db_query.eq("active", true);
+    } else if (filters.active === "false" || filters.active === "true") {
+      db_query = db_query.eq("active", filters.active);
     }
 
     if (userObject.user_metadata?.role === RolesEnum.VIGIL) {

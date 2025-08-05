@@ -9,24 +9,26 @@ import { StorageUtils } from "@/src/utils/storage.utils";
 import { useState } from "react";
 import { TabI } from "@/components/tabGroup/tabGroup";
 import PanoramicaTab from "@/app/vigil/tabs/panoramica";
-import Profile from "@/public/svg/Profile";
-import Prenotazioni from "@/public/svg/Prenotazioni";
-import Documenti from "@/public/svg/Informazioni";
-import Disponbilità from "@/public/svg/Disponibilità";
-import Recensioni from "@/public/svg/Recensioni";
 import PrenotationTabs from "@/app/vigil/tabs/prenotazioni";
 import InformazioniTab from "@/app/vigil/tabs/informazioni";
-import DisponibilitàTab from "@/app/vigil/tabs/disponibilita";
 import RecensioniTab from "@/app/vigil/tabs/recensioni";
 import PanoramicaConsumerTab from "@/app/(consumer)/tabs/panoramicaConsumer";
 import PrenotazioniConsumerTabs from "@/app/(consumer)/tabs/prenotazioniConsumer";
-import Famiglia from "@/public/svg/Famiglia";
 import FamigliaTab from "@/app/(consumer)/tabs/famigliaTab";
 import InformazioniConsumerTab from "@/app/(consumer)/tabs/informazionicConsumerTab";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { MapPinIcon } from "@heroicons/react/24/outline";
+import {
+  BriefcaseIcon,
+  CalendarDaysIcon,
+  DocumentIcon,
+  MapPinIcon,
+  StarIcon,
+  UserGroupIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
+import ServiziTab from "@/app/vigil/tabs/servizi";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
@@ -41,33 +43,37 @@ const ProfileComponent = () => {
 
   const tabs: TabI[] = [
     {
-      label: <Profile />,
+      label: <UserIcon className="size-6" />,
       id: "panoramica",
       active: true,
     },
     {
-      label: <Prenotazioni />,
+      label: <CalendarDaysIcon className="size-6" />,
       id: "prenotazioni",
     },
     ...(isVigil
       ? [
+          // {
+          //   label: <ClockIcon className="size-6" />,
+          //   id: "disponibilita",
+          // },
           {
-            label: <Disponbilità />,
-            id: "disponibilità",
+            label: <BriefcaseIcon className="size-6" />,
+            id: "servizi",
           },
         ]
       : [
           {
-            label: <Famiglia />,
+            label: <UserGroupIcon className="size-6" />,
             id: "famiglia",
           },
         ]),
     {
-      label: <Recensioni />,
+      label: <StarIcon className="size-6" />,
       id: "recensioni",
     },
     {
-      label: <Documenti />,
+      label: <DocumentIcon className="size-6" />,
       id: "informazioni",
     },
   ];
@@ -142,18 +148,21 @@ const ProfileComponent = () => {
                     </span>
                     <div className="flex flex-col items-center gap-2  mb-3">
                       {consumer?.address?.name ? (
-                      <div className="inline-flex items-center flex-nowrap gap-1">
-                        <MapPinIcon className="size-4" />
-                        <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
-                          {consumer?.address?.name}
-                        </span>
-                      </div>
-                    ) : null}
+                        <div className="inline-flex items-center flex-nowrap gap-1">
+                          <MapPinIcon className="size-4" />
+                          <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
+                            {consumer?.address?.name}
+                          </span>
+                        </div>
+                      ) : null}
                       {consumer?.created_at && (
                         <span>
                           🗓️ Su Vigila da:&nbsp;
                           <span className="capitalize">
-                            {dateDisplay(consumer.created_at, "monthYearLiteral")}
+                            {dateDisplay(
+                              consumer.created_at,
+                              "monthYearLiteral"
+                            )}
                           </span>
                         </span>
                       )}
@@ -232,7 +241,8 @@ const ProfileComponent = () => {
             {selectedTab.id === "panoramica" && <PanoramicaTab />}
             {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
             {selectedTab.id === "informazioni" && <InformazioniTab />}
-            {selectedTab.id === "disponibilità" && <DisponibilitàTab />}
+            {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
+            {selectedTab.id === "servizi" && <ServiziTab />}
             {selectedTab.id === "recensioni" && <RecensioniTab />}
           </div>
         </div>

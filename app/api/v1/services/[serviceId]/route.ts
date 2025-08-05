@@ -146,12 +146,9 @@ export async function PUT(
   context: { params: Promise<{ serviceId: string }> }
 ) {
   try {
-    const { data: updatedService } = await req.json();
+    const updatedService = await req.json();
     const { serviceId } = await context?.params;
-    console.log(
-      `API PUT services/${serviceId}`,
-      updatedService
-    );
+    console.log(`API PUT services/${serviceId}`, updatedService);
 
     if (!serviceId) {
       return jsonErrorResponse(400, {
@@ -162,7 +159,9 @@ export async function PUT(
 
     if (
       !updatedService?.id ||
-      updatedService?.id !== serviceId
+      updatedService?.id !== serviceId ||
+      updatedService?.postalCode?.length === 0 ||
+      !updatedService?.unit_price
     ) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_DETAILS_BAD_REQUEST.code,
@@ -177,9 +176,7 @@ export async function PUT(
         success: false,
       });
 
-    const service = (await verifyServiceAccess(
-      serviceId
-    )) as ServiceI;
+    const service = (await verifyServiceAccess(serviceId)) as ServiceI;
 
     if (service.vigil_id !== userObject.id) {
       return jsonErrorResponse(403, {
@@ -193,10 +190,10 @@ export async function PUT(
     // Only allow certain fields to be updated based on user role
     let allowedUpdates = {};
     if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
-      // Vigils can update status and notes
       allowedUpdates = {
-        status: updatedService.status,
-        notes: updatedService.notes,
+        active: updatedService.active,
+        unit_price: updatedService.unit_price,
+        postalCode: updatedService.postalCode,
       };
     }
 

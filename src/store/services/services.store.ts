@@ -25,7 +25,8 @@ export const useServicesStore = create<ServicesStoreType>()(
         ...initServicesStore,
         getServices: async (
           force: boolean = false,
-          vigil_id?: ServiceI["vigil_id"]
+          vigil_id?: ServiceI["vigil_id"],
+          filters: Record<string, any> = {}
         ) => {
           const action = async () => {
             try {
@@ -36,7 +37,7 @@ export const useServicesStore = create<ServicesStoreType>()(
                 dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
               ) {
                 const response = await ServicesService.getServices(
-                  vigil_id as string
+                  vigil_id as string, filters
                 );
                 if (response) {
                   set(
