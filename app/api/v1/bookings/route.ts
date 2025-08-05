@@ -153,18 +153,44 @@ export async function POST(req: NextRequest) {
 
     const price = (service.unit_price + serviceCatalog.fee) * body.quantity;
 
+    const formatDate = (date: Date) => {
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        "T" +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes()) +
+        ":" +
+        pad(date.getSeconds())
+      );
+    };
+
+    const startDateObj = new Date(
+      body.startDate.toString().replace("T", " ").replace("Z", "")
+    );
+    const startDate = formatDate(startDateObj);
+
+    const calculatedEndDateObj = body.endDate
+      ? new Date(body.endDate.toString().replace("T", " ").replace("Z", ""))
+      : new Date(
+          startDateObj.getTime() +
+            (service.unit_type === FrequencyEnum.HOURS
+              ? body.quantity * 60 * 60 * 1000
+              : service.unit_type === FrequencyEnum.DAYS
+                ? body.quantity * 24 * 60 * 60 * 1000
+                : body.quantity * 60 * 1000)
+        );
+    const endDate = formatDate(calculatedEndDateObj);
+
     const newBooking = {
       ...body,
-      endDate:
-        body.endDate ||
-        new Date(
-          new Date(body.startDate).getTime() +
-            (service.unit_type === FrequencyEnum.HOURS
-              ? body.quantity * (60000 * 60)
-              : service.unit_type === FrequencyEnum.DAYS
-                ? body.quantity * (60000 * 60 * 60)
-                : body.quantity * 60000)
-        ),
+      startDate,
+      endDate,
       consumer_id: userObject.id,
       vigil_id: service.vigil_id,
       status: BookingStatusEnum.PENDING,

@@ -21,7 +21,13 @@ export const dateDisplay = (
   format = "locale"
 ): string => {
   const date = isValidDate(dateToDisplay as unknown as string)
-    ? new Date(dateToDisplay as unknown as string)
+    ? new Date(
+        dateToDisplay
+          .toString()
+          .replace("T", " ")
+          .replace("Z", "")
+          .replace(/(.+\+.*)$/, (str) => str.slice(0, -6))
+      )
     : timestampToDate(dateToDisplay);
   switch (format) {
     case "locale":

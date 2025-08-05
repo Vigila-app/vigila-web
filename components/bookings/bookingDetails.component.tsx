@@ -82,8 +82,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     );
   }, [consumers, booking]);
 
-  console.log("Booking Details Component", booking)
-
   const checkCancellation = useCallback(async () => {
     if (!booking) {
       setCanCancel(false);
@@ -227,12 +225,19 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
               <p>
-                <span className="font-medium">Prezzo Totale:</span>{" "}
-                {amountDisplay(booking.price, booking.currency as CurrencyEnum)}
+                <span className="font-medium">Prezzo Totale:</span>&nbsp;
+                {amountDisplay(booking.price, booking.service?.currency as CurrencyEnum)}
               </p>
               <p>
-                <span className="font-medium">Stato del pagamento:</span>{" "}
-                {capitalize(booking.payment_status as string)}
+                <span className="font-medium">Stato del pagamento:</span>&nbsp;
+                <Badge
+                  label={BookingUtils.getPaymentStatusText(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                  color={BookingUtils.getStatusColor(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                />
               </p>
             </div>
           </div>
