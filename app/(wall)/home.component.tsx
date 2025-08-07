@@ -24,7 +24,7 @@ const HomeComponent = (props: HomeComponentI) => {
   return (
     <>
       {hero ? (
-        <section>
+        <section className="mt-8">
           <BaseHero
             title={hero?.title || ""}
             subtitle={hero?.subtitle}

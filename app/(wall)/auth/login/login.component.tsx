@@ -18,6 +18,8 @@ import { AltchaService } from "@/src/services/altcha.service";
 import { useEffect } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import Link from "next/link";
+import Login from "./page";
+import LoginPhoto from "@/components/svg/LoginPhoto";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -77,7 +79,10 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
 
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
-      <Undraw graphic="login" />
+     <div className=" flex items-center justify-center"> 
+     <LoginPhoto className="w-full h-auto mb-6 " />
+
+     </div>
       {title || text ? (
         <div>
           {title && <h2 className="text-center font-semibold text-3xl text-vigil-orange">{title}</h2>}

@@ -109,7 +109,7 @@ const MenuMobile = () => {
               </li>
               {user?.user_metadata?.role === RolesEnum.CONSUMER && (
                 <li className="block py-2">
-                  {MenuLinkItem(Routes.home, HomeIcon)}
+                  {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
                 </li>
               )}
               {user?.user_metadata?.role === RolesEnum.VIGIL && (
