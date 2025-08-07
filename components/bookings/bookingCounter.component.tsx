@@ -22,7 +22,7 @@ const BookingCounterComponent = () => {
 
   const numeroPrenotazioni = bookings.length || 0;
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col pb-8 gap-4">
       <Card>
         <div className="flex gap-4 justify-start items-center">
           <span className="text-4xl text-consumer-blue font-semibold">
