@@ -117,7 +117,8 @@ const ConsumerOnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-w-lg mx-auto space-y-8">
+            className="max-w-lg mx-auto space-y-8"
+          >
             <Controller
               name="lovedOneName"
               control={control}
@@ -230,7 +231,7 @@ const ConsumerOnboardComponent = () => {
                   {address && (
                     <div className="flex flex-col items-start text-start pt-1 mt-2 bg-gray-100 rounded-2xl ">
                       <span className="text-xs font-medium text-start px-2 text-gray-500 ">
-                      Se l'indirizzo è sbagliato, ri-effettua la ricerca
+                        Se l&apos;indirizzo è sbagliato, ri-effettua la ricerca
                       </span>
                       <span className="text-black mt-2 p-2 rounded text-sm">
                         {(address?.address
