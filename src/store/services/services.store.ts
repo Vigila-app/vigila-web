@@ -66,7 +66,10 @@ export const useServicesStore = create<ServicesStoreType>()(
                 try {
                   const serviceStoreBE =
                     await ServicesService.getServiceDetails(serviceId);
-                  if (get().services?.length) {
+                  if (
+                    get().services?.length &&
+                    get().services.find((s) => s.id === serviceId)
+                  ) {
                     set(
                       () => ({
                         services: get().services.map((service) => {
