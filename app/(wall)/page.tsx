@@ -1,12 +1,11 @@
 import { CmsService } from "@/src/services";
 import HomeComponent from "./home.component";
+import RedirectHandler from "./redirect-handler.component";
 import { CmsPageI } from "@/src/types/cms.types";
-import { calcDelay } from "@/src/utils/common.utils";
-import { FrequencyEnum } from "@/src/enums/common.enums";
 import { cache } from "react";
 
-// cache revalidation
-export const revalidate = calcDelay(30, FrequencyEnum.MINUTES);
+// cache revalidation - 30 minutes
+export const revalidate = 1800;
 
 const getCmsData = cache(async () => {
   try {
@@ -19,10 +18,11 @@ const getCmsData = cache(async () => {
 
 export default async function Home() {
   const data = (await getCmsData()) as CmsPageI;
-  const { ["main-hero"]: mainHero } = data;
+  const { ["main-hero"]: mainHero, ["section-cta"]: sectionCta } = data;
   return (
     <>
-      <HomeComponent hero={mainHero} />
+      <RedirectHandler />
+      <HomeComponent hero={mainHero} sectionCta={sectionCta} />
     </>
   );
 }

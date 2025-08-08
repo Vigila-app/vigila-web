@@ -1,0 +1,60 @@
+{
+  "services_catalog": [
+    {
+      "id": 1,
+      "name": "Compagnia e conversazione",
+      "description": "Presenza, dialogo, sorveglianza leggera.",
+      "long_description": "<p>Il servizio di <strong>compagnia e conversazione</strong> offre una presenza rassicurante e coinvolgente per chi ha bisogno di socializzazione e supporto emotivo.</p><ul><li><em>Presenza attiva</em> e dialogo stimolante</li><li>Sorveglianza discreta e non invasiva</li><li>Supporto emotivo e ascolto attivo</li><li>Attività di intrattenimento leggero</li></ul><p>Ideale per persone anziane, convalescenti o chiunque abbia bisogno di compagnia qualificata.</p>",
+      "type": "companionship",
+      "recommended_hourly_rate": 12,
+      "min_hourly_rate": 10,
+      "max_hourly_rate": 13,
+      "minimum_duration_hours": 1,
+      "extra": [],
+      "tags": [
+        "compagnia",
+        "conversazione",
+        "sorveglianza",
+        "presenza",
+        "dialogo",
+        "companionship",
+        "conversation",
+        "surveillance"
+      ],
+      "fee": 3
+    },
+    {
+      "id": 2,
+      "name": "Assistenza leggera",
+      "description": "Include piccole commissioni, accompagnamento a piedi, aiuto pasti, rassetto e compagnia attiva.",
+      "long_description": "<p>Il servizio di <strong>assistenza leggera</strong> comprende un supporto pratico quotidiano per mantenere l'autonomia e il benessere della persona assistita.</p><h4>Servizi inclusi:</h4><ul><li><strong>Piccole commissioni:</strong> spesa, farmacia, uffici pubblici</li><li><strong>Accompagnamento a piedi:</strong> passeggiate, visite mediche, attività sociali</li><li><strong>Supporto ai pasti:</strong> preparazione, servizio e compagnia durante i pasti</li><li><strong>Rassetto domestico:</strong> pulizie leggere e riordino degli spazi</li><li><strong>Compagnia attiva:</strong> conversazione, lettura, giochi da tavolo</li></ul><p><em>Perfetto per chi ha bisogno di un supporto pratico ma mantiene una buona autonomia.</em></p>",
+      "type": "light_assistance",
+      "recommended_hourly_rate": 15,
+      "min_hourly_rate": 13,
+      "max_hourly_rate": 16,
+      "minimum_duration_hours": 1,
+      "extra": [
+        {
+          "id": "transport",
+          "name": "Trasporto",
+          "description": "Supplemento per trasporto in auto o motorino da parte del caregiver.",
+          "fixed_price": 5,
+          "note": "Distanza massima 25km"
+        }
+      ],
+      "tags": [
+        "assistenza",
+        "commissioni",
+        "accompagnamento",
+        "pasti",
+        "rassetto",
+        "light_assistance",
+        "errands",
+        "meals",
+        "cleaning",
+        "assistance"
+      ],
+      "fee": 3
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { FrequencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ToastI } from "@/src/types/toast.type";
@@ -157,11 +157,11 @@ export const getUUID = (root = "") =>
 export const amountFormatter = (amount: number) =>
   Math.round((amount + Number.EPSILON) * 100) / 100;
 
-export const amountDisplay = (amount: number) =>
-  amountFormatter(amount).toLocaleString(undefined, {
+export const amountDisplay = (amount: number, currency?: CurrencyEnum) =>
+  `${currency || ""}${amountFormatter(amount).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
+  })}`;
 
 export const timestampToDate = (timestamp: any) => {
   try {
@@ -174,6 +174,18 @@ export const timestampToDate = (timestamp: any) => {
   } catch (error) {
     console.error("transformTimestamp error:", error);
   }
+};
+
+export const formatBookingDate = (dateString: string): string => {
+  const date = new Date(dateString);
+
+  return new Intl.DateTimeFormat("it-IT", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 };
 
 export const capitalize = (text: string) =>
@@ -206,4 +218,48 @@ export const deepMerge = (target: any, source: any) => {
   }
 
   return merged;
+};
+
+// Map per gestire multiple chiamate debounced con chiavi diverse
+const timeouts = new Map<string, NodeJS.Timeout>();
+
+export const debounce = (
+  key: string,
+  callback: (...args: any) => void,
+  delay = 500
+) => {
+  // Cancella il timeout precedente per questa chiave specifica
+  const existingTimeout = timeouts.get(key);
+  if (existingTimeout) {
+    clearTimeout(existingTimeout);
+  }
+  
+  // Imposta un nuovo timeout
+  const newTimeout = setTimeout(() => {
+    callback();
+    timeouts.delete(key); // Pulisce la mappa dopo l'esecuzione
+  }, delay);
+  
+  timeouts.set(key, newTimeout);
+};
+
+// Funzione per creare un debouncer con chiave automatica
+export const createDebouncer = (baseKey: string, delay = 500) => {
+  return (callback: (...args: any) => void, suffix = '') => {
+    const key = suffix ? `${baseKey}_${suffix}` : baseKey;
+    debounce(key, callback, delay);
+  };
+};
+
+export const getCurrency = (currency: CurrencyEnum) => {
+  switch (currency) {
+    case CurrencyEnum.EURO:
+      return "eur";
+    case CurrencyEnum.US_DOLLAR:
+      return "usd";
+    case CurrencyEnum.GB_POUND:
+      return "gbp";
+    default:
+      return (currency as string).toLowerCase();
+  }
 };

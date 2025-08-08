@@ -1,5 +1,6 @@
 "use client";
 
+import { RolesEnum } from "@/src/enums/roles.enums";
 import { FormUtils } from "@/src/utils/form.utils";
 import clsx from "clsx";
 import { FieldError } from "react-hook-form";
@@ -8,6 +9,7 @@ type CheckboxI = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   error?: FieldError;
   onChange?: (checked: boolean) => void;
+  role?: RolesEnum;
 };
 
 const Checkbox = (props: CheckboxI) => {
@@ -16,6 +18,7 @@ const Checkbox = (props: CheckboxI) => {
     error,
     id,
     label,
+    role,
     name,
     required = false,
     onChange,
@@ -26,6 +29,8 @@ const Checkbox = (props: CheckboxI) => {
       htmlFor={name || label}
       className={clsx(
         "relative flex cursor-pointer items-start gap-2",
+        role === RolesEnum.VIGIL && "text-vigil-orange",
+        role === RolesEnum.CONSUMER && "text-consumer-blue",
         error && "!border-red-500",
         disabled && "opacity-75 !cursor-not-allowed"
       )}
@@ -37,7 +42,10 @@ const Checkbox = (props: CheckboxI) => {
         <input
           {...{ ...props, type: "checkbox", error: undefined, icon: undefined }}
           className={clsx(
-            "size-4 rounded border-gray-300",
+            "appearance-none  size-4 rounded-sm border border-gray-300 ",
+            role === RolesEnum.VIGIL && "checked:bg-vigil-orange ",
+            role === RolesEnum.CONSUMER && "checked:bg-consumer-blue ",
+
             error && "!border-red-500",
             disabled && "cursor-not-allowed"
           )}
@@ -50,7 +58,9 @@ const Checkbox = (props: CheckboxI) => {
         <div>
           <span
             className={clsx(
-              "text-sm text-gray-700",
+              "text-sm",
+              role === RolesEnum.VIGIL && "checked:bg-vigil-orange",
+              role === RolesEnum.CONSUMER && "checked:bg-consumer-blue",
               error && "text-red-500",
               disabled && "!opacity-75 cursor-not-allowed"
             )}

@@ -6,8 +6,7 @@ import {
   UserType,
 } from "@/src/types/user.types";
 import { useUserStore } from "@/src/store/user/user.store";
-import { ApiService, RecaptchaService } from "@/src/services";
-import { RecaptchaActionEnum } from "@/src/enums/common.enums";
+import { ApiService } from "@/src/services";
 import { apiUser } from "@/src/constants/api.constants";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
@@ -32,7 +31,7 @@ export const UserService = {
 
         const { user } = useUserStore.getState();
 
-        resolve(user);
+        resolve(user || null);
       } catch (error) {
         console.error("UserService getUser error", error);
         reject(error);
@@ -209,7 +208,7 @@ export const UserService = {
           type: "signup",
           email: user.email,
           options: {
-            emailRedirectTo: `${AppConstants.hostUrl}/${Routes.confirmEmail.url}`,
+            emailRedirectTo: `${window?.location?.origin || AppConstants.hostUrl}/${Routes.confirmEmail.url}`,
           },
         });
 
@@ -225,13 +224,13 @@ export const UserService = {
   resetPassword: async (email: string) =>
     new Promise(async (resolve, reject) => {
       try {
-        await RecaptchaService.checkAppToken(
-          RecaptchaActionEnum.RESET_PASSWORD
-        );
+        // await RecaptchaService.checkAppToken(
+        //   RecaptchaActionEnum.RESET_PASSWORD
+        // );
         const { data, error } = await AuthInstance.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${AppConstants.hostUrl}/${Routes.updatePassword.url}`,
+            redirectTo: `${window?.location?.origin || AppConstants.hostUrl}/${Routes.updatePassword.url}`,
           }
         );
 

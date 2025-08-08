@@ -13,20 +13,18 @@ const HeaderProfile = () => {
 
   if (isServer) return;
 
-  //region Url
   const UrlByRole = () => {
     switch (role) {
       case RolesEnum.VIGIL:
         return Routes.profileVigil.url;
       case RolesEnum.CONSUMER:
         return Routes.profileConsumer.url;
+      case RolesEnum.ADMIN:
+        return Routes.admin.url;
       default:
         return Routes.home.url;
-
-      //TODO aggiungere altri ruoli nel caso
     }
   };
-  //endregion Url
 
   if (user?.id) {
     return (
@@ -40,11 +38,15 @@ const HeaderProfile = () => {
           className="inline-flex items-center text-sm font-medium"
         >
           <span className="sr-only">User</span>
-          <Avatar
-            inline
-            label={userDetails?.displayName || Routes.profile.label}
-            value={userDetails?.displayName || ""}
-          />
+          {userDetails?.role !== RolesEnum.ADMIN ? (
+            <Avatar
+              inline
+              label={userDetails?.displayName || Routes.profileConsumer.label}
+              value={userDetails?.displayName || ""}
+            />
+          ) : (
+            "Admin"
+          )}
         </Link>
       </div>
     );
@@ -54,7 +56,7 @@ const HeaderProfile = () => {
     <div className="flex items-center gap-4">
       <div className="sm:flex sm:gap-4">
         <Link
-          className="rounded bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-primary-700"
+          className="rounded-4xl px-3 py-2.5 text-sm font-semibold text-vigil-orange transition hover:bg-gray-100"
           href={Routes.login.url}
         >
           {Routes.login.label}

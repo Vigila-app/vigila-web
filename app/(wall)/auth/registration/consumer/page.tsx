@@ -1,0 +1,29 @@
+import { CmsService } from "@/src/services/cms.service";
+import SignupComponent from "@/components/signUp/signup.component";
+import { CmsPageI } from "@/src/types/cms.types";
+import { cache } from "react";
+import { RolesEnum } from "@/src/enums/roles.enums";
+
+// cache revalidation - 1 hour
+export const revalidate = 3600;
+
+const getCmsData = cache(async () => {
+  try {
+    const response = await CmsService.getLocalPage("registration");
+    return response;
+  } catch (error) {
+    throw new Error("Failed to fetch registration data");
+  }
+});
+
+export default async function ConsumerRegistration() {
+  const data = (await getCmsData()) as CmsPageI;
+  const { form: staticData } = data;
+  return (
+    <section className="py-4">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between">
+        <SignupComponent staticData={staticData} role={RolesEnum.CONSUMER} />
+      </div>
+    </section>
+  );
+}

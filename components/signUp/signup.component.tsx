@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ButtonLink, Divider, Undraw } from "@/components";
+import { Button, Divider } from "@/components";
 import ProviderButton from "@/components/button/providerButton";
 import { Input } from "@/components/form";
 import { SupabaseErrors } from "@/src/constants/supabase.constants";
@@ -12,11 +12,25 @@ import { AuthService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { CmsPageFormI } from "@/src/types/cms.types";
 import { UserTermsType } from "@/src/types/user.types";
-import { AtSymbolIcon, EyeIcon } from "@heroicons/react/24/outline";
+import {
+  AtSymbolIcon,
+  EyeIcon,
+  FaceSmileIcon,
+  HeartIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import dynamic from "next/dynamic";
+import useAltcha from "@/src/hooks/useAltcha";
+import { useEffect } from "react";
+import { AltchaService } from "@/src/services/altcha.service";
+import clsx from "clsx";
+
+const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
+  ssr: !!false,
+});
 
 const LocalLoaderId = "signup-progress";
 
@@ -43,6 +57,7 @@ const SignupComponent = (props: SignupComponentI) => {
     showToast,
   } = useAppStore();
   const router = useRouter();
+  const { challenge, isVerified, onStateChange } = useAltcha();
   const {
     control,
     formState: { errors, isValid },
@@ -92,11 +107,14 @@ const SignupComponent = (props: SignupComponentI) => {
               terms[term.id] = Boolean(formData[term.id]);
             });
         }
-        await AuthService.signup(
-          { email, password, name, surname, role },
-          terms
-        );
-        redirectOnboard();
+        if (challenge) {
+          await AltchaService.verifyChallenge(challenge);
+          await AuthService.signup(
+            { email, password, name, surname, role },
+            terms
+          );
+          redirectOnboard();
+        }
       } catch (error: any) {
         console.error("Error registering user", error);
         if (error) {
@@ -118,6 +136,13 @@ const SignupComponent = (props: SignupComponentI) => {
     }
   };
 
+  useEffect(() => {
+    if (isVerified) {
+      handleSubmit(onSubmit)();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVerified]);
+
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -131,7 +156,44 @@ const SignupComponent = (props: SignupComponentI) => {
             ) : null}
           </div>
         ) : null}
-        <Undraw graphic="sign-up" />
+        {/* <Undraw graphic="sign-up" /> */}
+        <div className="mt-4 mb-8 mx-auto max-w-56 text-center">
+          <div
+            className={clsx(
+              "mb-4 w-full inline-flex items-center justify-center gap-2 p-2 rounded-full shadow",
+              role === RolesEnum.CONSUMER
+                ? "text-consumer-blue bg-consumer-light-blue"
+                : "text-vigil-orange bg-vigil-light-orange"
+            )}
+          >
+            {role === RolesEnum.CONSUMER ? (
+              <HeartIcon className="size-6" />
+            ) : (
+              <FaceSmileIcon className="size-6" />
+            )}
+            <span>
+              Registrazione&nbsp;
+              {role === RolesEnum.CONSUMER ? "Famiglia" : "Vigil"}
+            </span>
+          </div>
+          <div>
+            <Link
+              href={
+                role === RolesEnum.CONSUMER
+                  ? Routes.registrationVigil.url
+                  : Routes.registrationConsumer.url
+              }
+              className={clsx(
+                "hover:font-semibold transition",
+                role === RolesEnum.CONSUMER
+                  ? "text-vigil-orange"
+                  : "text-consumer-blue"
+              )}
+            >
+              Cambia tipo di account
+            </Link>
+          </div>
+        </div>
         <Controller
           name="name"
           control={control}
@@ -258,19 +320,31 @@ const SignupComponent = (props: SignupComponentI) => {
 
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500 mt-2">
-            Creando un account, accetti i nostri&nbsp;
+            Creando un account accetti i nostri&nbsp;
             <Link
               href={Routes.termsConditions.url}
               target="blank"
-              className="text-gray-700 underline">
-              termini & condizioni
+              className={clsx(
+                "underline",
+                role === RolesEnum.CONSUMER
+                  ? "text-consumer-blue"
+                  : "text-vigil-orange"
+              )}
+            >
+              Termini e Condizioni
             </Link>
             &nbsp;e la&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
-              className="text-gray-700 underline">
-              privacy policy
+              className={clsx(
+                "underline",
+                role === RolesEnum.CONSUMER
+                  ? "text-consumer-blue"
+                  : "text-vigil-orange"
+              )}
+            >
+              Privacy Policy
             </Link>
             .
           </p>
@@ -281,9 +355,10 @@ const SignupComponent = (props: SignupComponentI) => {
             full
             type="submit"
             role={role}
-            label="Crea un account"
+            label={`Crea account ${role === RolesEnum.CONSUMER ? "Famiglia" : "Vigil"}`}
             isLoading={isLoading}
           />
+          <Altcha floating onStateChange={onStateChange} />
         </div>
       </form>
 
@@ -294,26 +369,33 @@ const SignupComponent = (props: SignupComponentI) => {
             provider={ProviderEnum.GOOGLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
-            label="Registrati con Google"
+            label="Continua con Google"
+            customClass="rounded-full shadow"
           />
-          <ProviderButton
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Registrati con Apple"
-          />
+          /> */}
         </div>
       </div>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
-        Hai già un account?&nbsp;
-        <ButtonLink
-          inline
-          text
-          label={Routes.login.label}
-          href={Routes.login.url}
-        />
-      </p>
+      <div className="space-y-2 mt-6">
+        <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
+          Hai già un account?&nbsp;
+          <Link
+            href={Routes.login.url}
+            className={clsx(
+              role === RolesEnum.CONSUMER
+                ? "text-consumer-blue"
+                : "text-vigil-orange"
+            )}
+          >
+            {Routes.login.label}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

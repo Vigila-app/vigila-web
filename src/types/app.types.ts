@@ -6,6 +6,19 @@ export type LoaderI = {
   isLoading: boolean;
 };
 
+export type PaginationI = {
+  from: number;
+  to: number;
+  page: number;
+  itemPerPage: number;
+  count?: number;
+};
+
+export enum OrderDirectionEnum {
+  ASC = "ASC",
+  DESC = "DESC"
+};
+
 export type AppStoreType = {
   onLogout: () => void;
 

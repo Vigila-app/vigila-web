@@ -1,5 +1,5 @@
 export type OnBoardType = {
-  birthdate: string;
+  birthday: string;
   city: string;
   CAP: string;
 };

@@ -3,6 +3,7 @@ import Avatar from "./avatar/avatar";
 import Badge from "./badge/badge.component";
 import Button from "./button/button";
 import ButtonLink from "./button/buttonLink";
+import Card from "./card/card";
 import Divider from "./divider/divider";
 import FloatingBanner from "./floatingBanner/floatingBanner";
 import Footer from "./footer/footer";
@@ -12,12 +13,17 @@ import HeaderLight from "./header/headerLight";
 import LastUpdate from './lastUpdate/lastUpdate.component';
 import LoaderSpinner from "./loaderSpinner/loaderSpinner";
 import Logo from "./logo/logo";
+import ProgressBar from "./progressBar/progressBar.component";
+import ServicesCatalog from "./services/ServicesCatalog";
 import SimplePage from "./simplePage/simplePage";
 import TabGroup from "./tabGroup/tabGroup";
 import Table from "./table/table.components";
 import Toast from "./toast/toast";
 import Tooltip from "./tooltip/tooltip";
-import Undraw from "./undraw/undraw.tsx";
+import Undraw from "./undraw/undraw";
+
+// Reviews components
+export * from "./reviews";
 
 export {
   Accordion,
@@ -25,6 +31,7 @@ export {
   Badge,
   Button,
   ButtonLink,
+  Card,
   Divider,
   FloatingBanner,
   Footer,
@@ -34,6 +41,8 @@ export {
   LastUpdate,
   LoaderSpinner,
   Logo,
+  ProgressBar,
+  ServicesCatalog,
   SimplePage,
   TabGroup,
   Table,

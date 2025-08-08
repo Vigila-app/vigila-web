@@ -9,11 +9,13 @@ export type UserDetailsType = {
   surname?: string;
   email?: string;
   email_verified?: boolean;
-  host_id?: string;
   username?: string;
   birthday?: string;
   gender?: GenderEnum;
+  phone?: string;
   other?: { [key: string]: string | number };
+  role?: RolesEnum;
+  user_metadata?: UserDetailsType;
 };
 
 export type UserDevicesType = {
@@ -35,15 +37,15 @@ export type UserClaimsType = {
   level: AccessLevelsEnum;
 };
 
-export type UserType =
-  | {
-      email: string;
-      id: string;
-      displayName?: string;
-      photoURL?: string;
-      user_metadata?: UserMetadata;
-    }
-  | undefined;
+export type UserType = {
+  created_at: string;
+  email: string;
+  id: string;
+  displayName?: string;
+  photoURL?: string;
+  phone: string;
+  user_metadata?: UserMetadata;
+};
 
 export type UserSignupType = UserType & {
   id?: string;
@@ -58,7 +60,7 @@ export type UserSignupType = UserType & {
 export type UserStoreType = {
   onLogout: () => void;
   lastUpdate?: Date;
-  user: UserType;
+  user?: UserType;
   userDetails?: UserDetailsType;
   userDevices?: UserDevicesType;
   userTerms?: UserTermsType;

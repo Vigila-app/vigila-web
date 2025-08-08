@@ -1,26 +1,34 @@
 import { ApiService } from "@/src/services";
 import { apiServices } from "@/src/constants/api.constants";
-import { ServiceI } from "@/src/types/services.types";
-import { getUUID } from "@/src/utils/common.utils";
+import { ServiceI, ServiceCatalogItem } from "@/src/types/services.types";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import servicesCatalogJson from "@/mock/cms/services-catalog.json";
+
+const convertCatalogData = (jsonData: any): ServiceCatalogItem[] => {
+  return jsonData.services_catalog.map((item: any) => ({
+    ...item,
+    type: item.type as ServiceCatalogTypeEnum,
+  }));
+};
+
+const servicesCatalogData: ServiceCatalogItem[] =
+  convertCatalogData(servicesCatalogJson);
 
 export const ServicesService = {
-  createService: async (newService: ServiceI) =>
+  createService: (newService: ServiceI) =>
     new Promise<ServiceI>(async (resolve, reject) => {
       try {
-        const id = newService?.id || getUUID("SERVICE");
-        const { data: service } = (await ApiService.post(apiServices.CREATE(), {
-          ...newService,
-          id,
-          creationDate: new Date(),
-          lastUpdateDate: new Date(),
-        })) as { data: ServiceI };
+        const { data: service } = (await ApiService.post(
+          apiServices.CREATE(),
+          newService
+        )) as { data: ServiceI };
         resolve(service);
       } catch (error) {
         console.error("ServicesService createService error", error);
         reject(error);
       }
     }),
-  editService: async (service: ServiceI) =>
+  editService: (service: ServiceI) =>
     new Promise<ServiceI>(async (resolve, reject) => {
       try {
         if (!service.id) reject();
@@ -34,7 +42,7 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  deleteService: async (serviceId: ServiceI["id"]) =>
+  deleteService: (serviceId: ServiceI["id"]) =>
     new Promise<boolean>(async (resolve, reject) => {
       try {
         if (!serviceId) reject();
@@ -45,11 +53,15 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getServices: async () =>
+  getServices: (
+    vigil_id: ServiceI["vigil_id"],
+    filters: Record<string, any> = {}
+  ) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
-          apiServices.LIST()
+          apiServices.LIST(),
+          { vigil_id, ...filters }
         )) as { data: ServiceI[] };
         resolve(response);
       } catch (error) {
@@ -57,7 +69,7 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getServiceDetails: async (serviceId: ServiceI["id"]) =>
+  getServiceDetails: (serviceId: ServiceI["id"]) =>
     new Promise<ServiceI>(async (resolve, reject) => {
       try {
         const { data: serviceDetails } = (await ApiService.get(
@@ -69,4 +81,25 @@ export const ServicesService = {
         reject(error);
       }
     }),
+
+  getServicesCatalog: (): ServiceCatalogItem[] => {
+    return servicesCatalogData;
+  },
+
+  getServiceCatalogById: (id: number): ServiceCatalogItem | undefined => {
+    return servicesCatalogData.find((service) => service.id === id);
+  },
+
+  getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem[] => {
+    return servicesCatalogData.filter((service) => service.type === type);
+  },
+
+  searchServicesByTag: (tag: string): ServiceCatalogItem[] => {
+    const lowerCaseTag = tag.toLowerCase();
+    return servicesCatalogData.filter((service) =>
+      service.tags.some((serviceTag) =>
+        serviceTag.toLowerCase().includes(lowerCaseTag)
+      )
+    );
+  },
 };

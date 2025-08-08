@@ -1,71 +1,138 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
-import { BookingsService } from "@/src/services";
-import { Button, Badge } from "@/components";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
-import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import { Button, Badge, Avatar, Card } from "@/components";
+import { ReviewButtonComponent } from "@/components/reviews";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+import {
+  amountDisplay,
+  capitalize,
+  replaceDynamicUrl,
+} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useModalStore } from "@/src/store/modal/modal.store";
+import { ServicesUtils } from "@/src/utils/services.utils";
+import { Routes } from "@/src/routes";
+import { useRouter } from "next/navigation";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { useServicesStore } from "@/src/store/services/services.store";
+import { useConsumerStore } from "@/src/store/consumer/consumer.store";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { BookingUtils } from "@/src/utils/booking.utils";
+import Link from "next/link";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
   onUpdate?: (booking: BookingI) => void;
+  isModal?: boolean;
 };
 
 const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
-  const { bookingId, onUpdate = () => ({}) } = props;
-  const [booking, setBooking] = useState<BookingI | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { showToast, showLoader, hideLoader } = useAppStore();
+  const { bookingId, onUpdate = () => ({}), isModal = false } = props;
+  const router = useRouter();
+  const {
+    showToast,
+    showLoader,
+    hideLoader,
+    loader: { isLoading },
+  } = useAppStore();
+  const { bookings, getBookingDetails } = useBookingsStore();
+  const { consumers } = useConsumerStore();
+  const { vigils } = useVigilStore();
+  const { services } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
 
-  const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
-  const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
+  const [canCancel, setCanCancel] = useState<boolean>(false);
+
+  const isConsumer = useMemo(() => {
+    return user?.user_metadata?.role === RolesEnum.CONSUMER;
+  }, [user]);
+
+  const isVigil = useMemo(() => {
+    return user?.user_metadata?.role === RolesEnum.VIGIL;
+  }, [user]);
+
+  const booking = useMemo(() => {
+    return bookings.find((b) => b.id === bookingId);
+  }, [bookings, bookingId]);
+
+  const service = useMemo(() => {
+    return (
+      booking?.service || services.find((s) => s.id === booking?.service_id)
+    );
+  }, [services, booking]);
+
+  const vigil = useMemo(() => {
+    return booking?.vigil || vigils.find((v) => v.id === booking?.vigil_id);
+  }, [vigils, booking]);
+
+  const consumer = useMemo(() => {
+    return (
+      booking?.consumer || consumers.find((c) => c.id === booking?.consumer_id)
+    );
+  }, [consumers, booking]);
+
+  const checkCancellation = useCallback(async () => {
+    if (!booking) {
+      setCanCancel(false);
+      return;
+    }
+
+    try {
+      const canCancelBooking = await BookingUtils.canCancelBooking(booking);
+      setCanCancel(canCancelBooking);
+    } catch (error) {
+      console.error(
+        "Errore nel verificare la possibilità di cancellazione:",
+        error
+      );
+      setCanCancel(false);
+    }
+  }, [booking]);
 
   useEffect(() => {
-    loadBookingDetails();
+    if (bookingId) getBookingDetails(bookingId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
-  const loadBookingDetails = async () => {
-    try {
-      setLoading(true);
-      const bookingDetails = await BookingsService.getBookingDetails(bookingId);
-      setBooking(bookingDetails);
-    } catch (error) {
-      console.error("Error loading booking details", error);
-      showToast({
-        message: "Error loading booking details",
-        type: ToastStatusEnum.ERROR,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Effetto per verificare se la cancellazione è possibile
+  useEffect(() => {
+    checkCancellation();
+  }, [checkCancellation]);
 
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
     if (!booking) return;
 
     try {
       showLoader();
-      const updatedBooking = await BookingsService.updateBookingStatus(booking.id, status);
-      setBooking(updatedBooking);
-      onUpdate(updatedBooking);
-      
-      showToast({
-        message: `Booking ${status.toLowerCase()} successfully`,
-        type: ToastStatusEnum.SUCCESS,
-      });
+      const updatedBooking = await BookingUtils.handleStatusUpdate(
+        booking,
+        status
+      );
+      if (updatedBooking) {
+        getBookingDetails(bookingId, true);
+        onUpdate(updatedBooking);
+
+        showToast({
+          message: "Prenotazione aggiornata con successo",
+          type: ToastStatusEnum.SUCCESS,
+        });
+      }
     } catch (error) {
       console.error("Error updating booking status", error);
       showToast({
-        message: "Error updating booking status",
+        message:
+          "Si è verificato un errore durante l'aggiornamento della prenotazione",
         type: ToastStatusEnum.ERROR,
       });
     } finally {
@@ -73,54 +140,12 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   };
 
-  const handleCancelBooking = async () => {
-    if (!booking) return;
-
-    if (confirm("Are you sure you want to cancel this booking?")) {
-      try {
-        showLoader();
-        await BookingsService.cancelBooking(booking.id);
-        
-        showToast({
-          message: "Booking cancelled successfully",
-          type: ToastStatusEnum.SUCCESS,
-        });
-        
-        closeModal();
-      } catch (error) {
-        console.error("Error cancelling booking", error);
-        showToast({
-          message: "Error cancelling booking",
-          type: ToastStatusEnum.ERROR,
-        });
-      } finally {
-        hideLoader();
-      }
-    }
-  };
-
-  const getStatusColor = (status: BookingStatusEnum) => {
-    switch (status) {
-      case BookingStatusEnum.PENDING:
-        return "yellow";
-      case BookingStatusEnum.CONFIRMED:
-        return "blue";
-      case BookingStatusEnum.IN_PROGRESS:
-        return "purple";
-      case BookingStatusEnum.COMPLETED:
-        return "green";
-      case BookingStatusEnum.CANCELLED:
-      case BookingStatusEnum.REFUNDED:
-        return "red";
-      default:
-        return "gray";
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Loading booking details...</p>
+        <p className="text-gray-500">
+          Recupero i dettagli della prenotazione...
+        </p>
       </div>
     );
   }
@@ -128,42 +153,95 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   if (!booking) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-500">Booking not found</p>
+        <p className="text-red-500">Prenotazione non trovata</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Booking Details</h2>
-          <p className="text-gray-600">Booking ID: {booking.id}</p>
-        </div>
-        <Badge
-          label={capitalize(booking.status)}
-          color={getStatusColor(booking.status)}
-        />
+      <div className="relative pr-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Dettagli della Prenotazione
+        </h2>
+        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
+        <span className="absolute top-0 right-0">
+          <Badge
+            label={
+              booking?.payment_status === PaymentStatusEnum.PAID
+                ? BookingUtils.getStatusText(
+                    booking.status as BookingStatusEnum
+                  )
+                : "Da pagare"
+            }
+            color={
+              booking?.payment_status === PaymentStatusEnum.PAID
+                ? BookingUtils.getStatusColor(
+                    booking.status as BookingStatusEnum
+                  )
+                : "yellow"
+            }
+          />
+        </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <h3 className="font-medium text-gray-900">Service Information</h3>
+            <h3 className="font-medium text-gray-900">Servizio prenotato</h3>
             <div className="mt-2 space-y-2 text-sm">
-              <p><span className="font-medium">Service:</span> {booking.service?.name}</p>
-              <p><span className="font-medium">Description:</span> {booking.service?.description}</p>
-              <p><span className="font-medium">Price per hour:</span> {booking.currency} {amountDisplay(booking.service?.price || 0)}</p>
+              <p>{service?.name}</p>
+              {service?.description && (
+                <p>
+                  <span className="font-medium">Descrizione:</span>&nbsp;
+                  {service.description}
+                </p>
+              )}
+              {/* <p>
+                <span className="font-medium">
+                  Prezzo per&nbsp;
+                  {ServicesUtils.getServiceUnitType(
+                    service?.unit_type as string
+                  )}
+                  :
+                </span>
+                &nbsp;
+                {service?.currency}
+                {amountDisplay(service?.unit_price || 0)}
+              </p> */}
             </div>
           </div>
 
           <div>
-            <h3 className="font-medium text-gray-900">Booking Details</h3>
+            <h3 className="font-medium text-gray-900">Ulteriori dettagli:</h3>
             <div className="mt-2 space-y-2 text-sm">
-              <p><span className="font-medium">Service Date:</span> {dateDisplay(booking.service_date)}</p>
-              <p><span className="font-medium">Duration:</span> {booking.duration_hours} hour(s)</p>
-              <p><span className="font-medium">Total Amount:</span> {booking.currency} {amountDisplay(booking.total_amount)}</p>
-              <p><span className="font-medium">Payment Status:</span> {capitalize(booking.payment_status)}</p>
+              <p>
+                <span className="font-medium">Data del Servizio:</span>&nbsp;
+                {dateDisplay(booking.startDate, "dateTime")}
+              </p>
+              <p>
+                <span className="font-medium">Durata:</span> {booking.quantity}
+                &nbsp;
+                {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
+              </p>
+              <p>
+                <span className="font-medium">Prezzo Totale:</span>&nbsp;
+                {amountDisplay(
+                  booking.price,
+                  booking.service?.currency as CurrencyEnum
+                )}
+              </p>
+              <p>
+                <span className="font-medium">Stato del pagamento:</span>&nbsp;
+                <Badge
+                  label={BookingUtils.getPaymentStatusText(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                  color={BookingUtils.getStatusColor(
+                    booking.payment_status as PaymentStatusEnum
+                  )}
+                />
+              </p>
             </div>
           </div>
         </div>
@@ -171,58 +249,66 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <div className="space-y-4">
           <div>
             <h3 className="font-medium text-gray-900">
-              {isConsumer ? "Vigil Information" : "Consumer Information"}
+              {isConsumer ? "Vigil" : "Consumer"}
             </h3>
             <div className="mt-2 space-y-2 text-sm">
               {isConsumer ? (
-                <>
-                  <p><span className="font-medium">Name:</span> {booking.vigil?.user_metadata?.displayName}</p>
-                  <p><span className="font-medium">Email:</span> {booking.vigil?.email}</p>
-                </>
+                <Link
+                  href={
+                    vigil?.id
+                      ? replaceDynamicUrl(
+                          Routes.vigilDetails.url,
+                          ":vigilId",
+                          vigil?.id
+                        )
+                      : "#"
+                  }>
+                  <Card className="p-4 bg-vigil-light-orange border border-vigil-orange rounded-full shadow">
+                    <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+                      <Avatar userId={vigil?.id} value={vigil?.displayName} />
+                      <div className="flex-1">
+                        <div className="font-medium">{vigil?.displayName}</div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
               ) : (
-                <>
-                  <p><span className="font-medium">Name:</span> {booking.consumer?.user_metadata?.displayName}</p>
-                  <p><span className="font-medium">Email:</span> {booking.consumer?.email}</p>
-                </>
+                <Card className="p-4 bg-consumer-light-blue border border-consumer-blue rounded-full shadow">
+                  <div className="inline-flex items-center flex-nowrap gap-2 w-full">
+                    <Avatar
+                      userId={consumer?.id}
+                      value={consumer?.displayName}
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">{consumer?.displayName}</div>
+                    </div>
+                  </div>
+                </Card>
               )}
             </div>
           </div>
 
-          {booking.guest && (
+          {booking.note && (
             <div>
-              <h3 className="font-medium text-gray-900">Guest Information</h3>
-              <div className="mt-2 space-y-2 text-sm">
-                <p><span className="font-medium">Name:</span> {booking.guest.name} {booking.guest.surname}</p>
-                {booking.guest.email && (
-                  <p><span className="font-medium">Email:</span> {booking.guest.email}</p>
-                )}
-                {booking.guest.phone && (
-                  <p><span className="font-medium">Phone:</span> {booking.guest.phone}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {booking.notes && (
-            <div>
-              <h3 className="font-medium text-gray-900">Notes</h3>
-              <p className="mt-2 text-sm text-gray-600">{booking.notes}</p>
+              <h3 className="font-medium ">Note</h3>
+              <p className="mt-2 text-sm text-gray-600">{booking.note}</p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4 border-t">
+      <div className="flex justify-center flex-wrap gap-4 pt-4 border-t">
         {isVigil && booking.status === BookingStatusEnum.PENDING && (
           <>
             <Button
-              primary
-              label="Confirm Booking"
+              role={RolesEnum.CONSUMER}
+              disabled={booking.payment_status !== PaymentStatusEnum.PAID}
+              label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
             <Button
               danger
-              label="Reject Booking"
+              label="Rifiuta Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
             />
           </>
@@ -230,34 +316,48 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {isVigil && booking.status === BookingStatusEnum.CONFIRMED && (
           <Button
-            primary
-            label="Start Service"
-            action={() => handleStatusUpdate(BookingStatusEnum.IN_PROGRESS)}
-          />
-        )}
-
-        {isVigil && booking.status === BookingStatusEnum.IN_PROGRESS && (
-          <Button
-            primary
-            label="Complete Service"
+            role={RolesEnum.CONSUMER}
+            label="Completa Prenotazione"
             action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
           />
         )}
 
-        {isConsumer && booking.status === BookingStatusEnum.PENDING && (
+        {canCancel && (
           <Button
             danger
-            label="Cancel Booking"
-            action={handleCancelBooking}
+            label="Annulla Prenotazione"
+            action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
           />
         )}
 
-        <Button
-          secondary
-          label="Close"
-          action={closeModal}
-        />
+        {isConsumer && booking.payment_status === PaymentStatusEnum.PENDING && (
+          <Button
+            label="Paga Prenotazione"
+            role={RolesEnum.CONSUMER}
+            action={() =>
+              router.push(
+                `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+              )
+            }
+          />
+        )}
+
+        {isModal && <Button secondary label="Chiudi" action={closeModal} />}
       </div>
+
+      {/* Review Section - Only for completed bookings */}
+      {booking.status === BookingStatusEnum.COMPLETED && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <ReviewButtonComponent
+            booking={booking}
+            vigilName={vigil?.displayName}
+            onReviewCreated={() => {
+              // Optionally refresh booking details or show success message
+              console.log("Review created/updated");
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

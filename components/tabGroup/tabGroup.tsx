@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 
 export type TabI = {
   active?: boolean;
-  label: string;
+  label: any;
+  id?: string;
   url?: string;
 };
 type TabGroupI = {
@@ -53,19 +54,17 @@ const TabGroup = (props: TabGroupI) => {
             </option>
           ))}
         </select> */}
-        <div className="flex space-x-2 border-b border-gray-200 mb-4">
+        <div className="flex justify-center gap-2 ">
           {tabs.map((tab) => (
             <button
-              key={tab.label}
+              key={tab.id}
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-                "px-4 py-2 text-sm font-medium transition-colors border-b-2",
-                activeTab.label === tab.label
-                  ? role === RolesEnum.CONSUMER
-                    ? "border-consumer-blue text-consumer-blue"
-                    : "border-vigil-orange text-vigil-orange"
-                  : "border-transparent text-gray-500 hover:text-black hover:border-white"
+                "px-3 py-1 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500 focus:bg-white ",
+                activeTab.label === tab.label && role === RolesEnum.CONSUMER
+                  ? " focus-within:text-consumer-blue"
+                  : "focus-within:text-vigil-orange   "
               )}>
               {tab.label}
             </button>
@@ -77,7 +76,7 @@ const TabGroup = (props: TabGroupI) => {
         <div className="border-b border-gray-200">
           <nav
             className={clsx(
-              "-mb-px flex gap-6",
+              " px-6 flex gap-6",
               align === "center"
                 ? "justify-center"
                 : align === "left"
@@ -87,13 +86,13 @@ const TabGroup = (props: TabGroupI) => {
             {tabs.map((tab) =>
               tab.url ? (
                 <Link
-                  key={tab.label}
+                  key={tab.id}
                   href={tab.url}
                   className={clsx(
                     "shrink-0 p-3 border font-medium text-sm transition",
                     activeTab.label === tab.label
-                      ? "rounded-t-lg border-gray-300 border-b-white bg-white text-primary-600 hover:!border-b-white hover:!border-gray-300"
-                      : "border-transparent text-gray-500 hover:text-gray-700",
+                      ? "rounded-t-2xl   bg-white text-primary-600"
+                      : "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
                     "hover:rounded-t-lg hover:border-gray-200"
                   )}
                   onClick={() => {
@@ -103,12 +102,12 @@ const TabGroup = (props: TabGroupI) => {
                 </Link>
               ) : (
                 <span
-                  key={tab.label}
+                  key={tab.id}
                   className={clsx(
                     "cursor-pointer shrink-0 p-3 border font-medium text-sm transition",
                     activeTab.label === tab.label
-                      ? "rounded-t-lg border-gray-300 border-b-white text-primary-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
+                      ? "rounded-t-lg  border-b-white text-primary-600"
+                      : "border-transparent text-gray-500 hover:text-black"
                   )}
                   onClick={() => {
                     setActiveTab(tab);

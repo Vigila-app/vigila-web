@@ -56,7 +56,7 @@ const TEXT_COLORS = [
 
 type AvatarI = {
   imgUrl?: string | null;
-  size?: "small" | "standard" | "medium" | "big";
+  size?: "small" | "standard" | "medium" | "big"| "xxl";
   label?: string;
   inline?: boolean;
   withUpload?: boolean;
@@ -65,6 +65,8 @@ type AvatarI = {
     metadata: { contentType: string }
   ) => void;
   value?: string;
+  userId?:string;
+  className?: string;
 };
 
 const AvatarSize = {
@@ -72,6 +74,7 @@ const AvatarSize = {
   standard: "size-8 text-sm",
   medium: "size-12 text-md",
   big: "size-16 text-lg",
+  xxl: "size-25 text-xl",
 };
 
 const Avatar = (props: AvatarI) => {
@@ -83,13 +86,15 @@ const Avatar = (props: AvatarI) => {
     withUpload = false,
     onFileUpload,
     value,
+    userId,
+    className,
   } = props;
   const { user, lastUpdate: lastUserUpdate } = useUserStore();
   const [profilePic, setProfilePic] = useState<string | undefined>();
 
-  const getProfilePic = async () => {
-    if (user?.id) {
-      const profilePicUrl = await StorageUtils.getURL("profile-pics", user.id);
+  const getProfilePic = async (id: string) => {
+    if (id) {
+      const profilePicUrl = await StorageUtils.getURL("profile-pics", id);
       if (profilePicUrl) {
         setProfilePic(profilePicUrl);
       }
@@ -97,9 +102,10 @@ const Avatar = (props: AvatarI) => {
   };
 
   useEffect(() => {
-    if (!imgUrl) getProfilePic();
+    const finalUserId = userId || user?.id;
+    if (!imgUrl && finalUserId) getProfilePic(finalUserId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imgUrl, user?.id, lastUserUpdate]);
+  }, [imgUrl, user?.id, userId, lastUserUpdate]);
 
   const imgStyle = clsx(
     "rounded-full object-cover font-normal",
@@ -112,7 +118,8 @@ const Avatar = (props: AvatarI) => {
     <div
       className={clsx(
         "relative items-center",
-        inline ? "inline-flex gap-1" : "flex flex-col gap-1"
+        inline ? "inline-flex gap-1" : "flex flex-col gap-1",
+        className
       )}
     >
       {imgUrl || profilePic ? (

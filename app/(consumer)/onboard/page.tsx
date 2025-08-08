@@ -1,8 +1,6 @@
-"use client";
-
 import dynamic from "next/dynamic";
 
-const OnboardComponent = dynamic(
+const ConsumerOnboardComponent = dynamic(
   () => import("@/components/onboarding/consumer/onboardComponent_Consumer"),
   { ssr: !!false }
 );
@@ -10,7 +8,7 @@ const OnboardComponent = dynamic(
 export default function Profile() {
   return (
     <section id="user-profile">
-      <OnboardComponent />
+      <ConsumerOnboardComponent />
     </section>
   );
 }

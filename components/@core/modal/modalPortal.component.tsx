@@ -58,7 +58,8 @@ const ModalPortalComponent = (props: ModalPortalI) => {
             className={clsx(
               "absolute z-50 bg-white p-6",
               "w-screen h-screen top-0 left-0",
-              "md:w-full md:h-auto md:max-w-lg md:left-1/2 md:-translate-x-1/2 md:top-1/4 md:-translate-y-1/4 md:max-h-[calc(100vh-8rem)]",
+              "md:w-full md:h-auto md:max-w-2xl md:left-1/2 md:-translate-x-1/2 md:top-1/4 md:-translate-y-1/4 md:max-h-[calc(100vh-8rem)]",
+              "lg:max-w-5xl",
               "rounded border border-gray-200 shadow-xl overflow-hidden",
               customClass
             )}

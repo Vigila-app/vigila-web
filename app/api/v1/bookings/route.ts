@@ -8,9 +8,14 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
-import { getPostgresTimestamp } from "@/src/utils/date.utils";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { NextRequest, NextResponse } from "next/server";
+import { FrequencyEnum } from "@/src/enums/common.enums";
+import { OrderDirectionEnum } from "@/src/types/app.types";
+import { ServicesService } from "@/src/services";
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,21 +36,22 @@ export async function GET(req: NextRequest) {
       });
 
     const _admin = getAdminClient();
-    let db_query = _admin
-      .from("bookings")
-      .select(`
+    let db_query = _admin.from("bookings").select(
+      `
         *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `, { count: "exact" });
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `,
+      { count: "exact" }
+    );
 
     // Filter based on user role
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       db_query = db_query.eq("consumer_id", userObject.id);
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
+      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID);
     }
 
     if (Object.keys(filters).length) {
@@ -58,7 +64,7 @@ export async function GET(req: NextRequest) {
 
     if (orderBy) {
       db_query = db_query.order(orderBy, {
-        ascending: orderDirection === "ASC" ? true : false,
+        ascending: orderDirection === OrderDirectionEnum.ASC ? true : false,
       });
     }
 
@@ -66,7 +72,11 @@ export async function GET(req: NextRequest) {
       db_query = db_query.range(from, to);
     }
 
-    const { data = [], error, count = 0 } = await db_query.returns<BookingI[]>();
+    const {
+      data = [],
+      error,
+      count = 0,
+    } = await db_query.returns<BookingI[]>();
 
     if (error || !data) throw error;
 
@@ -99,13 +109,16 @@ export async function POST(req: NextRequest) {
     console.log(`API POST bookings`, body);
 
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER)
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    )
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
         success: false,
       });
 
-    if (!(body?.service_id && body?.service_date && body?.duration_hours)) {
+    if (!(body?.service_id && body?.startDate && body?.quantity)) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.BOOKINGS_CREATE_BAD_REQUEST.code,
         success: false,
@@ -127,36 +140,70 @@ export async function POST(req: NextRequest) {
         success: false,
       });
     }
+    const serviceCatalog = ServicesService.getServiceCatalogById(
+      service.info.catalog_id
+    );
 
-    const totalAmount = service.price * body.duration_hours;
+    if (!serviceCatalog?.id) {
+      return jsonErrorResponse(500, {
+        code: ResponseCodesConstants.BOOKINGS_CREATE_ERROR.code,
+        success: false,
+      });
+    }
+
+    const price = (service.unit_price + serviceCatalog.fee) * body.quantity;
+
+    const formatDate = (date: Date) => {
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        "T" +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes()) +
+        ":" +
+        pad(date.getSeconds())
+      );
+    };
+
+    const startDateObj = new Date(
+      body.startDate.toString().replace("T", " ").replace("Z", "")
+    );
+    const startDate = formatDate(startDateObj);
+
+    const calculatedEndDateObj = body.endDate
+      ? new Date(body.endDate.toString().replace("T", " ").replace("Z", ""))
+      : new Date(
+          startDateObj.getTime() +
+            (service.unit_type === FrequencyEnum.HOURS
+              ? body.quantity * 60 * 60 * 1000
+              : service.unit_type === FrequencyEnum.DAYS
+                ? body.quantity * 24 * 60 * 60 * 1000
+                : body.quantity * 60 * 1000)
+        );
+    const endDate = formatDate(calculatedEndDateObj);
 
     const newBooking = {
-      service_id: body.service_id,
+      ...body,
+      startDate,
+      endDate,
       consumer_id: userObject.id,
-      vigil_id: service.ownerId,
-      guest_id: body.guest_id || null,
-      service_date: body.service_date,
-      duration_hours: body.duration_hours,
-      total_amount: totalAmount,
-      currency: service.currency,
+      vigil_id: service.vigil_id,
       status: BookingStatusEnum.PENDING,
       payment_status: PaymentStatusEnum.PENDING,
-      notes: body.notes || null,
-      created_at: getPostgresTimestamp(),
-      updated_at: getPostgresTimestamp(),
+      price,
+      fee: serviceCatalog.fee * body.quantity,
     };
 
     const { data, error } = await _admin
       .from("bookings")
       .insert(newBooking)
-      .select(`
-        *,
-        service:services(*),
-        consumer:auth.users!bookings_consumer_id_fkey(*),
-        vigil:auth.users!bookings_vigil_id_fkey(*),
-        guest:guests(*)
-      `)
-      .single<BookingI>();
+      .select()
+      .maybeSingle<BookingI>();
 
     if (error || !data) throw error;
 

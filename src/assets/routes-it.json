@@ -11,10 +11,22 @@
     "private": false,
     "roles": []
   },
+  "homeConsumer": {
+    "url": "/home",
+    "label": "Home",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "login": {
     "url": "/auth/login",
-    "label": "Login",
-    "title": "Login",
+    "label": "Accedi",
+    "title": "Accedi",
     "menu": {
       "mobile": true,
       "desktop": true,
@@ -26,29 +38,42 @@
   },
   "registration": {
     "url": "/auth/registration",
-    "label": "Sign up",
+    "label": "Registrati",
     "title": "Sign up",
     "menu": {
       "mobile": false,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["CONSUMER"]
+    "roles": []
   },
-  "registration/vigil": {
+  "registrationConsumer": {
+    "url": "/auth/registration/consumer",
+    "label": "Sign up",
+    "title": "Sign up",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "registrationVigil": {
     "url": "/auth/registration/vigil",
     "label": "Sign up vigil",
     "title": "Sign up vigil",
     "menu": {
       "mobile": true,
-      "desktop": true,
+      "desktop": false,
       "header": false,
       "footer": false
     },
     "private": false,
-    "roles": ["VIGIL"]
+    "roles": []
   },
   "onBoard": {
     "url": "/onboard",
@@ -97,50 +122,50 @@
     "private": false,
     "roles": []
   },
-  "dashboard": {
-    "url": "/dashboard",
-    "label": "Dashboard",
-    "title": "Dashboard",
+  "bookings": {
+    "url": "/booking",
+    "label": "Prenotazioni",
+    "title": "Prenotazioni",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": true,
+    "roles": ["CONSUMER", "VIGIL"]
+  },
+  "bookingDetails": {
+    "url": "/booking/:bookingId",
+    "label": "Dettagli Prenotazione",
+    "title": "Dettagli Prenotazione",
+    "matchingUrl": "/booking/",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER", "VIGIL"]
+  },
+  "admin": {
+    "url": "/dashboard-admin",
+    "label": "Admin Dashboard",
+    "title": "Admin Dashboard",
     "menu": {
       "mobile": false,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["ADMIN"]
   },
-  "bookings": {
-    "url": "/dashboard/bookings",
-    "label": "Bookings",
-    "title": "Bookings",
-    "menu": {
-      "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "crm": {
-    "url": "/dashboard/crm",
-    "label": "CRM",
-    "title": "CRM",
-    "menu": {
-      "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "guests": {
-    "url": "/dashboard/crm/guests",
-    "label": "Guests",
-    "title": "Guests",
-    "parents": ["crm"],
+  "adminOverview": {
+    "url": "/dashboard-admin/overview",
+    "label": "Panoramica",
+    "title": "Panoramica Admin",
     "menu": {
       "mobile": false,
       "desktop": false,
@@ -148,14 +173,12 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["ADMIN"]
   },
-  "guestDetails": {
-    "url": "/dashboard/crm/guests/:guestId",
-    "matchingUrl": "/crm/guests/",
-    "label": "Guest Details",
-    "title": "Guest Details",
-    "parents": ["crm", "guests"],
+  "adminBookings": {
+    "url": "/dashboard-admin/bookings",
+    "label": "Gestione Prenotazioni",
+    "title": "Gestione Prenotazioni",
     "menu": {
       "mobile": false,
       "desktop": false,
@@ -163,12 +186,12 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["ADMIN"]
   },
-  "user": {
-    "url": "/dashboard/user",
-    "label": "Utente",
-    "title": "Utente",
+  "adminPayments": {
+    "url": "/dashboard-admin/payments",
+    "label": "Gestione Pagamenti",
+    "title": "Gestione Pagamenti",
     "menu": {
       "mobile": false,
       "desktop": false,
@@ -176,14 +199,111 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["ADMIN"]
   },
-  "profile": {
-    "url": "/dashboard/user/profile",
-    "label": "Profilo",
-    "title": "Profilo",
+  "adminVigils": {
+    "url": "/dashboard-admin/vigils",
+    "label": "Gestione Vigils",
+    "title": "Gestione Vigils",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
     "private": true,
-    "roles": []
+    "roles": ["ADMIN"]
+  },
+  "adminConsumers": {
+    "url": "/dashboard-admin/consumers",
+    "label": "Gestione Utenti",
+    "title": "Gestione Utenti",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminServices": {
+    "url": "/dashboard-admin/services",
+    "label": "Gestione Servizi",
+    "title": "Gestione Servizi",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminAnalytics": {
+    "url": "/dashboard-admin/analytics",
+    "label": "Analytics",
+    "title": "Analytics e Statistiche",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "adminReviews": {
+    "url": "/dashboard-admin/reviews",
+    "label": "Gestione Recensioni",
+    "title": "Gestione Recensioni",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["ADMIN"]
+  },
+  "createBooking": {
+    "url": "/booking/create",
+    "label": "Nuova Prenotazione",
+    "title": "Nuova Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "paymentBooking": {
+    "url": "/booking/payment",
+    "label": "Paga Prenotazione",
+    "title": "Pagamento Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "paymentBookingConfirm": {
+    "url": "/booking/payment/result",
+    "label": "Conferma Prenotazione",
+    "title": "Conferma Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "profileConsumer": {
     "url": "/user/profile",
@@ -199,87 +319,29 @@
     "private": true,
     "roles": ["VIGIL"]
   },
-  "account": {
-    "url": "/dashboard/user/account",
-    "label": "Account",
-    "title": "Account",
+  "vigilDetails": {
+    "url": "/vigil/:vigilId",
+    "label": "Dettagli Vigil",
+    "title": "Dettagli Vigil",
+    "matchingUrl": "/vigil/",
     "private": true,
-    "roles": []
-  },
-  "accountDetails": {
-    "url": "/dashboard/user/account/details",
-    "label": "Details",
-    "title": "Account Details",
-    "parents": ["account"],
-    "private": true,
-    "roles": []
-  },
-  "accountSecurity": {
-    "url": "/dashboard/user/account/security",
-    "label": "Sicurezza",
-    "title": "Sicurezza Account",
-    "parents": ["account"],
-    "private": true,
-    "roles": []
-  },
-  "sales": {
-    "url": "/dashboard/sales",
-    "label": "Sales",
-    "title": "Sales",
-    "menu": {
-      "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "saleDetails": {
-    "url": "/dashboard/sales/:saleId",
-    "matchingUrl": "/dashboard/sales",
-    "label": "Sale Details",
-    "title": "Sale Details",
-    "parents": ["sales"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
-      "header": false,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
+    "roles": ["CONSUMER"]
   },
   "services": {
-    "url": "/dashboard/services",
+    "url": "/services",
     "label": "Servizi",
     "title": "Servizi",
     "menu": {
       "mobile": true,
-      "desktop": false,
-      "header": true,
-      "footer": false
-    },
-    "private": true,
-    "roles": []
-  },
-  "serviceDetails": {
-    "url": "/dashboard/services/:serviceId",
-    "matchingUrl": "/dashboard/services",
-    "label": "Service Details",
-    "title": "Service Details",
-    "parents": ["services"],
-    "menu": {
-      "mobile": false,
-      "desktop": false,
+      "desktop": true,
       "header": false,
-      "footer": false
+      "footer": true
     },
     "private": true,
-    "roles": []
+    "roles": ["CONSUMER"]
   },
   "notifications": {
-    "url": "/dashboard/notifications",
+    "url": "/notifications",
     "label": "Notifiche",
     "title": "Notifiche",
     "menu": {
@@ -289,7 +351,7 @@
       "footer": false
     },
     "private": true,
-    "roles": []
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "about": {
     "url": "/about",
@@ -298,7 +360,7 @@
     "menu": {
       "mobile": true,
       "desktop": true,
-      "header": true,
+      "header": false,
       "footer": true
     },
     "private": false,
@@ -359,5 +421,18 @@
       "changeFrequency": "monthly",
       "priority": 0.8
     }
+  },
+  "playground": {
+    "url": "/playground",
+    "label": "Playground",
+    "title": "Playground",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
   }
 }

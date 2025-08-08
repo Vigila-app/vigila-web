@@ -7,11 +7,9 @@ import { CmsContentType } from "@/src/enums/cms.enums";
 
 const requestHandler = async (
   req: Request,
-  context: { params: { contentType: CmsContentType; contentId: string } }
+  context: { params: Promise<{ contentType: CmsContentType; contentId: string }> }
 ) => {
-  const {
-    params: { contentType, contentId },
-  } = context;
+  const { contentType, contentId } = await context.params;
   const { method } = req;
 
   if (!(contentType && contentId)) {
@@ -38,31 +36,31 @@ const requestHandler = async (
   };
 
   switch (method) {
-    case "GET": {
-      try {
-        const response = await ApiService.get(
-          `${apiCms.CONTENT_SSR(`${getPathToContetType()}/${contentId}`)}`
-        );
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.CMS_CONTENT_SUCCESS.code,
-            data: response,
-            success: true,
-          },
-          { status: 200 }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            code: ResponseCodesConstants.CMS_CONTENT_ERROR.code,
-            success: false,
-            show: true,
-          },
-          { status: 500 }
-        );
-      }
-      break;
-    }
+    // case "GET": {
+    //   try {
+    //     const response = await ApiService.get(
+    //       `${apiCms.CONTENT_SSR(`${getPathToContetType()}/${contentId}`)}`
+    //     );
+    //     return NextResponse.json(
+    //       {
+    //         code: ResponseCodesConstants.CMS_CONTENT_SUCCESS.code,
+    //         data: response,
+    //         success: true,
+    //       },
+    //       { status: 200 }
+    //     );
+    //   } catch (error) {
+    //     return NextResponse.json(
+    //       {
+    //         code: ResponseCodesConstants.CMS_CONTENT_ERROR.code,
+    //         success: false,
+    //         show: true,
+    //       },
+    //       { status: 500 }
+    //     );
+    //   }
+    //   break;
+    // }
     default: {
       return NextResponse.json(
         {
@@ -78,7 +76,7 @@ const requestHandler = async (
 
 export async function GET(
   req: Request,
-  context: { params: { contentType: CmsContentType; contentId: string } }
+  context: { params: Promise<{ contentType: CmsContentType; contentId: string }> }
 ) {
   return requestHandler(req, context);
 }

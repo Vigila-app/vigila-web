@@ -5,6 +5,33 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 1001,
   },
 
+  // region ALTCHA
+  ALTCHA_CHALLENGE_SUCCESS: {
+    code: 8001,
+  },
+  ALTCHA_CHALLENGE_ERROR: {
+    code: 8002,
+  },
+  ALTCHA_CHALLENGE_BAD_REQUEST: {
+    code: 8003,
+  },
+  ALTCHA_CHALLENGE_METHOD_NOT_ALLOWED: {
+    code: 8006,
+  },
+  ALTCHA_VALIDATE_SUCCESS: {
+    code: 8011,
+  },
+  ALTCHA_VALIDATE_ERROR: {
+    code: 8012,
+  },
+  ALTCHA_VALIDATE_BAD_REQUEST: {
+    code: 8013,
+  },
+  ALTCHA_VALIDATE_METHOD_NOT_ALLOWED: {
+    code: 8016,
+  },
+  // endregion ALTCHA
+
   // region PAYMENT
   PAYMENT_INTENT_SUCCESS: {
     code: 8101,
@@ -15,8 +42,17 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   PAYMENT_INTENT_BAD_REQUEST: {
     code: 8103,
   },
-  PAYMENT_INTENT_METHOD_NOT_ALLOWED: {
+  PAYMENT_INTENT_UNAUTHORIZED: {
+    code: 8104,
+  },
+  PAYMENT_INTENT_NOT_FOUND: {
+    code: 8105,
+  },
+  PAYMENT_INTENT_ALREADY_PAID: {
     code: 8106,
+  },
+  PAYMENT_INTENT_METHOD_NOT_ALLOWED: {
+    code: 8107,
   },
 
   PAYMENT_WEBHOOK_SUCCESS: {
@@ -152,6 +188,31 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   BOOKINGS_DETAILS_SERVICE_UNAVAILABLE: {
     code: 9608,
+  },
+
+  BOOKINGS_UPDATE_SUCCESS: {
+    code: 9631,
+  },
+  BOOKINGS_UPDATE_ERROR: {
+    code: 9632,
+  },
+  BOOKINGS_UPDATE_BAD_REQUEST: {
+    code: 9633,
+  },
+  BOOKINGS_UPDATE_UNAUTHORIZED: {
+    code: 9634,
+  },
+  BOOKINGS_UPDATE_FORBIDDEN: {
+    code: 9635,
+  },
+  BOOKINGS_UPDATE_METHOD_NOT_ALLOWED: {
+    code: 9636,
+  },
+  BOOKINGS_UPDATE_NOT_FOUND: {
+    code: 9637,
+  },
+  BOOKINGS_UPDATE_SERVICE_UNAVAILABLE: {
+    code: 9638,
   },
   // endregion BOOKINGS
 
@@ -393,4 +454,46 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 5606,
   },
   // endregion SALES
+
+  // region CONSUMER
+  CONSUMER_DETAILS_SUCCESS: {
+    code: 7801,
+  },
+  CONSUMER_DETAILS_ERROR: {
+    code: 7802,
+  },
+  CONSUMER_DETAILS_BAD_REQUEST: {
+    code: 7803,
+  },
+  CONSUMER_DETAILS_UNAUTHORIZED: {
+    code: 7804,
+  },
+  CONSUMER_DETAILS_FORBIDDEN: {
+    code: 7805,
+  },
+  CONSUMER_DETAILS_METHOD_NOT_ALLOWED: {
+    code: 7806,
+  },
+  // endregion CONSUMER
+
+  // region VIGIL
+  VIGIL_DETAILS_SUCCESS: {
+    code: 7901,
+  },
+  VIGIL_DETAILS_ERROR: {
+    code: 7902,
+  },
+  VIGIL_DETAILS_BAD_REQUEST: {
+    code: 7903,
+  },
+  VIGIL_DETAILS_UNAUTHORIZED: {
+    code: 7904,
+  },
+  VIGIL_DETAILS_FORBIDDEN: {
+    code: 7905,
+  },
+  VIGIL_DETAILS_METHOD_NOT_ALLOWED: {
+    code: 7906,
+  },
+  // endregion VIGIL
 };
