@@ -18,7 +18,13 @@ interface ReviewListComponentProps {
 }
 
 const ReviewListComponent = (props: ReviewListComponentProps) => {
-  const { vigilId, consumerId, showActions = true, limit, title = "Recensioni" } = props;
+  const {
+    vigilId,
+    consumerId,
+    showActions = true,
+    limit,
+    title = "Recensioni",
+  } = props;
   const [loading, setLoading] = useState(false);
   const [reviews, setReviews] = useState<ReviewI[]>([]);
 
@@ -35,7 +41,7 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
     setLoading(true);
     try {
       let reviewData: ReviewI[] = [];
-      
+
       if (vigilId) {
         reviewData = await getReviewsByVigil(vigilId);
       } else {
@@ -43,7 +49,9 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
       }
 
       if (consumerId) {
-        reviewData = reviewData.filter(review => review.consumer_id === consumerId);
+        reviewData = reviewData.filter(
+          (review) => review.consumer_id === consumerId
+        );
       }
 
       if (limit) {
@@ -62,7 +70,7 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
     if (window.confirm("Sei sicuro di voler eliminare questa recensione?")) {
       try {
         await deleteReview(reviewId);
-        setReviews(reviews.filter(review => review.id !== reviewId));
+        setReviews(reviews.filter((review) => review.id !== reviewId));
       } catch (error) {
         console.error("Error deleting review:", error);
       }
@@ -87,11 +95,17 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
   };
 
   const canEditReview = (review: ReviewI) => {
-    return user?.id === review.consumer_id || user?.user_metadata?.role === RolesEnum.ADMIN;
+    return (
+      user?.id === review.consumer_id ||
+      user?.user_metadata?.role === RolesEnum.ADMIN
+    );
   };
 
   const canDeleteReview = (review: ReviewI) => {
-    return user?.id === review.consumer_id || user?.user_metadata?.role === RolesEnum.ADMIN;
+    return (
+      user?.id === review.consumer_id ||
+      user?.user_metadata?.role === RolesEnum.ADMIN
+    );
   };
 
   if (loading) {
@@ -133,11 +147,9 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
             className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
           >
             <div className="flex justify-between items-start mb-4">
-              <div className="flex-1">
-                {renderStars(review.rating)}
-              </div>
+              <div className="flex-1">{renderStars(review.rating)}</div>
               <div className="text-sm text-gray-500">
-                {dateDisplay(review.created_at, "datetime")}
+                {dateDisplay(review.created_at, "monthYearLiteral")}
               </div>
             </div>
 
@@ -147,10 +159,14 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
 
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-600">
-                <span>Di: </span>
-                <span className="font-medium">
-                  {review.consumer?.displayName}
-                </span>
+                {review.consumer?.displayName && (
+                  <>
+                    <span>Di: </span>
+                    <span className="font-medium">
+                      {review.consumer?.displayName}
+                    </span>
+                  </>
+                )}
                 {review.vigil && (
                   <>
                     <span className="mx-2">•</span>
@@ -170,12 +186,12 @@ const ReviewListComponent = (props: ReviewListComponentProps) => {
                       label="Modifica"
                       customClass="text-sm"
                       action={() =>
-                        openModal("review-edit", { 
+                        openModal("review-edit", {
                           reviewId: review.id,
                           initialData: {
                             rating: review.rating,
                             comment: review.comment,
-                          }
+                          },
                         })
                       }
                     />

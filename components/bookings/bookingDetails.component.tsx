@@ -297,19 +297,17 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         </div>
       </div>
 
-      <div className="flex justify-center gap-4 pt-4 border-t">
+      <div className="flex justify-center flex-wrap gap-4 pt-4 border-t">
         {isVigil && booking.status === BookingStatusEnum.PENDING && (
           <>
             <Button
               role={RolesEnum.CONSUMER}
-              small
               disabled={booking.payment_status !== PaymentStatusEnum.PAID}
               label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
             <Button
               danger
-              small
               label="Rifiuta Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
             />
@@ -318,7 +316,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {isVigil && booking.status === BookingStatusEnum.CONFIRMED && (
           <Button
-            small
             role={RolesEnum.CONSUMER}
             label="Completa Prenotazione"
             action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
@@ -328,7 +325,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         {canCancel && (
           <Button
             danger
-            small
             label="Annulla Prenotazione"
             action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
           />
@@ -337,7 +333,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         {isConsumer && booking.payment_status === PaymentStatusEnum.PENDING && (
           <Button
             label="Paga Prenotazione"
-            small
             role={RolesEnum.CONSUMER}
             action={() =>
               router.push(

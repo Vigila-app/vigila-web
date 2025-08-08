@@ -118,11 +118,11 @@ const MenuMobile = () => {
                   {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
                 </li>
               )}
-              {user?.user_metadata?.role === RolesEnum.VIGIL && (
+              {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
                 <li className="block py-2">
                   {MenuLinkItem(Routes.services, WrenchScrewdriverIcon)}
                 </li>
-              )}
+              )} */}
 
               {/* <li className="block py-2">
                 {MenuLinkItem(Routes.bookings, CalendarDaysIcon)}

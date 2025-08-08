@@ -10,6 +10,7 @@ import { useReviewsStore } from "@/src/store/reviews/reviews.store";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import ReviewEditForm from "./reviewEditForm.component";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 interface ReviewCardProps {
   review: ReviewI;
@@ -57,15 +58,6 @@ const ReviewCard = ({
         ★
       </span>
     ));
-  };
-
-  // Formatta la data
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("it-IT", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   // Gestisce la modifica della recensione
@@ -149,7 +141,7 @@ const ReviewCard = ({
           <span className="text-sm text-gray-500">({review.rating}/5)</span>
         </div>
         <span className="text-xs text-gray-400">
-          {formatDate(review.created_at)}
+          {dateDisplay(review.created_at, "monthYearLiteral")}
         </span>
       </div>
 
@@ -164,7 +156,7 @@ const ReviewCard = ({
       {review.consumer && (
         <div className="text-xs text-gray-500 border-t pt-2">
           <span>
-            Recensione di:{" "}
+            Recensione di:&nbsp;
             {review.consumer.user_metadata?.name || "Utente anonimo"}
           </span>
         </div>

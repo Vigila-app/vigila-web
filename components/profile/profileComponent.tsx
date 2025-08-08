@@ -28,12 +28,13 @@ import {
   UserGroupIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
   const { consumers } = useConsumerStore();
-  const { vigils} = useVigilStore();
+  const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
   const role = user?.user_metadata?.role as RolesEnum;
   const isConsumer = role === RolesEnum.CONSUMER;
@@ -171,18 +172,21 @@ const ProfileComponent = () => {
                 </div>
               </div>
               <div className="mt-2">
-              <TabGroup
-                role={role}
-                tabs={tabs}
-                onTabChange={(tab) => setSelectedTab(tab)}
-              />
-              {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
-              {selectedTab.id === "prenotazioni" && (
-                <PrenotazioniConsumerTabs />
-              )}
-              {selectedTab.id === "famiglia" && <FamigliaTab />}
-              {selectedTab.id === "recensioni" && <RecensioniTab />}
-              {selectedTab.id === "informazioni" && <InformazioniConsumerTab />} </div>
+                <TabGroup
+                  role={role}
+                  tabs={tabs}
+                  onTabChange={(tab) => setSelectedTab(tab)}
+                />
+                {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
+                {selectedTab.id === "prenotazioni" && (
+                  <PrenotazioniConsumerTabs />
+                )}
+                {selectedTab.id === "famiglia" && <FamigliaTab />}
+                {selectedTab.id === "recensioni" && <RecensioniTab />}
+                {selectedTab.id === "informazioni" && (
+                  <InformazioniConsumerTab />
+                )}{" "}
+              </div>
             </div>
           </div>
         </div>
@@ -213,16 +217,21 @@ const ProfileComponent = () => {
                     {formatRole(role)}
                   </span>
                   <div className="flex items-center gap-2 mb-3">
-                    {vigil?.averageRating  ? (
+                    {vigil?.averageRating ? (
                       <div className="inline-flex items-center flex-nowrap gap-1">
                         <div className="flex items-center gap-1">
-                          <StarIcon className="w-4 h-4 text-yellow-300" />
+                          <StarIconSolid className="w-4 h-4 text-yellow-300" />
                           <p className="text-xs font-medium text-gray-600">
                             Valutazione media: {vigil?.averageRating}
                           </p>
                         </div>
                       </div>
-                    ) : <span className="text-gray-500 font-medium flex items-center text-center"> 0 recensioni </span>}
+                    ) : (
+                      <span className="text-gray-500 font-medium flex items-center text-center">
+                        {" "}
+                        0 recensioni{" "}
+                      </span>
+                    )}
 
                     {vigil?.created_at && (
                       <span className="text-xs font-medium text-gray-700">
@@ -237,19 +246,18 @@ const ProfileComponent = () => {
               </div>
             </div>
             <div className="mt-2">
-              
-
-            <TabGroup
-              role={role}
-              tabs={tabs}
-              onTabChange={(tab) => setSelectedTab(tab)}
-            />
-            {selectedTab.id === "panoramica" && <PanoramicaTab />}
-            {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
-            {selectedTab.id === "informazioni" && <InformazioniTab />}
-            {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
-            {selectedTab.id === "servizi" && <ServiziTab />}
-            {selectedTab.id === "recensioni" && <RecensioniTab />} </div>
+              <TabGroup
+                role={role}
+                tabs={tabs}
+                onTabChange={(tab) => setSelectedTab(tab)}
+              />
+              {selectedTab.id === "panoramica" && <PanoramicaTab />}
+              {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
+              {selectedTab.id === "informazioni" && <InformazioniTab />}
+              {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
+              {selectedTab.id === "servizi" && <ServiziTab />}
+              {selectedTab.id === "recensioni" && <RecensioniTab />}{" "}
+            </div>
           </div>
         </div>
       </div>

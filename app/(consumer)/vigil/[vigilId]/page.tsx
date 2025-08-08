@@ -6,7 +6,6 @@ import { Avatar, Button } from "@/components";
 import { ReviewListComponent } from "@/components/reviews";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { Routes } from "@/src/routes";
-import dynamic from "next/dynamic";
 import { useAppStore } from "@/src/store/app/app.store";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
