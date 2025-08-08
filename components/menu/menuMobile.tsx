@@ -86,15 +86,21 @@ const MenuMobile = () => {
             <section className=" flex flex-col gap-2 justify-center items-center mb-12 mt-12">
               <Avatar
                 userId={user.id}
-                value={userDetails?.displayName}
+                value={
+                  userDetails?.displayName ||
+                  userDetails?.user_metadata?.displayName
+                }
                 size="xxl"
               />
               <span className="font-semibold text-lg">
-                {userDetails?.displayName}
+                {userDetails?.displayName ||
+                  userDetails?.user_metadata?.displayName}
               </span>
-              <span className="font-medium text-sm">
-                {user?.user_metadata?.role}
-              </span>
+              {role === RolesEnum.VIGIL && (
+                <span className="font-medium text-sm">
+                  {user?.user_metadata?.role}
+                </span>
+              )}
             </section>
             <ul className="flex flex-col gap-8 divide-y divide-gray-100 flex-1">
               <li className="flex py-2 items-center ">
@@ -118,9 +124,9 @@ const MenuMobile = () => {
                 </li>
               )}
 
-              <li className="block py-2">
+              {/* <li className="block py-2">
                 {MenuLinkItem(Routes.bookings, CalendarDaysIcon)}
-              </li>
+              </li> */}
             </ul>
           </>
         ) : null}

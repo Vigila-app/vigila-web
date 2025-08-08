@@ -266,6 +266,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
               // onCancel={handleBackToBookings}
               submitLabel="Completa pagamento"
               clientSecret={clientSecret}
+              showCancelButton={false}
             />
           </div>
         )}
