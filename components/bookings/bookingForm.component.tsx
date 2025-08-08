@@ -126,11 +126,11 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     if (watchedServiceId && services.length) {
       const service = services.find((s) => s.id === watchedServiceId);
       if (!service) {
-        getServiceDetails(watchedServiceId as string);
+        getServiceDetails(watchedServiceId as string, true);
       } else {
         setSelectedService(service || null);
       }
-    } else if (!services?.length) {
+    } else {
       if (watchedServiceId || serviceId) {
         getServiceDetails((watchedServiceId || serviceId) as string, true);
       } else {
@@ -152,10 +152,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   }, [selectedService, watchedDuration, serviceCatalog, role]);
 
   useEffect(() => {
-    if (services?.length === 1) {
-      setSelectedService(services[0]);
+    if (services?.length) {
+      setSelectedService(services.find((s) => s.id === serviceId) || null);
     }
-  }, [services]);
+  }, [services, serviceId]);
 
   useEffect(() => {
     setValue("service_id", selectedService?.id as never);
@@ -203,6 +203,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
   const serviceOptions = useMemo(
     () =>
+      !serviceId &&
       services.map((service) => ({
         label: `${service.name} - ${service.currency} ${amountDisplay(
           service.unit_price
@@ -210,7 +211,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         value: service.id,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [services, serviceId]
+    [services?.length, serviceId]
   );
 
   return (
@@ -241,7 +242,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           control={control}
           rules={{ required: true }}
           render={({ field }) =>
-            serviceOptions.length > 1 ? (
+            serviceOptions && serviceOptions?.length > 1 ? (
               <Select
                 {...field}
                 label="Servizio richiesto"
