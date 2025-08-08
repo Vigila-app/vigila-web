@@ -29,7 +29,7 @@ export default function HomeConsumer() {
   }, []);
 
   return (
-    <div className="my-6 md:max-w-3xl  mx-4">
+    <div className="my-6 md:max-w-3xl mx-4">
       <div className="text-2xl font-semibold mb-6 flex items-center justify-center gap-2 text-vigil-orange">
         <div className=" bg-vigil-light-orange rounded-full p-2 flex items-center justify-center">
           <span className="h-6 w-6 ">

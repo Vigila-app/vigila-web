@@ -2,10 +2,10 @@
 const LandingPhoto = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="391"
-    height="261"
+    width="320"
+    height="180"
     fill="none"
-    viewBox="0 0 391 261"
+    viewBox="0 0 320 180"
   >
     <path
       fill="#BCE6FF"
