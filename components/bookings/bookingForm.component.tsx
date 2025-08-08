@@ -29,6 +29,9 @@ const SearchAddress = dynamic(
   }
 );
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
+import { FrequencyEnum } from "@/src/enums/common.enums";
+import { StarIcon } from "@heroicons/react/24/solid";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -99,24 +102,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     [selectedService]
   );
 
-  // useEffect(() => {
-  // if (serviceId) {
-  //   // prova a trovare nel su service id uguali
-  //   const existing = services.find((s) => s.id === serviceId);
-  //   if (existing) {
-  //     setSelectedService(existing);
-  //     setValue("service_id", existing.id as never);
-  //
-  //   }
-  // }, [serviceId, services]);
-  // useEffect(() => {
-  //   if (serviceId) {
-  //     getServiceDetails(serviceId);
-  //     setValue("service_id", serviceId as never);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [serviceId]);
-
   useEffect(() => {
     if (vigilId) getVigilsDetails([vigilId], true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +152,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       console.log("⚠️ selectedService non corrisponde a serviceId");
     }
   }, [selectedService, serviceId]);
+
+  const age = Math.floor(
+    dateDiff(
+      new Date(),
+      new Date(vigilDetails?.birthday || ""),
+      FrequencyEnum.DAYS
+    ) / 365.25
+  );
 
   const submitForm = async (formData: BookingFormI) => {
     if (isValid) {
@@ -225,14 +218,36 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           </p>
         </div>
 
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange border border-vigil-light-orange p-3">
+        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange/60  p-3">
           <Avatar
             size="big"
             userId={vigilDetails?.id}
             value={vigilDetails?.displayName}
           />
-          <div className="flex-1">
-            <span>{vigilDetails?.displayName}</span>
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-[15px] text-gray-800">
+                {vigilDetails?.displayName}
+              </p>
+              <p className="font-medium text-xs text-gray-600">({age} anni)</p>
+            </div>
+            <div className="font-medium text-[12px] text-gray-600">
+              <span>
+                🗓️ Su Vigila da:&nbsp;
+                <span className="capitalize">
+                  {dateDisplay(
+                    vigilDetails?.created_at || "",
+                    "monthYearLiteral"
+                  )}
+                </span>
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <StarIcon className="w-4 h-4 text-yellow-300" />
+              <p className="text-xs font-medium text-gray-600">
+                Valutazione media: {vigilDetails?.averageRating}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -339,6 +354,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
         <SearchAddress
           location
+          role={RolesEnum.VIGIL}
           onSubmit={(address) =>
             address?.display_name
               ? setValue("address", address.display_name)
@@ -364,9 +380,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         />
 
         {selectedService && (
-          <div className="p-4 bg-vigil-light-orange rounded-lg border border-vigil-orange">
+          <div className="p-4  rounded-lg border border-vigil-orange">
             <h3 className="font-medium">Riepilogo Prenotazione</h3>
-            <div className="mt-2 space-y-1 text-sm text-gray-600">
+            <div className="mt-2 space-y-1 text-[16px] text-gray-700">
               <p>
                 Servizio: {selectedService.name}
                 {watchedAddress && ` presso ${watchedAddress}`}
@@ -404,7 +420,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
           <Button
             type="submit"
-            primary
+            role={RolesEnum.CONSUMER}
             full
             label={
               booking ? "Aggiorna Prenotazione" : "Conferma e vai al pagamento"

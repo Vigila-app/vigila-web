@@ -16,7 +16,7 @@ export default function RecensioniTab() {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {/* {role === RolesEnum.VIGIL &&
       user?.id &&
       vigilStats[user.id]?.average_rating ? (

@@ -23,7 +23,7 @@ const PanoramicaConsumerTab = () => {
 
   const consumer = consumers.find((c) => c.id === user?.id);
   return (
-    <section className="py-4  bg-gray-100 rounded-b-2xl">
+    <section className="py-4 w-full bg-gray-100 rounded-b-2xl flex flex-col gap-4">
       <Card>
         <h1 className="flex flex-row items-center gap-2 pb-2">
           <HeartIcon className="size-6 text-red-600" />

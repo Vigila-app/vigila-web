@@ -1,5 +1,5 @@
 const baseCardStyle =
-  "mb-4 p-4 shadow-sm rounded-2xl bg-pureWhite";
+  " p-4 shadow-sm rounded-2xl bg-pureWhite";
 
 const borderedCardStyle = "border border-gray-200";
 const shadowCardStyle = "shadow-md";

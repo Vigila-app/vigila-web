@@ -44,9 +44,9 @@ const TextArea = (props: TextAreaI) => {
         className={clsx(
           "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           role === RolesEnum.CONSUMER &&
-            "text-consumer-blue   border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue ",
+            "text-gray-700 placeholder:text-consumer-orange  border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue ",
           role === RolesEnum.VIGIL &&
-            " text-vigil-orange  focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange",
+            " text-gray-700 placeholder:text-vigil-orange focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange",
           error && "border-red-500",
           disabled && "!bg-gray-100 cursor-not-allowed"
         )}>

@@ -65,8 +65,8 @@ export default function HomeConsumer() {
       </Card>
 
       {bookings?.length > 0 && (
-        <section className="space-y-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between  font-semibold text-lg px-4">
+        <section className="flex flex-col gap-4 mt-8 ">
+          <div className="flex items-center justify-between  font-semibold text-lg ">
             <div className="inline-flex items-center gap-1 ">
               <CalendarIcon className="w-6 h-6 text-consumer-blue" />
               <span className="text-consumer-blue">Prossime Prenotazioni</span>
@@ -80,7 +80,7 @@ export default function HomeConsumer() {
           </div>
 
           {bookings?.length ? (
-            <div className="px-4">
+            <div className=" w-full flex flex-col gap-4 justify-center">
               {bookings.map((booking) => (
                 <BookingCardComponent key={booking.id} bookingId={booking.id} />
               ))}

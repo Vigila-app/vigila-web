@@ -19,6 +19,7 @@ import { ServicesUtils } from "@/src/utils/services.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { AppConstants } from "@/src/constants";
+import Card from "../card/card";
 
 type PaymentBookingI = {
   bookingId: BookingI["id"];
@@ -43,6 +44,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     () => services.find((s) => s.id === booking?.service_id),
     [services, booking?.service_id]
   );
+
   const vigil = useMemo(
     () => vigils.find((v) => v.id === booking?.vigil_id),
     [vigils, booking?.vigil_id]
@@ -191,82 +193,84 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   }
 
   return (
-    <div className="bg-gray-50 w-full mx-auto p-6 rounded-lg shadow-lg">
-      <div className="mb-6">
-        <h2 className="text-center font-medium text-xl">
-          Completa prenotazione
-        </h2>
-        <p className="text-center text-sm text-gray-500 mt-2">
-          Per completare la prenotazione, procedi al pagamento.
-          <br />
-          Una volta effettuato il pagamento, riceverai una conferma via email.
-        </p>
-      </div>
+    <Card customClass="mx-2">
+      <div className="bg-gray-50 w-full mx-auto p-6 rounded-3xl">
+        <div className="mb-6">
+          <h2 className="text-center font-medium text-xl">
+            Completa prenotazione
+          </h2>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            Per completare la prenotazione, procedi al pagamento.
+            <br />
+            Una volta effettuato il pagamento, riceverai una conferma via email.
+          </p>
+        </div>
 
-      {/* Riepilogo prenotazione */}
-      <div className="my-6 p-4 bg-white rounded-lg shadow">
-        <h3 className="font-medium text-gray-900 mb-3">
-          Riepilogo Prenotazione
-        </h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>ID Prenotazione:</span>
-            <span className="text-xs">{booking.id}</span>
-          </div>
-          {service?.id && (
+        {/* Riepilogo prenotazione */}
+        <div className="my-6 p-4 bg-vigil-light-orange rounded-exl shadow">
+          <h3 className="font-medium text-vigil-orange mb-3">
+            Riepilogo Prenotazione
+          </h3>
+          <div className="space-y-2 text-xs text-gray-700">
             <div className="flex justify-between">
-              <span>Servizio:</span>
-              <span>{service?.name}</span>
+              <span>ID Prenotazione:</span>
+              <span className="text-xs">{booking.id}</span>
             </div>
-          )}
-          {vigil?.id && (
+            {service?.id && (
+              <div className="flex justify-between">
+                <span>Servizio:</span>
+                <span>{service?.name}</span>
+              </div>
+            )}
+            {vigil?.id && (
+              <div className="flex justify-between">
+                <span>Vigil:</span>
+                <span>{vigil?.displayName}</span>
+              </div>
+            )}
             <div className="flex justify-between">
-              <span>Vigil:</span>
-              <span>{vigil?.displayName}</span>
+              <span>Quando:</span>
+              <span>{dateDisplay(booking.startDate, "dateTime")}</span>
             </div>
-          )}
-          <div className="flex justify-between">
-            <span>Quando:</span>
-            <span>{dateDisplay(booking.startDate, "dateTime")}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Indirizzo:</span>
-            <span className="max-w-3/4 text-right">{booking.address}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Quantità:</span>
-            <span>
-              {booking.quantity}&nbsp;
-              {service?.unit_type
-                ? ServicesUtils.getServiceUnitType(service?.unit_type)
-                : ""}
-            </span>
-          </div>
-          <div className="flex justify-between font-medium text-lg border-t pt-2">
-            <span>Totale:</span>
-            <span>
-              {service?.currency}
-              {amountDisplay(booking.price)}
-            </span>
+            <div className="flex justify-between">
+              <span>Indirizzo:</span>
+              <span className="max-w-3/4 text-right">{booking.address}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Quantità:</span>
+              <span>
+                {booking.quantity}&nbsp;
+                {service?.unit_type
+                  ? ServicesUtils.getServiceUnitType(service?.unit_type)
+                  : ""}
+              </span>
+            </div>
+            <div className="flex justify-between font-medium text-lg border-t pt-2">
+              <span>Totale:</span>
+              <span>
+                {service?.currency}
+                {amountDisplay(booking.price)}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Form di pagamento Stripe */}
-      {clientSecret && (
-        <div className="my-6 p-4 bg-white rounded-lg shadow">
-          <h3 className="font-medium text-gray-900 mb-3">Pagamento</h3>
-          <CheckoutForm
-            returnUrl={`${window?.location?.origin || AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}
-            onSuccess={handlePaymentSuccess}
-            onError={handlePaymentError}
-            // onCancel={handleBackToBookings}
-            submitLabel="Completa pagamento"
-            clientSecret={clientSecret}
-          />
-        </div>
-      )}
-    </div>
+        {/* Form di pagamento Stripe */}
+        {clientSecret && (
+          <div className="my-6 p-4 bg-vigil-light-orange rounded-3xl shadow">
+            <h3 className="font-medium text-vigil-orange mb-3">Pagamento</h3>
+            <CheckoutForm
+              returnUrl={`${window?.location?.origin || AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}
+              onSuccess={handlePaymentSuccess}
+              onError={handlePaymentError}
+              // onCancel={handleBackToBookings}
+              submitLabel="Completa pagamento"
+              clientSecret={clientSecret}
+            />
+          </div>
+        )}
+      </div>
+    </Card>
   );
 };
 

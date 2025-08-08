@@ -20,7 +20,6 @@ function BookingPaymentContent() {
   const {
     params: { bookingId },
   } = useQueryParams();
-
   if (!bookingId) {
     redirect(Routes.home.url);
   }
@@ -35,7 +34,8 @@ function BookingPaymentContent() {
 
 export default function BookingPaymentBookingPage() {
   return (
-    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+    <Suspense
+      fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
       <BookingPaymentContent />
     </Suspense>
   );
