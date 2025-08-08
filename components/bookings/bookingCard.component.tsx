@@ -39,8 +39,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   } = useAppStore();
   const { bookings, getBookings, getBookingDetails } = useBookingsStore();
   const { consumers } = useConsumerStore();
-  const { vigils } = useVigilStore();
-  const { services } = useServicesStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
 
   const isConsumer = useMemo(() => {
@@ -143,21 +143,18 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   return (
     <Link
       href={BookingUtils.getBookingDetailsUrl(booking.id)}
-      className="no-underline"
-    >
+      className="no-underline">
       <Card>
         <div
           className={clsx(
             isVigil && "flex flex-col gap-1",
             isConsumer && "flex gap-1 "
-          )}
-        >
+          )}>
           <div
             className={clsx(
               isVigil && "flex items-start gap-2",
               isConsumer && "inline-flex items-center flex-nowrap gap-2"
-            )}
-          >
+            )}>
             <Avatar
               size="big"
               userId={getUserInfo()?.id}

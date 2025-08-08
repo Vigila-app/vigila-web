@@ -122,7 +122,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         getServices(true, vigilId);
       }
     }
-
+    console.log("watchedServiceId:", watchedServiceId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedServiceId, services?.length]);
 
@@ -136,22 +136,28 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
   }, [selectedService, watchedDuration, serviceCatalog, role]);
 
+  // useEffect(() => {
+  //   if (services?.length === 1) {
+  //     setSelectedService(services[0]);
+  //   }
+  // }, [services]);
+
+  // useEffect(() => {
+  //   setValue("service_id", selectedService?.id as never);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedService]);
   useEffect(() => {
+    if (serviceId) {
+      const service = services.find((s) => s.id === serviceId);
+      if (service) {
+        setSelectedService(service);
+        return;
+      }
+    }
     if (services?.length === 1) {
       setSelectedService(services[0]);
     }
-  }, [services]);
-
-  useEffect(() => {
-    setValue("service_id", selectedService?.id as never);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedService]);
-
-  useEffect(() => {
-    if (selectedService && selectedService.id !== serviceId) {
-      console.log("⚠️ selectedService non corrisponde a serviceId");
-    }
-  }, [selectedService, serviceId]);
+  }, [services, serviceId]);
 
   const age = Math.floor(
     dateDiff(
