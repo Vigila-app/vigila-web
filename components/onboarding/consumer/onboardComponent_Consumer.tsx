@@ -229,10 +229,13 @@ const ConsumerOnboardComponent = () => {
                     label="Indirizzo della persona cara"
                   />
                   {address && (
-                    <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
-                      <span className="text-gray-700">
+                    <div className="flex flex-col items-start text-start pt-1 mt-2 bg-gray-100 rounded-2xl ">
+                      <span className="text-xs font-medium text-start px-2 text-gray-500 ">
+                        Se l&apos;indirizzo è sbagliato, ri-effettua la ricerca
+                      </span>
+                      <span className="text-black mt-2 p-2 rounded text-sm">
                         {(address?.address
-                          ? `${address.address.city || address.address.town || address.address.village || address.address.suburb}${address.address.city !== address.address.county ? ` (${address.address.county})` : ""}, ${address.address.postcode || ""}`
+                          ? `${address.display_name || address.address.city || address.address.town || address.address.village || address.address.suburb}${address.address.city !== address.address.county ? ` (${address.address.county})` : ""}, ${address.address.postcode || ""}`
                           : null) || address.display_name}
                       </span>
                     </div>

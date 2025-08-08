@@ -12,14 +12,20 @@ export default function TabCompletati() {
   }, []);
 
   return (
-    <div>
+    <div className="w-full">
       <h1 className="py-3 text-[18px] font-semibold">
         Prenotazioni completate
       </h1>
-      <div className="px-4">
-        {completedBookings.map((booking) => (
-          <BookingCardComponent key={booking.id} bookingId={booking.id} />
-        ))}
+      <div className="px-4 flex flex-col gap-4 items-center">
+        {completedBookings?.length ? (
+          completedBookings.map((booking) => (
+            <BookingCardComponent key={booking.id} bookingId={booking.id} />
+          ))
+        ) : (
+          <div className="text-center py-4 text-gray-500">
+            Nessuna prenotazione completata
+          </div>
+        )}
       </div>
     </div>
   );

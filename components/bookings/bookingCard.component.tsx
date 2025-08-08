@@ -13,11 +13,15 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
 import { useEffect, useMemo, useState } from "react";
-import { Avatar, Badge, Button, Card } from "@/components";
+import { Avatar, Badge, Button, ButtonLink, Card } from "@/components";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import Orologio from "@/components/svg/Orologio";
-import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { BookingUtils } from "@/src/utils/booking.utils";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
@@ -39,8 +43,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   } = useAppStore();
   const { bookings, getBookings, getBookingDetails } = useBookingsStore();
   const { consumers } = useConsumerStore();
-  const { vigils } = useVigilStore();
-  const { services } = useServicesStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const { services, getServiceDetails } = useServicesStore();
   const { user } = useUserStore();
 
   const isConsumer = useMemo(() => {
@@ -202,7 +206,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                   <span>{dateDisplay(booking.startDate, "date")}</span>
                 </span>
                 <span className="inline-flex items-center justify-center gap-1">
-                  <Orologio />
+                  <ClockIcon className="size-4" />
                   <span>{dateDisplay(booking.startDate, "time")}</span>
                 </span>
               </div>
@@ -218,12 +222,12 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                   <span>{dateDisplay(booking.startDate, "date")}</span>
                 </span>
                 <span className="inline-flex items-center justify-center gap-1">
-                  <Orologio />
-                  <span>{dateDisplay(booking.startDate, "time")}</span>{" "}
+                  <ClockIcon className="size-4" />
+                  <span>{dateDisplay(booking.startDate, "time")}</span>
                 </span>
               </div>
-              <div className="inline-flex items-start space-x-2 text-sm">
-                <MapPinIcon className="w-8 h-8  mt-0.5" />
+              <div className="inline-flex items-start space-x-2 text-sm mt-1">
+                <MapPinIcon className="size-4" />
                 <span className="text-gray-600">{booking.address}</span>
               </div>
             </div>
@@ -280,8 +284,14 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 </>
               )}
               {booking?.status === BookingStatusEnum.CONFIRMED && (
-                <Button label="Accettata" disabled />
+                <div>
+                  <ButtonLink
+                    label="Vedi dettagli"
+                    href={BookingUtils.getBookingDetailsUrl(booking.id)}
+                  />
+                </div>
               )}
+
               {booking?.status === BookingStatusEnum.CANCELLED && (
                 <Button label="Rifiutata" disabled />
               )}

@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import Image from "next/image";
 
 type HeroActionI = {
   label: string;
@@ -29,13 +30,19 @@ const BaseHero = (props: BaseHeroI) => {
 
   return (
     <div className={clsx("text-center", bgColor)}>
-      <p className="text-3xl font-bold in ">
+      <p className="inline-flex flex-wrap justify-center text-3xl font-bold mb-2">
         Un&nbsp;<span className="text-consumer-blue">ponte</span>
         &nbsp;tra&nbsp;
         <span className="text-vigil-orange">generazioni</span>
       </p>
-      <div className="mt-6 max-w-md mx-auto">{/* TODO immagine */}</div>
-
+      <div className="mx-auto w-fit h-auto mb-6">
+        <Image
+          src="/assets/home_banner.png"
+          alt="home_banner"
+          width={320}
+          height={180}
+        />
+      </div>
       <section className="w-full bg-primary py-12 px-4 text-center ">
         <h1 className="text-3xl md:text-4xl font-bold leading-tight">
           L&apos;assistenza&nbsp;

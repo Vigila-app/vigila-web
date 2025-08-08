@@ -103,7 +103,7 @@ const InformazioniConsumerTab = () => {
     }
   };
   return (
-    <div className="grid lg:grid-cols-2 gap-1">
+    <div className="grid lg:grid-cols-2 gap-4 w-full">
       <Card>
         <div>
           <div className="font-semibold ">Informazioni personali</div>
@@ -136,13 +136,6 @@ const InformazioniConsumerTab = () => {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-vigil-orange">
-              Telefono
-            </label>
-
-            <p>{userDetails?.phone}</p>
-          </div>
         </div>
       </Card>
       <Card>

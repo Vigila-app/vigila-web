@@ -22,9 +22,9 @@ export default async function Registration() {
   const data = (await getCmsData()) as CmsPageI;
   const { main: { title = "Sign up", text } = {} } = data;
   return (
-    <section className="py-8">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between">
-        <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg text-center">
+    <section className="py-16">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between ">
+        <div className="bg-pureWhite w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-3xl shadow-lg text-center">
           {title || text ? (
             <div>
               {title ? (

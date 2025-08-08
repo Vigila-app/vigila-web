@@ -15,6 +15,7 @@ export type UserDetailsType = {
   phone?: string;
   other?: { [key: string]: string | number };
   role?: RolesEnum;
+  user_metadata?: UserDetailsType;
 };
 
 export type UserDevicesType = {

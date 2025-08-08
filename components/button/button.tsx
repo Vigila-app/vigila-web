@@ -48,16 +48,18 @@ const Button = (props: ButtonI) => {
     danger
       ? ButtonStyle.dangerBtnStyle
       : text
-      ? ButtonStyle.textBtnStyle
-      : secondary
-      ? ButtonStyle.secondaryBtnStyle
-      : tab
-      ? ButtonStyle.tabBtnStyle
-      : primary
-      ? ButtonStyle.primaryBtnStyle
-      : "",
-    role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
-    role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle
+        ? ButtonStyle.textBtnStyle
+        : secondary
+          ? ButtonStyle.secondaryBtnStyle
+          : tab
+            ? ButtonStyle.tabBtnStyle
+            : role === RolesEnum.VIGIL
+            ? ButtonStyle.vigilBtnStyle
+            : role === RolesEnum.CONSUMER
+            ? ButtonStyle.consumerBtnStyle
+            : primary
+              ? ButtonStyle.primaryBtnStyle
+                  : ""
   );
   const isDisabled = isLoading || props.disabled;
 
@@ -81,6 +83,7 @@ const Button = (props: ButtonI) => {
         danger: undefined,
         text: undefined,
         tab: undefined,
+        role: undefined,
         icon: undefined,
         small: undefined,
         isLoading: undefined,

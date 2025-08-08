@@ -12,9 +12,9 @@ export default function TabConfirmed() {
   }, []);
 
   return (
-    <div>
+    <div className="w-full">
       <h1 className="py-3 text-[18px] font-semibold">Prenotazini accettate</h1>
-      <div className="px-4">
+      <div className="px-4 flex flex-col gap-4 items-center">
         {confirmedBookings?.length ? (
           confirmedBookings.map((booking) => (
             <BookingCardComponent key={booking.id} bookingId={booking.id} />

@@ -13,7 +13,7 @@
   },
   "homeConsumer": {
     "url": "/home",
-    "label": "Home Consumer",
+    "label": "Home",
     "menu": {
       "mobile": false,
       "desktop": false,

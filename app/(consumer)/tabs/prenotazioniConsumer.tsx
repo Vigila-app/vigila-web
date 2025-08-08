@@ -11,9 +11,9 @@ const PrenotazioniConsumerTabs = () => {
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center  w-full  ">
       <h1 className="py-3 text-[18px] font-semibold">Le tue Prenotazioni</h1>
-      <div className="">
+      <div className="flex flex-col justify-center gap-4">
         {bookings?.length ? (
           bookings.map((booking) => (
             <BookingCardComponent

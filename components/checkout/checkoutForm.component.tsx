@@ -171,7 +171,7 @@ const CheckoutFormComponent = ({
         </div>
       )}
 
-      <div className="flex gap-4">
+      <div className="flex flex-row-reverse md:flex-row gap-4 flex-wrap md:flex-nowrap items-center">
         {showCancelButton && (
           <Button
             type="button"
@@ -180,6 +180,7 @@ const CheckoutFormComponent = ({
             label={cancelLabel}
             action={handleCancel}
             disabled={isLoading}
+            customClass="px-4"
           />
         )}
         <Button

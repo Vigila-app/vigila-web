@@ -28,6 +28,7 @@ import {
   UserGroupIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
 
 const ProfileComponent = () => {
@@ -126,37 +127,37 @@ const ProfileComponent = () => {
     return (
       <div>
         <div className="max-w-7xl mx-auto">
-          <div className="rounded-lg h-full bg-background-default shadow-sm py-6 px-8 mb-6">
+          <div className="rounded-lg h-screen bg-background-default shadow-sm py-4 px-6 mb-3">
             <div className="flex flex-col items-center justify-between pt-5 bg-gray-100 rounded-2xl">
-              <div className="flex flex-col items-center rounded-2xl border-2 bg-white p-5">
+              <div className="flex w-full flex-col items-center rounded-2xl border-2 bg-white p-5 gap-2 border-consumer-blue/60">
                 <div className="flex items-center justify-center">
                   <Avatar
-                    size="big"
+                    size="xxl"
                     withUpload
                     onFileUpload={uploadProfilePic}
                     value={consumer?.displayName}
                     userId={consumer?.id}
                   />
                 </div>
-                <div className="flex-1  ">
-                  <section className="flex flex-col items-center ">
-                    <h1 className="text-3xl font-bold mb-2 text-center">
+                <div className="flex-1 ">
+                  <section className="flex flex-col items-center gap-2  ">
+                    <h1 className="text-3xl font-bold  text-center">
                       {consumer?.displayName}
                     </h1>
                     <span className="text-gray-500 font-medium flex items-center text-center">
                       {formatRole(role)}
                     </span>
-                    <div className="flex flex-col items-center gap-2  mb-3">
+                    <div className="flex  items-center gap-3 mb-3">
                       {consumer?.address?.name ? (
                         <div className="inline-flex items-center flex-nowrap gap-1">
-                          <MapPinIcon className="size-4" />
-                          <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
-                            {consumer?.address?.name}
+                          <MapPinIcon className="size-4 text-vigil-orange" />
+                          <span className="text-ellipsis text-xs font-medium  text-gray-700 overflow-hidden whitespace-nowrap max-w-48 md:max-w-56">
+                            {`${consumer?.address?.address?.suburb ?? consumer?.address?.display_name}, ${consumer?.address?.address?.city ?? ""}`}
                           </span>
                         </div>
                       ) : null}
                       {consumer?.created_at && (
-                        <span>
+                        <span className="text-xs font-medium text-gray-700">
                           🗓️ Su Vigila da:&nbsp;
                           <span className="capitalize">
                             {dateDisplay(
@@ -170,18 +171,22 @@ const ProfileComponent = () => {
                   </section>
                 </div>
               </div>
-              <TabGroup
-                role={role}
-                tabs={tabs}
-                onTabChange={(tab) => setSelectedTab(tab)}
-              />
-              {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
-              {selectedTab.id === "prenotazioni" && (
-                <PrenotazioniConsumerTabs />
-              )}
-              {selectedTab.id === "informazioni" && <InformazioniConsumerTab />}
-              {selectedTab.id === "famiglia" && <FamigliaTab />}
-              {selectedTab.id === "recensioni" && <RecensioniTab />}
+              <div className="mt-2">
+                <TabGroup
+                  role={role}
+                  tabs={tabs}
+                  onTabChange={(tab) => setSelectedTab(tab)}
+                />
+                {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
+                {selectedTab.id === "prenotazioni" && (
+                  <PrenotazioniConsumerTabs />
+                )}
+                {selectedTab.id === "famiglia" && <FamigliaTab />}
+                {selectedTab.id === "recensioni" && <RecensioniTab />}
+                {selectedTab.id === "informazioni" && (
+                  <InformazioniConsumerTab />
+                )}{" "}
+              </div>
             </div>
           </div>
         </div>
@@ -191,12 +196,12 @@ const ProfileComponent = () => {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <div className=" rounded-lg  bg-background-default shadow-sm py-6 px-8 mb-6">
+        <div className=" rounded-lg  bg-background-default shadow-sm py-6 px-6 mb-3">
           <div className="flex  flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
-            <div className="flex  flex-col items-center rounded-2xl border-2 bg-white p-5">
+            <div className="flex w-full flex-col items-center rounded-2xl border-2 bg-white p-5 gap-2 border-vigil-orange/60">
               <div className="  flex items-center justify-center">
                 <Avatar
-                  size="big"
+                  size="xxl"
                   withUpload
                   onFileUpload={uploadProfilePic}
                   value={vigil?.displayName}
@@ -204,25 +209,32 @@ const ProfileComponent = () => {
                 />
               </div>
               <div className="flex-1">
-                <section className="flex flex-col items-center ">
-                  <h1 className="text-3xl font-bold mb-2 text-center">
+                <section className="flex flex-col items-center gap-2 ">
+                  <h1 className="text-3xl font-boldtext-center">
                     {vigil?.displayName}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
                   <div className="flex items-center gap-2 mb-3">
-                    {vigil?.addresses?.length ? (
+                    {vigil?.averageRating ? (
                       <div className="inline-flex items-center flex-nowrap gap-1">
-                        <MapPinIcon className="size-4" />
-                        <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24">
-                          {vigil?.addresses?.map((a) => a.name)?.join(", ")}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <StarIconSolid className="w-4 h-4 text-yellow-300" />
+                          <p className="text-xs font-medium text-gray-600">
+                            Valutazione media: {vigil?.averageRating}
+                          </p>
+                        </div>
                       </div>
-                    ) : null}
-                    <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-16 md:max-w-24"></span>
+                    ) : (
+                      <span className="text-gray-500 font-medium flex items-center text-center">
+                        {" "}
+                        0 recensioni{" "}
+                      </span>
+                    )}
+
                     {vigil?.created_at && (
-                      <span>
+                      <span className="text-xs font-medium text-gray-700">
                         🗓️ Su Vigil da:&nbsp;
                         <span className="capitalize">
                           {dateDisplay(vigil.created_at, "monthYearLiteral")}
@@ -233,17 +245,19 @@ const ProfileComponent = () => {
                 </section>
               </div>
             </div>
-            <TabGroup
-              role={role}
-              tabs={tabs}
-              onTabChange={(tab) => setSelectedTab(tab)}
-            />
-            {selectedTab.id === "panoramica" && <PanoramicaTab />}
-            {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
-            {selectedTab.id === "informazioni" && <InformazioniTab />}
-            {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
-            {selectedTab.id === "servizi" && <ServiziTab />}
-            {selectedTab.id === "recensioni" && <RecensioniTab />}
+            <div className="mt-2">
+              <TabGroup
+                role={role}
+                tabs={tabs}
+                onTabChange={(tab) => setSelectedTab(tab)}
+              />
+              {selectedTab.id === "panoramica" && <PanoramicaTab />}
+              {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
+              {selectedTab.id === "informazioni" && <InformazioniTab />}
+              {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
+              {selectedTab.id === "servizi" && <ServiziTab />}
+              {selectedTab.id === "recensioni" && <RecensioniTab />}{" "}
+            </div>
           </div>
         </div>
       </div>

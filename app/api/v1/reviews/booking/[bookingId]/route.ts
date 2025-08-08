@@ -37,8 +37,8 @@ export async function GET(
       .select(`
         *,
         booking:bookings(*),
-        consumer:auth.users!reviews_consumer_id_fkey(id, raw_user_meta_data),
-        vigil:auth.users!reviews_vigil_id_fkey(id, raw_user_meta_data)
+        consumer:consumers(displayName),
+        vigil:vigils(displayName)
       `)
       .eq("booking_id", bookingId)
       .maybeSingle();

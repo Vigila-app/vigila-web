@@ -13,6 +13,7 @@ export type ConsumerDetailsType = {
   lovedOneBirthday?:string;
   lovedOnePhone?:string;
   phone?: string;
+  relationship?: string;
   information?: string;
   city?: string;
   created_at?: string;

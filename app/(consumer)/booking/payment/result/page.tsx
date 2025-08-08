@@ -11,6 +11,7 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { useEffect, useState, Suspense } from "react";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 function BookingPaymentResultContent() {
   const {
@@ -31,8 +32,9 @@ function BookingPaymentResultContent() {
       setError("");
 
       // Prima verifica lo stato del pagamento con Stripe
-      const paymentVerification = await PaymentService.verifyPaymentIntent(payment_intent);
-      
+      const paymentVerification =
+        await PaymentService.verifyPaymentIntent(payment_intent);
+
       if (!paymentVerification.success) {
         throw new Error("Impossibile verificare lo stato del pagamento");
       }
@@ -62,8 +64,15 @@ function BookingPaymentResultContent() {
       setPaymentVerified(true);
       return result;
     } catch (error) {
-      console.error("Failed to verify and update booking payment status:", error);
-      setError(error instanceof Error ? error.message : "Errore durante la verifica del pagamento");
+      console.error(
+        "Failed to verify and update booking payment status:",
+        error
+      );
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Errore durante la verifica del pagamento"
+      );
       throw error;
     } finally {
       setIsLoading(false);
@@ -105,17 +114,22 @@ function BookingPaymentResultContent() {
             <h1 className="text-2xl font-bold text-red-600 mb-4">
               Errore nella verifica del pagamento
             </h1>
-            <p className="text-gray-600 mb-6">
-              {error}
+            <p className="text-gray-600 mb-6">{error}</p>
+            <p className=" text-gray-600 text-xs font-normal mb-4">
+              Ti invitiamo a rifare il processo di prenotazione.
+              <br />
+              Se il problema dovesse sussistere, riprova più tardi o contatta il
+              supporto!
             </p>
             <div className="space-y-3">
               <ButtonLink
                 full
+                role={RolesEnum.CONSUMER}
                 label="Torna alle prenotazioni"
                 href={Routes.bookings.url}
               />
               <ButtonLink
-                secondary
+                role={RolesEnum.VIGIL}
                 full
                 label="Contatta il supporto"
                 href={Routes.home.url}
@@ -128,30 +142,31 @@ function BookingPaymentResultContent() {
               <CheckCircleIcon className="h-16 w-16 text-green-500" />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Pagamento Completato!
-            </h1>
+            <h1 className="text-2xl font-bold  mb-4">Pagamento Completato!</h1>
 
             <p className="text-gray-600 mb-6">
-              Il tuo pagamento è stato elaborato con successo e verificato. La tua prenotazione è
-              stata confermata, riceverai a breve una conferma via email.
+              Il tuo pagamento è stato elaborato con successo e verificato.
+              <br />
+              Di conseguenza, la tua prenotazione è stata confermata: riceverai
+              a breve una conferma via email!
             </p>
 
             {bookingId && (
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">ID Prenotazione:</p>
-                <p className="font-mono text-sm">{bookingId}</p>
+                <p className="text-sm ">ID Prenotazione:</p>
+                <p className="font-mono text-gray-600 text-sm">{bookingId}</p>
               </div>
             )}
 
             <div className="space-y-3">
               <ButtonLink
                 full
+                role={RolesEnum.VIGIL}
                 label="Visualizza le mie prenotazioni"
-                href={Routes.bookings.url}
+                href={Routes.profileConsumer.url}
               />
               <ButtonLink
-                secondary
+                role={RolesEnum.CONSUMER}
                 full
                 label="Torna alla home"
                 href={Routes.home.url}
@@ -160,7 +175,7 @@ function BookingPaymentResultContent() {
           </>
         ) : (
           <>
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6 rounded-3xl">
               <div className="h-16 w-16 bg-yellow-100 rounded-full flex items-center justify-center">
                 <span className="text-yellow-600 text-2xl font-bold">?</span>
               </div>
@@ -168,17 +183,18 @@ function BookingPaymentResultContent() {
             <h1 className="text-2xl font-bold text-yellow-600 mb-4">
               Stato del pagamento sconosciuto
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-700 mb-6">
               Non è stato possibile determinare lo stato del pagamento.
             </p>
             <div className="space-y-3">
               <ButtonLink
                 full
+                role={RolesEnum.VIGIL}
                 label="Torna alle prenotazioni"
                 href={Routes.bookings.url}
               />
               <ButtonLink
-                secondary
+                role={RolesEnum.CONSUMER}
                 full
                 label="Torna alla home"
                 href={Routes.home.url}
@@ -193,7 +209,9 @@ function BookingPaymentResultContent() {
 
 export default function BookingPaymentResultPage() {
   return (
-    <Suspense fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+    <Suspense
+      fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}
+    >
       <BookingPaymentResultContent />
     </Suspense>
   );

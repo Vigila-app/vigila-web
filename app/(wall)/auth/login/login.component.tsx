@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Divider, Undraw } from "@/components";
+import { Button, Divider } from "@/components";
 import { Input } from "@/components/form";
 import { AtSymbolIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { Controller, useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import { AltchaService } from "@/src/services/altcha.service";
 import { useEffect } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import Link from "next/link";
+import LoginPhoto from "@/components/svg/LoginPhoto";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -77,12 +78,22 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
 
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
-      <Undraw graphic="login" />
+      <div className=" flex items-center justify-center">
+        <div className="mx-auto h-auto mb-6">
+          <LoginPhoto />
+        </div>
+      </div>
       {title || text ? (
         <div>
-          {title && <h2 className="text-center font-semibold text-3xl text-vigil-orange">{title}</h2>}
+          {title && (
+            <h2 className="text-center font-semibold text-3xl text-vigil-orange">
+              {title}
+            </h2>
+          )}
           {text && (
-            <p className="text-center text-sm text-consumer-blue my-2">{text}</p>
+            <p className="text-center text-sm text-consumer-blue my-2">
+              {text}
+            </p>
           )}
         </div>
       ) : null}
@@ -134,7 +145,8 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
           <div className="text-right my-2">
             <Link
               href={Routes.resetPassword.url}
-              className="text-consumer-blue text-xs">
+              className="text-consumer-blue text-xs"
+            >
               Password dimenticata?
             </Link>
           </div>

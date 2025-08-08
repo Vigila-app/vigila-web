@@ -56,7 +56,7 @@ const HeaderProfile = () => {
     <div className="flex items-center gap-4">
       <div className="sm:flex sm:gap-4">
         <Link
-          className="rounded bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:bg-primary-700"
+          className="rounded-4xl px-3 py-2.5 text-sm font-semibold text-vigil-orange transition hover:bg-gray-100"
           href={Routes.login.url}
         >
           {Routes.login.label}
