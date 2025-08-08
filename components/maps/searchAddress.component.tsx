@@ -121,19 +121,17 @@ const SearchAddress = (props: {
         setIsLoading(true);
         const results =
           await MapsService.autocompleteAddress(debouncedSearchTerm);
-
-        // if (results.length > 1) {
         setAutocompleteResults(results);
-        console.log("Autocomplete results:", results);
-        // } else if (results.length === 1) {
-        //   const address = results[0];
-        //   const displayName = address.display_name || address.city || "";
-        //   setValue("search", displayName);
-        //   // setSearchTerm(displayName);
-        //   submit(address);
-        //   setSubmitted(false);
-        //   console.log("ADDRESS, submitting directly:", address);
-        // }
+        if (results.length > 1) {
+          setAutocompleteResults(results);
+        } else if (results.length === 1) {
+          const address = results[0];
+          const displayName = address.display_name || address.city || "";
+          setValue("search", displayName);
+          setSearchTerm(displayName);
+          submit(address);
+          setSubmitted(false);
+        }
       }
     } catch (error) {
       console.error("Error during address autocomplete", error);
@@ -154,14 +152,9 @@ const SearchAddress = (props: {
 
   useEffect(() => {
     setSubmitted(false);
-
-    if (debouncedSearchTerm.length >= minLength) {
-      autocompleteAdress();
-    } else {
-      setAutocompleteResults([]);
-    }
+    autocompleteAdress();
     setAutocompleteResults([]);
-
+    onChange?.(debouncedSearchTerm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]);
 
@@ -198,7 +191,7 @@ const SearchAddress = (props: {
           )}
         />
       </form>
-      {!submitted && autocompleteResults?.length > 0 ? (
+      {!submitted && autocompleteResults?.length > 1 ? (
         <div>
           <ul>
             {autocompleteResults.map((result, index) => (
@@ -208,11 +201,12 @@ const SearchAddress = (props: {
                     const displayName =
                       result.display_name || result.name || "";
                     setValue("search", displayName);
-                    // setSearchTerm(displayName);
+                    setSearchTerm(displayName);
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl">
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl"
+                >
                   {result.display_name}
                 </button>
               </li>
