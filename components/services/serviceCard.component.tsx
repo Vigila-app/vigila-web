@@ -191,18 +191,6 @@ const ServiceCard = (props: ServiceCardI) => {
           </div>
         </div>
       )}
-
-      <div className="flex items-center justify-end ">
-        <span className="text-consumer-blue font-bold">
-          {amountDisplay(
-            service?.unit_price +
-              (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
-            service?.currency
-          )}
-        </span>
-        <span>/</span>
-        {ServicesUtils.getServiceUnitType(service.unit_type)}
-      </div>
       {showActions && (
         <div className="inline-flex items-center gap-2 mt-4 flex-wrap">
           {onEdit && (

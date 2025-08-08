@@ -32,6 +32,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { StarIcon } from "@heroicons/react/24/solid";
+import { ReviewsUtils } from "@/src/utils/reviews.utils";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -74,6 +75,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
 
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
+
+  const averageRating = useMemo(() => {
+    return (
+      vigilDetails?.averageRating ||
+      ReviewsUtils.calculateAverageRating(vigilDetails?.reviews || [])
+    );
+  }, [vigilDetails?.averageRating, vigilDetails?.reviews]);
 
   const {
     control,
@@ -248,12 +256,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 </span>
               </span>
             </div>
-            <div className="flex items-center gap-1">
-              <StarIcon className="w-4 h-4 text-yellow-300" />
-              <p className="text-xs font-medium text-gray-600">
-                Valutazione media: {vigilDetails?.averageRating}
-              </p>
-            </div>
+            {averageRating ? (
+              <div className="flex items-center gap-1">
+                <StarIcon className="w-4 h-4 text-yellow-300" />
+                <p className="text-xs font-medium text-gray-600">
+                  Valutazione media: {averageRating}
+                </p>
+              </div>
+            ) : null}
           </div>
         </div>
 
