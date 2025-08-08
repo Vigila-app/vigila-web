@@ -35,6 +35,17 @@ const ServiziTab = () => {
     reloadServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (showStatusModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showStatusModal]);
 
   const handleSaveService = async (updatedService: ServiceI) => {
     await ServicesService.editService(updatedService);
@@ -91,10 +102,10 @@ const ServiziTab = () => {
   );
 
   return (
-    <div className="w-full mx-auto">
-      <Card>
-        <div className="p-4">
-          <h2 className="font-semibold text-lg mb-4">I tuoi servizi</h2>
+    <div className="w-full mx-auto mt-4">
+      <>
+        <div className="py-4">
+          <h2 className="font-semibold text-2xl mb-6">I tuoi servizi</h2>
           <ul className="space-y-4">
             {services.map((service, i) => (
               <li key={service.id}>
@@ -111,6 +122,7 @@ const ServiziTab = () => {
                     <Input
                       label="Prezzo (€)"
                       type="number"
+                      role={RolesEnum.CONSUMER}
                       value={service.unit_price}
                       min={
                         ServicesService.getServiceCatalogById(
@@ -131,11 +143,13 @@ const ServiziTab = () => {
                       <Button
                         label="Salva"
                         type="button"
+                        role={RolesEnum.CONSUMER}
                         action={() => handleSaveService(services[i])}
                       />
                       <Button
                         label="Annulla"
                         type="button"
+                        role={RolesEnum.VIGIL}
                         action={() => setEditingIndex(null)}
                       />
                     </div>
@@ -167,10 +181,13 @@ const ServiziTab = () => {
                     }));
                   }}
                 />
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 items-center justify-center mt-2">
                   <Button
                     label="Aggiungi"
                     type="button"
+                    small
+                    customClass="!!px-2"
+                    role={RolesEnum.CONSUMER}
                     action={() =>
                       newService.name &&
                       handleAddService(newService as ServiceI)
@@ -179,21 +196,24 @@ const ServiziTab = () => {
                   <Button
                     label="Annulla"
                     type="button"
+                    small
+                    customClass="!!px-2"
+                    danger
                     action={() => setNewServiceMode(false)}
                   />
                 </div>
               </div>
-            ) : (
+            ) : (<div className="flex justify-center items-center">
               <Button
                 label="Aggiungi nuovo servizio"
                 type="button"
                 action={() => setNewServiceMode(true)}
-              />
+              /></div>
             )}
           </div>
           {/* Modale warning cambio stato */}
           {showStatusModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-white/10 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                 <h3 className="text-lg font-bold mb-2">Attenzione</h3>
                 <p className="mb-4">
@@ -216,7 +236,7 @@ const ServiziTab = () => {
             </div>
           )}
         </div>
-      </Card>
+      </>
     </div>
   );
 };

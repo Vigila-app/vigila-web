@@ -277,8 +277,20 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 </>
               )}
               {booking?.status === BookingStatusEnum.CONFIRMED && (
+                <div>
                 <Button label="Accettata" disabled />
-              )}
+                 {/* <Button
+                    customClass="!px-6 !py-2"
+                    role={RolesEnum.CONSUMER}
+                    label="Completa"
+                    action={() =>
+                      handleStatusUpdate(BookingStatusEnum.COMPLETED)
+                    }
+                  /> */}
+                 </div>
+              )
+              }
+              
               {booking?.status === BookingStatusEnum.CANCELLED && (
                 <Button label="Rifiutata" disabled />
               )}

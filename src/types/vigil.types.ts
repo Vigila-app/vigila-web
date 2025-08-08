@@ -1,4 +1,5 @@
 import { ReviewI } from "@/src/types/review.types";
+import { AddressI } from "./maps.types";
 
 export type VigilDetailsType = {
   displayName?: string;
@@ -17,6 +18,7 @@ export type VigilDetailsType = {
   created_at?: string;
   updated_at?: string;
   status: string;
+  address?: AddressI;
   birthday?: string;
   addresses?: {
     id: string;

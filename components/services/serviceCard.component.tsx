@@ -74,9 +74,8 @@ const ServiceCard = (props: ServiceCardI) => {
 
   return (
     <Card
-      customClass={clsx("p-4", !service.active && "!bg-gray-100")}
-      containerClass="space-y-2"
-    >
+      customClass={clsx("py-4", !service.active && "!bg-gray-100")}
+      containerClass="space-y-2">
       {!simplified ? (
         <div className="inline-flex flex-nowrap gap-4 w-full">
           <Avatar
@@ -146,21 +145,32 @@ const ServiceCard = (props: ServiceCardI) => {
           </div>
         </div>
       ) : null}
-      {service?.name ? <div>{service?.name}</div> : null}
-      {simplified && role === RolesEnum.VIGIL ? (
-        <div>
-          <Badge
-            label={service.active ? "Attivo" : "Non attivo"}
-            color={service.active ? "green" : "red"}
-          />
+      {service?.name ? (
+        <div className="flex-flexcol items-start gap-6">
+          <div className="flex justify-between">
+            <p className="text-[17px] font-semibold text-vigil-orange">
+              {service?.name}
+            </p>
+            {simplified && role === RolesEnum.VIGIL ? (
+              <div>
+                <Badge
+                  label={service.active ? "Attivo" : "Non attivo"}
+                  color={service.active ? "green" : "red"}
+                />
+              </div>
+            ) : null}
+          </div>
+          <p className="text-sm text-gray-600">{service?.description}</p>
         </div>
       ) : null}
+
       {!simplified && service?.vigil?.information ? (
         <div>{service?.vigil?.information}</div>
       ) : null}
       {/* TODO add categories <div>categorie</div> */}
-      <div className="inline-flex items-center flex-nowrap gap-4 w-full mt-6">
-        {!simplified && (
+
+      {!simplified && (
+        <div className="inline-flex items-center flex-nowrap gap-4 w-full mt-6">
           <Button
             role={RolesEnum.VIGIL}
             customClass="flex-1 !p-3"
@@ -168,26 +178,48 @@ const ServiceCard = (props: ServiceCardI) => {
             action={goToBooking}
             icon={<CalendarIcon className="size-6" />}
           />
-        )}
-        <div className="inline-flex flex-col items-end">
-          <span className="text-consumer-blue font-bold">
-            {amountDisplay(
-              service?.unit_price +
-                (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
-              service?.currency
-            )}
-          </span>
-          &nbsp;a&nbsp;
-          {ServicesUtils.getServiceUnitType(service.unit_type)}
+          <div className="flex items-center justify-center ">
+            <span className="text-consumer-blue font-bold">
+              {amountDisplay(
+                service?.unit_price +
+                  (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
+                service?.currency
+              )}
+            </span>
+            <span>/</span>
+            {ServicesUtils.getServiceUnitType(service.unit_type)}
+          </div>
         </div>
+      )}
+
+      <div className="flex items-center justify-end ">
+        <span className="text-consumer-blue font-bold">
+          {amountDisplay(
+            service?.unit_price +
+              (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
+            service?.currency
+          )}
+        </span>
+        <span>/</span>
+        {ServicesUtils.getServiceUnitType(service.unit_type)}
       </div>
       {showActions && (
         <div className="inline-flex items-center gap-2 mt-4 flex-wrap">
-          {onEdit && <Button label="Modifica" type="button" action={onEdit} />}
+          {onEdit && (
+            <Button
+              label="Modifica"
+              small
+              role={RolesEnum.CONSUMER}
+              type="button"
+              action={onEdit}
+            />
+          )}
           {onToggleStatus && (
             <Button
+              small
               label={service.active ? "Disattiva" : "Attiva"}
               type="button"
+              role={RolesEnum.CONSUMER}
               action={onToggleStatus}
             />
           )}
@@ -195,6 +227,7 @@ const ServiceCard = (props: ServiceCardI) => {
             <Button
               label="Elimina"
               type="button"
+              small
               danger
               action={() => setShowDeleteModal(true)}
             />
@@ -202,16 +235,17 @@ const ServiceCard = (props: ServiceCardI) => {
         </div>
       )}
       {showDeleteModal && onDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0  bg-white/10 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
             <h3 className="text-lg font-bold mb-2">Conferma eliminazione</h3>
             <p className="mb-4">
               Sei sicuro di voler eliminare il servizio <b>{service.name}</b>?
               Questa azione non può essere annullata.
             </p>
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-6 justify-center">
               <Button
                 label="Annulla"
+                role={RolesEnum.CONSUMER}
                 type="button"
                 action={() => setShowDeleteModal(false)}
               />
