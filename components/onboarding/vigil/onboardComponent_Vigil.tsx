@@ -134,19 +134,18 @@ const VigilOnboardComponent = () => {
   };
 
   return (
-    <div className="w-full p-6">
+    <div className="w-full px-4 pt-8 pb-4">
       <Card>
-        <div className="p-4 ">
-          <section className="flex flex-col items-center gap-1">
-            <h1 className="font-semibold text-xl">Iniziamo a conoscerti</h1>
-            <span className="font-normal text-lg break-normal whitespace-normal">
+        <div className="">
+          <section className="flex flex-col items-center gap-2">
+            <p className="font-semibold text-[28px] text-vigil-orange">Iniziamo a conoscerti</p>
+            <span className="font-normal text-center text-lg break-normal whitespace-normal">
               Raccontaci qualcosa di te per iniziare questa bella avventura
             </span>
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-8 p-4"
-          >
+            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2">
             <Controller
               name="birthday"
               control={control}
@@ -274,8 +273,7 @@ const VigilOnboardComponent = () => {
                       {addresses.map((addr, i) => (
                         <li
                           key={i}
-                          className="w-full inline-flex items-center gap-2 text-black text-xs"
-                        >
+                          className="w-full inline-flex items-center gap-2 text-black text-xs">
                           <span>
                             {(addr?.address
                               ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
@@ -289,8 +287,7 @@ const VigilOnboardComponent = () => {
                               );
                             }}
                             className="text-red-500 hover:text-red-700 font-bold"
-                            aria-label="Rimuovi indirizzo"
-                          >
+                            aria-label="Rimuovi indirizzo">
                             <XCircleIcon className="size-3" />
                           </button>
                         </li>
@@ -318,8 +315,7 @@ const VigilOnboardComponent = () => {
                       "block font-medium mb-1",
                       role === RolesEnum.VIGIL && "text-vigil-orange",
                       role === RolesEnum.CONSUMER && "text-consumer-blue"
-                    )}
-                  >
+                    )}>
                     Mezzo di trasporto
                   </label>
                   <div className="space-y-2">

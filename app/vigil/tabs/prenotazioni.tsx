@@ -35,8 +35,8 @@ const PrenotationTabs = () => {
   }, []);
 
   return (
-    <section className="">
-      <div className=" text-[10px} rounded-2xl bg-gray-200 ">
+    <section className="pt-4">
+      <div className=" text-[10px py-1 rounded-2xl bg-gray-200 items-center ">
         <TabGroup
           role={role}
           tabs={tabs}

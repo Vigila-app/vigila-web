@@ -1,13 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card } from "@/components";
+import { Button, Card } from "@/components";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { ServicesService } from "@/src/services/services.service";
 import clsx from "clsx";
-import { XCircleIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
+import {
+  XCircleIcon,
+  PlusIcon,
+  MinusIcon,
+  ShoppingCartIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
 
 type SelectedService = {
   catalogId: number;
@@ -38,7 +44,18 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   const [servicesCatalog, setServicesCatalog] = useState<ServiceCatalogItem[]>(
     []
   );
-
+  const iconMap: Record<string, React.ReactNode> = {
+    "Compagnia e conversazione": (
+      <div className=" bg-red-300 w-14 h-14 rounded-full p-1 flex items-center justify-center">
+        <UsersIcon className="w-10 h-10 text-red-800 " />
+      </div>
+    ),
+    "Assistenza leggera": (
+      <div className=" bg-yellow-200 w-16 h-16 rounded-full p-1 flex items-center justify-center">
+        <ShoppingCartIcon className="w-12 h-12 text-yellow-700" />
+      </div>
+    ),
+  };
   // Carica il catalogo servizi
   useEffect(() => {
     setServicesCatalog(ServicesService.getServicesCatalog());
@@ -122,43 +139,52 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <label
           className={clsx(
-            "block font-medium mb-4 text-lg",
+            "block font-semibold mb- text-xl mb-4",
             role === RolesEnum.VIGIL && "text-vigil-orange",
             role === RolesEnum.CONSUMER && "text-consumer-blue"
-          )}
-        >
+          )}>
           Scegli i servizi che vuoi offrire
         </label>
 
         {/* Catalogo servizi disponibili */}
-        <div className="grid gap-4 mb-6">
+        <div className="grid gap-6 mb-8">
           {servicesCatalog.map((catalogService: ServiceCatalogItem) => (
-            <Card key={catalogService.id} containerClass="p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">
+            <Card key={catalogService.id}>
+              <div className="flex flex-col justify-between items-start ">
+                <div className="flex-1 mb-4">
+                  <p className="font-semibold text-xl text-consumer-blue mb-4">
                     {catalogService.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3">
+                  </p>
+
+                  <div className="flex justify-between">
+                    {iconMap[catalogService.name] || ""}
+                    <div className="flex flex-col gap-1 text-[16px] font-medium justify-center items-end">
+                      <div className="flex  gap-2">
+                        <span>
+                          €{catalogService.min_hourly_rate}-
+                          {catalogService.max_hourly_rate}/ora
+                        </span>
+                        <span>
+                          Min. {catalogService.minimum_duration_hours}h
+                        </span>
+                      </div>
+                      <span className="text-[16px] text-gray-600">
+                        Consigliato: €{catalogService.recommended_hourly_rate}
+                        /ora
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-lg font-semibold my-2">Descrizione:</p>
+                  <p className=" text-[16px] font-medium mb-3">
                     {catalogService.description}
                   </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>
-                      €{catalogService.min_hourly_rate}-
-                      {catalogService.max_hourly_rate}/ora
-                    </span>
-                    <span>
-                      Consigliato: €{catalogService.recommended_hourly_rate}/ora
-                    </span>
-                    <span>Min. {catalogService.minimum_duration_hours}h</span>
-                  </div>
                   {catalogService.extra.length > 0 && (
                     <div className="mt-2">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-sm text-gray-500">
                         Opzioni extra disponibili:{" "}
                         {catalogService.extra
                           .map((e: any) => `${e.name} €${e.fixed_price}`)
@@ -167,24 +193,15 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                     </div>
                   )}
                 </div>
-                <button
+                <Button
+                  role={RolesEnum.VIGIL}
+                  customClass="!px-3 "
+                  full
+                  label="Aggiungi Servizio"
                   type="button"
-                  onClick={() => addService(catalogService)}
+                  action={() => addService(catalogService)}
                   disabled={isServiceSelected(catalogService.id)}
-                  className={clsx(
-                    "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    isServiceSelected(catalogService.id)
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : role === RolesEnum.VIGIL
-                        ? "bg-vigil-orange text-white hover:bg-vigil-orange/90"
-                        : "bg-consumer-blue text-white hover:bg-consumer-blue/90"
-                  )}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  {isServiceSelected(catalogService.id)
-                    ? "Aggiunto"
-                    : "Aggiungi"}
-                </button>
+                />
               </div>
             </Card>
           ))}
@@ -193,8 +210,10 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
         {/* Servizi selezionati */}
         {internalSelectedServices.length > 0 && (
           <div>
-            <h4 className="font-medium mb-3">Servizi selezionati:</h4>
-            <div className="space-y-3">
+            <p className="font-semibold text-xl mb-3 text-vigil-orange">
+              Servizi selezionati:
+            </p>
+            <div className="space-y-4">
               {internalSelectedServices.map((selectedService, index) => {
                 const catalogService = getCatalogService(
                   selectedService.catalogId
@@ -202,27 +221,30 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                 if (!catalogService) return null;
 
                 return (
-                  <Card key={index} className="p-4 bg-gray-50">
+                  <Card
+                    key={index}
+                    className="p-2 rounded-2xl bg-vigil-light-orange/60">
                     <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h5 className="font-medium">{selectedService.name}</h5>
-                        <p className="text-sm text-gray-600">
+                      <div className="flex flex-col gap-2">
+                        <p className="font-medium text-lg ">
+                          {selectedService.name}
+                        </p>
+                        <p className="text-[16px] font-medium text-gray-600">
                           {selectedService.description}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeService(index)}
-                        className="text-red-500 hover:text-red-700 p-1"
-                        aria-label="Rimuovi servizio"
-                      >
-                        <XCircleIcon className="w-5 h-5" />
+                        className="text-consumer-blue hover:text-blue-800 p-1"
+                        aria-label="Rimuovi servizio">
+                        <XCircleIcon className="w-7 h-7" />
                       </button>
                     </div>
 
                     {/* Configurazione prezzo */}
                     <div className="mb-3">
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-[16px] font-medium mb-2">
                         Prezzo orario (€{catalogService.min_hourly_rate}-
                         {catalogService.max_hourly_rate})
                       </label>
@@ -242,8 +264,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                             selectedService.unit_price <=
                             catalogService.min_hourly_rate
                           }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
+                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
                           <MinusIcon className="w-4 h-4" />
                         </button>
                         <span className="font-medium min-w-[60px] text-center">
@@ -264,8 +285,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                             selectedService.unit_price >=
                             catalogService.max_hourly_rate
                           }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
+                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
                           <PlusIcon className="w-4 h-4" />
                         </button>
                       </div>
@@ -281,8 +301,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                           {catalogService.extra.map((extra: any) => (
                             <label
                               key={extra.id}
-                              className="flex items-center gap-2 text-sm"
-                            >
+                              className="flex items-center gap-2 text-sm">
                               <input
                                 type="checkbox"
                                 checked={selectedService.selectedExtras.includes(

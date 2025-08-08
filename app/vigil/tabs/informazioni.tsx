@@ -104,12 +104,12 @@ const InformazioniTab = () => {
     }
   };
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid lg:grid-cols-2 gap-6 w-full mt-6 ">
       <Card>
         <div>
-          <div className="font-semibold ">Informazioni personali</div>
+          <div className="font-semibold text-xl ">Informazioni personali</div>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium  text-vigil-orange">

@@ -262,8 +262,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                           vigil?.id
                         )
                       : "#"
-                  }
-                >
+                  }>
                   <Card className="p-4 bg-vigil-light-orange border border-vigil-orange rounded-full shadow">
                     <div className="inline-flex items-center flex-nowrap gap-2 w-full">
                       <Avatar userId={vigil?.id} value={vigil?.displayName} />
@@ -291,24 +290,26 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
           {booking.note && (
             <div>
-              <h3 className="font-medium text-gray-900">Note</h3>
+              <h3 className="font-medium ">Note</h3>
               <p className="mt-2 text-sm text-gray-600">{booking.note}</p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex gap-4 pt-4 border-t">
+      <div className="flex justify-center gap-4 pt-4 border-t">
         {isVigil && booking.status === BookingStatusEnum.PENDING && (
           <>
             <Button
-              primary
+              role={RolesEnum.CONSUMER}
+              small
               disabled={booking.payment_status !== PaymentStatusEnum.PAID}
               label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
             <Button
               danger
+              small
               label="Rifiuta Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
             />
@@ -317,7 +318,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {isVigil && booking.status === BookingStatusEnum.CONFIRMED && (
           <Button
-            primary
+            small
+            role={RolesEnum.CONSUMER}
             label="Completa Prenotazione"
             action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
           />
@@ -326,6 +328,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         {canCancel && (
           <Button
             danger
+            small
             label="Annulla Prenotazione"
             action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
           />
@@ -334,6 +337,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         {isConsumer && booking.payment_status === PaymentStatusEnum.PENDING && (
           <Button
             label="Paga Prenotazione"
+            small
+            role={RolesEnum.CONSUMER}
             action={() =>
               router.push(
                 `${Routes.paymentBooking.url}?bookingId=${booking.id}`
