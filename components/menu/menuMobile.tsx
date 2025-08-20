@@ -13,10 +13,13 @@ import {
   ArrowLeftStartOnRectangleIcon,
   Bars3Icon,
   CalendarDaysIcon,
+  BriefcaseIcon,
+  UserGroupIcon,
+  StarIcon,
   HomeIcon,
   UserIcon,
-  WrenchScrewdriverIcon,
   XMarkIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -32,19 +35,29 @@ const MenuMobile = () => {
 
   const isUserLogged = !!user?.id;
 
-  const MenuLinkItem = (route: RouteI, Icon?: React.ElementType) => (
-    <Link
-      className={clsx(
-        "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
-        pathname === route?.url &&
-          "active bg-gray-100 text-primary-500 hover:text-primary-600"
-      )}
-      href={route?.url || ""}
-    >
-      {Icon && <Icon className=" w-6 h-6 text-current" />}
-      {route?.label}
-    </Link>
-  );
+  const MenuLinkItem = (
+    route: RouteI,
+    Icon?: React.ElementType,
+    internal = true
+  ) => {
+    const className = clsx(
+      "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
+      pathname === route?.url &&
+        "active bg-gray-100 text-primary-500 hover:text-primary-600"
+    );
+    return internal ? (
+      <Link className={className} href={route?.url || ""}>
+        {Icon && <Icon className=" w-6 h-6 text-current" />}
+        {route?.label}
+      </Link>
+    ) : (
+      <a className={className} href={route?.url || ""}>
+        {" "}
+        {Icon && <Icon className=" w-6 h-6 text-current" />}
+        {route?.label}
+      </a>
+    );
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -103,7 +116,12 @@ const MenuMobile = () => {
               )}
             </section>
             <ul className="flex flex-col gap-8 divide-y divide-gray-100 flex-1">
-              <li className="flex py-2 items-center ">
+              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
+                <li className="block py-2">
+                  {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
+                </li>
+              )}
+              <li className="block py-2">
                 {MenuLinkItem(
                   user.user_metadata?.role === RolesEnum.CONSUMER
                     ? Routes.profileConsumer
@@ -113,11 +131,59 @@ const MenuMobile = () => {
                   UserIcon
                 )}
               </li>
-              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
-                <li className="block py-2">
-                  {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
-                </li>
-              )}
+              <li className="block py-2">
+                {MenuLinkItem(
+                  {
+                    ...(user.user_metadata?.role === RolesEnum.CONSUMER
+                      ? {
+                          ...Routes.profileConsumer,
+                          url: `${Routes.profileConsumer.url}?tab=prenotazioni`,
+                          label: "Prenotazioni",
+                        }
+                      : {
+                          ...Routes.profileVigil,
+                          url: `${Routes.profileVigil.url}?tab=prenotazioni`,
+                          label: "Prenotazioni",
+                        }),
+                  },
+                  CalendarDaysIcon,
+                  false
+                )}
+              </li>
+              <li className="block py-2">
+                {MenuLinkItem(
+                  {
+                    ...(user.user_metadata?.role === RolesEnum.CONSUMER
+                      ? {
+                          ...Routes.profileConsumer,
+                          url: `${Routes.profileConsumer.url}?tab=famiglia`,
+                          label: "Famiglia",
+                        }
+                      : {
+                          ...Routes.profileVigil,
+                          url: `${Routes.profileVigil.url}?tab=servizi`,
+                          label: "Servizi",
+                        }),
+                  },
+                  user.user_metadata?.role === RolesEnum.CONSUMER
+                    ? UserGroupIcon
+                    : BriefcaseIcon,
+                  false
+                )}
+              </li>
+              <li className="block py-2">
+                {user?.user_metadata?.role === RolesEnum.VIGIL
+                  ? MenuLinkItem(
+                      {
+                        ...Routes.profileConsumer,
+                        url: `${Routes.profileConsumer.url}?tab=recensioni`,
+                        label: "Recensioni",
+                      },
+                      StarIcon,
+                      false
+                    )
+                  : MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
+              </li>
               {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
                 <li className="block py-2">
                   {MenuLinkItem(Routes.services, WrenchScrewdriverIcon)}

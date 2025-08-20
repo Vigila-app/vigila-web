@@ -379,6 +379,19 @@
     "private": false,
     "roles": []
   },
+  "customerCare": {
+    "url": "/customer-care",
+    "label": "Servizio Clienti",
+    "title": "Servizio Clienti",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
   "termsConditions": {
     "url": "/terms-and-conditions",
     "label": "Termini & Condizioni",

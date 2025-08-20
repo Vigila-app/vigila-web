@@ -20,12 +20,14 @@ type TabGroupI = {
 const TabGroup = (props: TabGroupI) => {
   const { align = "left", tabs = [], onTabChange = () => ({}), role } = props;
 
-  const [activeTab, setActiveTab] = useState(
-    tabs.find((tab) => tab.active) || tabs[0]
-  );
+  const [activeTab, setActiveTab] = useState<TabI | undefined>();
 
   useEffect(() => {
-    onTabChange(activeTab);
+    setActiveTab(tabs.find((tab) => tab.active));
+  }, [tabs]);
+
+  useEffect(() => {
+    if (activeTab) onTabChange(activeTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -61,11 +63,14 @@ const TabGroup = (props: TabGroupI) => {
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-                "px-3 py-1 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500 focus:bg-white ",
-                activeTab.label === tab.label && role === RolesEnum.CONSUMER
-                  ? " focus-within:text-consumer-blue"
-                  : "focus-within:text-vigil-orange   "
-              )}>
+                "px-3 py-1 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500",
+                activeTab?.id === tab.id
+                  ? role === RolesEnum.CONSUMER
+                    ? "!text-consumer-blue bg-white"
+                    : "!text-vigil-orange bg-white"
+                  : null
+              )}
+            >
               {tab.label}
             </button>
           ))}
@@ -80,9 +85,10 @@ const TabGroup = (props: TabGroupI) => {
               align === "center"
                 ? "justify-center"
                 : align === "left"
-                ? "justify-start"
-                : "justify-end"
-            )}>
+                  ? "justify-start"
+                  : "justify-end"
+            )}
+          >
             {tabs.map((tab) =>
               tab.url ? (
                 <Link
@@ -90,14 +96,18 @@ const TabGroup = (props: TabGroupI) => {
                   href={tab.url}
                   className={clsx(
                     "shrink-0 p-3 border font-medium text-sm transition",
-                    activeTab.label === tab.label
-                      ? "rounded-t-2xl   bg-white text-primary-600"
-                      : "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
+                    activeTab?.id === tab.id
+                      ? role === RolesEnum.CONSUMER
+                        ? "rounded-t-2xl bg-white !text-consumer-blue"
+                        : "rounded-t-2xl bg-white !text-vigil-orange"
+                      : null,
+                    "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
                     "hover:rounded-t-lg hover:border-gray-200"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}>
+                  }}
+                >
                   {tab.label}
                 </Link>
               ) : (
@@ -105,13 +115,16 @@ const TabGroup = (props: TabGroupI) => {
                   key={tab.id}
                   className={clsx(
                     "cursor-pointer shrink-0 p-3 border font-medium text-sm transition",
-                    activeTab.label === tab.label
-                      ? "rounded-t-lg  border-b-white text-primary-600"
+                    activeTab?.id === tab.id
+                      ? role === RolesEnum.CONSUMER
+                        ? "rounded-t-lg  border-b-white !text-consumer-blue"
+                        : "rounded-t-lg  border-b-white !text-vigil-orange"
                       : "border-transparent text-gray-500 hover:text-black"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}>
+                  }}
+                >
                   {tab.label}
                 </span>
               )

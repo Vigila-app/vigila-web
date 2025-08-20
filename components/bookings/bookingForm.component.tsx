@@ -334,7 +334,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               )
                 .toISOString()
                 .slice(0, 16)}
-              step={1800} // 30 minutes
+              step={300} // 5 minutes
             />
           )}
         />
