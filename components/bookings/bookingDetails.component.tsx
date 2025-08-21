@@ -51,7 +51,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   const { services } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
-   const currentDate = new Date();
+  const currentDate = new Date();
 
   const [canCancel, setCanCancel] = useState<boolean>(false);
 
@@ -157,7 +157,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <p className="text-red-500">Prenotazione non trovata</p>
       </div>
     );
-  } 
+  }
   return (
     <div className="space-y-6">
       <div className="relative pr-6">
@@ -226,10 +226,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>&nbsp;
-                {amountDisplay(
-                  booking.price,
-                  booking.service?.currency as CurrencyEnum
-                )}
+                {service?.unit_price &&
+                  amountDisplay(
+                    service.unit_price,
+                    booking.service?.currency as CurrencyEnum
+                  )}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>&nbsp;
@@ -317,7 +318,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {isVigil &&
           booking.status === BookingStatusEnum.CONFIRMED &&
-          dateDiff(booking.endDate,currentDate)<0  && (
+          dateDiff(booking.endDate, currentDate) < 0 && (
             <Button
               role={RolesEnum.CONSUMER}
               label="Completa Prenotazione"
@@ -325,7 +326,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             />
           )}
 
-        {canCancel && dateDiff(booking.endDate,currentDate)>0 && (
+        {canCancel && dateDiff(booking.endDate, currentDate) > 0 && (
           <Button
             danger
             label="Annulla Prenotazione"
