@@ -171,18 +171,21 @@ const MenuMobile = () => {
                   false
                 )}
               </li>
+              {user?.user_metadata?.role === RolesEnum.VIGIL ? (
+                <li className="block py-2">
+                  {MenuLinkItem(
+                    {
+                      ...Routes.profileConsumer,
+                      url: `${Routes.profileConsumer.url}?tab=recensioni`,
+                      label: "Recensioni",
+                    },
+                    StarIcon,
+                    false
+                  )}
+                </li>
+              ) : null}
               <li className="block py-2">
-                {user?.user_metadata?.role === RolesEnum.VIGIL
-                  ? MenuLinkItem(
-                      {
-                        ...Routes.profileConsumer,
-                        url: `${Routes.profileConsumer.url}?tab=recensioni`,
-                        label: "Recensioni",
-                      },
-                      StarIcon,
-                      false
-                    )
-                  : MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
+                {MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
               </li>
               {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
                 <li className="block py-2">
