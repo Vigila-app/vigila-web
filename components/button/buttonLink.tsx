@@ -5,7 +5,6 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   customClass?: string;
-
   label: string;
   primary?: boolean;
   secondary?: boolean;
@@ -45,7 +44,7 @@ const ButtonLink = (props: ButtonLinkI) => {
     role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
     role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle,
     full && ButtonStyle.fullBtnStyle,
-     small && ButtonStyle.smallBtnStyle,
+    small && ButtonStyle.smallBtnStyle
   );
 
   return (
