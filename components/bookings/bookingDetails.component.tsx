@@ -226,11 +226,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               </p>
               <p>
                 <span className="font-medium">Prezzo Totale:</span>&nbsp;
-                {service?.unit_price &&
-                  amountDisplay(
-                    service.unit_price,
-                    booking.service?.currency as CurrencyEnum
-                  )}
+                {amountDisplay(
+                  booking.price,
+                  booking.service?.currency as CurrencyEnum
+                )}
               </p>
               <p>
                 <span className="font-medium">Stato del pagamento:</span>&nbsp;
@@ -330,7 +329,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <Button
             danger
             label="Annulla Prenotazione"
-            action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
+            action={async () => {
+              await handleStatusUpdate(BookingStatusEnum.CANCELLED);
+              router.push(`${Routes.homeConsumer.url}`);
+            }}
           />
         )}
 
