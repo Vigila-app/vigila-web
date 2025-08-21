@@ -77,8 +77,7 @@ const MenuMobile = () => {
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="rounded bg-transparent p-2"
-      >
+        className="rounded bg-transparent p-2">
         {isOpen ? (
           <XMarkIcon className="h-6 w-6 text-consumer-blue transition hover:text-gray-600/75" />
         ) : (
@@ -92,8 +91,7 @@ const MenuMobile = () => {
         className={clsx(
           "absolute flex flex-col gap-8  md:hidden transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
           isOpen ? "block right-0" : "hidden"
-        )}
-      >
+        )}>
         {isUserLogged ? (
           <>
             <section className=" flex flex-col gap-2 justify-center items-center mb-12 mt-12">
@@ -214,8 +212,7 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700"
-              >
+                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>
