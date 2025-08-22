@@ -59,23 +59,7 @@ const PanoramicaTab = () => {
           </span>
         </div>
       </Card>
-      <Card>
-        <div className="flex flex-row items-center gap-2 pb-2">
-          <BookOpenIcon className="size-6 text-vigil-orange" />
-          <h3 className="text-lg font-semibold">Interessi</h3>
-        </div>
-        <div className="flex flex-wrap gap-2 ">
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full">
-            Hard coded
-          </span>
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            Hard coded
-          </span>
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            Hard coded
-          </span>
-        </div>
-      </Card>
+    
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
           <TrophyIcon className="size-6 text-yellow-500" />
@@ -127,23 +111,7 @@ const PanoramicaTab = () => {
           </div>
         </div>
       </Card>
-      <Card>
-        <div className="flex flex-row items-center gap-2 pb-2">
-          <LanguageIcon className="size-6 text-vigil-orange" />
-          <h3 className="text-lg font-semibold">Lingue</h3>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Italiano</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Inglese</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Francese</span>
-          </div>
-        </div>
-      </Card>
+      
     </section>
   );
 };
