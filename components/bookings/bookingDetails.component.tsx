@@ -13,7 +13,7 @@ import {
   capitalize,
   replaceDynamicUrl,
 } from "@/src/utils/common.utils";
-import { dateDisplay } from "@/src/utils/date.utils";
+import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -51,6 +51,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   const { services } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
+  const currentDate = new Date();
 
   const [canCancel, setCanCancel] = useState<boolean>(false);
 
@@ -157,7 +158,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="relative pr-6">
@@ -306,6 +306,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
+
             <Button
               danger
               label="Rifiuta Prenotazione"
@@ -314,19 +315,24 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           </>
         )}
 
-        {isVigil && booking.status === BookingStatusEnum.CONFIRMED && (
-          <Button
-            role={RolesEnum.CONSUMER}
-            label="Completa Prenotazione"
-            action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
-          />
-        )}
+        {isVigil &&
+          booking.status === BookingStatusEnum.CONFIRMED &&
+          dateDiff(booking.endDate, currentDate) < 0 && (
+            <Button
+              role={RolesEnum.CONSUMER}
+              label="Completa Prenotazione"
+              action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
+            />
+          )}
 
-        {canCancel && (
+        {canCancel && dateDiff(booking.endDate, currentDate) > 0 && (
           <Button
             danger
             label="Annulla Prenotazione"
-            action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
+            action={async () => {
+              await handleStatusUpdate(BookingStatusEnum.CANCELLED);
+              router.push(`${Routes.homeConsumer.url}`);
+            }}
           />
         )}
 
