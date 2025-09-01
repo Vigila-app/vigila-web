@@ -1,4 +1,5 @@
 import Card from "@/components/card/card";
+import { RolesEnum } from "@/src/enums/roles.enums";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
@@ -12,20 +13,29 @@ import {
   PhoneIcon,
   TrophyIcon,
 } from "@heroicons/react/24/outline";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 const PanoramicaTab = () => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { user } = useUserStore();
+  const params = useParams();
+  const vigilIdFromParams = params?.vigilId;
+  const vigilId =
+    user?.user_metadata?.role === RolesEnum.VIGIL ? user?.id : vigilIdFromParams;
 
   useEffect(() => {
-    if (user?.id) {
-      getVigilsDetails([user.id], true);
+    if (vigilId) {
+      getVigilsDetails([vigilId], true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [vigilId]);
 
-  const vigil = vigils.find((v) => v.id === user?.id);
+  const vigil = vigils.find((v) => v.id === vigilId);
+
+  console.log("params:", params);
+  console.log("Vigil in panoramica:", vigil);
+  console.log("User:", user);
 
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
@@ -59,7 +69,7 @@ const PanoramicaTab = () => {
           </span>
         </div>
       </Card>
-    
+
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
           <TrophyIcon className="size-6 text-yellow-500" />
@@ -97,7 +107,7 @@ const PanoramicaTab = () => {
         <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <EnvelopeIcon className="size-4" />
-            <span>{user?.email}</span>
+            <span>{vigil?.email}</span>
           </div>
           <div className="flex items-center gap-2">
             <PhoneIcon className="size-4" />
@@ -111,7 +121,6 @@ const PanoramicaTab = () => {
           </div>
         </div>
       </Card>
-      
     </section>
   );
 };

@@ -11,10 +11,13 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesService } from "@/src/services";
+import { useParams } from "next/navigation";
 
 const ServiziTab = () => {
+  const params = useParams();
+const vigilIdFromParams = params?.vigilId;
   const { user } = useUserStore();
-  const vigilId = user?.id;
+  const vigilId = user?.user_metadata?.role === RolesEnum.VIGIL ? user?.id : vigilIdFromParams;
   const { services, getServices, deleteService } = useServicesStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newServiceMode, setNewServiceMode] = useState(false);
