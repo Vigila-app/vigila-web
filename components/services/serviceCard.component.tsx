@@ -264,8 +264,8 @@ const ServiceCard = (props: ServiceCardI) => {
             icon={<EyeIcon className="size-6" />}
             customClass="!p-3"
           />
-          <Button
-            // TODO feature missing
+            {/* TODO feature missing */}
+          {/* <Button
             disabled
             secondary
             full
@@ -275,7 +275,7 @@ const ServiceCard = (props: ServiceCardI) => {
             }}
             icon={<HeartIcon className="size-6" />}
             customClass="!p-3"
-          />
+          /> */}
         </div>
       ) : null}
     </Card>
