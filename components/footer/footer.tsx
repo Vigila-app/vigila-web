@@ -1,9 +1,8 @@
 import { NavigationUtils } from "@/src/utils/navigation.utils";
 import clsx from "clsx";
 import Link from "next/link";
-import { Logo } from "@/components";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
-import LogoFooter from "../logo/logoFooter";
+import LogoFooter from "@/components/logo/logoFooter";
 
 const Footer = () => {
   return (
