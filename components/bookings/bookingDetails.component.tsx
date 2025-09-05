@@ -159,12 +159,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     );
   }
   return (
-    <div className="space-y-6">
-      <div className="relative pr-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Dettagli della Prenotazione
+    <div className="space-y-6  ">
+      <div className="relative pr-6 ">
+        <h2 className="text-2xl font-bold  text-gray-900">
+          Dettagli prenotazione
         </h2>
-        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
         <span className="absolute top-0 right-0">
           <Badge
             label={
@@ -183,6 +182,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             }
           />
         </span>
+        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,10 +190,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <div>
             <h3 className="font-medium text-gray-900">Servizio prenotato</h3>
             <div className="mt-2 space-y-2 text-sm">
-              <p>{service?.name}</p>
+              <p className="font-medium ">{service?.name}</p>
               {service?.description && (
                 <p>
-                  <span className="font-medium">Descrizione:</span>&nbsp;
+                  <span className="font-medium ]">Descrizione:</span>&nbsp;
                   {service.description}
                 </p>
               )}
@@ -218,6 +218,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               <p>
                 <span className="font-medium">Data del Servizio:</span>&nbsp;
                 {dateDisplay(booking.startDate, "dateTime")}
+              </p>
+              <p>
+                <span className="font-medium">Indirizzo del servizio:</span>&nbsp;
+                {capitalize(booking.address)}
               </p>
               <p>
                 <span className="font-medium">Durata:</span> {booking.quantity}
