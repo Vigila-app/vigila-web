@@ -380,7 +380,7 @@
     "roles": []
   },
   "customerCare": {
-    "url": "/customer-care",
+    "url": "https://wa.me/393292130529?text=Salve%2C%20ho%20bisogno%20di%20assistenza%20cliente%21",
     "label": "Servizio Clienti",
     "title": "Servizio Clienti",
     "menu": {
