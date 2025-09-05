@@ -15,7 +15,7 @@ import { FormFieldType } from "@/src/constants/form.constants";
 import dynamic from "next/dynamic";
 import useAltcha from "@/src/hooks/useAltcha";
 import { AltchaService } from "@/src/services/altcha.service";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import Link from "next/link";
 import LoginPhoto from "@/components/svg/LoginPhoto";
@@ -34,6 +34,7 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
   const { showLoader, hideLoader, showToast } = useAppStore();
   const router = useRouter();
   const { challenge, isVerified, onStateChange } = useAltcha();
+
   const {
     control,
     formState: { errors, isValid },
@@ -44,6 +45,7 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
   const redirectHome = () => {
     router.replace(Routes.home.url);
   };
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (formData: LoginFormI) => {
     if (isValid) {
@@ -132,21 +134,26 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
                 {...field}
                 label="Password"
                 placeholder="Inserisci password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 login
                 autoComplete="current-password"
                 aria-invalid={!!errors.password}
                 error={errors.password}
-                icon={<EyeIcon className="size-4 text-gray-500" />}
+                icon={
+                  <button
+                    onClick={() => setShowPassword(!showPassword)}
+                    type="button">
+                    <EyeIcon className="size-4 text-gray-500" />
+                  </button>
+                }
               />
             )}
           />
           <div className="text-right my-2">
             <Link
               href={Routes.resetPassword.url}
-              className="text-consumer-blue text-xs"
-            >
+              className="text-consumer-blue text-xs">
               Password dimenticata?
             </Link>
           </div>
