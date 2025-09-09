@@ -68,21 +68,19 @@ const PanoramicaTab = () => {
           information.length > 0
         ) {
           await UserService.updateUser({}, { information });
-
-          console.log("successo");
-          setIsEditing(false); //aggiunta per il setEditing
+          setIsEditing(false);
           showToast({
             message: "Profile updated successfully",
             type: ToastStatusEnum.SUCCESS,
           });
-        } else if (information === vigil?.information) {
+        } else if (information === userDetails?.information) {
           setError("information", {
             type: "custom",
             message: "Must insert different new info to update profile",
           });
         } else if (information.length === 0) {
           setError("information", {
-            type: ToastStatusEnum.ERROR,
+            type: "custom",
             message: "Must insert info to update profile",
           });
         }
@@ -133,7 +131,7 @@ const PanoramicaTab = () => {
                   label=""
                 />
               )}
-            />{" "}
+            />
             {isEditing && (
               <div className="flex gap-1.5 mt-3">
                 <Button
@@ -141,6 +139,7 @@ const PanoramicaTab = () => {
                   role={RolesEnum.CONSUMER}
                   label="Salva"
                   full
+                  customClass="mt-2"
                 />
               </div>
             )}
