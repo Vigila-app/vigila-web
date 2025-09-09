@@ -37,6 +37,9 @@ const ReviewCard = ({
   const userRole = currentUser?.user_metadata?.role;
   const isOwner = currentUser?.id === review.consumer_id;
   const isAdmin = userRole === RolesEnum.ADMIN;
+
+  //Lascio per ipotetica futura  feature per contattare supporto per review non veritiera
+
   const isVigilOwner =
     userRole === RolesEnum.VIGIL && currentUser?.id === review.vigil_id;
 
@@ -44,7 +47,7 @@ const ReviewCard = ({
   const canEdit = isEditable && (isOwner || isAdmin);
 
   // Determina se l'utente può eliminare la recensione
-  const canDelete = isEditable && (isOwner || isAdmin || isVigilOwner);
+  const canDelete = isEditable && (isOwner || isAdmin);
 
   // Renderizza le stelle per il rating
   const renderStars = (rating: number) => {
@@ -53,8 +56,7 @@ const ReviewCard = ({
         key={index}
         className={`text-lg ${
           index < rating ? "text-yellow-400" : "text-gray-300"
-        }`}
-      >
+        }`}>
         ★
       </span>
     ));
@@ -133,9 +135,9 @@ const ReviewCard = ({
   }
 
   return (
-    <Card className="p-4 space-y-3">
+    <Card className="p-4 space-y-3 border border-amber-600 rounded-2xl w-full max-w-full"> 
       {/* Header con rating e data */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between  items-start">
         <div className="flex items-center space-x-2">
           <div className="flex">{renderStars(review.rating)}</div>
           <span className="text-sm text-gray-500">({review.rating}/5)</span>
