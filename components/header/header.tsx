@@ -47,7 +47,7 @@ const Header = (props: HeaderI) => {
             <Menu />
             <MenuPrivate />
             <HeaderProfile />
-              <div className="block md:hidden">
+              <div className="">
             {isUserLogged ? (
                 <MenuMobile />
             ) : (
