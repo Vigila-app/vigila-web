@@ -1,4 +1,5 @@
 import Card from "@/components/card/card";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
@@ -16,6 +17,7 @@ import { useEffect } from "react";
 
 const PanoramicaTab = () => {
   const { vigils, getVigilsDetails } = useVigilStore();
+  const { bookings, getBookings } = useBookingsStore();
   const { user } = useUserStore();
 
   useEffect(() => {
@@ -26,6 +28,12 @@ const PanoramicaTab = () => {
   }, [user?.id]);
 
   const vigil = vigils.find((v) => v.id === user?.id);
+ 
+  const completedBookings = bookings.filter((b) => b.status === "completed");
+  const numberCompletedBookings = completedBookings.length;
+
+  // parte da 0 e per ogni elemento di completedBookings somma il risultato di prezzo- vigila fee
+  const totalEarnings = completedBookings.reduce((total, booking) => total +(booking.price - booking.fee), 0);
 
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
@@ -67,24 +75,24 @@ const PanoramicaTab = () => {
         </div>
         <div className="grid grid-cols-2 gap-4 text-center">
           <div>
-            <p className="text-2xl font-bold text-blue-600">TBD</p>
-            <p className="text-sm text-muted-foreground">servizi completati</p>
+            <p className="text-2xl font-bold text-consumer-blue">{numberCompletedBookings}</p>
+            <p className="text-sm font-medium">Servizi completati</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-600">TBD</p>
-            <p className="text-sm text-muted-foreground">guadagno totale</p>
+            <p className="text-2xl font-bold text-vigil-orange">{totalEarnings}€</p>
+            <p className="text-sm font-medium">Guadagno totale</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-consumer-blue">
               {vigil?.averageRating}
             </p>
-            <p className="text-sm text-muted-foreground">valutazione media</p>
+            <p className="text-sm font-medium">Valutazione media</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-vigil-orange">
               {vigil?.reviews?.length || "0"}
             </p>
-            <p className="text-sm text-muted-foreground">recensioni</p>
+            <p className="text-sm font-medium">Recensioni</p>
           </div>
         </div>
       </Card>
