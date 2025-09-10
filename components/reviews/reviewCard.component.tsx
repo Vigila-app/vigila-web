@@ -19,6 +19,7 @@ interface ReviewCardProps {
   onEdit?: (review: ReviewI) => void;
   onDelete?: (reviewId: string) => void;
   showEditInline?: boolean;
+  simplified?: boolean;
 }
 
 const ReviewCard = ({
@@ -28,6 +29,7 @@ const ReviewCard = ({
   onEdit,
   onDelete,
   showEditInline = false,
+  simplified = false,
 }: ReviewCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,6 +50,8 @@ const ReviewCard = ({
 
   // Determina se l'utente può eliminare la recensione
   const canDelete = isEditable && (isOwner || isAdmin);
+
+  const isConsumerView = userRole === RolesEnum.CONSUMER && simplified;
 
   // Renderizza le stelle per il rating
   const renderStars = (rating: number) => {
@@ -135,7 +139,7 @@ const ReviewCard = ({
   }
 
   return (
-    <Card className="p-4 space-y-3 border border-amber-600 rounded-2xl w-full max-w-full"> 
+    <Card customClass=" space-y-3  w-full max-w-full">
       {/* Header con rating e data */}
       <div className="flex justify-between  items-start">
         <div className="flex items-center space-x-2">
@@ -150,7 +154,7 @@ const ReviewCard = ({
       {/* Commento */}
       {review.comment && (
         <div className="text-gray-700">
-          <p className="leading-relaxed">{review.comment}</p>
+          <p className="leading-relaxed ">{review.comment}</p>
         </div>
       )}
 
@@ -179,7 +183,7 @@ const ReviewCard = ({
       </div>
 
       {/* Azioni */}
-      {(canEdit  || canDelete) && (
+      {!isConsumerView && (canEdit || canDelete) && (
         <div className="flex justify-end space-x-2 border-t pt-3">
           {canEdit && (
             <Button

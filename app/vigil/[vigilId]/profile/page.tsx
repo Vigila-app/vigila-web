@@ -42,6 +42,7 @@ const vigilProfile = () => {
     {
       label: <StarIcon className="size-6" />,
       id: "recensioni",
+      simplified: true,
     },
   ];
 
@@ -117,7 +118,9 @@ const vigilProfile = () => {
               />
               {selectedTab?.id === "panoramica" && <PanoramicaTab />}
               {selectedTab?.id === "servizi" && <ServiziTab />}
-              {selectedTab?.id === "recensioni" && <RecensioniTab />}{" "}
+              {selectedTab?.id === "recensioni" && (
+                <RecensioniTab simplified={true} />
+              )}{" "}
             </div>
           </div>
         </div>

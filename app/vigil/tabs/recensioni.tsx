@@ -6,7 +6,13 @@ import { useReviewsStore } from "@/src/store/reviews/reviews.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useEffect } from "react";
 
-export default function RecensioniTab() {
+interface RecensioniTabProps {
+  simplified?: boolean;
+}
+
+export default function RecensioniTab({
+  simplified = false,
+}: RecensioniTabProps) {
   const { user } = useUserStore();
   const { reviews, getReviews } = useReviewsStore();
 
@@ -16,7 +22,8 @@ export default function RecensioniTab() {
   }, []);
 
   return (
-    <div className="space-y-4 w-full mt-6 ">
+    <div className="space-y-4  mt-6 py-2.5 ">
+      <h2 className="font-semibold text-2xl mb-6 ">Recensioni recenti</h2>
       {/* {role === RolesEnum.VIGIL &&
       user?.id &&
       vigilStats[user.id]?.average_rating ? (
@@ -34,6 +41,7 @@ export default function RecensioniTab() {
               currentUser={user}
               isEditable={true}
               showEditInline={true}
+              simplified={simplified}
             />
           ))
         ) : (

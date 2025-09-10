@@ -9,6 +9,7 @@ export type TabI = {
   label: any;
   id?: string;
   url?: string;
+  simplified?: boolean;
 };
 type TabGroupI = {
   align?: "left" | "center" | "right";
@@ -69,8 +70,7 @@ const TabGroup = (props: TabGroupI) => {
                     ? "!text-consumer-blue bg-white"
                     : "!text-vigil-orange bg-white"
                   : null
-              )}
-            >
+              )}>
               {tab.label}
             </button>
           ))}
@@ -87,8 +87,7 @@ const TabGroup = (props: TabGroupI) => {
                 : align === "left"
                   ? "justify-start"
                   : "justify-end"
-            )}
-          >
+            )}>
             {tabs.map((tab) =>
               tab.url ? (
                 <Link
@@ -106,8 +105,7 @@ const TabGroup = (props: TabGroupI) => {
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}
-                >
+                  }}>
                   {tab.label}
                 </Link>
               ) : (
@@ -123,8 +121,7 @@ const TabGroup = (props: TabGroupI) => {
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}
-                >
+                  }}>
                   {tab.label}
                 </span>
               )
