@@ -34,10 +34,8 @@ const PanoramicaTab = () => {
       ? user?.id
       : vigilIdFromParams;
 
-const isVigil= user?.user_metadata?.role === RolesEnum.VIGIL;
-const isConsumer= user?.user_metadata?.role === RolesEnum.CONSUMER;
-
-
+  const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
+  const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
 
   useEffect(() => {
     if (vigilId) {
@@ -50,7 +48,7 @@ const isConsumer= user?.user_metadata?.role === RolesEnum.CONSUMER;
 
   console.log("params:", params);
   console.log("Vigil in panoramica:", vigil);
-  console.log("User:", user);
+  console.log("User:", userDetails);
 
   type ProfileFormI = {
     information: string;
@@ -116,21 +114,23 @@ const isConsumer= user?.user_metadata?.role === RolesEnum.CONSUMER;
         <h1 className="flex flex-row items-center gap-2 pb-3 relative">
           <HeartIcon className="size-6 text-red-600" />
           <span className="font-semibold text-lg">Chi sono</span>
-         {isVigil && ( <Button
-            label={isEditing ? "Annulla" : "Modifica"}
-            action={
-              isEditing ? () => setIsEditing(false) : () => setIsEditing(true)
-            }
-            small
-            role={RolesEnum.VIGIL}
-            customClass="absolute top-0 end-0"
-          />)}
+          {isVigil && (
+            <Button
+              label={isEditing ? "Annulla" : "Modifica"}
+              action={
+                isEditing ? () => setIsEditing(false) : () => setIsEditing(true)
+              }
+              small
+              role={RolesEnum.VIGIL}
+              customClass="absolute top-0 end-0"
+            />
+          )}
         </h1>
 
         {!isEditing ? (
           <div>
             <p className="font-medium leading-relaxed text-sm">
-              {userDetails?.information}
+              {isVigil ? userDetails?.information : vigil?.information}
             </p>
           </div>
         ) : (

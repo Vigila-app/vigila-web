@@ -177,7 +177,7 @@ const ReviewCard = ({
       </div>
 
       {/* Azioni */}
-      {(canEdit || canDelete) && (
+      {(canEdit  || canDelete) && (
         <div className="flex justify-end space-x-2 border-t pt-3">
           {canEdit && (
             <Button

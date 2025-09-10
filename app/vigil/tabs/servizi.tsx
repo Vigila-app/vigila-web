@@ -15,9 +15,12 @@ import { useParams } from "next/navigation";
 
 const ServiziTab = () => {
   const params = useParams();
-const vigilIdFromParams = params?.vigilId;
+  const vigilIdFromParams = params?.vigilId;
   const { user } = useUserStore();
-  const vigilId = user?.user_metadata?.role === RolesEnum.VIGIL ? user?.id : vigilIdFromParams;
+  const vigilId =
+    user?.user_metadata?.role === RolesEnum.VIGIL
+      ? user?.id
+      : vigilIdFromParams;
   const { services, getServices, deleteService } = useServicesStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newServiceMode, setNewServiceMode] = useState(false);
@@ -29,7 +32,7 @@ const vigilIdFromParams = params?.vigilId;
   const [pendingStatusValue, setPendingStatusValue] = useState<boolean | null>(
     null
   );
-
+  const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
   const reloadServices = (fullReload = true) => {
     if (vigilId) getServices(true, vigilId, { active: fullReload && "*" });
   };
@@ -120,7 +123,7 @@ const vigilIdFromParams = params?.vigilId;
                   onDelete={() => handleRemoveService(i)}
                   simplified
                 />
-                {editingIndex === i && (
+                {editingIndex === i && isVigil && (
                   <div className="mt-2 p-4 bg-gray-50 rounded">
                     <Input
                       label="Prezzo (€)"
@@ -161,61 +164,65 @@ const vigilIdFromParams = params?.vigilId;
               </li>
             ))}
           </ul>
-          <div className="mt-6">
-            {newServiceMode ? (
-              <div className="border rounded p-3 bg-gray-100">
-                <ServicesCatalog
-                  role={user?.user_metadata?.role as RolesEnum}
-                  selectedServices={services}
-                  onServicesChange={(services) => {
-                    if (services.length) {
-                      setNewService(services[0]);
-                    }
-                  }}
-                />
-                <Input
-                  label="Prezzo (€)"
-                  type="number"
-                  value={newService.unit_price || ""}
-                  onChange={(value) => {
-                    setNewService((ns) => ({
-                      ...ns,
-                      unit_price: Number(value),
-                    }));
-                  }}
-                />
-                <div className="flex gap-2 items-center justify-center mt-2">
-                  <Button
-                    label="Aggiungi"
-                    type="button"
-                    small
-                    customClass="!!px-2"
-                    role={RolesEnum.CONSUMER}
-                    action={() =>
-                      newService.name &&
-                      handleAddService(newService as ServiceI)
-                    }
+          {isVigil && (
+            <div className="mt-6">
+              {newServiceMode ? (
+                <div className="border rounded p-3 bg-gray-100">
+                  <ServicesCatalog
+                    role={user?.user_metadata?.role as RolesEnum}
+                    selectedServices={services}
+                    onServicesChange={(services) => {
+                      if (services.length) {
+                        setNewService(services[0]);
+                      }
+                    }}
                   />
+                  <Input
+                    label="Prezzo (€)"
+                    type="number"
+                    value={newService.unit_price || ""}
+                    onChange={(value) => {
+                      setNewService((ns) => ({
+                        ...ns,
+                        unit_price: Number(value),
+                      }));
+                    }}
+                  />
+                  <div className="flex gap-2 items-center justify-center mt-2">
+                    <Button
+                      label="Aggiungi"
+                      type="button"
+                      small
+                      customClass="!!px-2"
+                      role={RolesEnum.CONSUMER}
+                      action={() =>
+                        newService.name &&
+                        handleAddService(newService as ServiceI)
+                      }
+                    />
+                    <Button
+                      label="Annulla"
+                      type="button"
+                      small
+                      customClass="!!px-2"
+                      danger
+                      action={() => setNewServiceMode(false)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center items-center">
                   <Button
-                    label="Annulla"
+                    label="Aggiungi nuovo servizio"
                     type="button"
-                    small
-                    customClass="!!px-2"
-                    danger
-                    action={() => setNewServiceMode(false)}
+                    action={() => setNewServiceMode(true)}
                   />
                 </div>
-              </div>
-            ) : (<div className="flex justify-center items-center">
-              <Button
-                label="Aggiungi nuovo servizio"
-                type="button"
-                action={() => setNewServiceMode(true)}
-              /></div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           {/* Modale warning cambio stato */}
-          {showStatusModal && (
+          {showStatusModal && isVigil && (
             <div className="fixed inset-0 bg-white/10 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
                 <h3 className="text-lg font-bold mb-2">Attenzione</h3>
