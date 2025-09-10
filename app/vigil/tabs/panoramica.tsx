@@ -1,6 +1,9 @@
+import { Button } from "@/components";
 import Card from "@/components/card/card";
+import { Input, TextArea } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useUserStore } from "@/src/store/user/user.store";
+import { UserService } from "@/src/services";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
   AcademicCapIcon,
@@ -14,15 +17,27 @@ import {
   TrophyIcon,
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ToastStatusEnum } from "@/src/enums/toast.enum";
+import { useAppStore } from "@/src/store/app/app.store";
 
 const PanoramicaTab = () => {
   const { vigils, getVigilsDetails } = useVigilStore();
-  const { user } = useUserStore();
+  const { user, userDetails } = useUserStore();
+  const { showToast } = useAppStore();
+  const [isEditing, setIsEditing] = useState(false);
   const params = useParams();
   const vigilIdFromParams = params?.vigilId;
   const vigilId =
-    user?.user_metadata?.role === RolesEnum.VIGIL ? user?.id : vigilIdFromParams;
+    user?.user_metadata?.role === RolesEnum.VIGIL
+      ? user?.id
+      : vigilIdFromParams;
+
+const isVigil= user?.user_metadata?.role === RolesEnum.VIGIL;
+const isConsumer= user?.user_metadata?.role === RolesEnum.CONSUMER;
+
+
 
   useEffect(() => {
     if (vigilId) {
@@ -37,19 +52,115 @@ const PanoramicaTab = () => {
   console.log("Vigil in panoramica:", vigil);
   console.log("User:", user);
 
+  type ProfileFormI = {
+    information: string;
+  };
+  const {
+    control,
+    formState: { errors, isValid },
+    handleSubmit,
+    setError,
+    reset,
+  } = useForm<ProfileFormI>({
+    defaultValues: {
+      information: userDetails?.information || "",
+    },
+  });
+  useEffect(() => {
+    if (userDetails && isEditing) {
+      reset({
+        information: userDetails.information || "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userDetails, isEditing, reset]);
+
+  const onSubmit = async (formData: ProfileFormI) => {
+    if (isValid) {
+      try {
+        const { information } = formData;
+        if (
+          information !== userDetails?.information &&
+          information.length > 0
+        ) {
+          await UserService.updateUser({}, { information });
+          setIsEditing(false);
+          showToast({
+            message: "Profile updated successfully",
+            type: ToastStatusEnum.SUCCESS,
+          });
+        } else if (information === userDetails?.information) {
+          setError("information", {
+            type: "custom",
+            message: "Must insert different new info to update profile",
+          });
+        } else if (information.length === 0) {
+          setError("information", {
+            type: "custom",
+            message: "Must insert info to update profile",
+          });
+        }
+      } catch (err) {
+        console.error("Error updating user", err);
+        showToast({
+          message: "Sorry, something went wrong",
+          type: ToastStatusEnum.ERROR,
+        });
+      }
+    }
+  };
+
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>
-        <h1 className="flex flex-row items-center gap-2 pb-2">
+        <h1 className="flex flex-row items-center gap-2 pb-3 relative">
           <HeartIcon className="size-6 text-red-600" />
           <span className="font-semibold text-lg">Chi sono</span>
+         {isVigil && ( <Button
+            label={isEditing ? "Annulla" : "Modifica"}
+            action={
+              isEditing ? () => setIsEditing(false) : () => setIsEditing(true)
+            }
+            small
+            role={RolesEnum.VIGIL}
+            customClass="absolute top-0 end-0"
+          />)}
         </h1>
 
-        <div>
-          <p className="font-medium leading-relaxed text-sm">
-            {vigil?.information}
-          </p>
-        </div>
+        {!isEditing ? (
+          <div>
+            <p className="font-medium leading-relaxed text-sm">
+              {userDetails?.information}
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="information"
+              control={control}
+              render={({ field }) => (
+                <TextArea
+                  type="text"
+                  aria-invalid={!!errors.information}
+                  error={errors.information}
+                  {...field}
+                  label=""
+                />
+              )}
+            />
+            {isEditing && (
+              <div className="flex gap-1.5 mt-3">
+                <Button
+                  type="submit"
+                  role={RolesEnum.CONSUMER}
+                  label="Salva"
+                  full
+                  customClass="mt-2"
+                />
+              </div>
+            )}
+          </form>
+        )}
       </Card>
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
