@@ -50,6 +50,7 @@ const ServiceCard = (props: ServiceCardI) => {
     [user?.user_metadata?.role]
   );
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
+  const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
 
   const goToBooking = () => {
     if (service?.id && service?.vigil_id) {
@@ -170,7 +171,7 @@ const ServiceCard = (props: ServiceCardI) => {
       ) : null}
       {/* TODO add categories <div>categorie</div> */}
 
-      {(
+      {isConsumer && (
         <div className="inline-flex items-center flex-nowrap gap-4 w-full mt-6">
           <Button
             role={RolesEnum.VIGIL}
@@ -222,9 +223,7 @@ const ServiceCard = (props: ServiceCardI) => {
             />
           )}
         </div>
-      ) : (
-            null
-          )}
+      ) : null}
       {showDeleteModal && onDelete && (
         <div className="fixed inset-0  bg-white/10 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
