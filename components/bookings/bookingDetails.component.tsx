@@ -167,7 +167,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <span className="absolute top-0 right-0">
           <Badge
             label={
-              // Se lo stato è finale, mostro lo stato della prenotazione
               [
                 BookingStatusEnum.CANCELLED,
                 BookingStatusEnum.REFUNDED,
@@ -176,15 +175,13 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 ? BookingUtils.getStatusText(
                     booking.status as BookingStatusEnum
                   )
-                : // Altrimenti controllo il pagamento
-                  booking.payment_status === PaymentStatusEnum.PAID
+                : booking.payment_status === PaymentStatusEnum.PAID
                   ? BookingUtils.getStatusText(
                       booking.status as BookingStatusEnum
                     )
                   : "Da pagare"
             }
             color={
-              // Se lo stato è finale, uso il colore dello stato
               [
                 BookingStatusEnum.CANCELLED,
                 BookingStatusEnum.REFUNDED,
@@ -193,8 +190,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 ? BookingUtils.getStatusColor(
                     booking.status as BookingStatusEnum
                   )
-                : // Altrimenti controllo il pagamento
-                  booking.payment_status === PaymentStatusEnum.PAID
+                : booking.payment_status === PaymentStatusEnum.PAID
                   ? BookingUtils.getStatusColor(
                       booking.status as BookingStatusEnum
                     )
