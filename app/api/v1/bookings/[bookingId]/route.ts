@@ -7,7 +7,7 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { deepMerge } from "@/src/utils/common.utils";
-import { getPostgresTimestamp } from "@/src/utils/date.utils";
+import { dateDiff, getPostgresTimestamp } from "@/src/utils/date.utils";
 import { BookingI } from "@/src/types/booking.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import {
@@ -264,6 +264,18 @@ export async function PUT(
           service_date: updatedBooking.service_date,
           duration_hours: updatedBooking.duration_hours,
           notes: updatedBooking.notes,
+          status: updatedBooking.status,
+        };
+      }
+      if (
+        booking.status === BookingStatusEnum.CONFIRMED &&
+        dateDiff(booking.endDate, new Date()) > 24
+      ) {
+        allowedUpdates = {
+          service_date: updatedBooking.service_date,
+          duration_hours: updatedBooking.duration_hours,
+          notes: updatedBooking.notes,
+          status: updatedBooking.status,
         };
       }
 
