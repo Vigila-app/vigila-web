@@ -167,18 +167,38 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <span className="absolute top-0 right-0">
           <Badge
             label={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              // Se lo stato è finale, mostro lo stato della prenotazione
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusText(
                     booking.status as BookingStatusEnum
                   )
-                : "Da pagare"
+                : // Altrimenti controllo il pagamento
+                  booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusText(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "Da pagare"
             }
             color={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              // Se lo stato è finale, uso il colore dello stato
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusColor(
                     booking.status as BookingStatusEnum
                   )
-                : "yellow"
+                : // Altrimenti controllo il pagamento
+                  booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusColor(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "yellow"
             }
           />
         </span>
@@ -220,7 +240,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 {dateDisplay(booking.startDate, "dateTime")}
               </p>
               <p>
-                <span className="font-medium">Indirizzo del servizio:</span>&nbsp;
+                <span className="font-medium">Indirizzo del servizio:</span>
+                &nbsp;
                 {capitalize(booking.address)}
               </p>
               <p>
