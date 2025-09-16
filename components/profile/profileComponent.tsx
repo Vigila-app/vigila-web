@@ -31,6 +31,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
+import clsx from "clsx";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
@@ -38,19 +40,30 @@ const ProfileComponent = () => {
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
+  const { bookings } = useBookingsStore();
   const role = user?.user_metadata?.role as RolesEnum;
   const isConsumer = role === RolesEnum.CONSUMER;
   const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === user?.id);
 
+  const pendingBookings = bookings.filter((b) => b.status === "pending");
+  console.log("pendingBookings", pendingBookings);
   const tabs: TabI[] = [
     {
       label: <UserIcon className="size-6" />,
       id: "panoramica",
     },
     {
-      label: <CalendarDaysIcon className="size-6" />,
+      label: (
+        <CalendarDaysIcon
+          className={clsx(
+            "size-6",
+            pendingBookings.length>0 && "text-red-600",
+            pendingBookings.length<=0 && "text-gray-400"
+          )}
+        />
+      ),
       id: "prenotazioni",
     },
     ...(isVigil
