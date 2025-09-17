@@ -24,7 +24,7 @@ const PrenotationTabs = () => {
       label: (
         <span className="flex ">
           {/* <ClockIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
-          <span className=" truncate">
+          <span className="">
             In attesa{" "}
             {pendingBookings.length !== 0 && (
               <span className="bg-consumer-blue rounded-full px-2  text-white">
@@ -42,7 +42,7 @@ const PrenotationTabs = () => {
       label: (
         <span className="flex ">
           {/* <ShieldCheckIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
-          <span className=" truncate">
+          <span className="">
             Confermate{" "}
             {confirmedBookings.length !== 0 && (
               <span className="bg-consumer-blue rounded-full px-2  text-white">
@@ -58,14 +58,7 @@ const PrenotationTabs = () => {
       label: (
         <span className="flex ">
           {/* <CheckBadgeIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
-          <span className=" truncate">
-            Completate{" "}
-            {completedBookings.length !== 0 && (
-              <span className="bg-consumer-blue rounded-full px-2 text-white">
-                {completedBookings.length}
-              </span>
-            )}
-          </span>
+          Completate
         </span>
       ),
       id: "Completate",
