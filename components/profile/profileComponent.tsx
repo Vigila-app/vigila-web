@@ -59,7 +59,7 @@ const ProfileComponent = () => {
           className={clsx(
             "size-6",
             pendingBookings.length>0 && "text-red-500",
-            pendingBookings.length<=0 && "text-gray-400"
+            
           )}
         />
       ),

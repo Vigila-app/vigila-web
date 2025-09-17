@@ -6,6 +6,11 @@ import TabInattesa from "@/app/vigil/tabs/TabsPrenotazioni/TabInAttesa";
 import TabConfirmed from "@/app/vigil/tabs/TabsPrenotazioni/TabConfirmed";
 import TabCompletati from "@/app/vigil/tabs/TabsPrenotazioni/TabCompletati";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import {
+  CheckBadgeIcon,
+  ClockIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/outline";
 
 const PrenotationTabs = () => {
   const { user } = useUserStore();
@@ -17,35 +22,53 @@ const PrenotationTabs = () => {
   const tabs: TabI[] = [
     {
       label: (
-        <span className="text-black">
-          In attesa{" "}
-          <span className="bg-consumer-blue rounded-full px-2">
-            {pendingBookings.length}
+        <span className="flex ">
+          {/* <ClockIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
+          <span className=" truncate">
+            In attesa{" "}
+            {pendingBookings.length !== 0 && (
+              <span className="bg-consumer-blue rounded-full px-2  text-white">
+                {pendingBookings.length}
+              </span>
+            )}
           </span>
         </span>
       ),
 
       active: true,
+      id: "In attesa",
     },
     {
       label: (
-        <span className="text-black">
-          Confermate{" "}
-          <span className="bg-consumer-blue rounded-full px-2">
-            {confirmedBookings.length}
+        <span className="flex ">
+          {/* <ShieldCheckIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
+          <span className=" truncate">
+            Confermate{" "}
+            {confirmedBookings.length !== 0 && (
+              <span className="bg-consumer-blue rounded-full px-2  text-white">
+                {confirmedBookings.length}
+              </span>
+            )}
           </span>
         </span>
       ),
+      id: "Accettate",
     },
     {
       label: (
-        <span className="text-black">
-          Completate{" "}
-          <span className="bg-consumer-blue rounded-full px-2">
-            {completedBookings.length}
+        <span className="flex ">
+          {/* <CheckBadgeIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
+          <span className=" truncate">
+            Completate{" "}
+            {completedBookings.length !== 0 && (
+              <span className="bg-consumer-blue rounded-full px-2 text-white">
+                {completedBookings.length}
+              </span>
+            )}
           </span>
         </span>
       ),
+      id: "Completate",
     },
   ];
   const [selectedTab, setSelectedTab] = useState<TabI>(tabs[0]); //per avere tab attive
@@ -65,9 +88,9 @@ const PrenotationTabs = () => {
         />
       </div>
 
-      {selectedTab.label === "In attesa" && <TabInattesa />}
-      {selectedTab.label === "Accettate" && <TabConfirmed />}
-      {selectedTab.label === "Completate" && <TabCompletati />}
+      {selectedTab.id === "In attesa" && <TabInattesa />}
+      {selectedTab.id === "Accettate" && <TabConfirmed />}
+      {selectedTab.id === "Completate" && <TabCompletati />}
       {/* //  ToDO popolazione delle prenotazione  */}
     </section>
   );
