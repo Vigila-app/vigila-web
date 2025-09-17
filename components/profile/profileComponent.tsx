@@ -48,7 +48,6 @@ const ProfileComponent = () => {
   const vigil = vigils?.find((v) => v.id === user?.id);
 
   const pendingBookings = bookings.filter((b) => b.status === "pending");
-  console.log("pendingBookings", pendingBookings);
   const tabs: TabI[] = [
     {
       label: <UserIcon className="size-6" />,
@@ -59,7 +58,7 @@ const ProfileComponent = () => {
         <CalendarDaysIcon
           className={clsx(
             "size-6",
-            pendingBookings.length>0 && "text-red-600",
+            pendingBookings.length>0 && "text-red-500",
             pendingBookings.length<=0 && "text-gray-400"
           )}
         />
