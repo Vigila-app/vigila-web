@@ -318,9 +318,10 @@ const SignupComponent = (props: SignupComponentI) => {
           ) : null
         )}
 
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500 mt-2">
-            Creando un account accetti i nostri&nbsp;
+            L&apos;Utente dichiara di avere preso visione e di accettare
+            integralmente le disposizioni di cui ai&nbsp;
             <Link
               href={Routes.termsConditions.url}
               target="blank"
@@ -333,7 +334,10 @@ const SignupComponent = (props: SignupComponentI) => {
             >
               Termini e Condizioni
             </Link>
-            &nbsp;e la&nbsp;
+            .
+            <br />
+            <br />
+            L&apos;Utente dichiara di avere preso visione delle&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
@@ -346,9 +350,10 @@ const SignupComponent = (props: SignupComponentI) => {
             >
               Privacy Policy
             </Link>
-            .
+            &nbsp;e di acconsentire al trattamento dei propri dati personali,
+            conformemente a quanto previsto nella stessa informativa.
           </p>
-        </div>
+        </div> */}
 
         <div>
           <Button

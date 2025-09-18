@@ -99,24 +99,25 @@ const CookieBannerComponent = () => {
   if (!showCookieBanner) return null;
 
   return (
-    <div className="fixed bottom-0 w-full z-50">
+    <div className="fixed bottom-0 w-full z-50 text-black">
       <div className="relative">
         <section
           aria-label="cookies banner"
           id="cookies-banner"
-          className="mx-auto max-w-screen-lg w-full sticky bottom-0 rounded text-center p-4 border border-gray-200 bg-white shadow transition"
+          className="mx-auto max-w-screen-lg w-full sticky bottom-0 rounded-sm text-center px-4 py-2 md:!p-4 border border-gray-200 bg-white shadow-xs transition"
         >
-          <div className="flex flex-wrap w-full items-center justify-center gap-4">
-            <div className="overflow-y-scroll max-h-96">
-              <div className="w-full text-sm">
-                <h2 className="text-lg font-medium">{cmsData.title}</h2>
-                <p className="p-2 text-left">
-                  {cmsData.text}
+          <div className="flex flex-wrap w-full items-center justify-center gap-2 md:gap-4">
+            <div className="overflow-y-scroll max-h-44 md:max-h-72">
+              <div className="w-full text-xs md:text-sm">
+                <h2 className="text-sm md:text-base font-medium">{cmsData.title}</h2>
+                <div className="p-2 text-left">
+                  <p>{cmsData.text}</p>
                   <br />
                   <div>
-                    Learn more about our&nbsp;
+                    Leggi di più sulla&nbsp;
                     <Link
                       className="underline transition hover:font-medium"
+                      target="_blank"
                       href={Routes.cookiePolicy.url}
                     >
                       {Routes.cookiePolicy.label}
@@ -133,7 +134,7 @@ const CookieBannerComponent = () => {
                                   {field.label}
                                 </label>
                                 {field.required ? (
-                                  <strong>Always active</strong>
+                                  <strong>Sempre attivi</strong>
                                 ) : (
                                   <Toggle
                                     label={field.label}
@@ -156,7 +157,7 @@ const CookieBannerComponent = () => {
                       ) : null}
                     </div>
                   ) : null}
-                </p>
+                </div>
               </div>
               {!showCookiePreferences ? (
                 <Button
@@ -164,7 +165,7 @@ const CookieBannerComponent = () => {
                     setShowCookiePreferences(!showCookiePreferences)
                   }
                   text
-                  label="Show preferences"
+                  label="Mostra preferenze"
                 />
               ) : null}
             </div>
@@ -172,7 +173,7 @@ const CookieBannerComponent = () => {
               action={closeCookieBanner}
               primary
               label={
-                !showCookiePreferences ? "Accept all Cookies" : "Save and Apply"
+                !showCookiePreferences ? "Accetta tutti Cookies" : "Salva e applica"
               }
             />
           </div>
