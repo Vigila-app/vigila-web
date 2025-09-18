@@ -109,7 +109,7 @@ const TabGroup = (props: TabGroupI) => {
                 <span
                   key={tab.id}
                   className={clsx(
-                    "cursor-pointer shrink-0 p-3 border rounded-3xl whitespace-nowrap font-medium  text-sm text black transition  ",
+                    "cursor-pointer shrink-0 p-3 border rounded-3xl whitespace-nowrap font-medium text-sm text-black transition",
                     activeTab?.id === tab.id &&
                       "border-transparent bg-pureWhite hover:consumer-blue"
                   )}
