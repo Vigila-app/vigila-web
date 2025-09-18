@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: Routes.privacyPolicy.title,
+  title: Routes.cookiePolicy.title,
 };
 
 export default function CookiePolicy() {
