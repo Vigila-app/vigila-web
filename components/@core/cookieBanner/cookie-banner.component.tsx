@@ -119,7 +119,6 @@ const CookieBannerComponent = () => {
                       className="underline transition hover:font-medium"
                       target="_blank"
                       href={Routes.cookiePolicy.url}
-                      
                     >
                       {Routes.cookiePolicy.label}
                     </Link>
