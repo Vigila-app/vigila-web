@@ -361,7 +361,7 @@
       "mobile": true,
       "desktop": true,
       "header": false,
-      "footer": true
+      "footer": false
     },
     "private": false,
     "roles": []
@@ -374,7 +374,7 @@
       "mobile": true,
       "desktop": true,
       "header": false,
-      "footer": true
+      "footer": false
     },
     "private": false,
     "roles": []
@@ -393,7 +393,7 @@
     "roles": []
   },
   "termsConditions": {
-    "url": "/terms-and-conditions",
+    "url": "/termini-e-condizioni",
     "label": "Termini & Condizioni",
     "title": "Termini & Condizioni",
     "menu": {
