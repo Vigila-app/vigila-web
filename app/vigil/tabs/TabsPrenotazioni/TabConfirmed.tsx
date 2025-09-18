@@ -13,7 +13,7 @@ export default function TabConfirmed() {
 
   return (
     <div className="w-full">
-      <h1 className="py-3 text-[18px] font-semibold">Prenotazini accettate</h1>
+      <h1 className="py-3 text-[18px] font-semibold">Prenotazioni accettate</h1>
       <div className=" flex flex-col gap-4 items-center">
         {confirmedBookings?.length ? (
           confirmedBookings.map((booking) => (
