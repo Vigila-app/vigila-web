@@ -13,10 +13,13 @@ import {
   ArrowLeftStartOnRectangleIcon,
   Bars3Icon,
   CalendarDaysIcon,
+  BriefcaseIcon,
+  UserGroupIcon,
+  StarIcon,
   HomeIcon,
   UserIcon,
-  WrenchScrewdriverIcon,
   XMarkIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -32,19 +35,41 @@ const MenuMobile = () => {
 
   const isUserLogged = !!user?.id;
 
-  const MenuLinkItem = (route: RouteI, Icon?: React.ElementType) => (
-    <Link
-      className={clsx(
-        "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
-        pathname === route?.url &&
-          "active bg-gray-100 text-primary-500 hover:text-primary-600"
-      )}
-      href={route?.url || ""}
-    >
-      {Icon && <Icon className=" w-6 h-6 text-current" />}
-      {route?.label}
-    </Link>
-  );
+  const MenuLinkItem = (
+    route: RouteI,
+    Icon?: React.ElementType,
+    internal = true
+  ) => {
+    const className = clsx(
+      "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
+      pathname === route?.url &&
+        "active bg-gray-100 text-primary-500 hover:text-primary-600"
+    );
+    return internal ? (
+      <Link className={className} href={route?.url || ""}>
+        {Icon && <Icon className=" w-6 h-6 text-current" />}
+        {route?.label}
+      </Link>
+    ) : (
+      <a className={className} href={route?.url || ""}>
+        {" "}
+        {Icon && <Icon className=" w-6 h-6 text-current" />}
+        {route?.label}
+      </a>
+    );
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,8 +89,7 @@ const MenuMobile = () => {
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="rounded bg-transparent p-2"
-      >
+        className="rounded bg-transparent p-2">
         {isOpen ? (
           <XMarkIcon className="h-6 w-6 text-consumer-blue transition hover:text-gray-600/75" />
         ) : (
@@ -79,8 +103,7 @@ const MenuMobile = () => {
         className={clsx(
           "absolute flex flex-col gap-8  md:hidden transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
           isOpen ? "block right-0" : "hidden"
-        )}
-      >
+        )}>
         {isUserLogged ? (
           <>
             <section className=" flex flex-col gap-2 justify-center items-center mb-12 mt-12">
@@ -103,7 +126,12 @@ const MenuMobile = () => {
               )}
             </section>
             <ul className="flex flex-col gap-8 divide-y divide-gray-100 flex-1">
-              <li className="flex py-2 items-center ">
+              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
+                <li className="block py-2">
+                  {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
+                </li>
+              )}
+              <li className="block py-2">
                 {MenuLinkItem(
                   user.user_metadata?.role === RolesEnum.CONSUMER
                     ? Routes.profileConsumer
@@ -113,11 +141,62 @@ const MenuMobile = () => {
                   UserIcon
                 )}
               </li>
-              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
+              <li className="block py-2">
+                {MenuLinkItem(
+                  {
+                    ...(user.user_metadata?.role === RolesEnum.CONSUMER
+                      ? {
+                          ...Routes.profileConsumer,
+                          url: `${Routes.profileConsumer.url}?tab=prenotazioni`,
+                          label: "Prenotazioni",
+                        }
+                      : {
+                          ...Routes.profileVigil,
+                          url: `${Routes.profileVigil.url}?tab=prenotazioni`,
+                          label: "Prenotazioni",
+                        }),
+                  },
+                  CalendarDaysIcon,
+                  false
+                )}
+              </li>
+              <li className="block py-2">
+                {MenuLinkItem(
+                  {
+                    ...(user.user_metadata?.role === RolesEnum.CONSUMER
+                      ? {
+                          ...Routes.profileConsumer,
+                          url: `${Routes.profileConsumer.url}?tab=famiglia`,
+                          label: "Famiglia",
+                        }
+                      : {
+                          ...Routes.profileVigil,
+                          url: `${Routes.profileVigil.url}?tab=servizi`,
+                          label: "Servizi",
+                        }),
+                  },
+                  user.user_metadata?.role === RolesEnum.CONSUMER
+                    ? UserGroupIcon
+                    : BriefcaseIcon,
+                  false
+                )}
+              </li>
+              {user?.user_metadata?.role === RolesEnum.VIGIL ? (
                 <li className="block py-2">
-                  {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
+                  {MenuLinkItem(
+                    {
+                      ...Routes.profileConsumer,
+                      url: `${Routes.profileConsumer.url}?tab=recensioni`,
+                      label: "Recensioni",
+                    },
+                    StarIcon,
+                    false
+                  )}
                 </li>
-              )}
+              ) : null}
+              <li className="block py-2">
+                {MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
+              </li>
               {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
                 <li className="block py-2">
                   {MenuLinkItem(Routes.services, WrenchScrewdriverIcon)}
@@ -145,8 +224,7 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700"
-              >
+                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>

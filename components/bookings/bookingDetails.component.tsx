@@ -13,7 +13,7 @@ import {
   capitalize,
   replaceDynamicUrl,
 } from "@/src/utils/common.utils";
-import { dateDisplay } from "@/src/utils/date.utils";
+import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -51,6 +51,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   const { services } = useServicesStore();
   const { user } = useUserStore();
   const { closeModal } = useModalStore();
+  const currentDate = new Date();
 
   const [canCancel, setCanCancel] = useState<boolean>(false);
 
@@ -157,32 +158,47 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       </div>
     );
   }
-
   return (
-    <div className="space-y-6">
-      <div className="relative pr-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Dettagli della Prenotazione
+    <div className="space-y-6  ">
+      <div className="relative pr-6 ">
+        <h2 className="text-2xl font-bold  text-gray-900">
+          Dettagli prenotazione
         </h2>
-        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
         <span className="absolute top-0 right-0">
           <Badge
             label={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusText(
                     booking.status as BookingStatusEnum
                   )
-                : "Da pagare"
+                : booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusText(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "Da pagare"
             }
             color={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusColor(
                     booking.status as BookingStatusEnum
                   )
-                : "yellow"
+                : booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusColor(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "yellow"
             }
           />
         </span>
+        <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,10 +206,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <div>
             <h3 className="font-medium text-gray-900">Servizio prenotato</h3>
             <div className="mt-2 space-y-2 text-sm">
-              <p>{service?.name}</p>
+              <p className="font-medium ">{service?.name}</p>
               {service?.description && (
                 <p>
-                  <span className="font-medium">Descrizione:</span>&nbsp;
+                  <span className="font-medium ]">Descrizione:</span>&nbsp;
                   {service.description}
                 </p>
               )}
@@ -218,6 +234,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               <p>
                 <span className="font-medium">Data del Servizio:</span>&nbsp;
                 {dateDisplay(booking.startDate, "dateTime")}
+              </p>
+              <p>
+                <span className="font-medium">Indirizzo del servizio:</span>
+                &nbsp;
+                {capitalize(booking.address)}
               </p>
               <p>
                 <span className="font-medium">Durata:</span> {booking.quantity}
@@ -306,6 +327,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               label="Conferma Prenotazione"
               action={() => handleStatusUpdate(BookingStatusEnum.CONFIRMED)}
             />
+
             <Button
               danger
               label="Rifiuta Prenotazione"
@@ -314,19 +336,24 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           </>
         )}
 
-        {isVigil && booking.status === BookingStatusEnum.CONFIRMED && (
-          <Button
-            role={RolesEnum.CONSUMER}
-            label="Completa Prenotazione"
-            action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
-          />
-        )}
+        {isVigil &&
+          booking.status === BookingStatusEnum.CONFIRMED &&
+          dateDiff(booking.endDate, currentDate) < 0 && (
+            <Button
+              role={RolesEnum.CONSUMER}
+              label="Completa Prenotazione"
+              action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
+            />
+          )}
 
-        {canCancel && (
+        {canCancel && dateDiff(booking.endDate, currentDate) > 0 && (
           <Button
             danger
             label="Annulla Prenotazione"
-            action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
+            action={async () => {
+              await handleStatusUpdate(BookingStatusEnum.CANCELLED);
+              router.push(`${Routes.homeConsumer.url}`);
+            }}
           />
         )}
 

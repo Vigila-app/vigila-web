@@ -1,22 +1,30 @@
+import { Button } from "@/components";
 import Card from "@/components/card/card";
+import { TextArea } from "@/components/form";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useUserStore } from "@/src/store/user/user.store";
+import { UserService } from "@/src/services";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
   AcademicCapIcon,
-  BookOpenIcon,
-  CheckBadgeIcon,
   EnvelopeIcon,
   HeartIcon,
-  LanguageIcon,
   MapPinIcon,
   PhoneIcon,
   TrophyIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ToastStatusEnum } from "@/src/enums/toast.enum";
+import { useAppStore } from "@/src/store/app/app.store";
 
 const PanoramicaTab = () => {
   const { vigils, getVigilsDetails } = useVigilStore();
-  const { user } = useUserStore();
+  const { bookings, getBookings } = useBookingsStore();
+  const { user, userDetails } = useUserStore();
+  const { showToast } = useAppStore();
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -27,19 +35,124 @@ const PanoramicaTab = () => {
 
   const vigil = vigils.find((v) => v.id === user?.id);
 
+  type ProfileFormI = {
+    information: string;
+  };
+  const {
+    control,
+    formState: { errors, isValid },
+    handleSubmit,
+    setError,
+    reset,
+  } = useForm<ProfileFormI>({
+    defaultValues: {
+      information: userDetails?.information || "",
+    },
+  });
+  useEffect(() => {
+    if (userDetails && isEditing) {
+      reset({
+        information: userDetails.information || "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userDetails, isEditing, reset]);
+
+  const onSubmit = async (formData: ProfileFormI) => {
+    if (isValid) {
+      try {
+        const { information } = formData;
+        if (
+          information !== userDetails?.information &&
+          information.length > 0
+        ) {
+          await UserService.updateUser({}, { information });
+          setIsEditing(false);
+          showToast({
+            message: "Profile updated successfully",
+            type: ToastStatusEnum.SUCCESS,
+          });
+        } else if (information === userDetails?.information) {
+          setError("information", {
+            type: "custom",
+            message: "Must insert different new info to update profile",
+          });
+        } else if (information.length === 0) {
+          setError("information", {
+            type: "custom",
+            message: "Must insert info to update profile",
+          });
+        }
+      } catch (err) {
+        console.error("Error updating user", err);
+        showToast({
+          message: "Sorry, something went wrong",
+          type: ToastStatusEnum.ERROR,
+        });
+      }
+    }
+  };
+
+  const completedBookings = bookings.filter((b) => b.status === "completed");
+  const numberCompletedBookings = completedBookings.length;
+
+  // parte da 0 e per ogni elemento di completedBookings somma il risultato di prezzo- vigila fee. Se .leght=0 allora reduce usa default 0
+  const totalEarnings = completedBookings.reduce(
+    (total, booking) => total + (booking.price - booking.fee),
+    0
+  );
+
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>
-        <h1 className="flex flex-row items-center gap-2 pb-2">
+        <h1 className="flex flex-row items-center gap-2 pb-3 relative">
           <HeartIcon className="size-6 text-red-600" />
           <span className="font-semibold text-lg">Chi sono</span>
+          <Button
+            label={isEditing ? "Annulla" : "Modifica"}
+            action={
+              isEditing ? () => setIsEditing(false) : () => setIsEditing(true)
+            }
+            small
+            role={RolesEnum.VIGIL}
+            customClass="absolute top-0 end-0"
+          />
         </h1>
 
-        <div>
-          <p className="font-medium leading-relaxed text-sm">
-            {vigil?.information}
-          </p>
-        </div>
+        {!isEditing ? (
+          <div>
+            <p className="font-medium leading-relaxed text-sm">
+              {userDetails?.information}
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="information"
+              control={control}
+              render={({ field }) => (
+                <TextArea
+                  type="text"
+                  aria-invalid={!!errors.information}
+                  error={errors.information}
+                  {...field}
+                  label=""
+                />
+              )}
+            />
+            {isEditing && (
+              <div className="flex gap-1.5 mt-3">
+                <Button
+                  type="submit"
+                  role={RolesEnum.CONSUMER}
+                  label="Salva"
+                  full
+                  customClass="mt-2"
+                />
+              </div>
+            )}
+          </form>
+        )}
       </Card>
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
@@ -59,23 +172,7 @@ const PanoramicaTab = () => {
           </span>
         </div>
       </Card>
-      <Card>
-        <div className="flex flex-row items-center gap-2 pb-2">
-          <BookOpenIcon className="size-6 text-vigil-orange" />
-          <h3 className="text-lg font-semibold">Interessi</h3>
-        </div>
-        <div className="flex flex-wrap gap-2 ">
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full">
-            Hard coded
-          </span>
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            Hard coded
-          </span>
-          <span className="bg-vigil-light-orange text-red-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            Hard coded
-          </span>
-        </div>
-      </Card>
+
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
           <TrophyIcon className="size-6 text-yellow-500" />
@@ -83,24 +180,28 @@ const PanoramicaTab = () => {
         </div>
         <div className="grid grid-cols-2 gap-4 text-center">
           <div>
-            <p className="text-2xl font-bold text-blue-600">TBD</p>
-            <p className="text-sm text-muted-foreground">servizi completati</p>
+            <p className="text-2xl font-bold text-consumer-blue">
+              {numberCompletedBookings}
+            </p>
+            <p className="text-sm font-medium">Servizi completati</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-600">TBD</p>
-            <p className="text-sm text-muted-foreground">guadagno totale</p>
+            <p className="text-2xl font-bold text-vigil-orange">
+              {totalEarnings}€
+            </p>
+            <p className="text-sm font-medium">Guadagno totale</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-consumer-blue">
               {vigil?.averageRating}
             </p>
-            <p className="text-sm text-muted-foreground">valutazione media</p>
+            <p className="text-sm font-medium">Valutazione media</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-vigil-orange">
               {vigil?.reviews?.length || "0"}
             </p>
-            <p className="text-sm text-muted-foreground">recensioni</p>
+            <p className="text-sm font-medium">Recensioni</p>
           </div>
         </div>
       </Card>
@@ -124,23 +225,6 @@ const PanoramicaTab = () => {
             <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-36 md:max-w-52">
               {vigil?.addresses?.map((a) => a.name)?.join(", ")}
             </span>
-          </div>
-        </div>
-      </Card>
-      <Card>
-        <div className="flex flex-row items-center gap-2 pb-2">
-          <LanguageIcon className="size-6 text-vigil-orange" />
-          <h3 className="text-lg font-semibold">Lingue</h3>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Italiano</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Inglese</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Francese</span>
           </div>
         </div>
       </Card>

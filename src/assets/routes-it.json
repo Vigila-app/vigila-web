@@ -361,7 +361,7 @@
       "mobile": true,
       "desktop": true,
       "header": false,
-      "footer": true
+      "footer": false
     },
     "private": false,
     "roles": []
@@ -374,13 +374,26 @@
       "mobile": true,
       "desktop": true,
       "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "customerCare": {
+    "url": "https://wa.me/393292130529?text=Salve%2C%20ho%20bisogno%20di%20assistenza%20cliente%21",
+    "label": "Servizio Clienti",
+    "title": "Servizio Clienti",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
       "footer": true
     },
     "private": false,
     "roles": []
   },
   "termsConditions": {
-    "url": "/terms-and-conditions",
+    "url": "/termini-e-condizioni",
     "label": "Termini & Condizioni",
     "title": "Termini & Condizioni",
     "menu": {

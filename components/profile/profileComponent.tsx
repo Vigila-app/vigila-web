@@ -6,7 +6,8 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQueryState } from "nuqs";
 import { TabI } from "@/components/tabGroup/tabGroup";
 import PanoramicaTab from "@/app/vigil/tabs/panoramica";
 import PrenotationTabs from "@/app/vigil/tabs/prenotazioni";
@@ -30,26 +31,38 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
+import clsx from "clsx";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
+  const [tab, setTab] = useQueryState("tab");
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
+  const { bookings } = useBookingsStore();
   const role = user?.user_metadata?.role as RolesEnum;
   const isConsumer = role === RolesEnum.CONSUMER;
   const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === user?.id);
 
+  const pendingBookings = bookings.filter((b) => b.status === "pending");
   const tabs: TabI[] = [
     {
       label: <UserIcon className="size-6" />,
       id: "panoramica",
-      active: true,
     },
     {
-      label: <CalendarDaysIcon className="size-6" />,
+      label: (
+        <CalendarDaysIcon
+          className={clsx(
+            "size-6",
+            pendingBookings.length > 0 && "text-red-500",
+            
+          )}
+        />
+      ),
       id: "prenotazioni",
     },
     ...(isVigil
@@ -79,21 +92,12 @@ const ProfileComponent = () => {
     },
   ];
 
-  // Add reviews tab for vigils
-  const getTabsForRole = (role: RolesEnum): TabI[] => {
-    const baseTabs = [...tabs];
+  const [selectedTab, setSelectedTab] = useState<TabI>(); //per avere tab attive
 
-    if (role === RolesEnum.VIGIL) {
-      baseTabs.splice(1, 0, {
-        label: "Recensioni",
-      });
-    }
-
-    return baseTabs;
-  };
-
-  const userTabs = getTabsForRole(role);
-  const [selectedTab, setSelectedTab] = useState<TabI>(userTabs[0]); //per avere tab attive
+  useEffect(() => {
+    setSelectedTab(tabs.find((t) => t.id === tab) || tabs[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   const formatRole = (role: string) => {
     if (!role) return "";
@@ -120,9 +124,9 @@ const ProfileComponent = () => {
       }
     } catch (error) {
       console.error(error);
-    } finally {
     }
   };
+
   if (isConsumer) {
     return (
       <div>
@@ -174,16 +178,19 @@ const ProfileComponent = () => {
               <div className="mt-2">
                 <TabGroup
                   role={role}
-                  tabs={tabs}
-                  onTabChange={(tab) => setSelectedTab(tab)}
+                  tabs={tabs.map((t) => ({
+                    ...t,
+                    active: t.id === tab,
+                  }))}
+                  onTabChange={(tab) => setTab(tab.id as string)}
                 />
-                {selectedTab.id === "panoramica" && <PanoramicaConsumerTab />}
-                {selectedTab.id === "prenotazioni" && (
+                {selectedTab?.id === "panoramica" && <PanoramicaConsumerTab />}
+                {selectedTab?.id === "prenotazioni" && (
                   <PrenotazioniConsumerTabs />
                 )}
-                {selectedTab.id === "famiglia" && <FamigliaTab />}
-                {selectedTab.id === "recensioni" && <RecensioniTab />}
-                {selectedTab.id === "informazioni" && (
+                {selectedTab?.id === "famiglia" && <FamigliaTab />}
+                {selectedTab?.id === "recensioni" && <RecensioniTab />}
+                {selectedTab?.id === "informazioni" && (
                   <InformazioniConsumerTab />
                 )}{" "}
               </div>
@@ -248,15 +255,18 @@ const ProfileComponent = () => {
             <div className="mt-2">
               <TabGroup
                 role={role}
-                tabs={tabs}
-                onTabChange={(tab) => setSelectedTab(tab)}
+                tabs={tabs.map((t) => ({
+                  ...t,
+                  active: t.id === tab,
+                }))}
+                onTabChange={(tab) => setTab(tab.id as string)}
               />
-              {selectedTab.id === "panoramica" && <PanoramicaTab />}
-              {selectedTab.id === "prenotazioni" && <PrenotationTabs />}
-              {selectedTab.id === "informazioni" && <InformazioniTab />}
+              {selectedTab?.id === "panoramica" && <PanoramicaTab />}
+              {selectedTab?.id === "prenotazioni" && <PrenotationTabs />}
+              {selectedTab?.id === "informazioni" && <InformazioniTab />}
               {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
-              {selectedTab.id === "servizi" && <ServiziTab />}
-              {selectedTab.id === "recensioni" && <RecensioniTab />}{" "}
+              {selectedTab?.id === "servizi" && <ServiziTab />}
+              {selectedTab?.id === "recensioni" && <RecensioniTab />}{" "}
             </div>
           </div>
         </div>

@@ -141,16 +141,19 @@ export const BookingUtils = {
         return true;
       }
 
-      if (userRole === RolesEnum.CONSUMER) {
+      if (
+        userRole === RolesEnum.CONSUMER &&
+        booking.status === BookingStatusEnum.CONFIRMED
+      ) {
         const now = new Date();
-        const startDate = new Date(booking.startDate);
-        const timeDifferenceMs = startDate.getTime() - now.getTime();
+        const endDate = new Date(booking.endDate);
+        const timeDifferenceMs = endDate.getTime() - now.getTime();
         const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
 
-        return timeDifferenceHours >= 48;
+        return timeDifferenceHours >= 24;
+      } else {
+        return true;
       }
-
-      return false;
     } catch (error) {
       console.error(
         "BookingUtils canCancelBooking error: Errore nel verificare la possibilità di cancellazione:",

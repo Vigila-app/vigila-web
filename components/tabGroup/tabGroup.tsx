@@ -20,12 +20,12 @@ type TabGroupI = {
 const TabGroup = (props: TabGroupI) => {
   const { align = "left", tabs = [], onTabChange = () => ({}), role } = props;
 
-  const [activeTab, setActiveTab] = useState(
-    tabs.find((tab) => tab.active) || tabs[0]
+  const [activeTab, setActiveTab] = useState<TabI | undefined>(
+    () => tabs.find((tab) => tab.active) || tabs[0]
   );
 
   useEffect(() => {
-    onTabChange(activeTab);
+    if (activeTab) onTabChange(activeTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -61,10 +61,12 @@ const TabGroup = (props: TabGroupI) => {
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-                "px-3 py-1 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500 focus:bg-white ",
-                activeTab.label === tab.label && role === RolesEnum.CONSUMER
-                  ? " focus-within:text-consumer-blue"
-                  : "focus-within:text-vigil-orange   "
+                "px-3 py-1 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500",
+                activeTab?.id === tab.id
+                  ? role === RolesEnum.CONSUMER
+                    ? "!text-consumer-blue bg-white"
+                    : "!text-vigil-orange bg-white"
+                  : null
               )}>
               {tab.label}
             </button>
@@ -73,15 +75,15 @@ const TabGroup = (props: TabGroupI) => {
       </div>
 
       <div className="hidden sm:block">
-        <div className="border-b border-gray-200">
+        <div >
           <nav
             className={clsx(
               " px-6 flex gap-6",
               align === "center"
                 ? "justify-center"
                 : align === "left"
-                ? "justify-start"
-                : "justify-end"
+                  ? "justify-start"
+                  : "justify-end"
             )}>
             {tabs.map((tab) =>
               tab.url ? (
@@ -90,10 +92,13 @@ const TabGroup = (props: TabGroupI) => {
                   href={tab.url}
                   className={clsx(
                     "shrink-0 p-3 border font-medium text-sm transition",
-                    activeTab.label === tab.label
-                      ? "rounded-t-2xl   bg-white text-primary-600"
-                      : "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
-                    "hover:rounded-t-lg hover:border-gray-200"
+                    activeTab?.id === tab.id
+                      ? role === RolesEnum.CONSUMER
+                        ? "rounded-2xl bg-white !text-consumer-blue"
+                        : "rounded-2xl bg-white !text-vigil-orange"
+                      : null,
+                    "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
+                    "hover:rounded-lg hover:border-gray-200"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
@@ -104,10 +109,9 @@ const TabGroup = (props: TabGroupI) => {
                 <span
                   key={tab.id}
                   className={clsx(
-                    "cursor-pointer shrink-0 p-3 border font-medium text-sm transition",
-                    activeTab.label === tab.label
-                      ? "rounded-t-lg  border-b-white text-primary-600"
-                      : "border-transparent text-gray-500 hover:text-black"
+                    "cursor-pointer shrink-0 p-3 border rounded-3xl whitespace-nowrap font-medium text-sm text-black transition",
+                    activeTab?.id === tab.id &&
+                      "border-transparent bg-pureWhite hover:consumer-blue"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
