@@ -14,6 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import VigilRedirectHandler from "./vigil-redirect-handler.component";
+import CommonScript from "@/components/@core/commonScript/common-script.component";
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
@@ -53,6 +54,11 @@ export default function RootLayout({
 }) {
   return (
     <HtmlDocument
+      otherHead={
+        <>
+          <CommonScript />
+        </>
+      }
       otherBody={
         <>
           <PermitGuardComponent />
