@@ -1,6 +1,6 @@
 {
     "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-    "theme_color": "#22c55e",
+    "theme_color": "#FDFDFD",
     "background_color": "#FDFDFD",
     "display": "standalone",
     "scope": "/",
