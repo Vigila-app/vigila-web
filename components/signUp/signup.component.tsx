@@ -24,7 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import dynamic from "next/dynamic";
 import useAltcha from "@/src/hooks/useAltcha";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AltchaService } from "@/src/services/altcha.service";
 import clsx from "clsx";
 
@@ -58,6 +58,7 @@ const SignupComponent = (props: SignupComponentI) => {
   } = useAppStore();
   const router = useRouter();
   const { challenge, isVerified, onStateChange } = useAltcha();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     control,
     formState: { errors, isValid },
@@ -259,13 +260,20 @@ const SignupComponent = (props: SignupComponentI) => {
               {...field}
               label="Password"
               placeholder="Inserisci password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.password}
               error={errors.password}
-              icon={<EyeIcon className="size-4 text-gray-500" />}
+              icon={
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                >
+                  <EyeIcon className="size-4 text-gray-500" />
+                </button>
+              }
             />
           )}
         />
@@ -278,13 +286,20 @@ const SignupComponent = (props: SignupComponentI) => {
               {...field}
               label="Conferma password"
               placeholder="Re-inserisci password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               role={role}
               autoComplete="new-password"
               aria-invalid={!!errors.confirmPassword}
               error={errors.confirmPassword}
-              icon={<EyeIcon className="size-4 text-gray-500" />}
+              icon={
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                >
+                  <EyeIcon className="size-4 text-gray-500" />
+                </button>
+              }
             />
           )}
         />
@@ -318,9 +333,10 @@ const SignupComponent = (props: SignupComponentI) => {
           ) : null
         )}
 
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500 mt-2">
-            Creando un account accetti i nostri&nbsp;
+            L&apos;Utente dichiara di avere preso visione e di accettare
+            integralmente le disposizioni di cui ai&nbsp;
             <Link
               href={Routes.termsConditions.url}
               target="blank"
@@ -333,7 +349,10 @@ const SignupComponent = (props: SignupComponentI) => {
             >
               Termini e Condizioni
             </Link>
-            &nbsp;e la&nbsp;
+            .
+            <br />
+            <br />
+            L&apos;Utente dichiara di avere preso visione delle&nbsp;
             <Link
               href={Routes.privacyPolicy.url}
               target="blank"
@@ -346,9 +365,10 @@ const SignupComponent = (props: SignupComponentI) => {
             >
               Privacy Policy
             </Link>
-            .
+            &nbsp;e di acconsentire al trattamento dei propri dati personali,
+            conformemente a quanto previsto nella stessa informativa.
           </p>
-        </div>
+        </div> */}
 
         <div>
           <Button

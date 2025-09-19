@@ -176,6 +176,7 @@ const PanoramicaTab = () => {
 
           <h3 className="text-lg font-semibold ">Competenze</h3>
         </div>
+        {/* TODO da sistemare
         <div className="flex flex-wrap gap-2">
           <span className="bg-consumer-light-blue text-blue-900 text-sm font-medium px-2.5 py-0.5 rounded-full">
             Hard coded
@@ -186,7 +187,7 @@ const PanoramicaTab = () => {
           <span className="bg-consumer-light-blue text-blue-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
             hard coded
           </span>
-        </div>
+        </div> */}
       </Card>
 
       <Card>

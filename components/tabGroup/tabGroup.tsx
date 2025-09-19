@@ -21,11 +21,9 @@ type TabGroupI = {
 const TabGroup = (props: TabGroupI) => {
   const { align = "left", tabs = [], onTabChange = () => ({}), role } = props;
 
-  const [activeTab, setActiveTab] = useState<TabI | undefined>();
-
-  useEffect(() => {
-    setActiveTab(tabs.find((tab) => tab.active));
-  }, [tabs]);
+  const [activeTab, setActiveTab] = useState<TabI | undefined>(
+    () => tabs.find((tab) => tab.active) || tabs[0]
+  );
 
   useEffect(() => {
     if (activeTab) onTabChange(activeTab);
@@ -78,7 +76,7 @@ const TabGroup = (props: TabGroupI) => {
       </div>
 
       <div className="hidden sm:block">
-        <div className="border-b border-gray-200">
+        <div >
           <nav
             className={clsx(
               " px-6 flex gap-6",
@@ -97,11 +95,11 @@ const TabGroup = (props: TabGroupI) => {
                     "shrink-0 p-3 border font-medium text-sm transition",
                     activeTab?.id === tab.id
                       ? role === RolesEnum.CONSUMER
-                        ? "rounded-t-2xl bg-white !text-consumer-blue"
-                        : "rounded-t-2xl bg-white !text-vigil-orange"
+                        ? "rounded-2xl bg-white !text-consumer-blue"
+                        : "rounded-2xl bg-white !text-vigil-orange"
                       : null,
                     "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
-                    "hover:rounded-t-lg hover:border-gray-200"
+                    "hover:rounded-lg hover:border-gray-200"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
@@ -112,12 +110,9 @@ const TabGroup = (props: TabGroupI) => {
                 <span
                   key={tab.id}
                   className={clsx(
-                    "cursor-pointer shrink-0 p-3 border font-medium text-sm transition",
-                    activeTab?.id === tab.id
-                      ? role === RolesEnum.CONSUMER
-                        ? "rounded-t-lg  border-b-white !text-consumer-blue"
-                        : "rounded-t-lg  border-b-white !text-vigil-orange"
-                      : "border-transparent text-gray-500 hover:text-black"
+                    "cursor-pointer shrink-0 p-3 border rounded-3xl whitespace-nowrap font-medium text-sm text-black transition",
+                    activeTab?.id === tab.id &&
+                      "border-transparent bg-pureWhite hover:consumer-blue"
                   )}
                   onClick={() => {
                     setActiveTab(tab);

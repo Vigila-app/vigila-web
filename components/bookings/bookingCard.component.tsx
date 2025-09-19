@@ -147,21 +147,18 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   return (
     <Link
       href={BookingUtils.getBookingDetailsUrl(booking.id)}
-      className="no-underline"
-    >
+      className="no-underline">
       <Card>
         <div
           className={clsx(
             isVigil && "flex flex-col gap-1",
             isConsumer && "flex gap-1 "
-          )}
-        >
+          )}>
           <div
             className={clsx(
               isVigil && "flex items-start gap-2",
               isConsumer && "inline-flex items-center flex-nowrap gap-2"
-            )}
-          >
+            )}>
             <Avatar
               size="big"
               userId={getUserInfo()?.id}
@@ -239,18 +236,34 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
               </span>
               <Badge
                 label={
-                  booking?.payment_status === PaymentStatusEnum.PAID
+                  [
+                    BookingStatusEnum.CANCELLED,
+                    BookingStatusEnum.REFUNDED,
+                    BookingStatusEnum.COMPLETED,
+                  ].includes(booking.status as BookingStatusEnum)
                     ? BookingUtils.getStatusText(
                         booking.status as BookingStatusEnum
                       )
-                    : "Da pagare"
+                    : booking.payment_status === PaymentStatusEnum.PAID
+                      ? BookingUtils.getStatusText(
+                          booking.status as BookingStatusEnum
+                        )
+                      : "Da pagare"
                 }
                 color={
-                  booking?.payment_status === PaymentStatusEnum.PAID
+                  [
+                    BookingStatusEnum.CANCELLED,
+                    BookingStatusEnum.REFUNDED,
+                    BookingStatusEnum.COMPLETED,
+                  ].includes(booking.status as BookingStatusEnum)
                     ? BookingUtils.getStatusColor(
                         booking.status as BookingStatusEnum
                       )
-                    : "yellow"
+                    : booking.payment_status === PaymentStatusEnum.PAID
+                      ? BookingUtils.getStatusColor(
+                          booking.status as BookingStatusEnum
+                        )
+                      : "yellow"
                 }
               />
             </div>
