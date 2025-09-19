@@ -9,4 +9,5 @@ export const AppConstants = {
     : "https://todo-define-url.vercel.app",
   defaultUserRole: RolesEnum.CONSUMER,
   defaultUserLevel: AccessLevelsEnum.BASE,
+  cs_id: process.env.NEXT_PUBLIC_CONTENTSQUARE_ID,
 };
