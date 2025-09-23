@@ -231,7 +231,7 @@ const PanoramicaTab = () => {
         <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <EnvelopeIcon className="size-4" />
-            <span>{vigil?.email}</span>
+            <span>{isConsumer ? vigil?.email : userDetails?.email}</span>
           </div>
           <div className="flex items-center gap-2">
             <PhoneIcon className="size-4" />
