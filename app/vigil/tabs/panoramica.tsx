@@ -154,25 +154,7 @@ const PanoramicaTab = () => {
           </form>
         )}
       </Card>
-      <Card>
-        <div className="flex flex-row items-center gap-2 pb-2">
-          <AcademicCapIcon className="size-6 text-consumer-blue" />
-
-          <h3 className="text-lg font-semibold ">Competenze</h3>
-        </div>
-        {/* TODO da sistemare
-        <div className="flex flex-wrap gap-2">
-          <span className="bg-consumer-light-blue text-blue-900 text-sm font-medium px-2.5 py-0.5 rounded-full">
-            Hard coded
-          </span>
-          <span className="bg-consumer-light-blue text-blue-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            Hard coded
-          </span>
-          <span className="bg-consumer-light-blue text-blue-900 text-sm font-medium px-2.5 py-0.5 rounded-full ">
-            hard coded
-          </span>
-        </div> */}
-      </Card>
+      
 
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
