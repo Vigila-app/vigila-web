@@ -228,15 +228,15 @@ const PanoramicaTab = () => {
 
           <h3 className="text-lg font-semibold">Contatti</h3>
         </div>
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
+       <div className="space-y-2 text-sm text-muted-foreground">
+         {isVigil && (<div className="flex items-center gap-2">
             <EnvelopeIcon className="size-4" />
-            <span>{isConsumer ? vigil?.email : userDetails?.email}</span>
-          </div>
-          <div className="flex items-center gap-2">
+            <span>{userDetails?.email}</span>
+          </div>)}
+          {isVigil &&(<div className="flex items-center gap-2">
             <PhoneIcon className="size-4" />
             <span>{vigil?.phone}</span>
-          </div>
+          </div>)}
           <div className="flex items-center gap-2">
             <MapPinIcon className="size-4" />
             <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-36 md:max-w-52">
