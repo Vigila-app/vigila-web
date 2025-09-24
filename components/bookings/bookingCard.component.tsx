@@ -14,9 +14,9 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
 import { useEffect, useMemo, useState } from "react";
 import { Avatar, Badge, Button, ButtonLink, Card } from "@/components";
-import { amountDisplay } from "@/src/utils/common.utils";
+import { amountDisplay} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
-import Orologio from "@/components/svg/Orologio";
+
 import {
   CalendarIcon,
   ClockIcon,
@@ -147,17 +147,17 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   return (
     <Link
       href={BookingUtils.getBookingDetailsUrl(booking.id)}
-      className="no-underline">
-      <Card>
+      className="no-underline w-full flex justify-center">
+      <Card customClass=" w-full max-w-4xl " >
         <div
           className={clsx(
-            isVigil && "flex flex-col gap-1",
-            isConsumer && "flex gap-1 "
+            isVigil && "flex flex-col gap-1 ",
+            isConsumer && "flex gap-1 w-full   "
           )}>
           <div
             className={clsx(
-              isVigil && "flex items-start gap-2",
-              isConsumer && "inline-flex items-center flex-nowrap gap-2"
+              isVigil && "flex items-start gap-2 ",
+              isConsumer && "inline-flex items-center flex-nowrap  gap-2 "
             )}>
             <Avatar
               size="big"
@@ -179,11 +179,11 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           {/* presente in entrambe servizio nome e price servizio*/}
           {isVigil && (
             <div className="flex justify-between">
-              <p className="font-semibold text-[12px] text-consumer-blue">
+              <p className="font-semibold text-sm text-consumer-blue">
                 {service?.name}
               </p>
-              <p className="font-semibold text-[12px] text-vigil-orange">
-                {booking?.price}
+              <p className="font-semibold text-[16px] text-vigil-orange">
+                {BookingUtils.calculateAmountVigil(booking)}
                 {service?.currency}
               </p>
             </div>
@@ -197,7 +197,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
               <p className="font-semibold items-center text-[12px] text-consumer-blue">
                 {service?.name}
               </p>
-              <div className="flex gap-2 text-[10px] font-normal text-gray-600">
+              <div className="flex gap-2 text-sm font-normal text-gray-600">
                 <span className="inline-flex items-center justify-center gap-1">
                   <CalendarIcon className="size-4" />
                   <span>{dateDisplay(booking.startDate, "date")}</span>
@@ -213,7 +213,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
 
           {isVigil && (
             <div>
-              <div className="flex gap-4 text-[10px] font-normal text-gray-600">
+              <div className="flex gap-4 text-sm font-normal text-gray-600">
                 <span className="inline-flex items-center justify-center gap-1">
                   <CalendarIcon className="w-4 h-4" />
                   <span>{dateDisplay(booking.startDate, "date")}</span>

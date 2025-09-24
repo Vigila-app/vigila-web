@@ -175,7 +175,7 @@ const ProfileComponent = () => {
                   </section>
                 </div>
               </div>
-              <div className="mt-2">
+              <div className="mt-2 w-full">
                 <TabGroup
                   role={role}
                   tabs={tabs.map((t) => ({
@@ -252,7 +252,7 @@ const ProfileComponent = () => {
                 </section>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 w-full">
               <TabGroup
                 role={role}
                 tabs={tabs.map((t) => ({

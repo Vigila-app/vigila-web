@@ -12,11 +12,11 @@ export default function TabCompletati() {
   }, []);
 
   return (
-    <div className="w-full">
-      <h1 className="py-3 text-[18px] font-semibold">
+    <div className=" flex flex-col items-center w-full max-h-[480px] sm:max-h-full">
+      <h1 className="py-3 w-full text-[18px] font-semibold text-start">
         Prenotazioni completate
       </h1>
-      <div className=" flex flex-col gap-4 items-center">
+      <div className=" flex flex-col gap-4 items-center w-full overflow-y-auto">
         {completedBookings?.length ? (
           completedBookings.map((booking) => (
             <BookingCardComponent key={booking.id} bookingId={booking.id} />
