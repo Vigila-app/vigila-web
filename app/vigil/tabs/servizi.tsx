@@ -15,7 +15,7 @@ import { useParams } from "next/navigation";
 
 const ServiziTab = () => {
   const params = useParams();
-  const vigilIdFromParams = params?.vigilId;
+  const vigilIdFromParams = params?.vigilId as string | undefined;
   const { user } = useUserStore();
   const vigilId =
     user?.user_metadata?.role === RolesEnum.VIGIL
@@ -36,7 +36,9 @@ const ServiziTab = () => {
   const reloadServices = (fullReload = true) => {
     if (vigilId) getServices(true, vigilId, { active: fullReload && "*" });
   };
-
+  const personalServices = services.filter(
+    (service) => service.vigil_id === vigilId
+  );
   useEffect(() => {
     reloadServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,7 +115,7 @@ const ServiziTab = () => {
         <div className="py-4">
           <h2 className="font-semibold text-2xl mb-6">I tuoi servizi</h2>
           <ul className="space-y-4">
-            {services.map((service, i) => (
+            {(isVigil ? services : personalServices).map((service, i) => (
               <li key={service.id}>
                 <ServiceCard
                   service={service}

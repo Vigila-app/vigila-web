@@ -27,7 +27,7 @@ const PanoramicaTab = () => {
   const { showToast } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const params = useParams();
-  const vigilIdFromParams = params?.vigilId;
+  const vigilIdFromParams = params?.vigilId as string | undefined;
   const vigilId =
     user?.user_metadata?.role === RolesEnum.VIGIL
       ? user?.id
@@ -44,10 +44,6 @@ const PanoramicaTab = () => {
   }, [vigilId]);
 
   const vigil = vigils.find((v) => v.id === vigilId);
-
-  console.log("params:", params);
-  console.log("Vigil in panoramica:", vigil);
-  console.log("User:", userDetails);
 
   type ProfileFormI = {
     information: string;
@@ -196,18 +192,22 @@ const PanoramicaTab = () => {
           <h3 className="text-lg font-semibold">Le mie statistiche</h3>
         </div>
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div>
-            <p className="text-2xl font-bold text-consumer-blue">
-              {numberCompletedBookings}
-            </p>
-            <p className="text-sm font-medium">Servizi completati</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-vigil-orange">
-              {totalEarnings}€
-            </p>
-            <p className="text-sm font-medium">Guadagno totale</p>
-          </div>
+          {isVigil && (
+            <div>
+              <p className="text-2xl font-bold text-consumer-blue">
+                {numberCompletedBookings}
+              </p>
+              <p className="text-sm font-medium">Servizi completati</p>
+            </div>
+          )}
+          {isVigil && (
+            <div>
+              <p className="text-2xl font-bold text-vigil-orange">
+                {totalEarnings}€
+              </p>
+              <p className="text-sm font-medium">Guadagno totale</p>
+            </div>
+          )}
           <div>
             <p className="text-2xl font-bold text-consumer-blue">
               {vigil?.averageRating}
@@ -228,15 +228,19 @@ const PanoramicaTab = () => {
 
           <h3 className="text-lg font-semibold">Contatti</h3>
         </div>
-       <div className="space-y-2 text-sm text-muted-foreground">
-         {isVigil && (<div className="flex items-center gap-2">
-            <EnvelopeIcon className="size-4" />
-            <span>{userDetails?.email}</span>
-          </div>)}
-          {isVigil &&(<div className="flex items-center gap-2">
-            <PhoneIcon className="size-4" />
-            <span>{vigil?.phone}</span>
-          </div>)}
+        <div className="space-y-2 text-sm text-muted-foreground">
+          {isVigil && (
+            <div className="flex items-center gap-2">
+              <EnvelopeIcon className="size-4" />
+              <span>{userDetails?.email}</span>
+            </div>
+          )}
+          {isVigil && (
+            <div className="flex items-center gap-2">
+              <PhoneIcon className="size-4" />
+              <span>{vigil?.phone}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <MapPinIcon className="size-4" />
             <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-36 md:max-w-52">
