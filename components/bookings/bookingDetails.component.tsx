@@ -341,7 +341,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           dateDiff(booking.endDate, currentDate) < 0 && (
             <div className="flex flex-col items-center gap-3">
               <h3 className=" font font-medium">Completamento:</h3>
-              <p className="text-sm">Ricorda di completare solo dopo che il servizio è stato erogato correttamente; altrimenti contatta l'assistenza clienti!</p>
+              <p className="text-sm">Ricorda di completare solo dopo che il servizio è stato erogato correttamente; altrimenti contatta l&apos;assistenza clienti!</p>
               <Button
                 role={RolesEnum.CONSUMER}
                 label="Completa Prenotazione"
