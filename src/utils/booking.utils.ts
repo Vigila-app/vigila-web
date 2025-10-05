@@ -137,6 +137,12 @@ export const BookingUtils = {
         return false;
       }
 
+      if (
+        userRole === RolesEnum.VIGIL &&
+        booking.status === BookingStatusEnum.PENDING
+      ) {
+        return false;
+      }
       if (userRole === RolesEnum.VIGIL) {
         return true;
       }
