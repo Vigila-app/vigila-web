@@ -270,8 +270,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           )}
 
           {isVigil && booking?.note && (
-            <div className="bg-gray-100 p-3 rounded-2xl">
-              <p className="text-[10px] ">{booking.note}</p>
+            <div className="bg-gray-100 p-3 rounded-2xl w-full">
+              <p className="text-[10px] whitespace-normal break-words">{booking.note}</p>
             </div>
           )}
           {isVigil && (
