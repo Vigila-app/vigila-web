@@ -270,28 +270,31 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           )}
 
           {isVigil && booking?.note && (
-            <div className="bg-gray-100 p-3 rounded-2xl">
-              <p className="text-[10px] ">{booking.note}</p>
+            <div className="bg-gray-100 p-3 rounded-2xl w-full">
+              <p className="text-[10px] whitespace-normal break-words">{booking.note}</p>
             </div>
           )}
           {isVigil && (
             <div className="flex justify-center gap-3 mt-2">
               {booking?.status === BookingStatusEnum.PENDING && (
                 <>
-                  <Button
+                  <ButtonLink
                     customClass="!px-6 !py-2"
                     role={RolesEnum.CONSUMER}
                     label="Accetta"
-                    action={() =>
-                      handleStatusUpdate(BookingStatusEnum.CONFIRMED)
-                    }
+                    // action={() =>
+                    //   handleStatusUpdate(BookingStatusEnum.CONFIRMED)
+                    // }
+                    href={BookingUtils.getBookingDetailsUrl(booking.id)}
+                    
                   />
-                  <Button
+                  <ButtonLink
                     customClass="!px-6 !py-2"
                     role={RolesEnum.VIGIL}
-                    action={() =>
-                      handleStatusUpdate(BookingStatusEnum.CANCELLED)
-                    }
+                    // action={() =>
+                    //   handleStatusUpdate(BookingStatusEnum.CANCELLED)
+                    // }
+                    href={BookingUtils.getBookingDetailsUrl(booking.id)}
                     label="Rifiuta"
                   />
                 </>

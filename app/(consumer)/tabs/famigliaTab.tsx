@@ -45,39 +45,46 @@ export default function FamigliaTab() {
   };
 
   return (
-    <Card full>
-      <div className="flex flex-col gap-2 mb-1 px-4">
-        <div className="flex justify-start items-start">
-          <div className="flex gap-2">
-            <Avatar size="big" value={consumer?.lovedOneName} />
-            <div className="flex flex-col justify-center gap-1 flex-1">
-              <p className="font-semibold text-[16px] text-gray-800">
-                {consumer?.lovedOneName}
-              </p>
-              <div className="flex items-center gap-3">
-                <p className="text-sm text-gray-600">{consumer?.lovedOneAge}&nbsp;anni</p>
-                <p className="text-sm text-gray-600">{relationship}</p>
+    <div className=" flex flex-col items-center w-full max-h-[480px] sm:max-h-full">
+      <h1 className="py-3 w-full text-[18px] font-semibold text-start">
+        Famiglia
+      </h1>
+      <Card full>
+        <div className="flex flex-col gap-2 mb-1 px-4">
+          <div className="flex justify-start items-start">
+            <div className="flex gap-2">
+              <Avatar size="big" value={consumer?.lovedOneName} />
+              <div className="flex flex-col justify-center gap-1 flex-1">
+                <p className="font-semibold text-[16px] text-gray-800">
+                  {consumer?.lovedOneName}
+                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-gray-600">
+                    {consumer?.lovedOneAge}&nbsp;anni
+                  </p>
+                  <p className="text-sm text-gray-600">{relationship}</p>
+                </div>
               </div>
             </div>
-          </div>
-          {/*To DO struttura familiare a più lovedOne */}
-          {/* <Button
+            {/*To DO struttura familiare a più lovedOne */}
+            {/* <Button
             label={<Cestino />}
             className="flex items-center justify-center"
             action={handleCancelFamily}
           />
           */}
-        </div>
-
-        {consumer?.address?.name && (
-          <div className="flex items-center gap-2 text-xs">
-            <MapPinIcon className="w-6 h-6 text-vigil-orange" />
-            <span className="text-gray-700">
-              {consumer?.address?.display_name}
-            </span>
           </div>
-        )}
-      </div>
-    </Card>
+
+          {consumer?.address?.name && (
+            <div className="flex items-center gap-2 text-xs">
+              <MapPinIcon className="w-6 h-6 text-vigil-orange" />
+              <span className="text-gray-700">
+                {consumer?.address?.display_name}
+              </span>
+            </div>
+          )}
+        </div>
+      </Card>
+    </div>
   );
 }

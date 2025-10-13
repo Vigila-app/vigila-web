@@ -77,6 +77,7 @@ const PrenotationTabs = () => {
         <TabGroup
           role={role}
           tabs={tabs}
+          align="center"
           onTabChange={(tab) => setSelectedTab(tab)}
         />
       </div>

@@ -255,6 +255,7 @@ const ProfileComponent = () => {
             <div className="mt-2 w-full">
               <TabGroup
                 role={role}
+                align="center"
                 tabs={tabs.map((t) => ({
                   ...t,
                   active: t.id === tab,
