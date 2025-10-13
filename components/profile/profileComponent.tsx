@@ -131,7 +131,7 @@ const ProfileComponent = () => {
     return (
       <div>
         <div className="max-w-7xl mx-auto">
-          <div className="rounded-lg h-screen bg-background-default shadow-sm py-4 px-6 mb-3">
+          <div className="rounded-lg min-h-screen bg-background-default shadow-sm py-4 px-6 mb-3">
             <div className="flex flex-col items-center justify-between pt-5 bg-gray-100 rounded-2xl">
               <div className="flex w-full flex-col items-center rounded-2xl border-2 bg-white p-5 gap-2 border-consumer-blue/60">
                 <div className="flex items-center justify-center">

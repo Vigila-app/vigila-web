@@ -107,8 +107,8 @@ const vigilProfile = () => {
                 </section>
               </div>
             </div>
-            <div className="mt-2">
-              <TabGroup
+            <div className="mt-2 w-full">
+              <TabGroup 
                 role={role}
                 tabs={tabs.map((t) => ({
                   ...t,
