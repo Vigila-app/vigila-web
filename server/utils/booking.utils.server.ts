@@ -2,13 +2,12 @@ import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { isServer } from "@/src/utils/common.utils";
 import { EmailService } from "@/server/email.service";
 import { BookingI } from "@/src/types/booking.types";
-import { ConsumerDetailsType } from "@/src/types/consumer.types";
-import { VigilDetailsType } from "@/src/types/vigil.types";
+import { User } from "@supabase/supabase-js";
 
 export const BookingUtilsServer = {
   sendConsumerBookingStatusUpdateNotification: async (
     booking: BookingI,
-    consumer: ConsumerDetailsType
+    consumer: User
   ) => {
     try {
       if (!isServer) {
@@ -76,7 +75,7 @@ export const BookingUtilsServer = {
   },
   sendVigilBookingStatusUpdateNotification: async (
     booking: BookingI,
-    vigil: VigilDetailsType
+    vigil: User
   ) => {
     try {
       if (!isServer) {
