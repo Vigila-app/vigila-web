@@ -245,13 +245,23 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 &nbsp;
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
-              <p>
-                <span className="font-medium">Prezzo Totale:</span>&nbsp;
-                {amountDisplay(
-                  booking.price,
-                  booking.service?.currency as CurrencyEnum
-                )}
-              </p>
+              {isVigil && (
+                <p>
+                  <span className="font-medium">Prezzo del servizio:</span>
+                  &nbsp;
+                  {BookingUtils.calculateAmountVigil(booking)}
+                  {service?.currency}
+                </p>
+              )}
+              {!isVigil && (
+                <p>
+                  <span className="font-medium">Prezzo del servizio:</span>
+                  {amountDisplay(
+                    booking.price,
+                    booking.service?.currency as CurrencyEnum
+                  )}
+                </p>
+              )}
               <p>
                 <span className="font-medium">Stato del pagamento:</span>&nbsp;
                 <Badge

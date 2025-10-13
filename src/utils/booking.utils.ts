@@ -95,6 +95,10 @@ export const BookingUtils = {
     return booking.price.toFixed(2);
   },
 
+  calculateAmountVigil: (booking: BookingI): string => {
+    return (booking.price - booking.fee).toFixed(0)
+  },
+
   handleStatusUpdate: async (
     booking: BookingI,
     newStatus: BookingStatusEnum

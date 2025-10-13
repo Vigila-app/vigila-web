@@ -12,9 +12,9 @@ export default function TabInattesa() {
   }, []);
 
   return (
-    <div>
-      <h1 className="py-3 text-[18px] font-semibold">Richieste in arrivo</h1>
-      <div className="flex flex-col gap-4 items-center">
+    <div className=" flex flex-col items-center w-full max-h-[480px] sm:max-h-full">
+      <h1 className="py-3 w-full text-[18px] font-semibold text-start">Richieste in arrivo</h1>
+      <div className=" flex flex-col gap-4 items-center w-full overflow-y-auto">
         {pendingBookings?.length ? (
           pendingBookings.map((booking) => (
             <BookingCardComponent key={booking.id} bookingId={booking.id} />
