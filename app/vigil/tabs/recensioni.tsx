@@ -35,17 +35,9 @@ export default function RecensioniTab({
   }, [vigilId]);
 
   return (
-    <div className="space-y-4  mt-6 py-2.5 ">
-      <h2 className="font-semibold text-2xl mb-6 ">Recensioni recenti</h2>
-      {/* {role === RolesEnum.VIGIL &&
-      user?.id &&
-      vigilStats[user.id]?.average_rating ? (
-        <Card>
-          <p>Valutazione Media {vigilStats[user.id].average_rating}</p>
-        </Card>
-      ) : null} */}
-
-      <div className="flex flex-col gap-4 items-center justify-center">
+    <div className="flex flex-col items-center justify-center w-full max-h-[480px] sm:max-h-full ">
+      <h1 className="py-3 text-[18px] text-start w-full font-semibold">Le tue Recensioni</h1>
+      <div className="flex flex-col items-center gap-4 w-full overflow-y-scroll ">
         {reviews.length ? (
           reviews.map((review) => (
             <ReviewCard

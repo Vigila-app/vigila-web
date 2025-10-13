@@ -103,7 +103,7 @@ const InformazioniConsumerTab = () => {
     }
   };
   return (
-    <div className="grid lg:grid-cols-2 gap-4 w-full">
+    <div className="grid lg:grid-cols-2 gap-4 w-full py-4">
       <Card>
         <div>
           <div className="font-semibold ">Informazioni personali</div>
