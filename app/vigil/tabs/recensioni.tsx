@@ -37,7 +37,7 @@ export default function RecensioniTab({
   return (
     <div className="flex flex-col items-center justify-center w-full max-h-[480px] sm:max-h-full ">
       <h1 className="py-3 text-[18px] text-start w-full font-semibold">Le tue Recensioni</h1>
-      <div className="flex flex-col items-center gap-4 w-full overflow-y-scroll ">
+      <div className="flex flex-col items-center gap-4 w-full overflow-y-scroll hide-scrollbar">
         {reviews.length ? (
           reviews.map((review) => (
             <ReviewCard
