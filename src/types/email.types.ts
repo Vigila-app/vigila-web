@@ -28,8 +28,8 @@ export interface BookingConfirmationEmailDataI {
   customerName: string;
   bookingId: string;
   serviceName: string;
-  bookingDate: string;
-  bookingTime: string;
+  bookingDate: string | Date;
+  bookingTime: string | Date;
   vigilName?: string;
   location: string;
   totalAmount: string;

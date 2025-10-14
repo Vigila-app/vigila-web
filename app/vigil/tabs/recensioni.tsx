@@ -43,6 +43,11 @@ export default function RecensioniTab({
     } else {
       getReviews(true);
     }
+    if (vigilId) {
+      getReviewsByVigil(vigilId, true);
+    } else {
+      getReviews(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId]);
 
@@ -117,6 +122,7 @@ export default function RecensioniTab({
               currentUser={user}
               isEditable={true}
               showEditInline={true}
+              simplified={simplified}
               simplified={simplified}
             />
           ))

@@ -11,18 +11,12 @@ import { TabI } from "@/components/tabGroup/tabGroup";
 import { BriefcaseIcon, StarIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useQueryState } from "nuqs";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
-import { useAppStore } from "@/src/store/app/app.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { useUserStore } from "@/src/store/user/user.store";
-import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useParams } from "next/navigation";
 
-const vigilProfile = () => {
-  const { user, forceUpdate: forceUserUpdate } = useUserStore();
+const VigilProfile = () => {
   const [tab, setTab] = useQueryState("tab");
-  const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
-  const { showToast } = useAppStore();
   const params = useParams();
   const vigilId = params?.vigilId as string;
   const role = RolesEnum.VIGIL;
@@ -72,7 +66,7 @@ const vigilProfile = () => {
               </div>
               <div className="flex-1">
                 <section className="flex flex-col items-center gap-2 ">
-                  <h1 className="text-3xl font-boldtext-center">
+                  <h1 className="text-3xl font-bold text-center">
                     {vigil?.displayName}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
@@ -107,8 +101,8 @@ const vigilProfile = () => {
                 </section>
               </div>
             </div>
-            <div className="mt-2">
-              <TabGroup
+            <div className="mt-2 w-full">
+              <TabGroup 
                 role={role}
                 tabs={tabs.map((t) => ({
                   ...t,
@@ -128,4 +122,4 @@ const vigilProfile = () => {
     </div>
   );
 };
-export default vigilProfile;
+export default VigilProfile;

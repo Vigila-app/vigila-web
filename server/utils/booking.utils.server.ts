@@ -1,14 +1,15 @@
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
-import { isServer } from "@/src/utils/common.utils";
+import { isServer, amountDisplay } from "@/src/utils/common.utils";
+import { dateDisplay } from "@/src/utils/date.utils";
 import { EmailService } from "@/server/email.service";
 import { BookingI } from "@/src/types/booking.types";
-import { ConsumerDetailsType } from "@/src/types/consumer.types";
-import { VigilDetailsType } from "@/src/types/vigil.types";
+import { User } from "@supabase/supabase-js";
 
 export const BookingUtilsServer = {
   sendConsumerBookingStatusUpdateNotification: async (
     booking: BookingI,
-    consumer: ConsumerDetailsType
+    consumer: User,
+    vigil?: User
   ) => {
     try {
       if (!isServer) {
@@ -23,13 +24,42 @@ export const BookingUtilsServer = {
       let content = "";
 
       switch (booking.status) {
-        case BookingStatusEnum.CONFIRMED:
-          statusText = "confermata";
-          content = `
+        case BookingStatusEnum.CONFIRMED: {
+          try {
+            // Invia email di conferma prenotazione
+            await EmailService.sendBookingConfirmationEmail({
+              to: consumer.email,
+              customerName:
+                (consumer as any)?.user_metadata?.name ||
+                (consumer as any)?.user_metadata?.firstName ||
+                (consumer as any)?.name,
+              bookingId: booking.id,
+              serviceName: booking.service?.name || "",
+              bookingDate: booking.startDate,
+              bookingTime: booking.startDate,
+              vigilName:
+                booking.vigil?.name ||
+                booking.vigil?.displayName ||
+                booking.vigil?.surname ||
+                (vigil as any)?.user_metadata?.name ||
+                (vigil as any)?.user_metadata?.firstName ||
+                "",
+              location: booking.address || "",
+              totalAmount:
+                typeof booking.price === "number"
+                  ? amountDisplay(booking.price, booking.currency as any)
+                  : String(booking.price || ""),
+            });
+            return; // Esci dalla funzione dopo aver inviato l'email di conferma
+          } catch (error) {
+            statusText = "confermata";
+            content = `
                     <p>La tua prenotazione <strong>#${booking.id}</strong> è stata confermata.</p>
                     <p>Il Vigil ti contatterà a breve per i dettagli finali.</p>
                   `;
+          }
           break;
+        }
         case BookingStatusEnum.CANCELLED:
           statusText = "cancellata";
           content = `
@@ -76,7 +106,7 @@ export const BookingUtilsServer = {
   },
   sendVigilBookingStatusUpdateNotification: async (
     booking: BookingI,
-    vigil: VigilDetailsType
+    vigil: User
   ) => {
     try {
       if (!isServer) {
@@ -91,13 +121,54 @@ export const BookingUtilsServer = {
       let content = "";
 
       switch (booking.status) {
-        case BookingStatusEnum.CONFIRMED:
-          statusText = "confermata";
-          content = `
-                    <p>La prenotazione <strong>#${booking.id}</strong> è stata confermata.</p>
+        case BookingStatusEnum.CONFIRMED: {
+          try {
+            // Invia email di conferma prenotazione al Vigil (simile al consumer)
+            await EmailService.sendBookingConfirmationEmail(
+              {
+                to: vigil.email,
+                // customerName è il nome del consumer associato alla prenotazione
+                customerName:
+                  booking.consumer?.name ||
+                  booking.consumer?.displayName ||
+                  booking.consumer?.surname ||
+                  booking.consumer?.username ||
+                  "",
+                bookingId: booking.id,
+                serviceName: booking.service?.name || "",
+                bookingDate: booking.startDate,
+                bookingTime: booking.startDate,
+                // vigilName è il nome del vigil (destinatario)
+                vigilName:
+                  booking.vigil?.name ||
+                  booking.vigil?.displayName ||
+                  booking.vigil?.surname ||
+                  (vigil as any)?.user_metadata?.name ||
+                  (vigil as any)?.user_metadata?.firstName ||
+                  (vigil as any)?.name ||
+                  (vigil as any)?.displayName ||
+                  "",
+                location: booking.address || "",
+                totalAmount:
+                  typeof booking.price === "number"
+                    ? amountDisplay(
+                        booking.price - booking.fee,
+                        booking.currency as any
+                      )
+                    : String(booking.price - booking.fee || ""),
+              },
+              true
+            );
+            return; // Esci dopo aver inviato l'email di conferma al vigil
+          } catch (error) {
+            statusText = "confermata";
+            content = `
+                    <p>Hai ricevuto una nuova prenotazione <strong>#${booking.id}</strong>.</p>
                     <p>Contatta l'utente a breve per i dettagli finali.</p>
                   `;
+          }
           break;
+        }
         case BookingStatusEnum.CANCELLED:
           statusText = "cancellata";
           content = `

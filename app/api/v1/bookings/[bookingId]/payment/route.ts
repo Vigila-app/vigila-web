@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   authenticateUser,
   getAdminClient,
+  getUserByIdAdmin,
   jsonErrorResponse,
   verifyPaymentWithStripe,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function PUT(
@@ -23,7 +27,10 @@ export async function PUT(
 
     // Verifica autenticazione utente
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    ) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.BOOKINGS_UPDATE_UNAUTHORIZED.code,
         success: false,
@@ -42,7 +49,14 @@ export async function PUT(
     // Verifica che la prenotazione appartenga all'utente
     const { data: existingBooking, error: fetchError } = await _admin
       .from("bookings")
-      .select("*")
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `
+      )
       .eq("id", bookingId)
       .eq("consumer_id", userObject.id)
       .single();
@@ -57,21 +71,22 @@ export async function PUT(
     // Verifica del pagamento con Stripe se si sta aggiornando lo stato di pagamento a "paid"
     if (payment_id && payment_status === PaymentStatusEnum.PAID) {
       try {
-        console.log(`Verifying payment for booking ${bookingId} with payment ID ${payment_id}`);
-        
-        await verifyPaymentWithStripe(
-          payment_id,
-          userObject.id,
-          bookingId
+        console.log(
+          `Verifying payment for booking ${bookingId} with payment ID ${payment_id}`
         );
+
+        await verifyPaymentWithStripe(payment_id, userObject.id, bookingId);
 
         console.log(`Payment verification successful for booking ${bookingId}`);
       } catch (paymentError) {
-        console.error(`Payment verification failed for booking ${bookingId}:`, paymentError);
+        console.error(
+          `Payment verification failed for booking ${bookingId}:`,
+          paymentError
+        );
         return jsonErrorResponse(400, {
           code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
           success: false,
-          error: `Payment verification failed: ${paymentError instanceof Error ? paymentError.message : 'Unknown error'}`,
+          error: `Payment verification failed: ${paymentError instanceof Error ? paymentError.message : "Unknown error"}`,
         });
       }
     }
@@ -85,13 +100,44 @@ export async function PUT(
       updateData.payment_id = payment_id;
     }
 
-    if (payment_status && Object.values(PaymentStatusEnum).includes(payment_status)) {
+    if (
+      payment_status &&
+      Object.values(PaymentStatusEnum).includes(payment_status)
+    ) {
       updateData.payment_status = payment_status;
     }
 
-    // if (status && Object.values(BookingStatusEnum).includes(status)) {
-    //   updateData.status = status;
-    // }
+    // Validate allowed status transitions
+    const allowedStatusTransitions: Record<
+      BookingStatusEnum,
+      BookingStatusEnum[]
+    > = {
+      [BookingStatusEnum.PENDING]: [
+        BookingStatusEnum.CONFIRMED,
+        BookingStatusEnum.CANCELLED,
+      ],
+      [BookingStatusEnum.CONFIRMED]: [
+        BookingStatusEnum.COMPLETED,
+        BookingStatusEnum.CANCELLED,
+      ],
+      [BookingStatusEnum.IN_PROGRESS]: [],
+      [BookingStatusEnum.REFUNDED]: [],
+      [BookingStatusEnum.COMPLETED]: [],
+      [BookingStatusEnum.CANCELLED]: [],
+    };
+    if (status && Object.values(BookingStatusEnum).includes(status)) {
+      const currentStatus = existingBooking.status;
+      const allowedNextStatuses =
+        allowedStatusTransitions[currentStatus as BookingStatusEnum] || [];
+      if (!allowedNextStatuses.includes(status)) {
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
+          success: false,
+          error: `Invalid status transition from '${currentStatus}' to '${status}'`,
+        });
+      }
+      updateData.status = status;
+    }
 
     // Aggiorna la prenotazione
     const { data: updatedBooking, error: updateError } = await _admin
@@ -105,36 +151,57 @@ export async function PUT(
       throw updateError;
     }
 
-        // Invia email di aggiornamento stato se lo stato è cambiato
-        if (updatedBooking.status !== existingBooking.status) {
-          try {
-           const consumer = {
-            ...userObject,
-            email: userObject.email,
-            first_name:
-              userObject.user_metadata?.name || userObject.user_metadata?.firstName,
-            last_name:
-              userObject.user_metadata?.surname ||
-              userObject.user_metadata?.lastName,
-          };
-    
-            if (consumer?.email) {
-              await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
-                updatedBooking,
-                consumer
-              );
+    // Invia email di aggiornamento stato se lo stato è cambiato
+    if (status !== existingBooking.status) {
+      try {
+        const consumer = {
+          ...userObject,
+          email: userObject.email,
+          first_name:
+            userObject.user_metadata?.name ||
+            userObject.user_metadata?.firstName,
+          last_name:
+            userObject.user_metadata?.surname ||
+            userObject.user_metadata?.lastName,
+        };
 
-              // TODO notification for vigil
-              // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-              //   updatedBooking,
-              //   vigil
-              // );
-            }
-          } catch (emailError) {
-            // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
-            console.error('Errore invio email di aggiornamento stato:', emailError);
+        let vigil = undefined;
+        if (existingBooking.vigil_id) {
+          vigil = await getUserByIdAdmin(existingBooking.vigil_id);
+          if (vigil?.email) {
+            await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+              {
+                ...updatedBooking,
+                service: updatedBooking.service || existingBooking.service,
+                vigil: updatedBooking.vigil || existingBooking.vigil,
+                consumer: updatedBooking.consumer || existingBooking.consumer,
+              }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
+              vigil
+            );
+          } else {
+            console.error("Vigil email not found");
           }
         }
+
+        if (consumer?.email) {
+          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+            {
+              ...updatedBooking,
+              service: updatedBooking.service || existingBooking.service,
+              vigil: updatedBooking.vigil || existingBooking.vigil,
+              consumer: updatedBooking.consumer || existingBooking.consumer,
+            }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
+            consumer,
+            vigil
+          );
+        } else {
+          console.error("Consumer email not found");
+        }
+      } catch (emailError) {
+        // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
+        console.error("Errore invio email di aggiornamento stato:", emailError);
+      }
+    }
 
     return NextResponse.json(
       {

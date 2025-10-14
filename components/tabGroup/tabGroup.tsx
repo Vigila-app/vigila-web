@@ -19,7 +19,7 @@ type TabGroupI = {
 };
 
 const TabGroup = (props: TabGroupI) => {
-  const { align = "left", tabs = [], onTabChange = () => ({}), role } = props;
+  const { align = "center", tabs = [], onTabChange = () => ({}), role } = props;
 
   const [activeTab, setActiveTab] = useState<TabI | undefined>(
     () => tabs.find((tab) => tab.active) || tabs[0]
