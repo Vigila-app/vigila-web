@@ -71,6 +71,18 @@ const MenuMobile = () => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
+
   return (
     <>
       <button
@@ -113,7 +125,7 @@ const MenuMobile = () => {
                 </span>
               )}
             </section>
-            <ul className="flex flex-col gap-8 divide-y divide-gray-100 flex-1">
+            <ul className="flex flex-col gap-8  flex-1 overflow-y-auto ">
               {user?.user_metadata?.role === RolesEnum.CONSUMER && (
                 <li className="block py-2">
                   {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
@@ -198,7 +210,7 @@ const MenuMobile = () => {
           </>
         ) : null}
         <div className="sticky bottom-0 py-2 w-full mt-auto ">
-          <ul className="relative divide-y divide-gray-100 header-menu">
+          <ul className="relative  header-menu">
             {NavigationUtils.getHeaderMenu()
               .filter((route) => route?.menu?.mobile)
               .map((route) => (

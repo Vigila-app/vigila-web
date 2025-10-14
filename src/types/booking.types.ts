@@ -16,6 +16,7 @@ export type BookingI = {
   endDate: Date;
   quantity: number;
   price: number;
+  fee: number;
   currency: string;
   status?: BookingStatusEnum;
   payment_status?: PaymentStatusEnum;

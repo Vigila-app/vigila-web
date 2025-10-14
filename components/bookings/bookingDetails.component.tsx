@@ -167,18 +167,34 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <span className="absolute top-0 right-0">
           <Badge
             label={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusText(
                     booking.status as BookingStatusEnum
                   )
-                : "Da pagare"
+                : booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusText(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "Da pagare"
             }
             color={
-              booking?.payment_status === PaymentStatusEnum.PAID
+              [
+                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.REFUNDED,
+                BookingStatusEnum.COMPLETED,
+              ].includes(booking.status as BookingStatusEnum)
                 ? BookingUtils.getStatusColor(
                     booking.status as BookingStatusEnum
                   )
-                : "yellow"
+                : booking.payment_status === PaymentStatusEnum.PAID
+                  ? BookingUtils.getStatusColor(
+                      booking.status as BookingStatusEnum
+                    )
+                  : "yellow"
             }
           />
         </span>
@@ -220,7 +236,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 {dateDisplay(booking.startDate, "dateTime")}
               </p>
               <p>
-                <span className="font-medium">Indirizzo del servizio:</span>&nbsp;
+                <span className="font-medium">Indirizzo del servizio:</span>
+                &nbsp;
                 {capitalize(booking.address)}
               </p>
               <p>
@@ -228,13 +245,23 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 &nbsp;
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
-              <p>
-                <span className="font-medium">Prezzo Totale:</span>&nbsp;
-                {amountDisplay(
-                  booking.price,
-                  booking.service?.currency as CurrencyEnum
-                )}
-              </p>
+              {isVigil && (
+                <p>
+                  <span className="font-medium">Prezzo del servizio:</span>
+                  &nbsp;
+                  {BookingUtils.calculateAmountVigil(booking)}
+                  {service?.currency}
+                </p>
+              )}
+              {!isVigil && (
+                <p>
+                  <span className="font-medium">Prezzo del servizio:</span>
+                  {amountDisplay(
+                    booking.price,
+                    booking.service?.currency as CurrencyEnum
+                  )}
+                </p>
+              )}
               <p>
                 <span className="font-medium">Stato del pagamento:</span>&nbsp;
                 <Badge
@@ -322,11 +349,15 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         {isVigil &&
           booking.status === BookingStatusEnum.CONFIRMED &&
           dateDiff(booking.endDate, currentDate) < 0 && (
-            <Button
-              role={RolesEnum.CONSUMER}
-              label="Completa Prenotazione"
-              action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
-            />
+            <div className="flex flex-col items-center gap-3">
+              <h3 className=" font font-medium">Completamento:</h3>
+              <p className="text-sm">Ricorda di completare solo dopo che il servizio è stato erogato correttamente; altrimenti contatta l&apos;assistenza clienti!</p>
+              <Button
+                role={RolesEnum.CONSUMER}
+                label="Completa Prenotazione"
+                action={() => handleStatusUpdate(BookingStatusEnum.COMPLETED)}
+              />
+            </div>
           )}
 
         {canCancel && dateDiff(booking.endDate, currentDate) > 0 && (

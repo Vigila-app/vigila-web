@@ -128,3 +128,29 @@ export const getQueryParams = (
 
   return queryObject;
 };
+
+export const getUserByIdAdmin = async (userId: string) => {
+  try {
+    const admin = getAdminClient();
+    const { data, error } = await admin.auth.admin.getUserById(userId);
+
+    if (error) {
+      console.error("Error fetching user by id (admin):", error);
+      throw jsonErrorResponse(500, {
+        code: ResponseCodesConstants.CUSTOMERS_DETAILS_SERVICE_UNAVAILABLE.code,
+        success: false,
+        message: error.message || "Error fetching user",
+      } as any);
+    }
+
+    return data?.user ?? null;
+  } catch (err) {
+    console.error("getUserByIdAdmin failed:", err);
+    // Se l'errore è già una NextResponse, rilanciarlo così com'è
+    if (err instanceof NextResponse) throw err;
+    throw jsonErrorResponse(500, {
+      code: ResponseCodesConstants.CUSTOMERS_DETAILS_SERVICE_UNAVAILABLE.code,
+      success: false,
+    } as any);
+  }
+};

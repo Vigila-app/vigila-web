@@ -2,7 +2,7 @@ import { EmailConfigI } from "@/src/types/email.types";
 
 export const EmailConstants: EmailConfigI = {
   // Sender di default (sostituisci con il tuo dominio verificato)
-  defaultFrom: "Vigila <noreply@vigila.it>",
+  defaultFrom: "Vigila <noreply@vigila.org>",
 
   devEmail: "delivered+${email}@resend.dev",
 

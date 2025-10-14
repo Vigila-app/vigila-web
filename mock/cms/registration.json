@@ -8,14 +8,20 @@
     "text": "Crea il tuo account ed inizia subito",
     "fields": [
       {
-        "id": "marketing-1",
-        "label": "Accetto di ricevere notifiche su eventi, aggiornamenti dei prodotti e annunci aziendali.",
-        "required": false,
+        "id": "legal-1",
+        "label": "L’Utente dichiara di avere preso visione e di accettare integralmente le disposizioni di cui ai Termini & Condizioni.",
+        "required": true,
         "type": "term"
       },
       {
-        "id": "marketing-2",
-        "label": "Accetto di condividere i miei dati con partner di terze parti per ottenere maggiori vantaggi.",
+        "id": "legal-2",
+        "label": "L’Utente dichiara di avere preso visione delle Privacy Policy e di acconsentire al trattamento dei propri dati personali, conformemente a quanto previsto nella stessa informativa.",
+        "required": true,
+        "type": "term"
+      },
+      {
+        "id": "marketing-1",
+        "label": "L’Utente acconsente a ricevere comunicazioni di marketing a mezzo e-mail sui prodotti e servizi offerti dal Titolare, conformemente a quanto previsto nella Privacy Policy.",
         "required": false,
         "type": "term"
       }

@@ -29,13 +29,14 @@
   --color-tertiary-900: #00993d;
 
   --color-vigil-orange: #e94e34;
-  --color-vigil-light-orange: #FDEDEB;
+  --color-vigil-light-orange: #fdedeb;
 
   --color-consumer-blue: #009eda;
-  --color-consumer-light-blue:#e6f5fb;
+  --color-consumer-light-blue: #e6f5fb;
 
-  --color-background-default:#f5f5f5;
-  --color-background-footer:#00161F;
+  --color-background-default: #f5f5f5;
+  --color-background-footer: #00161f;
+  --color-color-footer: #8e8e8e;
 }
 
 @layer base {

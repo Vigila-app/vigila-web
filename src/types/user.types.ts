@@ -11,6 +11,7 @@ export type UserDetailsType = {
   email_verified?: boolean;
   username?: string;
   birthday?: string;
+  information?: string;
   gender?: GenderEnum;
   phone?: string;
   other?: { [key: string]: string | number };

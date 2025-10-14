@@ -72,7 +72,7 @@ const TextArea = (props: TextAreaI) => {
         {error ? (
           <p
             role="alert"
-            className="absolute start-2.5 -bottom-4 text-xs text-red-500">
+            className="absolute start-2.5 -bottom-5 text-sm text-red-500">
             {FormUtils.getErrorByType(error)}
           </p>
         ) : null}

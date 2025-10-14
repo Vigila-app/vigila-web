@@ -31,6 +31,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
+import clsx from "clsx";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
@@ -38,19 +40,29 @@ const ProfileComponent = () => {
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
+  const { bookings } = useBookingsStore();
   const role = user?.user_metadata?.role as RolesEnum;
   const isConsumer = role === RolesEnum.CONSUMER;
   const consumer = consumers?.find((c) => c.id === user?.id);
   const isVigil = role === RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === user?.id);
 
+  const pendingBookings = bookings.filter((b) => b.status === "pending");
   const tabs: TabI[] = [
     {
       label: <UserIcon className="size-6" />,
       id: "panoramica",
     },
     {
-      label: <CalendarDaysIcon className="size-6" />,
+      label: (
+        <CalendarDaysIcon
+          className={clsx(
+            "size-6",
+            pendingBookings.length > 0 && "text-red-500",
+            
+          )}
+        />
+      ),
       id: "prenotazioni",
     },
     ...(isVigil
@@ -119,7 +131,7 @@ const ProfileComponent = () => {
     return (
       <div>
         <div className="max-w-7xl mx-auto">
-          <div className="rounded-lg h-screen bg-background-default shadow-sm py-4 px-6 mb-3">
+          <div className="rounded-lg min-h-screen bg-background-default shadow-sm py-4 px-6 mb-3">
             <div className="flex flex-col items-center justify-between pt-5 bg-gray-100 rounded-2xl">
               <div className="flex w-full flex-col items-center rounded-2xl border-2 bg-white p-5 gap-2 border-consumer-blue/60">
                 <div className="flex items-center justify-center">
@@ -163,7 +175,7 @@ const ProfileComponent = () => {
                   </section>
                 </div>
               </div>
-              <div className="mt-2">
+              <div className="mt-2 w-full">
                 <TabGroup
                   role={role}
                   tabs={tabs.map((t) => ({
@@ -240,9 +252,10 @@ const ProfileComponent = () => {
                 </section>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-2 w-full">
               <TabGroup
                 role={role}
+                align="center"
                 tabs={tabs.map((t) => ({
                   ...t,
                   active: t.id === tab,

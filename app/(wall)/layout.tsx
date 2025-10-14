@@ -12,6 +12,7 @@ import { AppConstants } from "@/src/constants";
 import HtmlDocument from "@/components/@core/htmlDocument/htmlDocument.component";
 import { isMocked } from "@/src/utils/envs.utils";
 import { Analytics } from "@vercel/analytics/next";
+import CommonScript from "@/components/@core/commonScript/common-script.component";
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
@@ -55,6 +56,11 @@ export default function RootLayout({
 }) {
   return (
     <HtmlDocument
+      otherHead={
+        <>
+          <CommonScript />
+        </>
+      }
       otherBody={
         <>
           <PermitGuardComponent />

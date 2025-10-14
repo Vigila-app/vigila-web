@@ -23,7 +23,7 @@ const PanoramicaConsumerTab = () => {
 
   const consumer = consumers.find((c) => c.id === user?.id);
   return (
-    <section className="py-4 w-full bg-gray-100 rounded-b-2xl flex flex-col gap-4">
+    <section className="flex flex-col py-4 w-full bg-gray-100 rounded-b-2xl  gap-4">
       <Card>
         <h1 className="flex flex-row items-center gap-2 pb-2">
           <HeartIcon className="size-6 text-red-600" />
@@ -31,7 +31,7 @@ const PanoramicaConsumerTab = () => {
         </h1>
 
         <div>
-          <p className="font-medium leading-relaxed text-[13px]">
+          <p className="font-medium leading-relaxed text-sm">
             {consumer?.information}
           </p>
         </div>
@@ -61,8 +61,6 @@ const PanoramicaConsumerTab = () => {
           )}
         </div>
       </Card>
-
-      
     </section>
   );
 };

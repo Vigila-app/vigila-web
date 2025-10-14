@@ -95,6 +95,10 @@ export const BookingUtils = {
     return booking.price.toFixed(2);
   },
 
+  calculateAmountVigil: (booking: BookingI): string => {
+    return (booking.price - booking.fee).toFixed(0)
+  },
+
   handleStatusUpdate: async (
     booking: BookingI,
     newStatus: BookingStatusEnum
@@ -137,20 +141,29 @@ export const BookingUtils = {
         return false;
       }
 
+      if (
+        userRole === RolesEnum.VIGIL &&
+        booking.status === BookingStatusEnum.PENDING
+      ) {
+        return false;
+      }
       if (userRole === RolesEnum.VIGIL) {
         return true;
       }
 
-      if (userRole === RolesEnum.CONSUMER) {
+      if (
+        userRole === RolesEnum.CONSUMER &&
+        booking.status === BookingStatusEnum.CONFIRMED
+      ) {
         const now = new Date();
-        const startDate = new Date(booking.startDate);
-        const timeDifferenceMs = startDate.getTime() - now.getTime();
+        const endDate = new Date(booking.endDate);
+        const timeDifferenceMs = endDate.getTime() - now.getTime();
         const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
 
-        return timeDifferenceHours >= 48;
+        return timeDifferenceHours >= 24;
+      } else {
+        return true;
       }
-
-      return false;
     } catch (error) {
       console.error(
         "BookingUtils canCancelBooking error: Errore nel verificare la possibilità di cancellazione:",
