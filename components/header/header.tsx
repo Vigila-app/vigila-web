@@ -47,18 +47,18 @@ const Header = (props: HeaderI) => {
             <Menu />
             <MenuPrivate />
             <HeaderProfile />
-              <div className="block md:hidden">
-            {isUserLogged ? (
+            <div className="">
+              {isUserLogged ? (
                 <MenuMobile />
-            ) : (
-              <ButtonLink
-                label="Registrati"
-                role={RolesEnum.CONSUMER}
-                customClass="!px-3 !py-1"
-                href="/auth/registration"
+              ) : (
+                <ButtonLink
+                  label="Registrati"
+                  role={RolesEnum.CONSUMER}
+                  customClass="!px-3 !py-1"
+                  href="/auth/registration"
                 />
-            )}
-                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -31,12 +31,10 @@ const HeaderProfile = () => {
       <div
         aria-label="user"
         id="User"
-        className="hidden md:inline-flex items-center border-gray-200 md:border-l pl-4 text-gray-500 transition hover:text-gray-700"
-      >
+        className="hidden md:inline-flex items-center border-gray-200 md:border-l pl-4 text-gray-500 transition hover:text-gray-700">
         <Link
           href={UrlByRole()}
-          className="inline-flex items-center text-sm font-medium"
-        >
+          className="inline-flex items-center text-sm font-medium">
           <span className="sr-only">User</span>
           {userDetails?.role !== RolesEnum.ADMIN ? (
             <Avatar
@@ -57,19 +55,18 @@ const HeaderProfile = () => {
       <div className="sm:flex sm:gap-4">
         <Link
           className="rounded-4xl px-3 py-2.5 text-sm font-semibold text-vigil-orange transition hover:bg-gray-100"
-          href={Routes.login.url}
-        >
+          href={Routes.login.url}>
           {Routes.login.label}
         </Link>
 
-        <div className="hidden sm:flex">
+        {/* <div className="hidden sm:flex">
           <Link
             className="rounded bg-secondary-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-secondary-700"
             href={Routes.registration.url}
           >
             {Routes.registration.label}
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );
