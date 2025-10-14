@@ -7,7 +7,7 @@ import { AppConstants } from "@/src/constants";
 
 const Footer = () => {
   return (
-    <footer className="bg-background-footer/40 text-white">
+    <footer className="bg-background-footer text-color-footer">
       <div className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="absolute end-4 top-4 sm:end-6 sm:top-6 lg:end-8 lg:top-8">
           <a
@@ -23,9 +23,9 @@ const Footer = () => {
           <LogoFooter  />
         </div>
         <div className="flex flex-col items-center mt-4 gap-1  ">
-          <span className="font-semibold">Un ponte tra generazioni</span>
+          <span className="font-semibold text-white">Un ponte tra generazioni</span>
 
-          <p className="mx-auto max-w-md text-center leading-relaxed">
+          <p className="mx-auto max-w-md text-center leading-relaxed text-white">
             Creiamo connessioni autentiche che arricchiscono la vita di giovani
             e anziani, costruendo una comunità più unita e solidale.
           </p>
@@ -40,7 +40,7 @@ const Footer = () => {
                 `sm:${route.menu?.desktop ? "block" : "hidden"}`
               )}>
               <Link
-                className=" text-gray-800 transition hover:text-gray-500"
+                className="transition hover:text-vigil-orange"
                 href={route.url}>
                 {route.label}
               </Link>
@@ -54,7 +54,7 @@ const Footer = () => {
               href={AppConstants.facebookUrl}
               rel="noreferrer"
               target="_blank"
-              className=" text-gray-800 transition hover:text-black">
+              className="transition hover:text-consumer-blue">
               <span className="sr-only">Facebook</span>
               <svg
                 className="h-6 w-6"
@@ -75,7 +75,7 @@ const Footer = () => {
               href={AppConstants.instagramUrl}
               rel="noreferrer"
               target="_blank"
-              className=" text-gray-800 transition hover:text-black">
+              className="transition hover:text-consumer-blue">
               <span className="sr-only">Instagram</span>
               <svg
                 className="h-6 w-6"
@@ -92,7 +92,7 @@ const Footer = () => {
           </li>
         </ul>
         <br/>
-        <p className="mt-8 text-center text-xs text-gray-800">
+        <p className="mt-8 text-center text-xs leading-relaxed">
            {new Date().getFullYear()} Vigila. Un ponte tra generazioni.</p>
       </div>
     </footer>
