@@ -66,7 +66,7 @@ const VigilProfile = () => {
               </div>
               <div className="flex-1">
                 <section className="flex flex-col items-center gap-2 ">
-                  <h1 className="text-3xl font-boldtext-center">
+                  <h1 className="text-3xl font-bold text-center">
                     {vigil?.displayName}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
