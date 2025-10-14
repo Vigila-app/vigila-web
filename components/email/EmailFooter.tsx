@@ -28,7 +28,7 @@ export function EmailFooter({
         }}
       >
         <img
-          src={`${AppConstants.hostUrl}/assets/logo_white.png`}
+          src={`${AppConstants.publicUrl}/assets/logo_white.png`}
           alt="Vigila"
           style={{ width: small ? 96 : 140, height: "auto" }}
         />

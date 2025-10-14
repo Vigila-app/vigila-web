@@ -39,7 +39,11 @@ export function BookingConfirmationEmailTemplate(
       }}
     >
       <EmailHeader
-        title={`Prenotazione Confermata ✅`}
+        title={
+          isVigil
+            ? `Nuova Prenotazione Assegnata ✅`
+            : `Prenotazione Confermata ✅`
+        }
         subtitle={undefined}
       />
 
@@ -126,7 +130,8 @@ export function BookingConfirmationEmailTemplate(
                 Data:
               </td>
               <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {dateDisplay(bookingDate, "dateTime")}
+                {dateDisplay(bookingDate, "date")}&nbsp;
+                {dateDisplay(bookingTime, "time")}
               </td>
             </tr>
             {!isVigil && vigilName && (

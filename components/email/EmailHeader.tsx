@@ -25,7 +25,7 @@ export function EmailHeader({
         }}
       >
         <img
-          src={`${AppConstants.hostUrl}/assets/logo.png`}
+          src={`${AppConstants.publicUrl}/assets/logo.png`}
           alt="Vigila"
           style={{ width: 140, height: "auto" }}
         />

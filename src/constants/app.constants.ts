@@ -5,6 +5,7 @@ export const AppConstants = {
   title: "Vigila",
   description: "Is a simple base-app based on Next.js and Supabase",
   hostUrl: isMocked ? "http://localhost:3000" : "https://vigila.org",
+  publicUrl: "https://vigila.org",
   defaultUserRole: RolesEnum.CONSUMER,
   defaultUserLevel: AccessLevelsEnum.BASE,
   cs_id: process.env.NEXT_PUBLIC_CONTENTSQUARE_ID,
