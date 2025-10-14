@@ -40,7 +40,7 @@ export const EmailService = {
       try {
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
-          subject: `${EmailConstants.subjectPrefixes.booking} #${data.bookingId} confermata`,
+          subject: `${EmailConstants.subjectPrefixes.booking} #${data.bookingId} ${isVigil ? "assegnata" : "confermata"}`,
           react: BookingConfirmationEmailTemplate(
             {
               customerName: data.customerName,

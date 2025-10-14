@@ -2,6 +2,7 @@ import { AppConstants } from "@/src/constants";
 import * as React from "react";
 import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 interface BookingConfirmationEmailProps {
   customerName: string;
@@ -40,8 +41,6 @@ export function BookingConfirmationEmailTemplate(
       <EmailHeader
         title={`Prenotazione Confermata ✅`}
         subtitle={undefined}
-        backgroundColor="#28a745"
-        titleColor="#ffffff"
       />
 
       <div style={{ padding: "40px 20px", backgroundColor: "#ffffff" }}>
@@ -58,9 +57,8 @@ export function BookingConfirmationEmailTemplate(
           }}
         >
           {isVigil
-            ? `Hai ricevuto una nuova prenotazione.`
+            ? `Ti abbiamo assegnato una nuova prenotazione.`
             : "La tua prenotazione è stata confermata."}
-          ,
         </p>
         <br />
         <br />
@@ -128,22 +126,7 @@ export function BookingConfirmationEmailTemplate(
                 Data:
               </td>
               <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {bookingDate}
-              </td>
-            </tr>
-            <tr>
-              <td
-                style={{
-                  padding: "8px 0",
-                  color: "#666",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
-              >
-                Orario:
-              </td>
-              <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {bookingTime}
+                {dateDisplay(bookingDate, "dateTime")}
               </td>
             </tr>
             {!isVigil && vigilName && (

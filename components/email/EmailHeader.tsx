@@ -11,13 +11,13 @@ interface EmailHeaderProps {
 export function EmailHeader({
   title,
   subtitle,
-  backgroundColor = '#f8f9fa',
-  titleColor = '#333',
+  backgroundColor = '#fff',
+  titleColor = 'black',
 }: EmailHeaderProps) {
   return (
     <div style={{ backgroundColor, padding: '24px 20px', textAlign: 'center' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: title || subtitle ? '12px' : 0 }}>
-        <Logo size="normal" />
+        <Logo size="small" />
       </div>
 
       {title && (

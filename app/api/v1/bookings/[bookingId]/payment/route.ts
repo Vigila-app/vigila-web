@@ -8,7 +8,10 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function PUT(
@@ -46,7 +49,14 @@ export async function PUT(
     // Verifica che la prenotazione appartenga all'utente
     const { data: existingBooking, error: fetchError } = await _admin
       .from("bookings")
-      .select("*")
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `
+      )
       .eq("id", bookingId)
       .eq("consumer_id", userObject.id)
       .single();
@@ -132,7 +142,12 @@ export async function PUT(
           vigil = await getUserByIdAdmin(existingBooking.vigil_id);
           if (vigil?.email) {
             await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-              updatedBooking,
+              {
+                ...updatedBooking,
+                service: updatedBooking.service || existingBooking.service,
+                vigil: updatedBooking.vigil || existingBooking.vigil,
+                consumer: updatedBooking.consumer || existingBooking.consumer,
+              }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
               vigil
             );
           } else {
@@ -142,7 +157,12 @@ export async function PUT(
 
         if (consumer?.email) {
           await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
-            updatedBooking,
+            {
+              ...updatedBooking,
+              service: updatedBooking.service || existingBooking.service,
+              vigil: updatedBooking.vigil || existingBooking.vigil,
+              consumer: updatedBooking.consumer || existingBooking.consumer,
+            }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
             consumer,
             vigil
           );
