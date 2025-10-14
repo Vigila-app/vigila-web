@@ -34,7 +34,6 @@ export function BookingConfirmationEmailTemplate(
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        maxWidth: "600px",
         margin: "0 auto",
       }}
     >
@@ -47,7 +46,14 @@ export function BookingConfirmationEmailTemplate(
         subtitle={undefined}
       />
 
-      <div style={{ padding: "40px 20px", backgroundColor: "#ffffff" }}>
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
         <h2 style={{ color: "#333", fontSize: "22px", marginBottom: "20px" }}>
           Ciao {isVigil ? vigilName : customerName}!
         </h2>
@@ -57,7 +63,6 @@ export function BookingConfirmationEmailTemplate(
             color: "#666",
             fontSize: "16px",
             lineHeight: "1.6",
-            marginBottom: "30px",
           }}
         >
           {isVigil
@@ -65,8 +70,6 @@ export function BookingConfirmationEmailTemplate(
             : "La tua prenotazione è stata confermata."}
         </p>
         <br />
-        <br />
-
         <div
           style={{
             backgroundColor: "#f8f9fa",
@@ -216,15 +219,14 @@ export function BookingConfirmationEmailTemplate(
           <a
             href={`${appUrl}/bookings/${bookingId}`}
             style={{
-              backgroundColor: "#007bff",
-              color: "#ffffff",
+              backgroundColor: "#006fe6",
+              color: "#fdfdfd",
               padding: "12px 30px",
               textDecoration: "none",
-              borderRadius: "6px",
+              borderRadius: "32px",
               fontSize: "16px",
               fontWeight: "bold",
               display: "inline-block",
-              marginRight: "10px",
             }}
           >
             Visualizza Prenotazione

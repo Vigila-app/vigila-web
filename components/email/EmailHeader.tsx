@@ -16,11 +16,13 @@ export function EmailHeader({
   titleColor = "black",
 }: EmailHeaderProps) {
   return (
-    <div style={{ backgroundColor, padding: "24px 20px", textAlign: "center" }}>
+    <div style={{ backgroundColor, padding: "20px", textAlign: "center", borderBottom: "1px solid #ececec" }}>
       <div
         style={{
           display: "flex",
           justifyContent: "center",
+          maxWidth: "600px",
+          margin: "0 auto",
           marginBottom: title || subtitle ? "12px" : 0,
         }}
       >

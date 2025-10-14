@@ -24,6 +24,8 @@ export function EmailFooter({
         style={{
           display: "flex",
           justifyContent: "center",
+          maxWidth: "600px",
+          margin: "0 auto",
           marginBottom: "8px",
         }}
       >
@@ -33,6 +35,7 @@ export function EmailFooter({
           style={{ width: small ? 96 : 140, height: "auto" }}
         />
       </div>
+      <br />
       <div
         style={{
           display: "flex",
