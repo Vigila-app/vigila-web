@@ -140,12 +140,8 @@ export const BookingUtilsServer = {
                   "",
                 bookingId: booking.id,
                 serviceName: booking.service?.name || "",
-                bookingDate: booking.startDate
-                  ? dateDisplay(booking.startDate, "date")
-                  : "",
-                bookingTime: booking.startDate
-                  ? dateDisplay(booking.startDate, "time")
-                  : "",
+                bookingDate: booking.startDate,
+                bookingTime: booking.startDate,
                 // vigilName è il nome del vigil (destinatario)
                 vigilName:
                   booking.vigil?.name ||

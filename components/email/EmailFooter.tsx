@@ -15,7 +15,7 @@ export function EmailFooter({
   return (
     <div
       style={{
-        backgroundColor: "#959fa3",
+        backgroundColor: "#00161F",
         padding: small ? "12px" : "20px",
         textAlign: "center",
       }}
@@ -47,7 +47,7 @@ export function EmailFooter({
           aria-label="WhatsApp"
         >
           <img
-            src={`${AppConstants.hostUrl}/assets/whatsapp.png`}
+            src="https://s2.svgbox.net/social.svg?ic=discourse&color=8E8E8E"
             alt="WhatsApp"
             width={20}
             height={20}
@@ -61,7 +61,7 @@ export function EmailFooter({
           aria-label="Instagram"
         >
           <img
-            src={`${AppConstants.hostUrl}/assets/instagram.png`}
+            src="https://s2.svgbox.net/social.svg?ic=instagram&color=8E8E8E"
             alt="Instagram"
             width={20}
             height={20}
@@ -69,9 +69,13 @@ export function EmailFooter({
           />
         </a>
       </div>
-
+      <br />
       <p
-        style={{ color: "black", fontSize: small ? "12px" : "14px", margin: 0 }}
+        style={{
+          color: "#8E8E8E",
+          fontSize: "12px",
+          margin: 0,
+        }}
       >
         {copyrightText ||
           `© ${new Date().getFullYear()} Vigila. Tutti i diritti riservati.`}
