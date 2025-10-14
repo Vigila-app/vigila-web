@@ -4,12 +4,13 @@ import { Button } from "@/components";
 import { BookingCardComponent } from "@/components/bookings";
 import Card from "@/components/card/card";
 import { ReviewCard } from "@/components/reviews";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useReviewsStore } from "@/src/store/reviews/reviews.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface RecensioniTabProps {
   simplified?: boolean;
@@ -28,11 +29,14 @@ export default function RecensioniTab({
     user?.user_metadata?.role === RolesEnum.VIGIL
       ? user?.id
       : vigilIdFromParams;
-  const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
   const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
 
-  const filteredBookings = bookings.filter(
-    (b) => b.vigil_id === vigilId && b.status === "completed"
+  const filteredBookings = useMemo(
+    () =>
+      bookings.filter(
+        (b) => b.vigil_id === vigilId && b.status === BookingStatusEnum.COMPLETED
+      ),
+    [bookings, vigilId]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
