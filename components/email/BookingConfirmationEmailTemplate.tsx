@@ -1,3 +1,4 @@
+import { AppConstants } from '@/src/constants';
 import * as React from 'react';
 
 interface BookingConfirmationEmailProps {
@@ -21,10 +22,11 @@ export function BookingConfirmationEmailTemplate({
   vigilName,
   location,
   totalAmount,
-  appUrl = 'https://vigila.app'
+  appUrl = AppConstants.hostUrl
 }: BookingConfirmationEmailProps) {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
+      
       <div style={{ backgroundColor: '#28a745', padding: '40px 20px', textAlign: 'center' }}>
         <h1 style={{ color: '#ffffff', fontSize: '28px', marginBottom: '10px' }}>
           Prenotazione Confermata ✅
@@ -90,7 +92,7 @@ export function BookingConfirmationEmailTemplate({
             {vigilName && (
               <tr>
                 <td style={{ padding: '8px 0', color: '#666', fontSize: '14px', fontWeight: 'bold' }}>
-                  Vigile:
+                  Vigil:
                 </td>
                 <td style={{ padding: '8px 0', color: '#333', fontSize: '14px' }}>
                   {vigilName}

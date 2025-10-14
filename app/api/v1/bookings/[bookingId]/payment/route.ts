@@ -8,7 +8,7 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function PUT(
@@ -97,9 +97,9 @@ export async function PUT(
       updateData.payment_status = payment_status;
     }
 
-    // if (status && Object.values(BookingStatusEnum).includes(status)) {
-    //   updateData.status = status;
-    // }
+    if (status && Object.values(BookingStatusEnum).includes(status)) {
+      updateData.status = status;
+    }
 
     // Aggiorna la prenotazione
     const { data: updatedBooking, error: updateError } = await _admin
@@ -127,17 +127,9 @@ export async function PUT(
             userObject.user_metadata?.lastName,
         };
 
-        if (consumer?.email) {
-          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
-            updatedBooking,
-            consumer
-          );
-        } else {
-          console.error("Consumer email not found");
-        }
-
+        let vigil = undefined;
         if (existingBooking.vigil_id) {
-          const vigil = await getUserByIdAdmin(existingBooking.vigil_id);
+          vigil = await getUserByIdAdmin(existingBooking.vigil_id);
           if (vigil?.email) {
             await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
               updatedBooking,
@@ -146,6 +138,16 @@ export async function PUT(
           } else {
             console.error("Vigil email not found");
           }
+        }
+
+        if (consumer?.email) {
+          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+            updatedBooking,
+            consumer,
+            vigil
+          );
+        } else {
+          console.error("Consumer email not found");
         }
       } catch (emailError) {
         // Log dell'errore ma non interrompe l'aggiornamento della prenotazione

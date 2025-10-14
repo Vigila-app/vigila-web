@@ -7,6 +7,7 @@ import {
   EmailNotificationDataI,
   EmailResponseI,
 } from '@/src/types/email.types';
+import { AppConstants } from '@/src/constants';
 
 export const EmailService = {
   sendWelcomeEmail: async (data: WelcomeEmailDataI) =>
@@ -42,7 +43,7 @@ export const EmailService = {
             vigilName: data.vigilName,
             location: data.location,
             totalAmount: data.totalAmount,
-            appUrl: data.appUrl || 'https://vigila.app'
+            appUrl: data.appUrl || AppConstants.hostUrl
           }),
         });
         resolve(result);

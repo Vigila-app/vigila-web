@@ -1,5 +1,6 @@
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
-import { isServer } from "@/src/utils/common.utils";
+import { isServer, amountDisplay } from "@/src/utils/common.utils";
+import { dateDisplay } from "@/src/utils/date.utils";
 import { EmailService } from "@/server/email.service";
 import { BookingI } from "@/src/types/booking.types";
 import { User } from "@supabase/supabase-js";
@@ -7,7 +8,8 @@ import { User } from "@supabase/supabase-js";
 export const BookingUtilsServer = {
   sendConsumerBookingStatusUpdateNotification: async (
     booking: BookingI,
-    consumer: User
+    consumer: User,
+    vigil?: User
   ) => {
     try {
       if (!isServer) {
@@ -22,13 +24,46 @@ export const BookingUtilsServer = {
       let content = "";
 
       switch (booking.status) {
-        case BookingStatusEnum.CONFIRMED:
-          statusText = "confermata";
-          content = `
+        case BookingStatusEnum.CONFIRMED: {
+          try {
+            // Invia email di conferma prenotazione
+            await EmailService.sendBookingConfirmationEmail({
+              to: consumer.email,
+              customerName:
+                (consumer as any)?.user_metadata?.name ||
+                (consumer as any)?.user_metadata?.firstName ||
+                (consumer as any)?.name,
+              bookingId: booking.id,
+              serviceName: booking.service?.name || "",
+              bookingDate: booking.startDate
+                ? dateDisplay(booking.startDate, "date")
+                : "",
+              bookingTime: booking.startDate
+                ? dateDisplay(booking.startDate, "time")
+                : "",
+              vigilName:
+                booking.vigil?.name ||
+                booking.vigil?.displayName ||
+                booking.vigil?.surname ||
+                (vigil as any)?.user_metadata?.name ||
+                (vigil as any)?.user_metadata?.firstName ||
+                "",
+              location: booking.address || "",
+              totalAmount:
+                typeof booking.price === "number"
+                  ? amountDisplay(booking.price, booking.currency as any)
+                  : String(booking.price || ""),
+            });
+            return; // Esci dalla funzione dopo aver inviato l'email di conferma
+          } catch (error) {
+            statusText = "confermata";
+            content = `
                     <p>La tua prenotazione <strong>#${booking.id}</strong> è stata confermata.</p>
                     <p>Il Vigil ti contatterà a breve per i dettagli finali.</p>
                   `;
+          }
           break;
+        }
         case BookingStatusEnum.CANCELLED:
           statusText = "cancellata";
           content = `
@@ -93,7 +128,7 @@ export const BookingUtilsServer = {
         case BookingStatusEnum.CONFIRMED:
           statusText = "confermata";
           content = `
-                    <p>La prenotazione <strong>#${booking.id}</strong> è stata confermata.</p>
+                    <p>Hai ricevuto una nuova prenotazione <strong>#${booking.id}</strong>.</p>
                     <p>Contatta l'utente a breve per i dettagli finali.</p>
                   `;
           break;
