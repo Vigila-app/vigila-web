@@ -107,7 +107,26 @@ export async function PUT(
       updateData.payment_status = payment_status;
     }
 
-    if (status && Object.values(BookingStatusEnum).includes(status)) {
+    // Validate allowed status transitions
+    const allowedStatusTransitions: Record<BookingStatusEnum, BookingStatusEnum[]> = {
+      [BookingStatusEnum.PENDING]: [BookingStatusEnum.CONFIRMED, BookingStatusEnum.CANCELLED],
+      [BookingStatusEnum.CONFIRMED]: [BookingStatusEnum.COMPLETED, BookingStatusEnum.CANCELLED],
+      [BookingStatusEnum.COMPLETED]: [],
+      [BookingStatusEnum.CANCELLED]: [],
+    };
+    if (
+      status &&
+      Object.values(BookingStatusEnum).includes(status)
+    ) {
+      const currentStatus = existingBooking.status;
+      const allowedNextStatuses = allowedStatusTransitions[currentStatus as BookingStatusEnum] || [];
+      if (!allowedNextStatuses.includes(status)) {
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
+          success: false,
+          error: `Invalid status transition from '${currentStatus}' to '${status}'`,
+        });
+      }
       updateData.status = status;
     }
 
