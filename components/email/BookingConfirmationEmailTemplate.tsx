@@ -133,8 +133,7 @@ export function BookingConfirmationEmailTemplate(
                 Data:
               </td>
               <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {dateDisplay(bookingDate, "date")}&nbsp;
-                {dateDisplay(bookingTime, "time")}
+                {dateDisplay(bookingDate, "dateTime")}
               </td>
             </tr>
             {!isVigil && vigilName && (
