@@ -35,12 +35,8 @@ export const BookingUtilsServer = {
                 (consumer as any)?.name,
               bookingId: booking.id,
               serviceName: booking.service?.name || "",
-              bookingDate: booking.startDate
-                ? dateDisplay(booking.startDate, "date")
-                : "",
-              bookingTime: booking.startDate
-                ? dateDisplay(booking.startDate, "time")
-                : "",
+              bookingDate: booking.startDate,
+              bookingTime: booking.startDate,
               vigilName:
                 booking.vigil?.name ||
                 booking.vigil?.displayName ||

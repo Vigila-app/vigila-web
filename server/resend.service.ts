@@ -62,9 +62,26 @@ export const ResendService = {
           subject: options.subject,
           react: options.react,
           replyTo: options.replyTo,
-          text:
-            options.text ||
-            options.react?.props?.children?.toString()?.replace(/<[^>]*>/g, ""),
+          text: await (async () => {
+            if (options.text) return options.text;
+            try {
+              // dynamic import to avoid bundling react-dom/server into client bundles
+              const rds = await import("react-dom/server");
+              const renderToStaticMarkup = rds.renderToStaticMarkup as (
+                element: any
+              ) => string;
+              // render the react element to static HTML and strip tags to obtain plain text
+              const html = options.react ? renderToStaticMarkup(options.react) : "";
+              return html.replace(/<[^>]*>/g, "").trim() || undefined;
+            } catch (e) {
+              // fallback: attempt to stringify children or return undefined
+              try {
+                return options.react?.props?.children?.toString?.() || undefined;
+              } catch (ee) {
+                return undefined;
+              }
+            }
+          })(),
         };
         if (!isReleased) {
           console.log("Invio email con template:", body);
