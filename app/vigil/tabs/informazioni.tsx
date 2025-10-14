@@ -5,11 +5,10 @@ const InformazioniTab = () => {
   const { user, userDetails } = useUserStore();
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 w-full mx-auto mt-6 ">
-      <Card>
-        <div>
-          <div className="font-semibold text-xl ">Informazioni personali</div>
-        </div>
+    <div className="w-full mx-auto max-w-4xl gap-6 mt-6 ">
+      <Card customClass="w-full" >
+        <div className="font-semibold text-xl  ">Informazioni personali</div>
+
         <div className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
