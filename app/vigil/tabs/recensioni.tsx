@@ -123,7 +123,6 @@ export default function RecensioniTab({
               isEditable={true}
               showEditInline={true}
               simplified={simplified}
-              simplified={simplified}
             />
           ))
         ) : (
