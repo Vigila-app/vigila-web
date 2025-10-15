@@ -1,9 +1,11 @@
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { initAdmin } from "@/server/supabaseAdmin";
-import { ResponseCodesConstants } from "@/src/constants";
+import { AppConstants, ResponseCodesConstants } from "@/src/constants";
 import { AccessLevelsEnum, RolesEnum } from "@/src/enums/roles.enums";
+import { Routes } from "@/src/routes";
 import { AuthService } from "@/src/services";
 import { UserSignupType, UserType } from "@/src/types/user.types";
+import { isReleased } from "@/src/utils/envs.utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const genericError = (error: any = undefined) =>
@@ -70,10 +72,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await _admin.auth.admin.createUser({
       email,
       password,
-
-      // TODO review this part
-      email_confirm: true,
-
+      email_confirm: !isReleased,
       user_metadata: {
         name,
         surname,
@@ -131,6 +130,19 @@ export async function POST(req: NextRequest) {
 
       if (error) {
         return genericError(error);
+      }
+
+      if (isReleased) {
+        const { error: email_error } = await _admin.auth.resend({
+          type: "signup",
+          email,
+          options: {
+            emailRedirectTo: `${AppConstants.hostUrl}${Routes.login.url}`,
+          },
+        });
+        if (email_error) {
+          console.error("Error sending signup email", email_error);
+        }
       }
 
       return NextResponse.json(
