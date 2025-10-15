@@ -4,6 +4,7 @@ import { UserService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useUserStore } from "@/src/store/user/user.store";
+import { dateDisplay } from "@/src/utils/date.utils";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -11,7 +12,7 @@ const InformazioniConsumerTab = () => {
   const { user, userDetails } = useUserStore();
   const { showToast } = useAppStore();
   const { consumers, getConsumersDetails } = useConsumerStore();
-  const { role, email, birthday, phone } = user?.user_metadata || {};
+  const { email, birthday, phone } = user?.user_metadata || {};
   const consumer = consumers.find((c) => c.id === user?.id);
   //esempio di editing dinamico
   const [isEditing, setIsEditing] = useState(true);
@@ -51,6 +52,12 @@ const InformazioniConsumerTab = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails, isEditing, reset]);
+
+  useEffect(() => {
+    if (!consumer?.lovedOneName && user?.id)
+      getConsumersDetails([user.id], true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [consumer?.lovedOneName, user?.id]);
 
   const onSubmit = async (formData: ProfileFormI) => {
     if (isValid) {
@@ -135,7 +142,6 @@ const InformazioniConsumerTab = () => {
               Per modificare l&apos;email contatta il supporto
             </p>
           </div>
-
         </div>
       </Card>
       <Card>
@@ -149,15 +155,15 @@ const InformazioniConsumerTab = () => {
                 Nome
               </label>
 
-              <p>{consumer?.lovedOneName}</p>
+              <p>{consumer?.lovedOneName || "-"}</p>
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium  text-vigil-orange">
                 Cognome
               </label>
 
               <p>{userDetails?.surname}</p>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-2">
@@ -165,14 +171,18 @@ const InformazioniConsumerTab = () => {
               Data di nascita
             </label>
 
-            <p>{consumer?.lovedOneBirthday}</p>
+            <p>
+              {consumer?.lovedOneBirthday
+                ? dateDisplay(consumer?.lovedOneBirthday, "date")
+                : "-"}
+            </p>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-vigil-orange">
               Telefono
             </label>
-            <p>{consumer?.lovedOnePhone}</p>
+            <p>{consumer?.lovedOnePhone || "-"}</p>
           </div>
         </div>
       </Card>

@@ -31,8 +31,8 @@ const PanoramicaConsumerTab = () => {
         </h1>
 
         <div>
-          <p className="font-medium leading-relaxed text-sm">
-            {consumer?.information}
+          <p className="leading-relaxed text-sm">
+            {consumer?.information || "-"}
           </p>
         </div>
       </Card>
@@ -47,10 +47,10 @@ const PanoramicaConsumerTab = () => {
             <EnvelopeIcon className="size-4" />
             <span>{user?.email}</span>
           </div>
-          {(consumer?.lovedOnePhone || consumer?.phone) && (
+          {(consumer?.phone || consumer?.lovedOnePhone) && (
             <div className="flex items-center gap-2">
               <PhoneIcon className="size-4" />
-              <span>{consumer?.lovedOnePhone || consumer?.phone}</span>
+              <span>{consumer?.phone || consumer?.lovedOnePhone}</span>
             </div>
           )}
           {consumer?.address?.name && (

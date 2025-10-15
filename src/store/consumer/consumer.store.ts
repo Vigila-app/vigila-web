@@ -30,70 +30,65 @@ export const useConsumerStore = create<ConsumerStoreType>()(
         getConsumersDetails: async (consumers: string[], force = false) => {
           const action = async () => {
             try {
-              const getConsumersDetailsBE = async () => {
-                try {
-                  const promises = consumers
-                    .filter((consumerId) =>
-                      force ||
-                      !get().lastUpdate ||
-                      dateDiff(
-                        new Date(),
-                        get().lastUpdate,
-                        FrequencyEnum.MINUTES
-                      ) > 15
-                        ? consumerId
-                        : !get().consumers.find(
-                            (consumer) => consumer.id === consumerId
-                          )
-                    )
-                    .map((consumerId) =>
-                      ApiService.get<{ data: ConsumerDetailsType }>(
-                        apiConsumer.DETAILS(consumerId)
-                      )
-                    );
-                  if (!promises?.length) {
-                    return get().consumers.filter(c => consumers.includes(c.id));
-                  }
-                  const consumersDetailsStoreBE = await Promise.all(promises);
-                  if (!consumersDetailsStoreBE?.length) {
-                    throw new Error("No consumer details found");
-                  } else {
-                    const newConsumers = consumersDetailsStoreBE
-                      .filter(
-                        (item): item is { data: ConsumerDetailsType } =>
-                          item !== undefined
-                      )
-                      .map(({ data }) => data);
-                    
-                    set(
-                      () => ({
-                        consumers: Array.from(
-                          new Set([
-                            ...get().consumers,
-                            ...newConsumers,
-                          ])
-                        ),
-                        lastUpdate: new Date(),
-                      }),
-                      false,
-                      { type: "getConsumersDetails" }
-                    );
-                    return newConsumers;
-                  }
-                } catch (error) {
-                  throw error;
-                }
-              };
-              
-              return await getConsumersDetailsBE();
+              // decide which consumer ids actually need to be fetched
+              const lastUpdate = get().lastUpdate;
+              const idsToFetch = consumers.filter((consumerId) => {
+                if (force) return true;
+                if (!lastUpdate) return true;
+                if (
+                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 15
+                )
+                  return true;
+                // otherwise fetch only if not already present
+                return !get().consumers.find((c) => c.id === consumerId);
+              });
+
+              if (!idsToFetch.length) {
+                // Return existing consumers in requested order
+                return get().consumers.filter((c) => consumers.includes(c.id));
+              }
+
+              const promises = idsToFetch.map((consumerId) =>
+                ApiService.get<{ data: ConsumerDetailsType }>(
+                  apiConsumer.DETAILS(consumerId)
+                )
+              );
+
+              const consumersDetailsStoreBE = await Promise.all(promises);
+              if (!consumersDetailsStoreBE?.length) {
+                throw new Error("No consumer details found");
+              }
+
+              const newConsumers = consumersDetailsStoreBE
+                .filter((item): item is { data: ConsumerDetailsType } =>
+                  Boolean(item)
+                )
+                .map(({ data }) => data);
+
+              // Merge existing and new consumers, deduplicating by id and
+              // ensuring the newly fetched items replace older ones
+              const existing = get().consumers || [];
+              const mergedMap = new Map<string, ConsumerDetailsType>();
+              existing.forEach((c) => mergedMap.set(c.id, c));
+              newConsumers.forEach((c) => mergedMap.set(c.id, c));
+
+              const mergedArray = Array.from(mergedMap.values());
+
+              set(
+                () => ({ consumers: mergedArray, lastUpdate: new Date() }),
+                false,
+                { type: "getConsumersDetails" }
+              );
+
+              return newConsumers;
             } catch (error) {
               console.error("useConsumerStore getConsumersDetails error:", error);
               throw error;
             }
           };
 
-          const uniqueKey = consumers.sort().join(',');
-          return createDebouncedAction('getConsumersDetails', action, force, uniqueKey);
+          const uniqueKey = consumers.slice().sort().join(",");
+          return createDebouncedAction("getConsumersDetails", action, force, uniqueKey);
         },
         onLogout: () => {
           set(initConsumerStore, false, { type: "onLogout" });
