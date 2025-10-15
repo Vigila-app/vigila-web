@@ -111,7 +111,7 @@ const PanoramicaTab = () => {
     (total, booking) => total + (booking.price - booking.fee),
     0
   );
-
+ 
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>
@@ -134,7 +134,7 @@ const PanoramicaTab = () => {
         {!isEditing ? (
           <div>
             <p className="font-medium leading-relaxed text-sm">
-              {isVigil ? userDetails?.information : vigil?.information}
+              {isVigil ? user?.user_metadata?.information : vigil?.information}
             </p>
           </div>
         ) : (
@@ -214,7 +214,7 @@ const PanoramicaTab = () => {
           {isVigil && (
             <div className="flex items-center gap-2">
               <EnvelopeIcon className="size-4" />
-              <span>{userDetails?.email}</span>
+              <span>{user?.email}</span>
             </div>
           )}
           {isVigil && (
