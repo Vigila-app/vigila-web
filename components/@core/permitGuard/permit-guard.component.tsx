@@ -1,5 +1,6 @@
 "use client";
 
+import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { Routes } from "@/src/routes";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -29,6 +30,14 @@ const PermitGuardComponent = () => {
         handleNotAuthorized();
       } else {
         setHide(false);
+
+        if (user?.user_metadata?.status === UserStatusEnum.PENDING) {
+          router.replace(
+            user.user_metadata?.role === RolesEnum.CONSUMER
+              ? Routes.onBoard.url
+              : Routes.onBoardVigil.url
+          );
+        }
       }
     } else {
       handleNotAuthorized();

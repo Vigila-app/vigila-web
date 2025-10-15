@@ -91,7 +91,7 @@ const ConsumerOnboardComponent = () => {
       });
       AuthService.renewAuthentication();
 
-      router.replace(Routes.homeConsumer.url);
+      router.replace(Routes.home.url);
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({
@@ -133,6 +133,7 @@ const ConsumerOnboardComponent = () => {
                   maxLength={FormFieldType.NAME.maxLength}
                   role={role}
                   error={errors.lovedOneName}
+                  autoFocus
                 />
               )}
             />
@@ -227,6 +228,7 @@ const ConsumerOnboardComponent = () => {
                     }}
                     placeholder="Inserisci la città e il CAP della persona cara"
                     label="Indirizzo della persona cara"
+                    autoFocus={false}
                   />
                   {address && (
                     <div className="flex flex-col items-start text-start pt-1 mt-2 bg-gray-100 rounded-2xl ">
@@ -252,7 +254,7 @@ const ConsumerOnboardComponent = () => {
             <Controller
               name="information"
               control={control}
-              rules={{ required: true, ...FormFieldType.NOTE }}
+              rules={{ required: false, ...FormFieldType.NOTE }}
               render={({ field }) => (
                 <TextArea
                   {...field}
