@@ -241,7 +241,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 {capitalize(booking.address)}
               </p>
               <p>
-                <span className="font-medium">Durata:</span> {booking.quantity}
+                <span className="font-medium">Durata:</span>&nbsp;
+                {booking.quantity}
                 &nbsp;
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
@@ -256,6 +257,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               {!isVigil && (
                 <p>
                   <span className="font-medium">Prezzo del servizio:</span>
+                  &nbsp;
                   {amountDisplay(
                     booking.price,
                     booking.service?.currency as CurrencyEnum
@@ -293,7 +295,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                           vigil?.id
                         )
                       : "#"
-                  }>
+                  }
+                >
                   <Card className="p-4 bg-vigil-light-orange border border-vigil-orange rounded-full shadow">
                     <div className="inline-flex items-center flex-nowrap gap-2 w-full">
                       <Avatar userId={vigil?.id} value={vigil?.displayName} />
@@ -351,7 +354,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           dateDiff(booking.endDate, currentDate) < 0 && (
             <div className="flex flex-col items-center gap-3">
               <h3 className=" font font-medium">Completamento:</h3>
-              <p className="text-sm">Ricorda di completare solo dopo che il servizio è stato erogato correttamente; altrimenti contatta l&apos;assistenza clienti!</p>
+              <p className="text-sm">
+                Ricorda di completare solo dopo che il servizio è stato erogato
+                correttamente; altrimenti contatta l&apos;assistenza clienti!
+              </p>
               <Button
                 role={RolesEnum.CONSUMER}
                 label="Completa Prenotazione"
@@ -371,17 +377,19 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           />
         )}
 
-        {isConsumer && booking.payment_status === PaymentStatusEnum.PENDING && (
-          <Button
-            label="Paga Prenotazione"
-            role={RolesEnum.CONSUMER}
-            action={() =>
-              router.push(
-                `${Routes.paymentBooking.url}?bookingId=${booking.id}`
-              )
-            }
-          />
-        )}
+        {isConsumer &&
+          booking.payment_status === PaymentStatusEnum.PENDING &&
+          booking.status === BookingStatusEnum.PENDING && (
+            <Button
+              label="Paga Prenotazione"
+              role={RolesEnum.CONSUMER}
+              action={() =>
+                router.push(
+                  `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+                )
+              }
+            />
+          )}
 
         {isModal && <Button secondary label="Chiudi" action={closeModal} />}
       </div>
