@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/src/store/admin/admin.store";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 
 export default function AdminPaymentsPage() {
   const { payments, paymentsLoading, getPayments } = useAdminStore();
@@ -123,13 +124,13 @@ export default function AdminPaymentsPage() {
             <p className="text-3xl font-bold text-yellow-600">
               €
               {payments
-                .filter((p) => p.status === "pending")
+                .filter((p) => p.status === PaymentStatusEnum.PENDING)
                 .reduce((sum, p) => sum + p.amount, 0)
                 .toFixed(2)}
             </p>
             <p className="text-sm text-gray-600">In Attesa</p>
             <p className="text-xs text-gray-500">
-              {payments.filter((p) => p.status === "pending").length}{" "}
+              {payments.filter((p) => p.status === PaymentStatusEnum.PENDING).length}{" "}
               transazioni
             </p>
           </div>

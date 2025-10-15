@@ -27,6 +27,7 @@ import useAltcha from "@/src/hooks/useAltcha";
 import { useEffect, useState } from "react";
 import { AltchaService } from "@/src/services/altcha.service";
 import clsx from "clsx";
+import { isReleased } from "@/src/utils/envs.utils";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -114,7 +115,16 @@ const SignupComponent = (props: SignupComponentI) => {
             { email, password, name, surname, role },
             terms
           );
-          redirectOnboard();
+          if (isReleased) {
+            // redirect to confirmation page where user is told to check email
+            router.replace(
+              `${Routes.confirmRegistration.url}?email=${encodeURIComponent(
+                email
+              )}`
+            );
+          } else {
+            redirectOnboard();
+          }
         }
       } catch (error: any) {
         console.error("Error registering user", error);

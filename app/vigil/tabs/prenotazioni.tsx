@@ -6,11 +6,6 @@ import TabInattesa from "@/app/vigil/tabs/TabsPrenotazioni/TabInAttesa";
 import TabConfirmed from "@/app/vigil/tabs/TabsPrenotazioni/TabConfirmed";
 import TabCompletati from "@/app/vigil/tabs/TabsPrenotazioni/TabCompletati";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
-import {
-  CheckBadgeIcon,
-  ClockIcon,
-  ShieldCheckIcon,
-} from "@heroicons/react/24/outline";
 
 const PrenotationTabs = () => {
   const { user } = useUserStore();

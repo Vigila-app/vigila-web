@@ -57,3 +57,6 @@ button {
   @apply visible z-50;
 }
 
+.hide-scrollbar {
+  scrollbar-width: none;
+}

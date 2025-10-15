@@ -46,7 +46,6 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log("AdminLayout - rendering admin layout");
   return (
     <HtmlDocument
       otherBody={

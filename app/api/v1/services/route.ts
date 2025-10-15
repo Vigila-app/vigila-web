@@ -38,15 +38,15 @@ export async function GET(req: NextRequest) {
         success: false,
       });
 
-    if (
-      userObject.user_metadata?.role === RolesEnum.CONSUMER &&
-      !filters.postalCode
-    ) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
-        success: false,
-      });
-    }
+    // if (
+    //   userObject.user_metadata?.role === RolesEnum.CONSUMER &&
+    //   !filters.postalCode
+    // ) {
+    //   return jsonErrorResponse(400, {
+    //     code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
+    //     success: false,
+    //   });
+    // }
 
     const _admin = getAdminClient();
     let db_query = _admin.from("services").select(

@@ -101,7 +101,7 @@ const MenuMobile = () => {
         id="MenuMobile"
         style={!isOpen ? { right: "-100vw" } : {}}
         className={clsx(
-          "absolute flex flex-col gap-8  md:hidden transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
+          "absolute flex flex-col gap-8  transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
           isOpen ? "block right-0" : "hidden"
         )}>
         {isUserLogged ? (

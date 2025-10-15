@@ -122,6 +122,19 @@
     "private": false,
     "roles": []
   },
+  "confirmRegistration": {
+    "url": "/auth/confirm-registration",
+    "label": "Conferma registrazione",
+    "title": "Conferma registrazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
   "bookings": {
     "url": "/booking",
     "label": "Prenotazioni",
@@ -320,7 +333,7 @@
     "roles": ["VIGIL"]
   },
   "vigilDetails": {
-    "url": "/vigil/:vigilId",
+    "url": "/vigil/:vigilId/profile",
     "label": "Dettagli Vigil",
     "title": "Dettagli Vigil",
     "matchingUrl": "/vigil/",

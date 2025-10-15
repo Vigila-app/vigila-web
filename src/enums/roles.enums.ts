@@ -15,3 +15,11 @@ export enum AccessLevelsEnum {
     GOD = "GOD",
     // TODO other levels
 }
+
+export enum UserStatusEnum {
+    INACTIVE = "inactive",
+    PENDING = "pending",
+    ACTIVE = "active",
+    SUSPENDED = "suspended",
+    DELETED = "deleted",
+}
