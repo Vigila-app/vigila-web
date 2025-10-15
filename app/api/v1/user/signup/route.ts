@@ -1,4 +1,3 @@
-import User from "@/app/(consumer)/user/page";
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { initAdmin } from "@/server/supabaseAdmin";
 import { AppConstants, ResponseCodesConstants } from "@/src/constants";
