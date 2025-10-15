@@ -12,6 +12,7 @@ import { useAppStore } from "@/src/store/app/app.store";
 interface ReviewFormComponentProps {
   bookingId: string;
   vigilName?: string;
+  reviewId?: string;
   onSuccess?: () => void;
   isModal?: boolean;
   initialData?: {
@@ -59,7 +60,7 @@ const ReviewFormComponent = (props: ReviewFormComponentProps) => {
       if (isEditing) {
         // For editing, we need to find the review ID first
         const reviews = await getReviews();
-        const existingReview = reviews.find(r => r.booking_id === bookingId);
+        const existingReview = reviews.find(r => r.id === props.reviewId);
         
         if (existingReview) {
           await updateReview(existingReview.id, {

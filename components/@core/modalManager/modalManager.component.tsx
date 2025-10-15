@@ -53,6 +53,7 @@ const ModalManagerComponent = () => {
           <ReviewFormComponent
             isModal
             bookingId={payload?.bookingId as string}
+            reviewId={payload?.reviewId as string}
             vigilName={payload?.vigilName as string}
             onSuccess={payload?.onSuccess as (() => void) | undefined}
             // For editing, we could pass initial data
