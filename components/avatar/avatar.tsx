@@ -5,7 +5,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { InputFile } from "@/components/form";
 import { randomNumber } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { StorageUtils } from "@/src/utils/storage.utils";
 
 const BACKGROUND_COLORS = [
@@ -56,7 +56,7 @@ const TEXT_COLORS = [
 
 type AvatarI = {
   imgUrl?: string | null;
-  size?: "small" | "standard" | "medium" | "big"| "xxl";
+  size?: "small" | "standard" | "medium" | "big" | "xxl";
   label?: string;
   inline?: boolean;
   withUpload?: boolean;
@@ -65,7 +65,7 @@ type AvatarI = {
     metadata: { contentType: string }
   ) => void;
   value?: string;
-  userId?:string;
+  userId?: string;
   className?: string;
 };
 
@@ -90,6 +90,7 @@ const Avatar = (props: AvatarI) => {
     className,
   } = props;
   const { user, lastUpdate: lastUserUpdate } = useUserStore();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [profilePic, setProfilePic] = useState<string | undefined>();
 
   const getProfilePic = async (id: string) => {
@@ -116,12 +117,12 @@ const Avatar = (props: AvatarI) => {
 
   return (
     <div
+    onClick={() => inputRef.current?.click()}
       className={clsx(
-        "relative items-center",
+        "relative items-center cursor-pointer",
         inline ? "inline-flex gap-1" : "flex flex-col gap-1",
         className
-      )}
-    >
+      )}>
       {imgUrl || profilePic ? (
         <img alt="avatar" src={imgUrl || profilePic} className={imgStyle} />
       ) : value ? (
@@ -133,13 +134,11 @@ const Avatar = (props: AvatarI) => {
           )}
           style={{
             backgroundColor: `#${BACKGROUND_COLORS[randomKey]}`,
-          }}
-        >
+          }}>
           <span className="sr-only">{value}</span>
           <span
             className="uppercase !no-underline"
-            style={{ color: `#${TEXT_COLORS[randomKey]}` }}
-          >
+            style={{ color: `#${TEXT_COLORS[randomKey]}` }}>
             {String(
               value.includes(" ")
                 ? value
@@ -158,8 +157,7 @@ const Avatar = (props: AvatarI) => {
           className={clsx(
             "text-left text-ellipsis overflow-hidden text-nowrap select-all",
             inline ? "max-w-40" : "max-w-60"
-          )}
-        >
+          )}>
           {label}
         </p>
       ) : null}
@@ -167,6 +165,7 @@ const Avatar = (props: AvatarI) => {
       {withUpload ? (
         <div className="absolute">
           <InputFile
+          ref={inputRef} 
             hidden
             label="profile pic"
             type="image"
