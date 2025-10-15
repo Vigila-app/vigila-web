@@ -122,6 +122,19 @@
     "private": false,
     "roles": []
   },
+  "confirmRegistration": {
+    "url": "/auth/confirm-registration",
+    "label": "Conferma registrazione",
+    "title": "Conferma registrazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
   "bookings": {
     "url": "/booking",
     "label": "Prenotazioni",

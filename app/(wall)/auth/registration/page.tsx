@@ -23,7 +23,7 @@ export default async function Registration() {
   const { main: { title = "Sign up", text } = {} } = data;
   return (
     <section className="py-16">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between ">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 text-center">
         <div className="bg-pureWhite w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-3xl shadow-lg text-center">
           {title || text ? (
             <div>
@@ -38,9 +38,9 @@ export default async function Registration() {
           <h3 className="font-semibold text-sm my-4">
             Come vuoi unirti a Vigila?
           </h3>
-          <div className="space-y-4 my-4">
+          <div className="my-4">
             <Link href={Routes.registrationConsumer.url}>
-              <Card containerClass="text-consumer-blue flex flex-col items-center justify-center p-4 hover:scale-95 transition">
+              <Card customClass="mb-4" containerClass="text-consumer-blue flex flex-col items-center justify-center p-4 hover:scale-95 transition">
                 <HeartIcon className="size-6" />
                 <h4 className="font-bold">Hai bisogno di aiuto?</h4>
                 <p className="text-gray-500 text-[12px]">

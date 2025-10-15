@@ -13,6 +13,9 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { AppConstants } from "@/src/constants";
+import { Routes } from "@/src/routes";
+import { isReleased } from "@/src/utils/envs.utils";
 
 export const AuthInstance = AppInstance;
 
@@ -40,8 +43,9 @@ export const AuthService = {
           role,
         })) as { data: { user: User } };
         if (response?.data?.user?.id) {
-          // TODO redirect to landing page to confirm mail
-          await AuthService.login(email, password);
+          if (!isReleased) {
+            await AuthService.login(email, password);
+          }
           resolve(response.data);
         } else {
           reject();
@@ -129,6 +133,27 @@ export const AuthService = {
 
     return { appToken, authToken, user };
   },
+
+  resendConfirmation: async (
+    email: string,
+    redirectUrl = `${AppConstants.hostUrl}${Routes.login.url}`
+  ) =>
+    new Promise(async (resolve, reject) => {
+      try {
+        if (!email) return reject(new Error("Email required"));
+        const options = redirectUrl ? { emailRedirectTo: redirectUrl } : {};
+        const { error } = await AppInstance.auth.resend({
+          type: "signup",
+          email,
+          options,
+        });
+        if (error) return reject(error);
+        resolve(true);
+      } catch (error) {
+        console.error("AuthService resendConfirmation error", error);
+        reject(error);
+      }
+    }),
 
   // region 3RD PARTIES SIGN-IN PROVIDERS
   // googleLogin: async () =>

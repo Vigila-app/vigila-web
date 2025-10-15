@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
 import { Routes } from "@/src/routes";
-import { RolesEnum } from "@/src/enums/roles.enums";
+import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 
 export default function VigilRedirectHandler() {
   const router = useRouter();
@@ -13,10 +13,10 @@ export default function VigilRedirectHandler() {
   useEffect(() => {
     if (user?.user_metadata?.role === RolesEnum.VIGIL) {
       switch (user?.user_metadata?.status) {
-        case "active":
+        case UserStatusEnum.ACTIVE:
         default:
           break;
-        case "pending":
+        case UserStatusEnum.PENDING:
           router.replace(Routes.onBoardVigil.url);
           break;
       }
