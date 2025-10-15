@@ -2,7 +2,7 @@
 
 import { FormUtils } from "@/src/utils/form.utils";
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { FieldError } from "react-hook-form";
 
 type InputFileI = React.InputHTMLAttributes<HTMLInputElement> & {
@@ -22,7 +22,7 @@ const InputFileExtension = {
   file: "",
 };
 
-const InputFile = (props: InputFileI) => {
+const InputFile = forwardRef<HTMLInputElement, InputFileI>((props, ref) => {
   const {
     error: extError,
     hidden = false,
@@ -34,6 +34,7 @@ const InputFile = (props: InputFileI) => {
     onFileUpload = () => ({}),
     required = false,
   } = props;
+
   const [error, setError] = useState<FieldError | undefined>(extError);
 
   const checkFile = (file?: File) => {
@@ -48,7 +49,6 @@ const InputFile = (props: InputFileI) => {
       }
       return true;
     }
-
     return false;
   };
 
@@ -78,8 +78,7 @@ const InputFile = (props: InputFileI) => {
         "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600",
         error && "border-red-500",
         hidden && "sr-only p-8 opacity-0 cursor-pointer"
-      )}
-    >
+      )}>
       <input
         {...{
           ...props,
@@ -87,6 +86,7 @@ const InputFile = (props: InputFileI) => {
           hidden: undefined,
           onFileUpload: undefined,
         }}
+        ref={ref}
         type="file"
         accept={InputFileExtension[type]}
         id={id || name || label}
@@ -102,8 +102,7 @@ const InputFile = (props: InputFileI) => {
           "pointer-events-none absolute start-2.5 top-0 -translate-y-1/2 rounded bg-white p-0.5 text-xs text-gray-700 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-focus:top-0 peer-focus:text-xs",
           error && "text-red-500",
           hidden && "sr-only"
-        )}
-      >
+        )}>
         {label}
         {required && <>*</>}
       </span>
@@ -114,13 +113,13 @@ const InputFile = (props: InputFileI) => {
           className={clsx(
             "absolute start-2.5 top-12 text-xs text-red-500",
             hidden && "sr-only"
-          )}
-        >
+          )}>
           {FormUtils.getErrorByType(error)}
         </p>
       ) : null}
     </label>
   );
-};
+});
 
+InputFile.displayName = "InputFile";
 export default InputFile;

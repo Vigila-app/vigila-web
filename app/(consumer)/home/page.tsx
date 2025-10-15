@@ -1,7 +1,7 @@
 "use client";
 
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
-import { Button, ButtonLink } from "@/components";
+import { ButtonLink } from "@/components";
 import {
   CalendarIcon,
   ChevronRightIcon,

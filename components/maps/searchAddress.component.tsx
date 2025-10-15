@@ -22,6 +22,7 @@ const SearchAddress = (props: {
   role?: RolesEnum;
   location?: boolean;
   placeholder?: string;
+  autoFocus?: boolean;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -31,6 +32,7 @@ const SearchAddress = (props: {
     location = false,
     role,
     placeholder = "Inserisci CAP",
+    autoFocus = true,
   } = props;
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
@@ -173,7 +175,7 @@ const SearchAddress = (props: {
                 setSearchTerm(value as string);
               }}
               value={searchTerm}
-              autoFocus
+              autoFocus={autoFocus}
               label={label}
               placeholder={placeholder}
               type="text"

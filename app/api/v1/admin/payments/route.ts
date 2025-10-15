@@ -7,6 +7,7 @@ import {
   getQueryParams,
 } from "@/server/api.utils.server";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 
 export async function GET(req: NextRequest) {
   try {
@@ -84,15 +85,15 @@ export async function GET(req: NextRequest) {
     }));
 
     const totalRevenue = paymentsData
-      .filter((payment: any) => payment.status === "PAID")
+      .filter((payment: any) => payment.status === PaymentStatusEnum.PAID)
       .reduce((sum: number, payment: any) => sum + payment.amount, 0);
 
     const totalPending = paymentsData
-      .filter((payment: any) => payment.status === "PENDING")
+      .filter((payment: any) => payment.status === PaymentStatusEnum.PENDING)
       .reduce((sum: number, payment: any) => sum + payment.amount, 0);
 
     const totalRefunded = paymentsData
-      .filter((payment: any) => payment.status === "REFUNDED")
+      .filter((payment: any) => payment.status === PaymentStatusEnum.REFUNDED)
       .reduce((sum: number, payment: any) => sum + payment.amount, 0);
 
     return NextResponse.json({

@@ -4,7 +4,7 @@ import {
   getAdminClient,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
-import { RolesEnum } from "@/src/enums/roles.enums";
+import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
 import { NextResponse } from "next/server";
@@ -48,7 +48,7 @@ export async function POST(
       .from(table)
       .update({
         ...onBoardUser,
-        status: "active",
+        status: UserStatusEnum.ACTIVE,
         updated_at: getPostgresTimestamp(),
         id: originalUser.id,
       })
@@ -59,12 +59,12 @@ export async function POST(
     if (error || !data)
       throw error || new Error("No data returned from update");
 
-    if (userStatus === "pending") {
+    if (userStatus === UserStatusEnum.PENDING) {
       const { error: authError } = await _admin.auth.admin.updateUserById(
         userId,
         {
           user_metadata: deepMerge(originalUser.user_metadata, {
-            status: "active",
+            status: UserStatusEnum.ACTIVE,
           }),
         }
       );
