@@ -1,7 +1,8 @@
+import User from "@/app/(consumer)/user/page";
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { initAdmin } from "@/server/supabaseAdmin";
 import { AppConstants, ResponseCodesConstants } from "@/src/constants";
-import { AccessLevelsEnum, RolesEnum } from "@/src/enums/roles.enums";
+import { AccessLevelsEnum, RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { Routes } from "@/src/routes";
 import { AuthService } from "@/src/services";
 import { UserSignupType, UserType } from "@/src/types/user.types";
@@ -82,9 +83,9 @@ export async function POST(req: NextRequest) {
         level,
         status:
           role === RolesEnum.CONSUMER
-            ? "active"
+            ? UserStatusEnum.PENDING
             : role === RolesEnum.VIGIL
-              ? "pending"
+              ? UserStatusEnum.PENDING
               : undefined,
       },
     });
@@ -107,9 +108,9 @@ export async function POST(req: NextRequest) {
           displayName: `${name} ${surname}`,
           status:
             role === RolesEnum.CONSUMER
-              ? "active"
+              ? UserStatusEnum.PENDING
               : role === RolesEnum.VIGIL
-                ? "pending"
+                ? UserStatusEnum.PENDING
                 : undefined,
         })
         .select()

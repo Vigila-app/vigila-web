@@ -5,7 +5,6 @@ import {
   getAdminClient,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
-import { RolesEnum } from "@/src/enums/roles.enums";
 
 export async function GET(
   req: Request,
