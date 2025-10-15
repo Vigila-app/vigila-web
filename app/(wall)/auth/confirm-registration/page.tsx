@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components";
 import { AuthService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -13,8 +13,7 @@ import Link from "next/link";
 
 export default function ConfirmRegistrationPage() {
   const router = useRouter();
-  const params = useSearchParams();
-  const email = params?.get("email") || "";
+  const [email, setEmail] = useState<string>("");
   const {
     showToast,
     showLoader,
@@ -94,18 +93,33 @@ export default function ConfirmRegistrationPage() {
   useEffect(() => {
     // start initial countdown when component mounts
     startCountdown(isReleased ? 59 : 5);
-    // load attemptsUsed from localStorage (persist across reloads)
+
+    // read email from URL on client side
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const e = params.get("email") || "";
+      if (e) setEmail(e);
+    } catch (err) {
+      // ignore
+    }
+
+    return () => {
+      clearTimer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // load attemptsUsed once email is available
+  useEffect(() => {
+    if (!email) return;
     try {
       const stored = StorageUtils.getSessionValues(storageKey);
       if (stored) setAttemptsUsed(parseInt(stored, 10) || 0);
     } catch (err) {
       // ignore
     }
-    return () => {
-      clearTimer();
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [email]);
 
   const formatTime = (s: number) => {
     const mm = Math.floor(s / 60)
@@ -116,7 +130,7 @@ export default function ConfirmRegistrationPage() {
   };
 
   if (!email) {
-    router.push(Routes.home.url);
+    // router.push(Routes.home.url);
     return null;
   }
 
