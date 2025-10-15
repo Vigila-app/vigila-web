@@ -97,14 +97,16 @@ const ServiziTab = () => {
   // Gestione aggiunta nuovo servizio
   const handleAddService = useCallback(
     async (service: ServiceI) => {
+      const { id, ...servicePayload } = service;
       await ServicesService.createService({
-        ...service,
+        ...servicePayload,
         vigil_id: vigilId,
       } as ServiceI);
       reloadServices();
       setNewServiceMode(false);
       setNewService({});
     },
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [vigilId]
   );
@@ -127,7 +129,7 @@ const ServiziTab = () => {
                 />
                 {editingIndex === i && isVigil && (
                   <div className="mt-2 p-4 bg-gray-50 rounded">
-                    <Input
+                    {/* <Input
                       label="Prezzo (€)"
                       type="number"
                       role={RolesEnum.CONSUMER}
@@ -146,7 +148,7 @@ const ServiziTab = () => {
                         services[i].unit_price = Number(value);
                         setNewService({ ...service });
                       }}
-                    />
+                    /> */}
                     <div className="flex gap-2 mt-2 flex-wrap">
                       <Button
                         label="Salva"
@@ -175,11 +177,17 @@ const ServiziTab = () => {
                     selectedServices={services}
                     onServicesChange={(services) => {
                       if (services.length) {
-                        setNewService(services[0]);
+                        setNewService((prev) => {
+                          // aggiorna solo se è davvero diverso
+                          if (prev?.id !== services[0].id) {
+                            return services[0];
+                          }
+                          return prev;
+                        });
                       }
                     }}
                   />
-                  <Input
+                  {/* <Input
                     label="Prezzo (€)"
                     type="number"
                     value={newService.unit_price || ""}
@@ -189,7 +197,7 @@ const ServiziTab = () => {
                         unit_price: Number(value),
                       }));
                     }}
-                  />
+                  /> */}
                   <div className="flex gap-2 items-center justify-center mt-2">
                     <Button
                       label="Aggiungi"

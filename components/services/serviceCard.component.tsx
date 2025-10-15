@@ -195,7 +195,7 @@ const ServiceCard = (props: ServiceCardI) => {
       )}
       {showActions && isVigil ? (
         <div className="inline-flex items-center gap-2 mt-4 flex-wrap">
-          {onEdit && (
+          {/* {onEdit && (
             <Button
               label="Modifica"
               small
@@ -203,7 +203,7 @@ const ServiceCard = (props: ServiceCardI) => {
               type="button"
               action={onEdit}
             />
-          )}
+          )} */}
           {onToggleStatus && (
             <Button
               small
