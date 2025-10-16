@@ -266,7 +266,7 @@ const VigilOnboardComponent = () => {
                       });
                     }}
                     placeholder="Inserisci la città con il CAP"
-                    label="Scegli le zone in cui vorresti offrire i tuoi servizi"
+                    label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
                   />
                   {addresses.length ? (
                     <ul className="mt-2 pl-4 text-sm text-gray-700 space-y-1">

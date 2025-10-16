@@ -179,7 +179,7 @@ const ConsumerOnboardComponent = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="Telefono di contatto"
+                  label="Telefono di contatto della persona cara"
                   placeholder="es. 3331234567"
                   required
                   minLength={FormFieldType.PHONE.minLength}
@@ -261,7 +261,8 @@ const ConsumerOnboardComponent = () => {
                   label="Informazioni aggiuntive"
                   minLength={FormFieldType.NOTE.minLength}
                   maxLength={FormFieldType.NOTE.maxLength}
-                  placeholder="Dicci qualcosa sulla tua persona cara"
+                  required
+                  placeholder="Dicci tutto quello che può esserci utile sapere sulla persona cara (es. patologie, allergie, abitudini, hobby, ecc.)"
                   role={role}
                   error={errors.information}
                 />
