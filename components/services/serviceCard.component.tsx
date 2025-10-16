@@ -164,11 +164,13 @@ const ServiceCard = (props: ServiceCardI) => {
           </div>
           <div className="text-sm text-gray-600 ">
             <p>{service?.description}</p>
-            <p>
-              Prezzo: &nbsp;
-              {service?.unit_price}
-              {service?.currency}
-            </p>
+            {simplified && role === RolesEnum.VIGIL && (
+              <p>
+                Prezzo: &nbsp;
+                {service?.unit_price}
+                {service?.currency}
+              </p>
+            )}
           </div>
         </div>
       ) : null}
