@@ -206,7 +206,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         </div>
 
         {/* Riepilogo prenotazione */}
-        <div className="my-6 p-4 bg-vigil-light-orange rounded-exl shadow">
+        <div className="my-6 p-4 bg-pureWhite rounded-3xl shadow">
           <h3 className="font-medium text-vigil-orange mb-3">
             Riepilogo Prenotazione
           </h3>
@@ -256,7 +256,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
         {/* Form di pagamento Stripe */}
         {clientSecret && (
-          <div className="my-6 p-4 bg-vigil-light-orange rounded-3xl shadow">
+          <div className="my-6 p-4 bg-pureWhite rounded-3xl shadow">
             <h3 className="font-medium text-vigil-orange mb-3">Pagamento</h3>
             <CheckoutForm
               returnUrl={`${window?.location?.origin || AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}

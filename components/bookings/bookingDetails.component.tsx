@@ -161,7 +161,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   return (
     <div className="space-y-6  ">
       <div className="relative pr-6 ">
-        <h2 className="text-2xl font-bold  text-gray-900">
+        <h2 className="text-[21.5px] font-bold  text-gray-900">
           Dettagli prenotazione
         </h2>
         <span className="absolute top-0 right-0">
@@ -325,7 +325,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           {booking.note && (
             <div>
               <h3 className="font-medium ">Note</h3>
-              <p className="mt-2 text-sm text-gray-600">{booking.note}</p>
+              <p className="mt-2 text-sm text-gray-600 break-words whitespace-pre-line">{booking.note}</p>
             </div>
           )}
         </div>
