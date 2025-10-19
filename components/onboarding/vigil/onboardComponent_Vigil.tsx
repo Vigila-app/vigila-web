@@ -134,18 +134,20 @@ const VigilOnboardComponent = () => {
   };
 
   return (
-    <div className="w-full px-4 pt-8 pb-4">
+    <div className="w-full max-w-full mx-auto px-4 pt-8 pb-4">
       <Card>
         <div className="">
           <section className="flex flex-col items-center gap-2">
-            <p className="font-semibold text-[28px] text-vigil-orange">Iniziamo a conoscerti</p>
+            <p className="font-semibold text-[28px] text-vigil-orange">
+              Iniziamo a conoscerti
+            </p>
             <span className="font-normal text-center text-lg break-normal whitespace-normal">
               Raccontaci qualcosa di te per iniziare questa bella avventura
             </span>
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2">
+            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 ">
             <Controller
               name="birthday"
               control={control}

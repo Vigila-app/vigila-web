@@ -154,28 +154,28 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
         <div className="grid gap-6 mb-8">
           {servicesCatalog.map((catalogService: ServiceCatalogItem) => (
             <Card key={catalogService.id}>
-              <div className="flex flex-col justify-between items-start ">
+              <div className="flex flex-col justify-between  ">
                 <div className="flex-1 mb-4">
                   <p className="font-semibold text-xl text-consumer-blue mb-4">
                     {catalogService.name}
                   </p>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between w-full items-center">
                     {iconMap[catalogService.name] || ""}
                     <div className="flex flex-col gap-1 text-[16px] font-medium justify-center items-end">
                       <div className="flex  gap-2">
                         <span>
-                          €{catalogService.min_hourly_rate}-
+                          {/* €{catalogService.min_hourly_rate}- */}€
                           {catalogService.max_hourly_rate}/ora
                         </span>
                         <span>
                           Min. {catalogService.minimum_duration_hours}h
                         </span>
                       </div>
-                      <span className="text-[16px] text-gray-600">
+                      {/* <span className="text-[16px] text-gray-600">
                         Consigliato: €{catalogService.recommended_hourly_rate}
                         /ora
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                   <p className="text-lg font-semibold my-2">Descrizione:</p>
@@ -245,10 +245,9 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                     {/* Configurazione prezzo */}
                     <div className="mb-3">
                       <label className="block text-[16px] font-medium mb-2">
-                        Prezzo orario (€{catalogService.min_hourly_rate}-
-                        {catalogService.max_hourly_rate})
+                        Prezzo orario €{catalogService.min_hourly_rate}
                       </label>
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() =>
@@ -288,7 +287,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                           className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
                           <PlusIcon className="w-4 h-4" />
                         </button>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Opzioni extra */}
