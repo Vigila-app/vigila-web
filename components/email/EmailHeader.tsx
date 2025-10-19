@@ -16,7 +16,14 @@ export function EmailHeader({
   titleColor = "black",
 }: EmailHeaderProps) {
   return (
-    <div style={{ backgroundColor, padding: "20px", textAlign: "center", borderBottom: "1px solid #ececec" }}>
+    <div
+      style={{
+        backgroundColor,
+        padding: "20px",
+        textAlign: "center",
+        borderBottom: "1px solid #ececec",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -29,7 +36,12 @@ export function EmailHeader({
         <img
           src={`${AppConstants.publicUrl}/assets/logo.png`}
           alt="Vigila"
-          style={{ width: 140, height: "auto" }}
+          style={{
+            width: 140,
+            height: "auto",
+            display: "block",
+            border: "none",
+          }}
         />
       </div>
 

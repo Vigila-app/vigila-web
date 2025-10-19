@@ -89,6 +89,8 @@ export const EmailService = {
               location: data.location,
               totalAmount: data.totalAmount,
               appUrl: data.appUrl || AppConstants.hostUrl,
+              quantity: data.quantity,
+              unitType: data.unitType,
             },
             isVigil
           ),

@@ -32,7 +32,12 @@ export function EmailFooter({
         <img
           src={`${AppConstants.publicUrl}/assets/logo_white.png`}
           alt="Vigila"
-          style={{ width: small ? 96 : 140, height: "auto" }}
+          style={{
+            width: small ? 96 : 140,
+            height: "auto",
+            display: "block",
+            border: "none",
+          }}
         />
       </div>
       <br />
@@ -42,6 +47,7 @@ export function EmailFooter({
           justifyContent: "center",
           gap: "12px",
           marginBottom: "8px",
+          textAlign: "center",
         }}
       >
         <a

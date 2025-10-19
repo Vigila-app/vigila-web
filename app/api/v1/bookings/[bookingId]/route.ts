@@ -4,6 +4,7 @@ import {
   authenticateUser,
   getAdminClient,
   verifyPaymentWithStripe,
+  getUserByIdAdmin,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { deepMerge } from "@/src/utils/common.utils";
@@ -15,6 +16,7 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
+import { User } from "@supabase/supabase-js";
 
 const verifyBookingAccess = async (
   bookingId: string,
@@ -318,34 +320,31 @@ export async function PUT(
     // Invia email di aggiornamento stato se lo stato è cambiato
     if (isStatusUpdate && updatedBooking.status !== booking.status) {
       try {
-        const consumer = {
-          ...userObject,
-          email: userObject.email,
-          first_name:
-            userObject.user_metadata?.name ||
-            userObject.user_metadata?.firstName,
-          last_name:
-            userObject.user_metadata?.surname ||
-            userObject.user_metadata?.lastName,
-        };
+        const consumer = await getUserByIdAdmin(data.consumer_id);
+        const vigil = await getUserByIdAdmin(data.vigil_id);
 
         if (consumer?.email) {
-          const customerName = consumer.first_name
-            ? `${consumer.first_name} ${consumer.last_name || ""}`.trim()
-            : userObject.user_metadata?.displayName || "Cliente";
-
-          if (consumer?.email) {
-            await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
-              updatedBooking,
-              consumer
-            );
-
-            // TODO notification for vigil
-            // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-            //   updatedBooking,
-            //   vigil
-            // );
-          }
+          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+            {
+              ...data,
+              service: data.service || updatedBooking.service,
+              vigil: data.vigil || updatedBooking.vigil,
+              consumer: data.consumer || updatedBooking.consumer,
+            },
+            consumer
+          );
+        }
+        if (vigil?.email) {
+          // TODO notification for vigil
+          // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+          //   {
+          //     ...data,
+          //     service: data.service || updatedBooking.service,
+          //     vigil: data.vigil || updatedBooking.vigil,
+          //     consumer: data.consumer || updatedBooking.consumer,
+          //   },
+          //   vigil
+          // );
         }
       } catch (emailError) {
         // Log dell'errore ma non interrompe l'aggiornamento della prenotazione

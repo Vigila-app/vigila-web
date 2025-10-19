@@ -91,6 +91,8 @@ export const BookingUtilsServer = {
                 typeof booking.price === "number"
                   ? amountDisplay(booking.price, booking.currency as any)
                   : String(booking.price || ""),
+              quantity: booking.quantity,
+              unitType: booking.service?.unit_type,
             });
             return; // Esci dalla funzione dopo aver inviato l'email di conferma
           } catch (error) {

@@ -3,6 +3,7 @@ import * as React from "react";
 import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
 import { dateDisplay } from "@/src/utils/date.utils";
+import { ServicesUtils } from "@/src/utils/services.utils";
 
 interface BookingConfirmationEmailProps {
   customerName: string;
@@ -14,6 +15,8 @@ interface BookingConfirmationEmailProps {
   location: string;
   totalAmount: string;
   appUrl?: string;
+  quantity?: number | string;
+  unitType?: string;
 }
 
 export function BookingConfirmationEmailTemplate(
@@ -27,6 +30,8 @@ export function BookingConfirmationEmailTemplate(
     location,
     totalAmount,
     appUrl = AppConstants.hostUrl,
+    quantity,
+    unitType,
   }: BookingConfirmationEmailProps,
   isVigil = false
 ) {
@@ -136,6 +141,25 @@ export function BookingConfirmationEmailTemplate(
                 {dateDisplay(bookingDate, "dateTime")}
               </td>
             </tr>
+            {quantity && unitType && (
+              <tr>
+                <td
+                  style={{
+                    padding: "8px 0",
+                    color: "#666",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Durata:
+                </td>
+                <td
+                  style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}
+                >
+                  {quantity}&nbsp;{ServicesUtils.getServiceUnitType(unitType)}
+                </td>
+              </tr>
+            )}
             {!isVigil && vigilName && (
               <tr>
                 <td
