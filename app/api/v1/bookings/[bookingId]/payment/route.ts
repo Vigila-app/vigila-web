@@ -152,7 +152,7 @@ export async function PUT(
     }
 
     // Invia email di aggiornamento stato se lo stato è cambiato
-    if (status !== existingBooking.status) {
+    if (status !== existingBooking.status || payment_status !== existingBooking.payment_status) {
       try {
         const consumer = {
           ...userObject,

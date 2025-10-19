@@ -57,7 +57,6 @@ function BookingPaymentResultContent() {
         {
           payment_id: payment_intent,
           payment_status: PaymentStatusEnum.PAID,
-          status: BookingStatusEnum.CONFIRMED,
         }
       );
 

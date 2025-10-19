@@ -34,6 +34,8 @@ export interface BookingConfirmationEmailDataI {
   location: string;
   totalAmount: string;
   appUrl?: string;
+  quantity?: number | string;
+  unitType?: string;
 }
 
 export interface EmailNotificationDataI {

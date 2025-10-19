@@ -10,7 +10,7 @@ import { useBookingsStore } from "../store/bookings/bookings.store";
 export type UpdateBookingPaymentRequest = {
   payment_id: string;
   payment_status: PaymentStatusEnum;
-  status: BookingStatusEnum;
+  status?: BookingStatusEnum;
 };
 
 export const BookingsService = {

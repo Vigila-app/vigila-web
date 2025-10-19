@@ -143,7 +143,6 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         {
           payment_id: paymentIntentId,
           payment_status: PaymentStatusEnum.PAID,
-          status: BookingStatusEnum.CONFIRMED,
         }
       );
       return result;

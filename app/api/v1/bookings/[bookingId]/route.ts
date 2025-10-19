@@ -288,16 +288,6 @@ export async function PUT(
           status: updatedBooking.status || BookingStatusEnum.CONFIRMED,
         };
       }
-
-      // Consumers can also update payment-related fields after payment completion
-      if (isPaymentStatusUpdate && updatedBooking.payment_id) {
-        allowedUpdates = {
-          ...allowedUpdates,
-          payment_id: updatedBooking.payment_id,
-          payment_status: updatedBooking.payment_status,
-          status: updatedBooking.status || BookingStatusEnum.CONFIRMED,
-        };
-      }
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       // Vigils can update status and notes
       allowedUpdates = {

@@ -2,6 +2,7 @@ import { ResendService } from "./resend.service";
 import { EmailConstants } from "@/src/constants/email.constants";
 import {
   WelcomeEmailTemplate,
+  BookingCreationEmailTemplate,
   BookingConfirmationEmailTemplate,
   NotificationEmailTemplate,
 } from "@/components/email";
@@ -28,6 +29,42 @@ export const EmailService = {
         resolve(result);
       } catch (error) {
         console.error("EmailService sendWelcomeEmail error:", error);
+        reject(error);
+      }
+    }),
+
+  sendBookingCreationEmail: async (
+    data: BookingConfirmationEmailDataI,
+    isVigil = false
+  ) =>
+    new Promise<EmailResponseI>(async (resolve, reject) => {
+      try {
+        const result = await ResendService.sendEmailWithTemplate({
+          to: data.to,
+          subject: `${EmailConstants.subjectPrefixes.booking} ${isVigil ? "assegnata" : "confermata"}`,
+          react: BookingCreationEmailTemplate(
+            {
+              customerName: data.customerName,
+              bookingId: data.bookingId,
+              serviceName: data.serviceName,
+              bookingDate: data.bookingDate,
+              bookingTime: data.bookingTime,
+              vigilName: data.vigilName,
+              location: data.location,
+              totalAmount: data.totalAmount,
+              appUrl: data.appUrl || AppConstants.hostUrl,
+              quantity: data.quantity,
+              unitType: data.unitType,
+            },
+            isVigil
+          ),
+        });
+        resolve(result);
+      } catch (error) {
+        console.error(
+          "EmailService sendBookingConfirmationEmail error:",
+          error
+        );
         reject(error);
       }
     }),
