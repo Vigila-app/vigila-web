@@ -16,11 +16,18 @@ import { useParams } from "next/navigation";
 
 const VigilProfile = () => {
   const [tab, setTab] = useQueryState("tab");
-  const { vigils } = useVigilStore();
+  const { vigils, getVigilsDetails } = useVigilStore();
   const params = useParams();
   const vigilId = params?.vigilId as string;
   const role = RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === vigilId);
+
+  useEffect(() => {
+    if (vigilId) {
+      getVigilsDetails([vigilId]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vigilId]);
 
   const tabs: TabI[] = [
     {

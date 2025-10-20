@@ -45,7 +45,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     hideLoader,
     loader: { isLoading },
   } = useAppStore();
-  const { bookings, getBookingDetails } = useBookingsStore();
+  const { bookings, getBookingDetails, resetLastUpdate } = useBookingsStore();
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { services } = useServicesStore();
@@ -137,6 +137,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         type: ToastStatusEnum.ERROR,
       });
     } finally {
+      resetLastUpdate();
       hideLoader();
     }
   };

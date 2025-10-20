@@ -17,13 +17,13 @@ const PrenotationTabs = () => {
   const tabs: TabI[] = [
     {
       label: (
-        <span className="flex ">
+        <span className="flex">
           {/* <ClockIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
-            In attesa{" "}
+            In attesa&nbsp;
             {pendingBookings.length !== 0 && (
-              <span className="bg-consumer-blue rounded-full px-2  text-white">
-                {pendingBookings.length}
+              <span className="bg-consumer-blue rounded-full px-2 text-white">
+                {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
               </span>
             )}
           </span>
@@ -35,13 +35,13 @@ const PrenotationTabs = () => {
     },
     {
       label: (
-        <span className="flex ">
+        <span className="flex">
           {/* <ShieldCheckIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
-            Confermate{" "}
+            Confermate&nbsp;
             {confirmedBookings.length !== 0 && (
-              <span className="bg-consumer-blue rounded-full px-2  text-white">
-                {confirmedBookings.length}
+              <span className="bg-consumer-blue rounded-full px-2 text-white">
+                {confirmedBookings.length <= 99 ? confirmedBookings.length : "99+"}
               </span>
             )}
           </span>
@@ -51,9 +51,16 @@ const PrenotationTabs = () => {
     },
     {
       label: (
-        <span className="flex ">
+        <span className="flex">
           {/* <CheckBadgeIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
-          Completate
+          <span className="">
+          Completate&nbsp;
+          {completedBookings.length !== 0 && (
+            <span className="bg-consumer-blue rounded-full px-2 text-white">
+              {completedBookings.length <= 99 ? completedBookings.length : "99+"}
+            </span>
+          )}
+          </span>
         </span>
       ),
       id: "Completate",
