@@ -28,6 +28,7 @@ export type BookingI = {
   consumer?: Partial<ConsumerDetailsType>;
   vigil?: Partial<VigilDetailsType>;
   service?: Partial<ServiceI>;
+  extras?: Record<string, any>;
 };
 
 export type BookingFormI = BookingI & {};
