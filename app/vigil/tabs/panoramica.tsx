@@ -112,7 +112,7 @@ const PanoramicaTab = () => {
     (total, booking) => total + (booking.price - booking.fee),
     0
   );
- 
+
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>
@@ -143,6 +143,7 @@ const PanoramicaTab = () => {
             <Controller
               name="information"
               control={control}
+              rules={{ maxLength: 650 }}
               render={({ field }) => (
                 <TextArea
                   type="text"
@@ -167,7 +168,6 @@ const PanoramicaTab = () => {
           </form>
         )}
       </Card>
-      
 
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
