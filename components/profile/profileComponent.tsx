@@ -217,7 +217,7 @@ const ProfileComponent = () => {
                   userId={vigil?.id}
                 />
               </div>
-              <div className="flex-1">
+              <div className="md:flex-1 ">
                 <section className="flex flex-col items-center gap-2 ">
                   <h1 className="text-3xl font-boldtext-center">
                     {vigil?.displayName}
@@ -225,7 +225,7 @@ const ProfileComponent = () => {
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="md:flex items-center gap-2 mb-3">
                     {vigil?.averageRating ? (
                       <div className="inline-flex items-center flex-nowrap gap-1">
                         <div className="flex items-center gap-1">
@@ -236,7 +236,7 @@ const ProfileComponent = () => {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-500 font-medium flex items-center text-center">
+                      <span className="text-gray-500 font-medium flex justify-center items-center text-center">
                         {" "}
                         0 recensioni{" "}
                       </span>
