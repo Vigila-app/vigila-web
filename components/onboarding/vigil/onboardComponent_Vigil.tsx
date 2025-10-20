@@ -47,7 +47,7 @@ const VigilOnboardComponent = () => {
     hideLoader,
     loader: { isLoading },
   } = useAppStore();
-  const { user } = useUserStore();
+  const { user, getUserDetails } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const router = useRouter();
@@ -121,7 +121,8 @@ const VigilOnboardComponent = () => {
         type: ToastStatusEnum.SUCCESS,
       });
       await AuthService.renewAuthentication();
-      await UserService.updateUser({},{information:formData.information});
+      await getUserDetails(true);
+      // await UserService.updateUser({},{information:formData.information});
       redirectHome();
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);

@@ -194,7 +194,7 @@ const ProfileComponent = () => {
                 {selectedTab?.id === "recensioni" && <RecensioniTab />}
                 {selectedTab?.id === "informazioni" && (
                   <InformazioniConsumerTab />
-                )}{" "}
+                )}
               </div>
             </div>
           </div>
@@ -205,10 +205,10 @@ const ProfileComponent = () => {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <div className=" rounded-lg  bg-background-default shadow-sm py-6 px-6 mb-3">
-          <div className="flex  flex-col items-center justify-between pt-5 bg-gray-100  rounded-2xl ">
+        <div className=" rounded-lg bg-background-default shadow-sm py-6 px-6 mb-3">
+          <div className="flex flex-col items-center justify-between pt-5 bg-gray-100 rounded-2xl ">
             <div className="flex w-full flex-col items-center rounded-2xl border-2 bg-white p-5 gap-2 border-vigil-orange/60">
-              <div className="  flex items-center justify-center">
+              <div className="flex items-center justify-center">
                 <Avatar
                   size="xxl"
                   withUpload
@@ -231,7 +231,7 @@ const ProfileComponent = () => {
                         <div className="flex items-center gap-1">
                           <StarIconSolid className="w-4 h-4 text-yellow-300" />
                           <p className="text-xs font-medium text-gray-600">
-                            Valutazione media: {vigil?.averageRating}
+                            Valutazione media:&nbsp;{vigil?.averageRating}
                           </p>
                         </div>
                       </div>
@@ -269,7 +269,7 @@ const ProfileComponent = () => {
               {selectedTab?.id === "informazioni" && <InformazioniTab />}
               {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
               {selectedTab?.id === "servizi" && <ServiziTab />}
-              {selectedTab?.id === "recensioni" && <RecensioniTab />}{" "}
+              {selectedTab?.id === "recensioni" && <RecensioniTab />}
             </div>
           </div>
         </div>
