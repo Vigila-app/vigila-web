@@ -36,7 +36,7 @@ export const useConsumerStore = create<ConsumerStoreType>()(
                 if (force) return true;
                 if (!lastUpdate) return true;
                 if (
-                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 15
+                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
                 )
                   return true;
                 // otherwise fetch only if not already present

@@ -35,7 +35,7 @@ export const useReviewsStore = create<ReviewStoreType>()(
               if (
                 force ||
                 !lastUpdate ||
-                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
               ) {
                 const response = await ReviewsService.getReviews();
                 if (response) {

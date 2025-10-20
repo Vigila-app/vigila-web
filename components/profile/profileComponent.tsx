@@ -58,8 +58,7 @@ const ProfileComponent = () => {
         <CalendarDaysIcon
           className={clsx(
             "size-6",
-            pendingBookings.length > 0 && "text-red-500",
-            
+            pendingBookings.length > 0 && "text-red-500"
           )}
         />
       ),
@@ -121,6 +120,9 @@ const ProfileComponent = () => {
           message: "Profilo aggiornato",
           type: ToastStatusEnum.SUCCESS,
         });
+        setTimeout(() => {
+          window?.location.reload();
+        }, 1000);
       }
     } catch (error) {
       console.error(error);

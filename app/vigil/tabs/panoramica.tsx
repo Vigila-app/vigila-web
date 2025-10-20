@@ -39,6 +39,7 @@ const PanoramicaTab = () => {
   useEffect(() => {
     if (vigilId) {
       getVigilsDetails([vigilId], true);
+      getBookings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId]);
