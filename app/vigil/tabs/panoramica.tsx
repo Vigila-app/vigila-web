@@ -134,7 +134,7 @@ const PanoramicaTab = () => {
 
         {!isEditing ? (
           <div>
-            <p className="font-medium leading-relaxed text-sm">
+            <p className="font-medium leading-relaxed break-words text-sm">
               {isVigil ? user?.user_metadata?.information : vigil?.information}
             </p>
           </div>
