@@ -229,24 +229,6 @@ const VigilOnboardComponent = () => {
               )}
             />
 
-            {/* <Controller
-              name="cap"
-              control={control}
-              rules={{ required: true, ...FormFieldType.CAP }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  label="CAP"
-                  role={role}
-                  placeholder="Inserisci il tuo CAP di residenza"
-                  required
-                  error={errors.cap}
-                  minLength={FormFieldType.CAP.minLength}
-                  maxLength={FormFieldType.CAP.maxLength}
-                  aria-invalid={!!errors.cap}
-                />
-              )}
-            /> */}
             {/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
             <Controller
               name="addresses"
@@ -342,7 +324,7 @@ const VigilOnboardComponent = () => {
             <Controller
               name="information"
               control={control}
-              rules={{ required: true, maxLength: 400 }}
+              rules={{ required: true, maxLength: 650 }}
               render={({ field }) => (
                 <TextArea
                   {...field}
