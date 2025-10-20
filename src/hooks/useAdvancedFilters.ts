@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { OrderDirectionEnum } from '@/src/types/app.types';
 
 export enum OrderByEnum {
@@ -29,10 +29,10 @@ const initialFilters: AdvancedFilters = {
 
 export const useSortOptions = () => [
   { label: "Predefinito", value: "", orderBy: "", orderDirection: "" },
-  { label: "Prezzo: dal più basso", value: "price_asc", orderBy: OrderByEnum.PRICE, orderDirection: OrderDirectionEnum.ASC },
-  { label: "Prezzo: dal più alto", value: "price_desc", orderBy: OrderByEnum.PRICE, orderDirection: OrderDirectionEnum.DESC },
-  { label: "Valutazione: più alta", value: "rating_desc", orderBy: OrderByEnum.RATING, orderDirection: OrderDirectionEnum.DESC },
-  { label: "Valutazione: più bassa", value: "rating_asc", orderBy: OrderByEnum.RATING, orderDirection: OrderDirectionEnum.ASC },
+  // { label: "Prezzo: dal più basso", value: "price_asc", orderBy: OrderByEnum.PRICE, orderDirection: OrderDirectionEnum.ASC },
+  // { label: "Prezzo: dal più alto", value: "price_desc", orderBy: OrderByEnum.PRICE, orderDirection: OrderDirectionEnum.DESC },
+  // { label: "Valutazione: più alta", value: "rating_desc", orderBy: OrderByEnum.RATING, orderDirection: OrderDirectionEnum.DESC },
+  // { label: "Valutazione: più bassa", value: "rating_asc", orderBy: OrderByEnum.RATING, orderDirection: OrderDirectionEnum.ASC },
   { label: "Più recenti", value: "created_desc", orderBy: OrderByEnum.CREATED, orderDirection: OrderDirectionEnum.DESC },
   { label: "Meno recenti", value: "created_asc", orderBy: OrderByEnum.CREATED, orderDirection: OrderDirectionEnum.ASC },
 ];
