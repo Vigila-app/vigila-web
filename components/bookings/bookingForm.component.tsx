@@ -377,6 +377,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         <Controller
           name="note"
           control={control}
+          rules={{ maxLength: 650 }}
           render={({ field }) => (
             <TextArea
               {...field}
