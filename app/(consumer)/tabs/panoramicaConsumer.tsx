@@ -12,7 +12,7 @@ import { useEffect } from "react";
 
 const PanoramicaConsumerTab = () => {
   const { consumers, getConsumersDetails } = useConsumerStore();
-  const { user, userDetails } = useUserStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     if (user?.id) {
