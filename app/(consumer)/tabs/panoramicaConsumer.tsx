@@ -32,7 +32,7 @@ const PanoramicaConsumerTab = () => {
 
         <div>
           <p className="leading-relaxed text-sm">
-            {consumer?.information || "-"}
+            {consumer?.information || "Nessuna informazione disponibile."}
           </p>
         </div>
       </Card>

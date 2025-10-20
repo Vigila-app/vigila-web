@@ -2,6 +2,7 @@ export type AddressI = {
   city?: string;
   town?: string;
   village?: string;
+  road?: string;
   suburb?: string;
   county?: string;
   street?: string;
@@ -17,7 +18,7 @@ export type AddressI = {
   lat?: string | number;
   lon?: string | number;
   extended?: string;
-  q?:string
+  q?: string;
   display_name?: string;
   address?: AddressI;
   name?: string;
