@@ -173,7 +173,17 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     if (isValid) {
       try {
         showLoader();
-        const newBooking = await BookingsService.createBooking(formData);
+
+        const extras = serviceCatalog.extra.filter(
+          (extra) =>
+            Object.keys(formData.extras || {}).includes(extra.id) &&
+            (formData.extras || {})[extra.id]
+        ).map((extra) => extra.id);
+
+        const newBooking = await BookingsService.createBooking({
+          ...formData,
+          extras,
+        });
 
         showToast({
           message: "Prenotazione creata!",
@@ -414,7 +424,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-medium">{extra.name}</p>
                       <p className="font-medium text-consumer-blue">
-                        {selectedService?.currency}&nbsp;
+                        {selectedService?.currency}
                         {amountDisplay(extra.fixed_price)}
                       </p>
                     </div>
@@ -450,10 +460,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         {selectedService && (
           <div className="mt-8 pt-8 border-t border-gray-200">
             <div className="p-4 rounded-lg border border-vigil-orange">
-              <h3 className="font-medium">Riepilogo Prenotazione</h3>
+              <h3 className="font-medium text-vigil-orange">
+                Riepilogo Prenotazione
+              </h3>
               <div className="mt-2 space-y-1 text-[16px] text-gray-700">
                 <p>
-                  Servizio: {selectedService.name}
+                  Servizio:&nbsp;{selectedService.name}
                   {watchedAddress && ` presso ${watchedAddress}`}
                 </p>
                 <p>
@@ -467,7 +479,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   )}
                 </p>
                 <p>
-                  Quantità: {watchedDuration}&nbsp;
+                  Quantità:&nbsp;{watchedDuration}&nbsp;
                   {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
                 </p>
                 {extraOptions?.length ? (
@@ -479,14 +491,17 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                           Object.keys(watchedExtras || {}).includes(extra.id) &&
                           (watchedExtras || {})[extra.id]
                       )
-                      .map((extra) => extra.name)
+                      .map(
+                        (extra) =>
+                          `${extra.name} (${selectedService.currency}${amountDisplay(extra.fixed_price)})`
+                      )
                       .join(", ")}
                     {Object.values(watchedExtras || {}).filter((v) => v)
                       .length === 0 && "-"}
                   </div>
                 ) : null}
-                <p className="font-medium">
-                  Totale: {selectedService.currency}&nbsp;
+                <p className="font-medium pt-2 mt-2 border-t border-gray-200">
+                  Totale:&nbsp;{selectedService.currency}&nbsp;
                   {amountDisplay(
                     totalAmount +
                       (extraOptions?.length

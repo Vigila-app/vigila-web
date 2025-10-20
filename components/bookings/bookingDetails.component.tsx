@@ -29,6 +29,8 @@ import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { CurrencyEnum } from "@/src/enums/common.enums";
 import { BookingUtils } from "@/src/utils/booking.utils";
 import Link from "next/link";
+import { ServiceCatalogItem } from "@/src/types/services.types";
+import { ServicesService } from "@/src/services";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -82,6 +84,13 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       booking?.consumer || consumers.find((c) => c.id === booking?.consumer_id)
     );
   }, [consumers, booking]);
+
+  const serviceCatalog: ServiceCatalogItem = useMemo(
+    () =>
+      service?.info?.catalog_id &&
+      ServicesService.getServiceCatalogById(service.info.catalog_id),
+    [service]
+  );
 
   const checkCancellation = useCallback(async () => {
     if (!booking) {
@@ -247,6 +256,17 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 &nbsp;
                 {ServicesUtils.getServiceUnitType(service?.unit_type as string)}
               </p>
+              {booking.extras?.length ? (
+                <p>
+                  <span className="font-medium">Extra:</span>&nbsp;
+                  {serviceCatalog.extra
+                    .filter((extra) =>
+                      (booking.extras || []).includes(extra.id)
+                    )
+                    .map((extra) => extra.name)
+                    .join(", ")}
+                </p>
+              ) : null}
               {isVigil && (
                 <p>
                   <span className="font-medium">Prezzo del servizio:</span>
@@ -326,7 +346,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           {booking.note && (
             <div>
               <h3 className="font-medium ">Note</h3>
-              <p className="mt-2 text-sm text-gray-600 break-words whitespace-pre-line">{booking.note}</p>
+              <p className="mt-2 text-sm text-gray-600 break-words whitespace-pre-line">
+                {booking.note}
+              </p>
             </div>
           )}
         </div>
