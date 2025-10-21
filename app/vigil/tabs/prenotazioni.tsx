@@ -41,7 +41,9 @@ const PrenotationTabs = () => {
             Confermate&nbsp;
             {confirmedBookings.length !== 0 && (
               <span className="bg-consumer-blue rounded-full px-2 text-white">
-                {confirmedBookings.length <= 99 ? confirmedBookings.length : "99+"}
+                {confirmedBookings.length <= 99
+                  ? confirmedBookings.length
+                  : "99+"}
               </span>
             )}
           </span>
@@ -54,12 +56,14 @@ const PrenotationTabs = () => {
         <span className="flex">
           {/* <CheckBadgeIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
-          Completate&nbsp;
-          {completedBookings.length !== 0 && (
-            <span className="bg-green-500 rounded-full px-2 text-white">
-              {completedBookings.length <= 99 ? completedBookings.length : "99+"}
-            </span>
-          )}
+            Completate&nbsp;
+            {completedBookings.length !== 0 && (
+              <span className="bg-green-500 rounded-full px-2 text-white">
+                {completedBookings.length <= 99
+                  ? completedBookings.length
+                  : "99+"}
+              </span>
+            )}
           </span>
         </span>
       ),
@@ -75,7 +79,7 @@ const PrenotationTabs = () => {
 
   return (
     <section className="pt-4">
-      <div className=" text-[10px py-1 rounded-2xl bg-gray-200 items-center ">
+      <div className=" text-[10px] py-1 rounded-2xl bg-gray-200 items-center ">
         <TabGroup
           role={role}
           tabs={tabs}
