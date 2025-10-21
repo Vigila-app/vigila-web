@@ -20,7 +20,7 @@ import { isReleased } from "@/src/utils/envs.utils";
 import { BookingCancellationEmailTemplate } from "@/components/email/BookingCancellationEmailTemplate";
 import { BookingRejectEmailTemplate } from "@/components/email/BookingRejectEmailTemplate";
 
-const SEND_EMAIL_ACTIVE = true;
+const SEND_EMAIL_ACTIVE = isReleased;
 
 export const EmailService = {
   sendWelcomeEmail: async (data: WelcomeEmailDataI) =>
