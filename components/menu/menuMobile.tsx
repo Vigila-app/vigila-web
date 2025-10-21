@@ -224,7 +224,7 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-4 px-4 py-4 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
+                className="flex items-center gap-4 w-full rounded mb-2 px-4 pt-4 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>
