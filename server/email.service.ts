@@ -11,8 +11,11 @@ import {
   BookingConfirmationEmailDataI,
   EmailNotificationDataI,
   EmailResponseI,
+  EmailI,
 } from "@/src/types/email.types";
 import { AppConstants } from "@/src/constants";
+import { UserDetailsType } from "@/src/types/user.types";
+import { ProfileActiveEmailTemplate } from "@/components/email/ProfileActiveEmailTemplate";
 
 export const EmailService = {
   sendWelcomeEmail: async (data: WelcomeEmailDataI) =>
@@ -29,6 +32,24 @@ export const EmailService = {
         resolve(result);
       } catch (error) {
         console.error("EmailService sendWelcomeEmail error:", error);
+        reject(error);
+      }
+    }),
+  
+    sendProfileActiveEmail: async (data: EmailI, user: UserDetailsType) =>
+    new Promise<EmailResponseI>(async (resolve, reject) => {
+      try {
+        const result = await ResendService.sendEmailWithTemplate({
+          to: data.to,
+          subject: data.subject,
+          react: ProfileActiveEmailTemplate({
+            user,
+            appUrl: AppConstants.hostUrl,
+          }),
+        });
+        resolve(result);
+      } catch (error) {
+        console.error("EmailService sendProfileActiveEmail error:", error);
         reject(error);
       }
     }),
