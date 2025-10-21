@@ -9,17 +9,19 @@ import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
-import { BookingsService, PaymentService } from "@/src/services";
 import {
-  PaymentStatusEnum,
-  BookingStatusEnum,
-} from "@/src/enums/booking.enums";
+  BookingsService,
+  PaymentService,
+  ServicesService,
+} from "@/src/services";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { AppConstants } from "@/src/constants";
 import Card from "../card/card";
+import { ServiceCatalogItem } from "@/src/types/services.types";
 
 type PaymentBookingI = {
   bookingId: BookingI["id"];
@@ -48,6 +50,13 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   const vigil = useMemo(
     () => vigils.find((v) => v.id === booking?.vigil_id),
     [vigils, booking?.vigil_id]
+  );
+
+  const serviceCatalog: ServiceCatalogItem = useMemo(
+    () =>
+      service?.info?.catalog_id &&
+      ServicesService.getServiceCatalogById(service.info.catalog_id),
+    [service]
   );
 
   if (error) {
@@ -244,6 +253,19 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                   : ""}
               </span>
             </div>
+            {booking.extras?.length && serviceCatalog.extra?.length ? (
+              <div className="flex justify-between">
+                <span>Extra:</span>
+                <span>
+                  {serviceCatalog.extra
+                    .filter((extra) =>
+                      (booking.extras || []).includes(extra.id)
+                    )
+                    .map((extra) => extra.name)
+                    .join(", ")}
+                </span>
+              </div>
+            ) : null}
             <div className="flex justify-between font-medium text-lg border-t pt-2">
               <span>Totale:</span>
               <span>

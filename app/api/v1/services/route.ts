@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
       "from",
       "to",
       "pageSize",
-      "vigil_id",
       "search",
     ]);
     const { orderBy = "created_at", orderDirection = OrderDirectionEnum.DESC } =
