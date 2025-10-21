@@ -405,7 +405,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               {...field}
               label="Note"
               placeholder="Aggiungi eventuali note per il Vigil"
-              rows={5}
+              rows={6}
               role={RolesEnum.VIGIL}
               error={errors.note}
             />
