@@ -106,7 +106,7 @@ const MenuMobile = () => {
         )}>
         {isUserLogged ? (
           <>
-            <section className=" flex flex-col gap-2 justify-center items-center mb-12 mt-12">
+            <section className=" flex flex-col gap-2 justify-center items-center">
               <Avatar
                 userId={user.id}
                 value={
@@ -125,7 +125,7 @@ const MenuMobile = () => {
                 </span>
               )}
             </section>
-            <ul className="flex flex-col gap-8  flex-1 overflow-y-auto ">
+            <ul className="flex flex-col gap-8 justify-center flex-1 overflow-y-auto">
               {user?.user_metadata?.role === RolesEnum.CONSUMER && (
                 <li className="block py-2">
                   {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
@@ -209,12 +209,12 @@ const MenuMobile = () => {
             </ul>
           </>
         ) : null}
-        <div className=" sticky bottom-0 py-2 w-full mt-auto bg-white">
-          <ul className="relative  header-menu">
+        <div className=" sticky bottom-0  w-full  bg-white">
+          <ul className="relative header-menu">
             {NavigationUtils.getHeaderMenu()
               .filter((route) => route?.menu?.mobile)
               .map((route) => (
-                <li key={route.label} className="block py-2">
+                <li key={route.label} className="block ">
                   {MenuLinkItem(route)}
                 </li>
               ))}
@@ -224,7 +224,7 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-12 px-4 py-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
+                className="flex items-center gap-4 w-full rounded mb-4 px-4 py-4 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>
