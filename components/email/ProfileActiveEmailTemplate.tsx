@@ -21,7 +21,6 @@ export function ProfileActiveEmailTemplate({
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        maxWidth: "600px",
         margin: "0 auto",
       }}
     >
@@ -34,7 +33,14 @@ export function ProfileActiveEmailTemplate({
         }
       />
 
-      <div style={{ padding: "40px 20px", backgroundColor: "#ffffff" }}>
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
         {role === RolesEnum.CONSUMER ? (
           <>
             <h2

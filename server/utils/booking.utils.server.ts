@@ -6,6 +6,7 @@ import { isServer, amountDisplay } from "@/src/utils/common.utils";
 import { EmailService } from "@/server/email.service";
 import { BookingI } from "@/src/types/booking.types";
 import { User } from "@supabase/supabase-js";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 export const BookingUtilsServer = {
   sendConsumerBookingStatusUpdateNotification: async (
@@ -32,6 +33,7 @@ export const BookingUtilsServer = {
               // Invia email di conferma prenotazione
               await EmailService.sendBookingCreationEmail({
                 to: consumer.email,
+                subject: "Prenotazione Creata ✅",
                 customerName:
                   (consumer as any)?.user_metadata?.name ||
                   (consumer as any)?.user_metadata?.firstName ||
@@ -71,6 +73,7 @@ export const BookingUtilsServer = {
             // Invia email di conferma prenotazione
             await EmailService.sendBookingConfirmationEmail({
               to: consumer.email,
+              subject: `È confermato! ✅ ${dateDisplay(booking.startDate, "dateTime")} con ${booking.vigil?.name || booking.vigil?.displayName || (vigil as any)?.user_metadata?.name || (vigil as any)?.user_metadata?.firstName || ""}`,
               customerName:
                 (consumer as any)?.user_metadata?.name ||
                 (consumer as any)?.user_metadata?.firstName ||
@@ -172,6 +175,7 @@ export const BookingUtilsServer = {
               await EmailService.sendBookingCreationEmail(
                 {
                   to: vigil.email,
+                  subject: "Nuova richiesta vicino a te 🥳 📅",
                   // customerName è il nome del consumer associato alla prenotazione
                   customerName:
                     booking.consumer?.name ||

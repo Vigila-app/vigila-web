@@ -22,7 +22,7 @@ const PrenotationTabs = () => {
           <span className="">
             In attesa&nbsp;
             {pendingBookings.length !== 0 && (
-              <span className="bg-consumer-blue rounded-full px-2 text-white">
+              <span className="bg-vigil-orange rounded-full px-2 text-white animate-pulse">
                 {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
               </span>
             )}
@@ -56,7 +56,7 @@ const PrenotationTabs = () => {
           <span className="">
           Completate&nbsp;
           {completedBookings.length !== 0 && (
-            <span className="bg-consumer-blue rounded-full px-2 text-white">
+            <span className="bg-green-500 rounded-full px-2 text-white">
               {completedBookings.length <= 99 ? completedBookings.length : "99+"}
             </span>
           )}

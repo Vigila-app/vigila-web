@@ -16,11 +16,17 @@ import {
 import { AppConstants } from "@/src/constants";
 import { UserDetailsType } from "@/src/types/user.types";
 import { ProfileActiveEmailTemplate } from "@/components/email/ProfileActiveEmailTemplate";
+import { isReleased } from "@/src/utils/envs.utils";
+
+const SEND_EMAIL_ACTIVE = true;
 
 export const EmailService = {
   sendWelcomeEmail: async (data: WelcomeEmailDataI) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
           subject: `${EmailConstants.subjectPrefixes.welcome} - ${data.firstName}!`,
@@ -39,6 +45,9 @@ export const EmailService = {
     sendProfileActiveEmail: async (data: EmailI, user: UserDetailsType) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
           subject: data.subject,
@@ -59,10 +68,13 @@ export const EmailService = {
     isVigil = false
   ) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
+      if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
       try {
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
-          subject: `${EmailConstants.subjectPrefixes.booking} ${isVigil ? "assegnata" : "confermata"}`,
+          subject: data.subject,
           react: BookingCreationEmailTemplate(
             {
               customerName: data.customerName,
@@ -96,9 +108,12 @@ export const EmailService = {
   ) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
-          subject: `${EmailConstants.subjectPrefixes.booking} ${isVigil ? "assegnata" : "confermata"}`,
+          subject: data.subject,
           react: BookingConfirmationEmailTemplate(
             {
               customerName: data.customerName,
@@ -129,6 +144,9 @@ export const EmailService = {
   sendNotificationEmail: async (data: EmailNotificationDataI) =>
     new Promise<EmailResponseI>(async (resolve, reject) => {
       try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
           subject: `${EmailConstants.subjectPrefixes.notification} ${data.subject}`,

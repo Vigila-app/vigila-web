@@ -15,7 +15,16 @@ export function EmailFooter({
   return (
     <>
       <br />
-      <p>Team Vigila 🧡</p>
+      <div
+        style={{
+          padding: "8px 0",
+          backgroundColor: "#ffffff",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
+        <p>Team Vigila 🧡</p>
+      </div>
       <div
         style={{
           backgroundColor: "#00161F",
