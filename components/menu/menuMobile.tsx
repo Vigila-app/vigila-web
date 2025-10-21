@@ -209,7 +209,7 @@ const MenuMobile = () => {
             </ul>
           </>
         ) : null}
-        <div className="sticky bottom-0 py-2 w-full mt-auto ">
+        <div className="aboslute bottom-0 py-2 w-full mt-auto bg-white">
           <ul className="relative  header-menu">
             {NavigationUtils.getHeaderMenu()
               .filter((route) => route?.menu?.mobile)
