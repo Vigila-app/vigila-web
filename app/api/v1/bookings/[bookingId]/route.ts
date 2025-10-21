@@ -317,6 +317,9 @@ export async function PUT(
 
     if (error || !data) throw error;
 
+    console.log(1, updatedBooking);
+    console.log(2, booking);
+    console.log(3, isStatusUpdate);
     // Invia email di aggiornamento stato se lo stato è cambiato
     if (isStatusUpdate && updatedBooking.status !== booking.status) {
       try {
@@ -335,16 +338,15 @@ export async function PUT(
           );
         }
         if (vigil?.email) {
-          // TODO notification for vigil
-          // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-          //   {
-          //     ...data,
-          //     service: data.service || updatedBooking.service,
-          //     vigil: data.vigil || updatedBooking.vigil,
-          //     consumer: data.consumer || updatedBooking.consumer,
-          //   },
-          //   vigil
-          // );
+          await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+            {
+              ...data,
+              service: data.service || updatedBooking.service,
+              vigil: data.vigil || updatedBooking.vigil,
+              consumer: data.consumer || updatedBooking.consumer,
+            },
+            vigil
+          );
         }
       } catch (emailError) {
         // Log dell'errore ma non interrompe l'aggiornamento della prenotazione

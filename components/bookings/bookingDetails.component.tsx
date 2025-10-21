@@ -178,7 +178,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <Badge
             label={
               [
-                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.CANCELLED_USER,
+                BookingStatusEnum.CANCELLED_VIGIL,
+                BookingStatusEnum.REJECTED,
                 BookingStatusEnum.REFUNDED,
                 BookingStatusEnum.COMPLETED,
               ].includes(booking.status as BookingStatusEnum)
@@ -193,7 +195,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             }
             color={
               [
-                BookingStatusEnum.CANCELLED,
+                BookingStatusEnum.CANCELLED_USER,
+                BookingStatusEnum.CANCELLED_VIGIL,
+                BookingStatusEnum.REJECTED,
                 BookingStatusEnum.REFUNDED,
                 BookingStatusEnum.COMPLETED,
               ].includes(booking.status as BookingStatusEnum)
@@ -367,7 +371,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             <Button
               danger
               label="Rifiuta Prenotazione"
-              action={() => handleStatusUpdate(BookingStatusEnum.CANCELLED)}
+              action={() => handleStatusUpdate(BookingStatusEnum.REJECTED)}
             />
           </>
         )}
@@ -394,7 +398,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             danger
             label="Annulla Prenotazione"
             action={async () => {
-              await handleStatusUpdate(BookingStatusEnum.CANCELLED);
+              await handleStatusUpdate(isConsumer ? BookingStatusEnum.CANCELLED_USER : BookingStatusEnum.CANCELLED_VIGIL);
               router.push(`${Routes.homeConsumer.url}`);
             }}
           />
