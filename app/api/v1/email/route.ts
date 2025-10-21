@@ -12,6 +12,7 @@ interface WelcomeEmailRequest {
 interface BookingConfirmationRequest {
   type: 'booking-confirmation';
   to: string;
+  subject: string;
   customerName: string;
   bookingId: string;
   serviceName: string;
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
       case 'booking-confirmation': {
         const {
           to,
+          subject,
           customerName,
           bookingId,
           serviceName,
@@ -103,6 +105,7 @@ export async function POST(request: NextRequest) {
 
         result = await EmailService.sendBookingConfirmationEmail({
           to,
+          subject,
           customerName,
           bookingId,
           serviceName,
