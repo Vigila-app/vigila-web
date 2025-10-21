@@ -32,7 +32,7 @@ const relationships = ["Figlio/a", "Nipote", "Parente", "Amico/a", "Badante"];
 
 const ConsumerOnboardComponent = () => {
   const { showToast } = useAppStore();
-  const { user } = useUserStore();
+  const { user, getUserDetails } = useUserStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
 
   const router = useRouter();
@@ -89,8 +89,8 @@ const ConsumerOnboardComponent = () => {
         message: "Profilo aggiornato con successo",
         type: ToastStatusEnum.SUCCESS,
       });
-      AuthService.renewAuthentication();
-
+      await AuthService.renewAuthentication();
+      await getUserDetails(true);
       router.replace(Routes.home.url);
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
