@@ -22,7 +22,9 @@ export const BookingUtils = {
       case BookingStatusEnum.COMPLETED:
       case PaymentStatusEnum.PAID:
         return "green";
-      case BookingStatusEnum.CANCELLED:
+      case BookingStatusEnum.CANCELLED_USER:
+      case BookingStatusEnum.CANCELLED_VIGIL:
+      case BookingStatusEnum.REJECTED:
       case BookingStatusEnum.REFUNDED:
       case PaymentStatusEnum.FAILED:
         return "red";
@@ -41,8 +43,13 @@ export const BookingUtils = {
         return "In corso";
       case BookingStatusEnum.COMPLETED:
         return "Completata";
-      case BookingStatusEnum.CANCELLED:
+      case BookingStatusEnum.CANCELLED_USER:
+      case BookingStatusEnum.CANCELLED_VIGIL:
         return "Cancellata";
+      // case BookingStatusEnum.CANCELLED:
+      //   return "Cancellata";
+      case BookingStatusEnum.REJECTED:
+        return "Rifiutata";
       case BookingStatusEnum.REFUNDED:
         return "Rimborsata";
       default:
@@ -135,8 +142,10 @@ export const BookingUtils = {
 
       if (
         booking.status === BookingStatusEnum.COMPLETED ||
-        booking.status === BookingStatusEnum.CANCELLED ||
-        booking.status === BookingStatusEnum.REFUNDED
+        booking.status === BookingStatusEnum.CANCELLED_USER ||
+        booking.status === BookingStatusEnum.CANCELLED_VIGIL ||
+        booking.status === BookingStatusEnum.REFUNDED ||
+        booking.status === BookingStatusEnum.REJECTED
       ) {
         return false;
       }

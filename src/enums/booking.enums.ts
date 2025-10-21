@@ -3,7 +3,10 @@ export enum BookingStatusEnum {
   CONFIRMED = "confirmed",
   IN_PROGRESS = "in_progress",
   COMPLETED = "completed",
-  CANCELLED = "cancelled",
+  // CANCELLED = "cancelled",
+  CANCELLED_USER = "cancelled_user",
+  CANCELLED_VIGIL = "cancelled_vigil",
+  REJECTED = "rejected",
   REFUNDED = "refunded",
 }
 

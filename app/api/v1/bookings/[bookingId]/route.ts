@@ -317,6 +317,9 @@ export async function PUT(
 
     if (error || !data) throw error;
 
+    console.log(1, updatedBooking);
+    console.log(2, booking);
+    console.log(3, isStatusUpdate);
     // Invia email di aggiornamento stato se lo stato è cambiato
     if (isStatusUpdate && updatedBooking.status !== booking.status) {
       try {
