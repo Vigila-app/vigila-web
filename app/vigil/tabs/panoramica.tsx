@@ -146,6 +146,7 @@ const PanoramicaTab = () => {
             <Controller
               name="information"
               control={control}
+              rules={{ maxLength: 650 }}
               render={({ field }) => (
                 <TextArea
                   type="text"

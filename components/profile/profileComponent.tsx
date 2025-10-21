@@ -128,7 +128,6 @@ const ProfileComponent = () => {
       console.error(error);
     }
   };
-
   if (isConsumer) {
     return (
       <div>
@@ -153,12 +152,12 @@ const ProfileComponent = () => {
                     <span className="text-gray-500 font-medium flex items-center text-center">
                       {formatRole(role)}
                     </span>
-                    <div className="flex  items-center gap-3 mb-3">
+                    <div className="flex flex-col md:flex-row items-center gap-3 mb-3">
                       {consumer?.address?.name ? (
                         <div className="inline-flex items-center flex-nowrap gap-1">
                           <MapPinIcon className="size-4 text-vigil-orange" />
-                          <span className="text-ellipsis text-xs font-medium  text-gray-700 overflow-hidden whitespace-nowrap max-w-48 md:max-w-56">
-                            {`${consumer?.address?.address?.suburb ?? consumer?.address?.display_name}, ${consumer?.address?.address?.city ?? ""}`}
+                          <span className="text-xs font-medium  text-gray-700 overflow-hidden whitespace-nowrap text-ellipsis max-w-3xs md:max-w-md">
+                            {`${consumer?.address?.address?.road ?? consumer?.address?.display_name}, ${consumer?.address?.address?.suburb ?? ""}, ${consumer?.address?.address?.town ?? ""}, ${consumer?.address?.address?.county ?? ""} `}
                           </span>
                         </div>
                       ) : null}
@@ -217,7 +216,7 @@ const ProfileComponent = () => {
                   userId={vigil?.id}
                 />
               </div>
-              <div className="flex-1">
+              <div className="md:flex-1 ">
                 <section className="flex flex-col items-center gap-2 ">
                   <h1 className="text-3xl font-boldtext-center">
                     {vigil?.displayName}
@@ -225,7 +224,7 @@ const ProfileComponent = () => {
                   <span className="text-gray-500 font-medium flex items-center text-center">
                     {formatRole(role)}
                   </span>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex flex-col md:flex-row items-center gap-2 mb-3">
                     {vigil?.averageRating ? (
                       <div className="inline-flex items-center flex-nowrap gap-1">
                         <div className="flex items-center gap-1">
@@ -236,7 +235,7 @@ const ProfileComponent = () => {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-500 font-medium flex items-center text-center">
+                      <span className="text-gray-500 font-medium flex justify-center items-center text-center">
                         {" "}
                         0 recensioni{" "}
                       </span>
