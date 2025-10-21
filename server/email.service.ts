@@ -18,7 +18,7 @@ import { UserDetailsType } from "@/src/types/user.types";
 import { ProfileActiveEmailTemplate } from "@/components/email/ProfileActiveEmailTemplate";
 import { isReleased } from "@/src/utils/envs.utils";
 
-const SEND_EMAIL_ACTIVE = true;
+const SEND_EMAIL_ACTIVE = isReleased;
 
 export const EmailService = {
   sendWelcomeEmail: async (data: WelcomeEmailDataI) =>
