@@ -19,7 +19,7 @@ import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import { ServiceI } from "@/src/types/services.types";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { AuthService } from "@/src/services";
+import { AuthService, UserService } from "@/src/services";
 
 type OnboardFormI = {
   birthday: string;
@@ -47,7 +47,7 @@ const VigilOnboardComponent = () => {
     hideLoader,
     loader: { isLoading },
   } = useAppStore();
-  const { user } = useUserStore();
+  const { user, getUserDetails } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const router = useRouter();
@@ -120,7 +120,9 @@ const VigilOnboardComponent = () => {
         message: "Profilo aggiornato con successo",
         type: ToastStatusEnum.SUCCESS,
       });
-      AuthService.renewAuthentication();
+      await AuthService.renewAuthentication();
+      await getUserDetails(true);
+      // await UserService.updateUser({},{information:formData.information});
       redirectHome();
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
