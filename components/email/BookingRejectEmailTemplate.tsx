@@ -2,8 +2,6 @@ import { AppConstants } from "@/src/constants";
 import * as React from "react";
 import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
-import { dateDisplay } from "@/src/utils/date.utils";
-import { ServicesUtils } from "@/src/utils/services.utils";
 import { replaceDynamicUrl } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 

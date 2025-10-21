@@ -152,7 +152,7 @@ export const BookingUtilsServer = {
         }
         case BookingStatusEnum.CANCELLED_VIGIL: {
           try {
-            // Invia email di cancellazione prenotazione
+            // Invia email di cancellazione prenotazione da parte del Vigil
             await EmailService.sendBookingCancellationEmail({
               to: consumer.email,
               subject:
@@ -177,7 +177,7 @@ export const BookingUtilsServer = {
                 typeof booking.price === "number"
                   ? amountDisplay(booking.price, booking.currency as any)
                   : String(booking.price || ""),
-            });
+            }, false);
             return; // Esci dalla funzione dopo aver inviato l'email di cancellazione
           } catch (error) {
             statusText = "cancellata";
@@ -203,11 +203,7 @@ export const BookingUtilsServer = {
                   `;
           break;
         default:
-          statusText = "aggiornata";
-          content = `
-                    <p>La tua prenotazione <strong>#${booking.id}</strong> è stata aggiornata.</p>
-                    <p><strong>Nuovo stato:</strong> ${booking.status}</p>
-                  `;
+          return; // Per altri stati, non inviare email al consumer
       }
 
       // Invia email di notifica
@@ -295,13 +291,43 @@ export const BookingUtilsServer = {
           }
           break;
         }
-        case BookingStatusEnum.CANCELLED_USER:
-          statusText = "cancellata";
-          content = `
-                    <p>La prenotazione <strong>#${booking.id}</strong> è stata cancellata.</p>
+        case BookingStatusEnum.CANCELLED_USER: {
+          try {
+            // Invia email di cancellazione prenotazione da parte dell'utente
+            await EmailService.sendBookingCancellationEmail({
+              to: vigil.email,
+              subject: `${(booking.consumer as any)?.user_metadata?.name || (booking.consumer as any)?.name} ha annullato la prenotazione ❌`,
+              customerName:
+                (booking.consumer as any)?.user_metadata?.name ||
+                (booking.consumer as any)?.user_metadata?.firstName ||
+                (booking.consumer as any)?.name,
+              bookingId: booking.id,
+              serviceName: booking.service?.name || "",
+              bookingDate: booking.startDate,
+              bookingTime: booking.startDate,
+              vigilName:
+                booking.vigil?.name ||
+                booking.vigil?.displayName ||
+                booking.vigil?.surname ||
+                (vigil as any)?.user_metadata?.name ||
+                (vigil as any)?.user_metadata?.firstName ||
+                "",
+              location: booking.address || "",
+              totalAmount:
+                typeof booking.price === "number"
+                  ? amountDisplay(booking.price, booking.currency as any)
+                  : String(booking.price || ""),
+            }, true);
+            return; // Esci dalla funzione dopo aver inviato l'email di cancellazione
+          } catch (error) {
+            statusText = "cancellata";
+            content = `
+                    <p>La tua prenotazione <strong>#${booking.id}</strong> è stata cancellata.</p>
                     <p>Se hai domande, contattaci tramite l&apos;app.</p>
                   `;
+          }
           break;
+        }
         case BookingStatusEnum.COMPLETED:
           statusText = "completata";
           content = `
@@ -316,11 +342,7 @@ export const BookingUtilsServer = {
                   `;
           break;
         default:
-          statusText = "aggiornata";
-          content = `
-                    <p>La prenotazione <strong>#${booking.id}</strong> è stata aggiornata.</p>
-                    <p><strong>Nuovo stato:</strong> ${booking.status}</p>
-                  `;
+          return; // Per altri stati, non inviare email al vigil
       }
 
       // Invia email di notifica

@@ -338,16 +338,15 @@ export async function PUT(
           );
         }
         if (vigil?.email) {
-          // TODO notification for vigil
-          // await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-          //   {
-          //     ...data,
-          //     service: data.service || updatedBooking.service,
-          //     vigil: data.vigil || updatedBooking.vigil,
-          //     consumer: data.consumer || updatedBooking.consumer,
-          //   },
-          //   vigil
-          // );
+          await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+            {
+              ...data,
+              service: data.service || updatedBooking.service,
+              vigil: data.vigil || updatedBooking.vigil,
+              consumer: data.consumer || updatedBooking.consumer,
+            },
+            vigil
+          );
         }
       } catch (emailError) {
         // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
