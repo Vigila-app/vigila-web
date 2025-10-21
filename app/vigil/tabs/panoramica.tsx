@@ -7,7 +7,6 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { UserService } from "@/src/services";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
-  AcademicCapIcon,
   EnvelopeIcon,
   HeartIcon,
   MapPinIcon,
@@ -15,7 +14,7 @@ import {
   TrophyIcon,
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -28,13 +27,15 @@ const PanoramicaTab = () => {
   const [isEditing, setIsEditing] = useState(false);
   const params = useParams();
   const vigilIdFromParams = params?.vigilId as string | undefined;
-  const vigilId =
-    user?.user_metadata?.role === RolesEnum.VIGIL
-      ? user?.id
-      : vigilIdFromParams;
+  const vigilId = useMemo(
+    () =>
+      user?.user_metadata?.role === RolesEnum.VIGIL
+        ? user?.id
+        : vigilIdFromParams,
+    [user?.user_metadata?.role, user?.id, vigilIdFromParams]
+  );
 
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
-  const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
 
   useEffect(() => {
     if (vigilId) {
@@ -78,6 +79,9 @@ const PanoramicaTab = () => {
           information.length > 0
         ) {
           await UserService.updateUser({}, { information });
+          if (vigilId) {
+            await getVigilsDetails([vigilId], true);
+          }
           setIsEditing(false);
           showToast({
             message: "Profile updated successfully",
@@ -112,7 +116,6 @@ const PanoramicaTab = () => {
     (total, booking) => total + (booking.price - booking.fee),
     0
   );
- 
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>
@@ -134,8 +137,8 @@ const PanoramicaTab = () => {
 
         {!isEditing ? (
           <div>
-            <p className="font-medium leading-relaxed text-sm">
-              {isVigil ? user?.user_metadata?.information : vigil?.information}
+            <p className="font-medium leading-relaxed break-words text-sm">
+              {vigil?.information}
             </p>
           </div>
         ) : (
@@ -167,7 +170,6 @@ const PanoramicaTab = () => {
           </form>
         )}
       </Card>
-      
 
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
@@ -208,7 +210,6 @@ const PanoramicaTab = () => {
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
           <PhoneIcon className="size-6 text-consumer-blue" />
-
           <h3 className="text-lg font-semibold">Contatti</h3>
         </div>
         <div className="space-y-2 text-sm text-muted-foreground">
