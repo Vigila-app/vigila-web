@@ -399,12 +399,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         <Controller
           name="note"
           control={control}
+          rules={{ maxLength: 650 }}
           render={({ field }) => (
             <TextArea
               {...field}
               label="Note"
               placeholder="Aggiungi eventuali note per il Vigil"
-              rows={3}
+              rows={6}
               role={RolesEnum.VIGIL}
               error={errors.note}
             />
