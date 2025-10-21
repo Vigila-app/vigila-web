@@ -46,8 +46,6 @@ export const BookingUtils = {
       case BookingStatusEnum.CANCELLED_USER:
       case BookingStatusEnum.CANCELLED_VIGIL:
         return "Cancellata";
-      // case BookingStatusEnum.CANCELLED:
-      //   return "Cancellata";
       case BookingStatusEnum.REJECTED:
         return "Rifiutata";
       case BookingStatusEnum.REFUNDED:
