@@ -79,6 +79,9 @@ const PanoramicaTab = () => {
           information.length > 0
         ) {
           await UserService.updateUser({}, { information });
+          if (vigilId) {
+            await getVigilsDetails([vigilId], true);
+          }
           setIsEditing(false);
           showToast({
             message: "Profile updated successfully",
@@ -113,7 +116,6 @@ const PanoramicaTab = () => {
     (total, booking) => total + (booking.price - booking.fee),
     0
   );
-
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
       <Card>

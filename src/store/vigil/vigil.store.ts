@@ -59,21 +59,24 @@ export const useVigilStore = create<ViglStoreType>()(
                           item !== undefined
                       )
                       .map(({ data }) => data);
-                    
-                    set(
-                      () => ({
-                        vigils: Array.from(
-                          new Set([
-                            ...get().vigils,
-                            ...newVigils,
-                          ])
-                        ),
-                        lastUpdate: new Date(),
-                      }),
-                      false,
-                      { type: "getVigilsDetails" }
-                    );
-                    return newVigils;
+
+                    {
+                      const mergedMap = new Map<string, VigilDetailsType>(
+                        get().vigils.map((v) => [v.id, v])
+                      );
+                      newVigils.forEach((v) => mergedMap.set(v.id, v));
+                      const mergedVigils = Array.from(mergedMap.values());
+
+                      set(
+                        () => ({
+                          vigils: mergedVigils,
+                          lastUpdate: new Date(),
+                        }),
+                        false,
+                        { type: "getVigilsDetails" }
+                      );
+                      return newVigils;
+                    }
                   }
                 } catch (error) {
                   throw error;
