@@ -101,7 +101,7 @@ const MenuMobile = () => {
         id="MenuMobile"
         style={!isOpen ? { right: "-100vw" } : {}}
         className={clsx(
-          "absolute flex flex-col gap-8  transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
+          "absolute flex flex-col gap-6  transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
           isOpen ? "block right-0" : "hidden"
         )}>
         {isUserLogged ? (
@@ -125,13 +125,13 @@ const MenuMobile = () => {
                 </span>
               )}
             </section>
-            <ul className="flex flex-col gap-8 justify-center flex-1 overflow-y-auto">
+            <ul className="flex flex-col gap-4 md:gap-8 justify-center flex-1 max-h-80 overflow-y-auto mt-6">
               {user?.user_metadata?.role === RolesEnum.CONSUMER && (
-                <li className="block py-2">
+                <li className="block ">
                   {MenuLinkItem(Routes.homeConsumer, HomeIcon)}
                 </li>
               )}
-              <li className="block py-2">
+              <li className="block ">
                 {MenuLinkItem(
                   user.user_metadata?.role === RolesEnum.CONSUMER
                     ? Routes.profileConsumer
@@ -141,7 +141,7 @@ const MenuMobile = () => {
                   UserIcon
                 )}
               </li>
-              <li className="block py-2">
+              <li className="block">
                 {MenuLinkItem(
                   {
                     ...(user.user_metadata?.role === RolesEnum.CONSUMER
@@ -160,7 +160,7 @@ const MenuMobile = () => {
                   false
                 )}
               </li>
-              <li className="block py-2">
+              <li className="block ">
                 {MenuLinkItem(
                   {
                     ...(user.user_metadata?.role === RolesEnum.CONSUMER
@@ -182,7 +182,7 @@ const MenuMobile = () => {
                 )}
               </li>
               {user?.user_metadata?.role === RolesEnum.VIGIL ? (
-                <li className="block py-2">
+                <li className="block">
                   {MenuLinkItem(
                     {
                       ...Routes.profileConsumer,
@@ -194,7 +194,7 @@ const MenuMobile = () => {
                   )}
                 </li>
               ) : null}
-              <li className="block py-2">
+              <li className="block ">
                 {MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
               </li>
               {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
@@ -209,7 +209,7 @@ const MenuMobile = () => {
             </ul>
           </>
         ) : null}
-        <div className=" sticky bottom-0  w-full  bg-white">
+        <div className=" sticky bottom-0 w-full bg-white">
           <ul className="relative header-menu">
             {NavigationUtils.getHeaderMenu()
               .filter((route) => route?.menu?.mobile)
@@ -224,7 +224,7 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-2 px-4 pt-4 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
+                className="flex items-center gap-4 w-full rounded mb-2 px-4 pt-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>
