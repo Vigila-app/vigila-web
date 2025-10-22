@@ -169,11 +169,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     );
   }
   return (
-    <div className="space-y-6  ">
-      <div className="relative pr-6 ">
-        <h2 className="text-[21.5px] font-bold  text-gray-900">
-          Dettagli prenotazione
-        </h2>
+    <div className="space-y-6 relative ">
         <span className="absolute top-0 right-0">
           <Badge
             label={
@@ -208,6 +204,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             }
           />
         </span>
+      <div className="pt-5 ">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Dettagli prenotazione
+        </h2>
         <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
       </div>
 
