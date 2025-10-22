@@ -3,8 +3,10 @@ import {
   authenticateUser,
   getAdminClient,
 } from "@/server/api.utils.server";
+import { EmailService } from "@/server/email.service";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
+import { UserDetailsType } from "@/src/types/user.types";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
 import { NextResponse } from "next/server";
@@ -69,6 +71,17 @@ export async function POST(
         }
       );
       if (authError) throw authError;
+    }
+
+    if (originalUser.email) {
+
+      await EmailService.sendProfileActiveEmail(
+        {
+          to: originalUser.email,
+          subject: userRole === RolesEnum.CONSUMER ? "Il tuo profilo Vigila è pronto 🥳" : "Benvenuto/a in Vigila 🧡",
+        },
+        originalUser as UserDetailsType
+      );  
     }
 
     return NextResponse.json({

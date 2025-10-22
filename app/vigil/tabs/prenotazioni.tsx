@@ -21,7 +21,7 @@ const PrenotationTabs = () => {
           <span className="">
             In attesa&nbsp;
             {pendingBookings.length !== 0 && (
-              <span className="tab-buttons bg-vigil-orange">
+              <span className="tab-buttons bg-vigil-orange animate-pulse">
                 {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
               </span>
             )}

@@ -8,14 +8,21 @@ import { CurrencyEnum } from "@/src/enums/common.enums";
 import { BookingUtils } from "@/src/utils/booking.utils";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { Badge } from "@/components";
-import { useDebouncedSearch, createTextFilter } from "@/src/hooks/useDebouncedSearch";
+import {
+  useDebouncedSearch,
+  createTextFilter,
+} from "@/src/hooks/useDebouncedSearch";
 
 export default function AdminBookingsPage() {
   const { bookings, bookingsLoading, getBookings, updateBookingStatus } =
     useAdminStore();
 
   const [filter, setFilter] = useState("all");
-  const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch('', 300, 'adminBookings');
+  const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
+    "",
+    300,
+    "adminBookings"
+  );
 
   useEffect(() => {
     const filters = filter !== "all" ? { status: filter } : undefined;
@@ -25,11 +32,11 @@ export default function AdminBookingsPage() {
   // Crea il filtro di testo per la ricerca
   const textFilter = createTextFilter(debouncedSearchTerm);
 
-  const filteredBookings = bookings.filter(booking =>
+  const filteredBookings = bookings.filter((booking) =>
     textFilter(booking, [
-      'consumers.displayName',
-      'vigils.displayName', 
-      'services.name'
+      "consumers.displayName",
+      "vigils.displayName",
+      "services.name",
     ])
   );
 
@@ -73,11 +80,11 @@ export default function AdminBookingsPage() {
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             >
               <option value="all">Tutti gli stati</option>
-              <option value="pending">In attesa</option>
-              <option value="confirmed">Confermata</option>
-              <option value="in_progress">In corso</option>
-              <option value="completed">Completata</option>
-              <option value="cancelled">Cancellata</option>
+              <option value={BookingStatusEnum.PENDING}>In attesa</option>
+              <option value={BookingStatusEnum.CONFIRMED}>Confermata</option>
+              <option value={BookingStatusEnum.IN_PROGRESS}>In corso</option>
+              <option value={BookingStatusEnum.COMPLETED}>Completata</option>
+              <option value={BookingStatusEnum.CANCELLED_USER}>Cancellata</option>
             </select>
           </div>
           <div>
@@ -108,7 +115,7 @@ export default function AdminBookingsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">
-              {bookings.filter((b) => b.status === "pending").length}
+              {bookings.filter((b) => b.status === BookingStatusEnum.PENDING).length}
             </p>
             <p className="text-sm text-gray-600">In attesa</p>
           </div>
@@ -116,7 +123,7 @@ export default function AdminBookingsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-blue-600">
-              {bookings.filter((b) => b.status === "confirmed").length}
+              {bookings.filter((b) => b.status === BookingStatusEnum.CONFIRMED).length}
             </p>
             <p className="text-sm text-gray-600">Confermate</p>
           </div>
@@ -124,7 +131,7 @@ export default function AdminBookingsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-green-600">
-              {bookings.filter((b) => b.status === "completed").length}
+              {bookings.filter((b) => b.status === BookingStatusEnum.COMPLETED).length}
             </p>
             <p className="text-sm text-gray-600">Completate</p>
           </div>
@@ -132,9 +139,28 @@ export default function AdminBookingsPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="text-center">
             <p className="text-3xl font-bold text-red-600">
-              {bookings.filter((b) => b.status === "cancelled").length}
+              {
+                bookings.filter(
+                  (b) =>
+                    b.status === BookingStatusEnum.CANCELLED_USER ||
+                    b.status === BookingStatusEnum.CANCELLED_VIGIL
+                ).length
+              }
             </p>
             <p className="text-sm text-gray-600">Cancellate</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-center">
+            <p className="text-3xl font-bold text-black">
+              {
+                bookings.filter(
+                  (b) =>
+                    b.status === BookingStatusEnum.REJECTED
+                ).length
+              }
+            </p>
+            <p className="text-sm text-gray-600">Rifiutate</p>
           </div>
         </div>
       </div>
@@ -251,12 +277,12 @@ export default function AdminBookingsPage() {
                         Dettagli
                       </button>
 
-                      {booking.status === "pending" && (
+                      {booking.status === BookingStatusEnum.PENDING && (
                         <>
                           <button
                             className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                             onClick={() =>
-                              handleStatusUpdate(booking.id, "confirmed")
+                              handleStatusUpdate(booking.id, BookingStatusEnum.CONFIRMED)
                             }
                           >
                             Conferma
@@ -264,7 +290,7 @@ export default function AdminBookingsPage() {
                           <button
                             className="text-red-600 hover:text-red-900 text-xs bg-red-50 px-2 py-1 rounded"
                             onClick={() =>
-                              handleStatusUpdate(booking.id, "cancelled")
+                              handleStatusUpdate(booking.id, BookingStatusEnum.CANCELLED_VIGIL)
                             }
                           >
                             Cancella
@@ -272,22 +298,22 @@ export default function AdminBookingsPage() {
                         </>
                       )}
 
-                      {booking.status === "confirmed" && (
+                      {booking.status === BookingStatusEnum.CONFIRMED && (
                         <button
                           className="text-purple-600 hover:text-purple-900 text-xs bg-purple-50 px-2 py-1 rounded"
                           onClick={() =>
-                            handleStatusUpdate(booking.id, "in_progress")
+                            handleStatusUpdate(booking.id, BookingStatusEnum.IN_PROGRESS)
                           }
                         >
                           Avvia
                         </button>
                       )}
 
-                      {booking.status === "in_progress" && (
+                      {booking.status === BookingStatusEnum.IN_PROGRESS && (
                         <button
                           className="text-green-600 hover:text-green-900 text-xs bg-green-50 px-2 py-1 rounded"
                           onClick={() =>
-                            handleStatusUpdate(booking.id, "completed")
+                            handleStatusUpdate(booking.id, BookingStatusEnum.COMPLETED)
                           }
                         >
                           Completa

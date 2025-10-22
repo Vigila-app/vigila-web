@@ -114,16 +114,21 @@ export async function PUT(
     > = {
       [BookingStatusEnum.PENDING]: [
         BookingStatusEnum.CONFIRMED,
-        BookingStatusEnum.CANCELLED,
+        BookingStatusEnum.CANCELLED_USER,
+        BookingStatusEnum.CANCELLED_VIGIL,
+        BookingStatusEnum.REJECTED,
       ],
       [BookingStatusEnum.CONFIRMED]: [
         BookingStatusEnum.COMPLETED,
-        BookingStatusEnum.CANCELLED,
+        BookingStatusEnum.CANCELLED_USER,
+        BookingStatusEnum.CANCELLED_VIGIL,
       ],
       [BookingStatusEnum.IN_PROGRESS]: [],
       [BookingStatusEnum.REFUNDED]: [],
       [BookingStatusEnum.COMPLETED]: [],
-      [BookingStatusEnum.CANCELLED]: [],
+      [BookingStatusEnum.CANCELLED_VIGIL]: [],
+      [BookingStatusEnum.CANCELLED_USER]: [],
+      [BookingStatusEnum.REJECTED]: [],
     };
     if (status && Object.values(BookingStatusEnum).includes(status)) {
       const currentStatus = existingBooking.status;

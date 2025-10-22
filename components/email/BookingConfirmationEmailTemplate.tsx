@@ -4,6 +4,8 @@ import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { ServicesUtils } from "@/src/utils/services.utils";
+import { replaceDynamicUrl } from "@/src/utils/common.utils";
+import { Routes } from "@/src/routes";
 
 interface BookingConfirmationEmailProps {
   customerName: string;
@@ -48,7 +50,11 @@ export function BookingConfirmationEmailTemplate(
             ? `Nuova Prenotazione Assegnata ✅`
             : `Prenotazione Confermata ✅`
         }
-        subtitle={undefined}
+        subtitle={
+          !isVigil
+            ? "Ti chiamiamo noi per gli ultimi dettagli pratici."
+            : undefined
+        }
       />
 
       <div
@@ -60,7 +66,7 @@ export function BookingConfirmationEmailTemplate(
         }}
       >
         <h2 style={{ color: "#333", fontSize: "22px", marginBottom: "20px" }}>
-          Ciao {isVigil ? vigilName : customerName}!
+          Ciao&nbsp;{customerName}&nbsp;🎉
         </h2>
 
         <p
@@ -70,9 +76,8 @@ export function BookingConfirmationEmailTemplate(
             lineHeight: "1.6",
           }}
         >
-          {isVigil
-            ? `Ti abbiamo assegnato una nuova prenotazione.`
-            : "La tua prenotazione è stata confermata."}
+          {!isVigil &&
+            `il Vigil ${vigilName} ha confermato la tua richiesta. ✔️`}
         </p>
         <br />
         <div
@@ -92,7 +97,7 @@ export function BookingConfirmationEmailTemplate(
               marginTop: "0",
             }}
           >
-            Dettagli Prenotazione
+            Riepilogo:
           </h3>
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -105,10 +110,31 @@ export function BookingConfirmationEmailTemplate(
                   fontWeight: "bold",
                 }}
               >
-                ID Prenotazione:
+                Quando:
               </td>
               <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                #{bookingId}
+                {dateDisplay(bookingDate, "dateTime")}
+                {quantity && unitType && (
+                  <>
+                    &nbsp;-&nbsp;{quantity}&nbsp;
+                    {ServicesUtils.getServiceUnitType(unitType)}
+                  </>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{
+                  padding: "8px 0",
+                  color: "#666",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              >
+                Dove:
+              </td>
+              <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
+                {location}
               </td>
             </tr>
             <tr>
@@ -135,93 +161,6 @@ export function BookingConfirmationEmailTemplate(
                   fontWeight: "bold",
                 }}
               >
-                Data:
-              </td>
-              <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {dateDisplay(bookingDate, "dateTime")}
-              </td>
-            </tr>
-            {quantity && unitType && (
-              <tr>
-                <td
-                  style={{
-                    padding: "8px 0",
-                    color: "#666",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Durata:
-                </td>
-                <td
-                  style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}
-                >
-                  {quantity}&nbsp;{ServicesUtils.getServiceUnitType(unitType)}
-                </td>
-              </tr>
-            )}
-            {!isVigil && vigilName && (
-              <tr>
-                <td
-                  style={{
-                    padding: "8px 0",
-                    color: "#666",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Vigil:
-                </td>
-                <td
-                  style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}
-                >
-                  {vigilName}
-                </td>
-              </tr>
-            )}
-            {isVigil && customerName && (
-              <tr>
-                <td
-                  style={{
-                    padding: "8px 0",
-                    color: "#666",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Cliente:
-                </td>
-                <td
-                  style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}
-                >
-                  {customerName}
-                </td>
-              </tr>
-            )}
-            <tr>
-              <td
-                style={{
-                  padding: "8px 0",
-                  color: "#666",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
-              >
-                Luogo:
-              </td>
-              <td style={{ padding: "8px 0", color: "#333", fontSize: "14px" }}>
-                {location}
-              </td>
-            </tr>
-            <tr>
-              <td
-                style={{
-                  padding: "8px 0",
-                  color: "#666",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
-              >
                 Totale:
               </td>
               <td
@@ -232,7 +171,7 @@ export function BookingConfirmationEmailTemplate(
                   fontWeight: "bold",
                 }}
               >
-                €{totalAmount}
+                €{totalAmount}&nbsp;(pagamento tracciato in app)
               </td>
             </tr>
           </table>
@@ -240,7 +179,7 @@ export function BookingConfirmationEmailTemplate(
 
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           <a
-            href={`${appUrl}/bookings/${bookingId}`}
+            href={`${appUrl}${replaceDynamicUrl(Routes.bookingDetails.url, ":bookingId", bookingId)}`}
             style={{
               backgroundColor: "#006fe6",
               color: "#fdfdfd",
@@ -252,45 +191,21 @@ export function BookingConfirmationEmailTemplate(
               display: "inline-block",
             }}
           >
-            Visualizza Prenotazione
+            Gestisci Prenotazione
           </a>
         </div>
 
-        <div
+        <p
           style={{
-            backgroundColor: "#e7f3ff",
-            padding: "15px",
-            borderRadius: "6px",
-            borderLeft: "4px solid #007bff",
-            marginBottom: "20px",
+            color: "#0066cc",
+            fontSize: "14px",
+            margin: "0",
+            fontWeight: "bold",
           }}
         >
-          <p
-            style={{
-              color: "#0066cc",
-              fontSize: "14px",
-              margin: "0",
-              fontWeight: "bold",
-            }}
-          >
-            💡 Cosa fare ora:
-          </p>
-          <ul
-            style={{
-              color: "#0066cc",
-              fontSize: "14px",
-              margin: "10px 0 0 0",
-              paddingLeft: "20px",
-            }}
-          >
-            <li>Assicurati di essere presente all&apos;orario concordato</li>
-            <li>
-              Tieni a portata di mano il tuo telefono per eventuali
-              comunicazioni
-            </li>
-            <li>Prepara eventuali documenti richiesti per il servizio</li>
-          </ul>
-        </div>
+          📞 Concierge Vigila: ti contatteremo a breve per allineare ingresso in
+          casa, note utili e ogni dettaglio.
+        </p>
 
         <p style={{ color: "#666", fontSize: "14px", lineHeight: "1.6" }}>
           Per qualsiasi domanda o necessità di modifiche, contattaci tramite

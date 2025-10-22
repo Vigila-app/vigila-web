@@ -25,6 +25,7 @@ export interface WelcomeEmailDataI {
 
 export interface BookingConfirmationEmailDataI {
   to: string;
+  subject: string;
   customerName: string;
   bookingId: string;
   serviceName: string;

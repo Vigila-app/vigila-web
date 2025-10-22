@@ -237,7 +237,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
               <Badge
                 label={
                   [
-                    BookingStatusEnum.CANCELLED,
+                    BookingStatusEnum.CANCELLED_VIGIL,
+                    BookingStatusEnum.REJECTED,
                     BookingStatusEnum.REFUNDED,
                     BookingStatusEnum.COMPLETED,
                   ].includes(booking.status as BookingStatusEnum)
@@ -252,7 +253,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 }
                 color={
                   [
-                    BookingStatusEnum.CANCELLED,
+                    BookingStatusEnum.CANCELLED_VIGIL,
+                    BookingStatusEnum.REJECTED,
                     BookingStatusEnum.REFUNDED,
                     BookingStatusEnum.COMPLETED,
                   ].includes(booking.status as BookingStatusEnum)
@@ -293,7 +295,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                     customClass="!px-6 !py-2"
                     role={RolesEnum.VIGIL}
                     // action={() =>
-                    //   handleStatusUpdate(BookingStatusEnum.CANCELLED)
+                    //   handleStatusUpdate(BookingStatusEnum.REJECTED)
                     // }
                     href={BookingUtils.getBookingDetailsUrl(booking.id)}
                     label="Rifiuta"
@@ -309,7 +311,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                 </div>
               )}
 
-              {booking?.status === BookingStatusEnum.CANCELLED && (
+              {booking?.status === BookingStatusEnum.REJECTED && (
                 <Button label="Rifiutata" disabled />
               )}
             </div>

@@ -16,7 +16,6 @@ export function WelcomeEmailTemplate({
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        maxWidth: "600px",
         margin: "0 auto",
       }}
     >
@@ -25,11 +24,17 @@ export function WelcomeEmailTemplate({
         subtitle="Un ponte tra generazioni"
       />
 
-      <div style={{ padding: "40px 20px", backgroundColor: "#ffffff" }}>
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
         <h2 style={{ color: "#333", fontSize: "22px", marginBottom: "20px" }}>
           Ciao {firstName}! 👋
         </h2>
-
         <p
           style={{
             color: "#666",
@@ -43,7 +48,6 @@ export function WelcomeEmailTemplate({
           In Vigila creiamo connessioni autentiche che arricchiscono la vita di
           giovani e anziani, costruendo una comunità più unita e solidale.
         </p>
-
         <p
           style={{
             color: "#666",
@@ -54,7 +58,6 @@ export function WelcomeEmailTemplate({
         >
           Con Vigila puoi:
         </p>
-
         <ul
           style={{
             color: "#666",
@@ -68,7 +71,6 @@ export function WelcomeEmailTemplate({
           <li>Comunicare direttamente con i Vigil</li>
           <li>Gestire i pagamenti in sicurezza</li>
         </ul>
-
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           <a
             href={appUrl}
@@ -86,7 +88,6 @@ export function WelcomeEmailTemplate({
             Inizia ora
           </a>
         </div>
-
         <p style={{ color: "#888", fontSize: "14px", lineHeight: "1.6" }}>
           Se hai domande o hai bisogno di supporto, non esitare a contattarci.
           Siamo qui per aiutarti!

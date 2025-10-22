@@ -92,7 +92,9 @@ const BookingListComponent = () => {
         return "purple";
       case BookingStatusEnum.COMPLETED:
         return "green";
-      case BookingStatusEnum.CANCELLED:
+      case BookingStatusEnum.CANCELLED_USER:
+      case BookingStatusEnum.CANCELLED_VIGIL:
+      case BookingStatusEnum.REJECTED:
       case BookingStatusEnum.REFUNDED:
         return "red";
       default:
