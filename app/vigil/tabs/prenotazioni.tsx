@@ -21,7 +21,7 @@ const PrenotationTabs = () => {
           <span className="">
             In attesa&nbsp;
             {pendingBookings.length !== 0 && (
-              <span className="tab-buttons">
+              <span className="tab-buttons bg-vigil-orange">
                 {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
               </span>
             )}
@@ -35,11 +35,10 @@ const PrenotationTabs = () => {
     {
       label: (
         <span className="flex">
-          
           <span className="">
             Accettate&nbsp;
             {confirmedBookings.length !== 0 && (
-              <span className="tab-buttons">
+              <span className="tab-buttons bg-consumer-blue">
                 {confirmedBookings.length <= 99
                   ? confirmedBookings.length
                   : "99+"}
@@ -56,7 +55,7 @@ const PrenotationTabs = () => {
           <span className="">
             Completate&nbsp;
             {completedBookings.length !== 0 && (
-              <span className="tab-buttons">
+              <span className="tab-buttons bg-green-500">
                 {completedBookings.length <= 99
                   ? completedBookings.length
                   : "99+"}
