@@ -86,7 +86,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Vuoi lavorare?
                 </h3>
                 <p className="text-[12px] text-vigil-orange mt-1">
-                  Lavoro flessibile, retribuito e valido per CFU
+                  Lavoro flessibile, retribuito e gratificante
                 </p>
               </div>
               <ButtonLink
@@ -179,7 +179,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 </div>
                 <h3 className="font-semibold text-lg">Compagnia sincera</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Conversazioni, risate e momenti di vera connessione
+                  Conversazioni, ascolto e momenti di vera connessione
                 </p>
               </div>
             </Card>
@@ -230,7 +230,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   </li>
                   <li className="flex items-center">
                     <span className="inline-block w-2 h-2 rounded-full bg-consumer-blue mr-2"></span>
-                    Lavoro flessibile per i giovani Vigils
+                    Lavoro flessibile per gli assistenti Vigil
                   </li>
                   <li className="flex items-center">
                     <span className="inline-block w-2 h-2 rounded-full bg-vigil-orange mr-2"></span>
@@ -260,7 +260,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Per le Famiglie
                 </h3>
                 <p className="text-md  max-w-sm">
-                  Trovare un amico speciale per il tuo caro
+                  Trovare un assistenza per il tuo caro
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -273,7 +273,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     Trova un vigil vicino a te
                   </p>
                   <p className="text-[12px]">
-                    cerca nella tua zona e visualizza i profili disponibili
+                    Cerca nella tua zona e visualizza i profili disponibili
                   </p>
                 </div>
                 {/* Step 2 Famiglie */}
@@ -310,10 +310,10 @@ const HomeComponent = (props: HomeComponentI) => {
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-vigil-orange">
-                  Per i Giovani
+                  Per gli assistenti Vigil
                 </h3>
                 <p className="text-md max-w-sm">
-                  Trovare un amico speciale per il tuo caro
+                  Trovare un lavoro flessibile e gratificante
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -324,7 +324,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   </div>
                   <p className="text-lg font-medium">Condividi chi sei</p>
                   <p className="text-[12px]">
-                    Raccontaci i tuoi interessi e cosa ti piace fare
+                    Raccontaci chi sei e cosa ti spinge ad essere qui 
                   </p>
                 </div>
                 {/* Step 2 Giovani */}
@@ -332,9 +332,9 @@ const HomeComponent = (props: HomeComponentI) => {
                   <div className="w-10 h-10 rounded-full bg-vigil-orange text-white flex items-center justify-center text-lg font-bold">
                     2
                   </div>
-                  <p className="text-lg font-medium">Incontra nuovi amici</p>
+                  <p className="text-lg font-medium">Fai la differenza</p>
                   <p className="text-[12px]">
-                    conosci anziani meravigliosi con storie da raccontare
+                    Conosci anziani e aiutaci a combattere la solitudine
                   </p>
                 </div>
                 {/* Step 3 Giovani */}
@@ -342,9 +342,9 @@ const HomeComponent = (props: HomeComponentI) => {
                   <div className="w-10 h-10 rounded-full bg-vigil-orange text-white flex items-center justify-center text-lg font-bold">
                     3
                   </div>
-                  <p className="text-lg font-medium">Cresci insieme</p>
+                  <p className="text-lg font-medium">Cresci professionalemnte</p>
                   <p className="text-[12px]">
-                    Scopri quanto è bello imparare l&apos;uno dall&apos;altro
+                    Trasforma la solitudine in opportunità lavorativa 
                   </p>
                 </div>
               </div>
