@@ -12,7 +12,7 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo,} from "react";
 import { Avatar, Badge, Button, ButtonLink, Card } from "@/components";
 import { amountDisplay} from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
