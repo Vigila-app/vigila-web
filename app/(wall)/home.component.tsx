@@ -64,7 +64,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Hai bisogno di aiuto?
                 </h3>
                 <p className="text-[12px] text-consumer-blue mt-1">
-                  Trova un Vigil di fiducia nella tua zona
+                  Trova un'Assistente Vigil di fiducia nella tua zona
                 </p>
               </div>
               <ButtonLink
@@ -140,7 +140,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 </div>
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Trova un vigil di fiducia nella tua zona
+                  Trova uN'Assistente vigil di fiducia nella tua zona
                 </p>
               </div>
             </Card>
@@ -270,7 +270,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     1
                   </div>
                   <p className="text-lg font-medium">
-                    Trova un vigil vicino a te
+                    Trova un'Assistente vigil vicino a te
                   </p>
                   <p className="text-[12px]">
                     Cerca nella tua zona e visualizza i profili disponibili
@@ -285,7 +285,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     Scegli chi ti ispira fiducia
                   </p>
                   <p className="text-[12px] ">
-                    Leggi recensioni e seleziona il Vigil più adatto
+                    Leggi recensioni e seleziona l'Assistente Vigil più adatto
                   </p>
                 </div>
                 {/* Step 3 Famiglie */}
