@@ -72,8 +72,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 role={RolesEnum.CONSUMER}
                 full
                 href={primaryAction?.url}
-                type="button"
-              >
+                type="button">
                 {primaryAction?.label || "Trova un vigil vicino a te"}
               </ButtonLink>
 
@@ -94,8 +93,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 full
                 href={secondaryAction?.url}
                 type="button"
-                role={RolesEnum.VIGIL}
-              >
+                role={RolesEnum.VIGIL}>
                 {secondaryAction?.label || "Diventa un Vigil"}
               </ButtonLink>
             </div>
@@ -140,7 +138,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 </div>
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Trova uN'Assistente vigil di fiducia nella tua zona
+                  Trova un'Assistente vigil di fiducia nella tua zona
                 </p>
               </div>
             </Card>
@@ -188,7 +186,7 @@ const HomeComponent = (props: HomeComponentI) => {
         <section className=" py-12 md:py-24 lg:py-32">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-              PERCHÉ VIGILA È NECESSARIA?
+              Perché Vigila è necessaria?
             </h2>
             <p className="text-lg ">I numeri che raccontano un bisogno reale</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
@@ -260,7 +258,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Per le Famiglie
                 </h3>
                 <p className="text-md  max-w-sm">
-                  Trovare un assistenza per il tuo caro
+                  Trovare assistenza per il tuo caro
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -324,7 +322,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   </div>
                   <p className="text-lg font-medium">Condividi chi sei</p>
                   <p className="text-[12px]">
-                    Raccontaci chi sei e cosa ti spinge ad essere qui 
+                    Raccontaci chi sei e cosa ti spinge ad essere qui
                   </p>
                 </div>
                 {/* Step 2 Giovani */}
@@ -342,9 +340,11 @@ const HomeComponent = (props: HomeComponentI) => {
                   <div className="w-10 h-10 rounded-full bg-vigil-orange text-white flex items-center justify-center text-lg font-bold">
                     3
                   </div>
-                  <p className="text-lg font-medium">Cresci professionalemnte</p>
+                  <p className="text-lg font-medium">
+                    Cresci professionalmente
+                  </p>
                   <p className="text-[12px]">
-                    Trasforma la solitudine in opportunità lavorativa 
+                    Trasforma la solitudine in opportunità lavorativa
                   </p>
                 </div>
               </div>
