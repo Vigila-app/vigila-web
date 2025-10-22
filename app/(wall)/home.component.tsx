@@ -64,7 +64,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Hai bisogno di aiuto?
                 </h3>
                 <p className="text-[12px] text-consumer-blue mt-1">
-                  Trova un'Assistente Vigil di fiducia nella tua zona
+                  Trova un&aposAssistente Vigil di fiducia nella tua zona
                 </p>
               </div>
               <ButtonLink
@@ -133,12 +133,12 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 1 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-consumer-light-blue mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
                   <Stetoscopio />
                 </div>
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Trova un'Assistente vigil di fiducia nella tua zona
+                  Trova un&aposAssistente vigil di fiducia nella tua zona
                 </p>
               </div>
             </Card>
@@ -146,7 +146,7 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 2 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-vigil-light-orange mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
                   <CarrelloSpesa />
                 </div>
                 <h3 className="font-semibold text-lg">Spesa insieme</h3>
@@ -159,7 +159,7 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 3 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-vigil-light-orange mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
                   <Automobile />
                 </div>
                 <h3 className="font-semibold text-lg">Viaggi condivisi</h3>
@@ -172,7 +172,7 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 4 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-consumer-light-blue mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
                   <Cuore />
                 </div>
                 <h3 className="font-semibold text-lg">Compagnia sincera</h3>
@@ -268,7 +268,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     1
                   </div>
                   <p className="text-lg font-medium">
-                    Trova un'Assistente vigil vicino a te
+                    Trova un&aposAssistente vigil vicino a te
                   </p>
                   <p className="text-[12px]">
                     Cerca nella tua zona e visualizza i profili disponibili
@@ -283,7 +283,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     Scegli chi ti ispira fiducia
                   </p>
                   <p className="text-[12px] ">
-                    Leggi recensioni e seleziona l'Assistente Vigil più adatto
+                    Leggi recensioni e seleziona l&aposAssistente Vigil più adatto
                   </p>
                 </div>
                 {/* Step 3 Famiglie */}
