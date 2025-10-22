@@ -18,11 +18,10 @@ const PrenotationTabs = () => {
     {
       label: (
         <span className="flex">
-          {/* <ClockIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
             In attesa&nbsp;
             {pendingBookings.length !== 0 && (
-              <span className="bg-vigil-orange rounded-full px-2 text-white animate-pulse">
+              <span className="tab-buttons bg-vigil-orange animate-pulse">
                 {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
               </span>
             )}
@@ -36,11 +35,10 @@ const PrenotationTabs = () => {
     {
       label: (
         <span className="flex">
-          {/* <ShieldCheckIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
-            Confermate&nbsp;
+            Accettate&nbsp;
             {confirmedBookings.length !== 0 && (
-              <span className="bg-consumer-blue rounded-full px-2 text-white">
+              <span className="tab-buttons bg-consumer-blue">
                 {confirmedBookings.length <= 99
                   ? confirmedBookings.length
                   : "99+"}
@@ -54,11 +52,10 @@ const PrenotationTabs = () => {
     {
       label: (
         <span className="flex">
-          {/* <CheckBadgeIcon className="inline h-4 w-4 mr-1 mb-0.5" /> */}
           <span className="">
             Completate&nbsp;
             {completedBookings.length !== 0 && (
-              <span className="bg-green-500 rounded-full px-2 text-white">
+              <span className="tab-buttons bg-green-500">
                 {completedBookings.length <= 99
                   ? completedBookings.length
                   : "99+"}

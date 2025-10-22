@@ -91,7 +91,7 @@ const ReviewFormComponent = (props: ReviewFormComponentProps) => {
       console.error("Error saving review", error);
       setError("comment", { 
         type: "custom", 
-        message: "Errore nel salvataggio della recensione. Riprova." 
+        message: "Errore nel salvataggio della recensione. Contata l'assistenza per ricevere supporto." 
       });
     } finally {
       hideLoader();

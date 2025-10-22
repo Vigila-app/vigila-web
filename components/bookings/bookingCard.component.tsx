@@ -12,9 +12,9 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { BookingI } from "@/src/types/booking.types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Avatar, Badge, Button, ButtonLink, Card } from "@/components";
-import { amountDisplay} from "@/src/utils/common.utils";
+import { amountDisplay } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 
 import {
@@ -148,7 +148,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
     <Link
       href={BookingUtils.getBookingDetailsUrl(booking.id)}
       className="no-underline w-full flex justify-center">
-      <Card customClass=" w-full max-w-4xl " >
+      <Card customClass=" w-full max-w-4xl ">
         <div
           className={clsx(
             isVigil && "flex flex-col gap-1 ",
@@ -273,7 +273,9 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
 
           {isVigil && booking?.note && (
             <div className="bg-gray-100 p-3 rounded-2xl w-full">
-              <p className="text-[10px] whitespace-normal break-words">{booking.note}</p>
+              <p className="text-[10px] whitespace-normal break-words">
+                {booking.note}
+              </p>
             </div>
           )}
           {isVigil && (
@@ -288,7 +290,6 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                     //   handleStatusUpdate(BookingStatusEnum.CONFIRMED)
                     // }
                     href={BookingUtils.getBookingDetailsUrl(booking.id)}
-                    
                   />
                   <ButtonLink
                     customClass="!px-6 !py-2"

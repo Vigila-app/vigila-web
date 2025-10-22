@@ -169,11 +169,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     );
   }
   return (
-    <div className="space-y-6  ">
-      <div className="relative pr-6 ">
-        <h2 className="text-[21.5px] font-bold  text-gray-900">
-          Dettagli prenotazione
-        </h2>
+    <div className="space-y-6 relative ">
         <span className="absolute top-0 right-0">
           <Badge
             label={
@@ -212,6 +208,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             }
           />
         </span>
+      <div className="pt-5 ">
+        <h2 className="text-2xl font-bold text-gray-900">
+          Dettagli prenotazione
+        </h2>
         <p className="text-gray-600">ID Prenotazione: {booking.id}</p>
       </div>
 
@@ -423,7 +423,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
       {/* Review Section - Only for completed bookings */}
       {booking.status === BookingStatusEnum.COMPLETED && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6  ">
           <ReviewButtonComponent
             booking={booking}
             vigilName={vigil?.displayName}
