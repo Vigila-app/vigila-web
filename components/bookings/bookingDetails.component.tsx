@@ -419,7 +419,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
       {/* Review Section - Only for completed bookings */}
       {booking.status === BookingStatusEnum.COMPLETED && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6  ">
           <ReviewButtonComponent
             booking={booking}
             vigilName={vigil?.displayName}
