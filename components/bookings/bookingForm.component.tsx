@@ -72,7 +72,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
-
+  const [isAddressValid, setIsAddressValid] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
@@ -170,15 +171,24 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
 
   const submitForm = async (formData: BookingFormI) => {
+    if (!formData.address || !isAddressValid) {
+      showToast({
+        message: "L'indirizzo non è valido. Inserisci un indirizzo corretto.",
+        type: ToastStatusEnum.ERROR,
+      });
+      return;
+    }
     if (isValid) {
       try {
         showLoader();
 
-        const extras = serviceCatalog.extra.filter(
-          (extra) =>
-            Object.keys(formData.extras || {}).includes(extra.id) &&
-            (formData.extras || {})[extra.id]
-        ).map((extra) => extra.id);
+        const extras = serviceCatalog.extra
+          .filter(
+            (extra) =>
+              Object.keys(formData.extras || {}).includes(extra.id) &&
+              (formData.extras || {})[extra.id]
+          )
+          .map((extra) => extra.id);
 
         const newBooking = await BookingsService.createBooking({
           ...formData,
@@ -386,11 +396,11 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           <SearchAddress
             location
             role={RolesEnum.VIGIL}
-            onSubmit={(address) =>
-              address?.display_name
-                ? setValue("address", address.display_name)
-                : ""
-            }
+            onSubmit={(address) => {
+              setValue("address", address.display_name || "");
+              setSelectedAddress(address.display_name || "");
+              setIsAddressValid(true); // Indirizzo valido
+            }}
             label="Indirizzo"
             placeholder="Inserisci l'indirizzo per il Vigil"
           />
@@ -420,8 +430,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 {extraOptions.map((extra) => (
                   <div
                     key={extra.id}
-                    className="flex flex-col border border-gray-200 rounded-lg p-3"
-                  >
+                    className="flex flex-col border border-gray-200 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-medium">{extra.name}</p>
                       <p className="font-medium text-consumer-blue">
@@ -444,8 +453,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                           />
                           <label
                             htmlFor={extra.id}
-                            className="text-sm font-medium text-gray-700"
-                          >
+                            className="text-sm font-medium text-gray-700">
                             Aggiungi
                           </label>
                         </div>
