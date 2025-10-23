@@ -72,7 +72,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
-
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
@@ -170,15 +169,25 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
 
   const submitForm = async (formData: BookingFormI) => {
+    if (!watchedAddress) {
+      document?.getElementById("address")?.focus();
+      showToast({
+        message: "L'indirizzo non è valido. Inserisci un indirizzo corretto.",
+        type: ToastStatusEnum.ERROR,
+      });
+      return;
+    }
     if (isValid) {
       try {
         showLoader();
 
-        const extras = serviceCatalog.extra.filter(
-          (extra) =>
-            Object.keys(formData.extras || {}).includes(extra.id) &&
-            (formData.extras || {})[extra.id]
-        ).map((extra) => extra.id);
+        const extras = serviceCatalog.extra
+          .filter(
+            (extra) =>
+              Object.keys(formData.extras || {}).includes(extra.id) &&
+              (formData.extras || {})[extra.id]
+          )
+          .map((extra) => extra.id);
 
         const newBooking = await BookingsService.createBooking({
           ...formData,
@@ -387,12 +396,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             location
             role={RolesEnum.VIGIL}
             onSubmit={(address) =>
-              address?.display_name
-                ? setValue("address", address.display_name)
-                : ""
+              setValue("address", address?.display_name || "")
             }
             label="Indirizzo"
             placeholder="Inserisci l'indirizzo per il Vigil"
+            autoFocus={false}
+            id="address"
+            name="address"
           />
         </div>
 
