@@ -60,3 +60,6 @@ button {
 .hide-scrollbar {
   scrollbar-width: none;
 }
+.tab-buttons {
+  @apply rounded-full px-1.5 text-white text-sm font-semibold;
+}

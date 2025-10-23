@@ -333,7 +333,7 @@ const ServicesComponent = () => {
                 </div>
 
                 {/* Prezzo minimo */}
-                <div>
+                {/* <div>
                   <Input
                     type="number"
                     value={advancedFilters.minPrice?.toString() || ""}
@@ -354,10 +354,10 @@ const ServicesComponent = () => {
                         : undefined
                     }
                   />
-                </div>
+                </div> */}
 
                 {/* Prezzo massimo */}
-                <div>
+                {/* <div>
                   <Input
                     type="number"
                     value={advancedFilters.maxPrice?.toString() || ""}
@@ -378,7 +378,7 @@ const ServicesComponent = () => {
                         : undefined
                     }
                   />
-                </div>
+                </div> */}
 
                 {/* Valutazione minima */}
                 <div>
@@ -447,7 +447,7 @@ const ServicesComponent = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h3 className="text-lg font-medium text-gray-900">
-                Servizi trovati ({pagination.count})
+                Servizi trovati&nbsp;({pagination.count})
               </h3>
 
               {/* Mostra filtri attivi */}

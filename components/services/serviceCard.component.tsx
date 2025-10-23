@@ -162,7 +162,16 @@ const ServiceCard = (props: ServiceCardI) => {
               </div>
             ) : null}
           </div>
-          <p className="text-sm text-gray-600">{service?.description}</p>
+          <div className="text-sm text-gray-600 ">
+            <p>{service?.description}</p>
+            {simplified && role === RolesEnum.VIGIL && (
+              <p>
+                Prezzo: &nbsp;
+                {service?.unit_price}
+                {service?.currency}
+              </p>
+            )}
+          </div>
         </div>
       ) : null}
 
@@ -195,7 +204,7 @@ const ServiceCard = (props: ServiceCardI) => {
       )}
       {showActions && isVigil ? (
         <div className="inline-flex items-center gap-2 mt-4 flex-wrap">
-          {onEdit && (
+          {/* {onEdit && (
             <Button
               label="Modifica"
               small
@@ -203,7 +212,7 @@ const ServiceCard = (props: ServiceCardI) => {
               type="button"
               action={onEdit}
             />
-          )}
+          )} */}
           {onToggleStatus && (
             <Button
               small

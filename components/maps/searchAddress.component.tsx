@@ -23,6 +23,8 @@ const SearchAddress = (props: {
   location?: boolean;
   placeholder?: string;
   autoFocus?: boolean;
+  id?: string;
+  name?: string;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -33,6 +35,8 @@ const SearchAddress = (props: {
     role,
     placeholder = "Inserisci CAP",
     autoFocus = true,
+    id,
+    name,
   } = props;
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
@@ -170,6 +174,8 @@ const SearchAddress = (props: {
           render={({ field }) => (
             <Input
               {...field}
+              id={id || (field as any).id}
+              name={name || (field as any).name}
               onChange={(value) => {
                 field.onChange(value);
                 setSearchTerm(value as string);
@@ -189,6 +195,7 @@ const SearchAddress = (props: {
               isLoading={isLoading}
               aria-invalid={!!errors.search}
               error={errors.search}
+              autoComplete="shipping billing street-address postal-code city"
             />
           )}
         />
@@ -207,8 +214,7 @@ const SearchAddress = (props: {
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl"
-                >
+                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl">
                   {result.display_name}
                 </button>
               </li>

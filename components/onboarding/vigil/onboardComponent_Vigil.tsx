@@ -19,7 +19,7 @@ import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import { ServiceI } from "@/src/types/services.types";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { AuthService } from "@/src/services";
+import { AuthService, UserService } from "@/src/services";
 
 type OnboardFormI = {
   birthday: string;
@@ -47,7 +47,7 @@ const VigilOnboardComponent = () => {
     hideLoader,
     loader: { isLoading },
   } = useAppStore();
-  const { user } = useUserStore();
+  const { user, getUserDetails } = useUserStore();
 
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   const router = useRouter();
@@ -120,7 +120,9 @@ const VigilOnboardComponent = () => {
         message: "Profilo aggiornato con successo",
         type: ToastStatusEnum.SUCCESS,
       });
-      AuthService.renewAuthentication();
+      await AuthService.renewAuthentication();
+      await getUserDetails(true);
+      // await UserService.updateUser({},{information:formData.information});
       redirectHome();
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
@@ -134,18 +136,20 @@ const VigilOnboardComponent = () => {
   };
 
   return (
-    <div className="w-full px-4 pt-8 pb-4">
+    <div className="w-full max-w-full mx-auto px-4 pt-8 pb-4">
       <Card>
         <div className="">
           <section className="flex flex-col items-center gap-2">
-            <p className="font-semibold text-[28px] text-vigil-orange">Iniziamo a conoscerti</p>
+            <p className="font-semibold text-[28px] text-vigil-orange">
+              Iniziamo a conoscerti
+            </p>
             <span className="font-normal text-center text-lg break-normal whitespace-normal">
               Raccontaci qualcosa di te per iniziare questa bella avventura
             </span>
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2">
+            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 ">
             <Controller
               name="birthday"
               control={control}
@@ -227,24 +231,6 @@ const VigilOnboardComponent = () => {
               )}
             />
 
-            {/* <Controller
-              name="cap"
-              control={control}
-              rules={{ required: true, ...FormFieldType.CAP }}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  label="CAP"
-                  role={role}
-                  placeholder="Inserisci il tuo CAP di residenza"
-                  required
-                  error={errors.cap}
-                  minLength={FormFieldType.CAP.minLength}
-                  maxLength={FormFieldType.CAP.maxLength}
-                  aria-invalid={!!errors.cap}
-                />
-              )}
-            /> */}
             {/* TODO controller per il campo adresses con l'auto completamento tramite il compoenente mappe */}
             <Controller
               name="addresses"
@@ -266,7 +252,7 @@ const VigilOnboardComponent = () => {
                       });
                     }}
                     placeholder="Inserisci la città con il CAP"
-                    label="Scegli le zone in cui vorresti offrire i tuoi servizi"
+                    label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
                   />
                   {addresses.length ? (
                     <ul className="mt-2 pl-4 text-sm text-gray-700 space-y-1">
@@ -340,7 +326,7 @@ const VigilOnboardComponent = () => {
             <Controller
               name="information"
               control={control}
-              rules={{ required: true, maxLength: 400 }}
+              rules={{ required: true, maxLength: 650 }}
               render={({ field }) => (
                 <TextArea
                   {...field}

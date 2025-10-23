@@ -117,7 +117,7 @@ const Avatar = (props: AvatarI) => {
 
   return (
     <div
-    onClick={() => inputRef.current?.click()}
+      // onClick={() => inputRef.current?.click()}
       className={clsx(
         "relative items-center cursor-pointer",
         inline ? "inline-flex gap-1" : "flex flex-col gap-1",
@@ -165,7 +165,7 @@ const Avatar = (props: AvatarI) => {
       {withUpload ? (
         <div className="absolute">
           <InputFile
-          ref={inputRef} 
+            ref={inputRef}
             hidden
             label="profile pic"
             type="image"

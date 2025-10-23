@@ -154,7 +154,7 @@ const ReviewCard = ({
       {/* Commento */}
       {review.comment && (
         <div className="text-gray-700">
-          <p className="leading-relaxed ">{review.comment}</p>
+          <p className="leading-relaxed break-words">{review.comment}</p>
         </div>
       )}
 

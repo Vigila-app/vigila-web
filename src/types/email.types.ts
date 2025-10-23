@@ -25,6 +25,7 @@ export interface WelcomeEmailDataI {
 
 export interface BookingConfirmationEmailDataI {
   to: string;
+  subject: string;
   customerName: string;
   bookingId: string;
   serviceName: string;
@@ -34,6 +35,8 @@ export interface BookingConfirmationEmailDataI {
   location: string;
   totalAmount: string;
   appUrl?: string;
+  quantity?: number | string;
+  unitType?: string;
 }
 
 export interface EmailNotificationDataI {

@@ -72,7 +72,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
-
   const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
@@ -102,6 +101,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedServiceId = watch("service_id");
   const watchedDuration = watch("quantity");
   const watchedAddress = watch("address");
+  const watchedExtras = watch("extras");
 
   const serviceCatalog: ServiceCatalogItem = useMemo(
     () =>
@@ -169,10 +169,30 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
 
   const submitForm = async (formData: BookingFormI) => {
+    if (!watchedAddress) {
+      document?.getElementById("address")?.focus();
+      showToast({
+        message: "L'indirizzo non è valido. Inserisci un indirizzo corretto.",
+        type: ToastStatusEnum.ERROR,
+      });
+      return;
+    }
     if (isValid) {
       try {
         showLoader();
-        const newBooking = await BookingsService.createBooking(formData);
+
+        const extras = serviceCatalog.extra
+          .filter(
+            (extra) =>
+              Object.keys(formData.extras || {}).includes(extra.id) &&
+              (formData.extras || {})[extra.id]
+          )
+          .map((extra) => extra.id);
+
+        const newBooking = await BookingsService.createBooking({
+          ...formData,
+          extras,
+        });
 
         showToast({
           message: "Prenotazione creata!",
@@ -213,6 +233,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [services?.length, serviceId]
   );
+
+  const extraOptions = useMemo(() => {
+    if (selectedService?.info?.extras?.length) {
+      return serviceCatalog.extra.filter((extra) =>
+        selectedService.info?.extras?.find((e: string) => e === extra.id)
+      );
+    }
+    return undefined;
+  }, [selectedService, serviceCatalog]);
 
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
@@ -362,58 +391,144 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
         />
 
-        <SearchAddress
-          location
-          role={RolesEnum.VIGIL}
-          onSubmit={(address) =>
-            address?.display_name
-              ? setValue("address", address.display_name)
-              : ""
-          }
-          label="Indirizzo"
-          placeholder="Inserisci l'indirizzo per il Vigil"
-        />
+        <div>
+          <SearchAddress
+            location
+            role={RolesEnum.VIGIL}
+            onSubmit={(address) =>
+              setValue("address", address?.display_name || "")
+            }
+            label="Indirizzo"
+            placeholder="Inserisci l'indirizzo per il Vigil"
+            autoFocus={false}
+            id="address"
+            name="address"
+          />
+        </div>
 
         <Controller
           name="note"
           control={control}
+          rules={{ maxLength: 650 }}
           render={({ field }) => (
             <TextArea
               {...field}
               label="Note"
               placeholder="Aggiungi eventuali note per il Vigil"
-              rows={3}
+              rows={6}
               role={RolesEnum.VIGIL}
               error={errors.note}
             />
           )}
         />
 
+        {extraOptions?.length ? (
+          <>
+            <div className="space-y-2">
+              <h3 className="text-vigil-orange">Extra disponibili</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {extraOptions.map((extra) => (
+                  <div
+                    key={extra.id}
+                    className="flex flex-col border border-gray-200 rounded-lg p-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-medium">{extra.name}</p>
+                      <p className="font-medium text-consumer-blue">
+                        {selectedService?.currency}
+                        {amountDisplay(extra.fixed_price)}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {extra.description}
+                    </p>
+                    <Controller
+                      name={`extras.${extra.id}` as const}
+                      control={control}
+                      render={({ field }) => (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            {...field}
+                            className="h-4 w-4 text-consumer-blue border-gray-300 rounded focus:ring-consumer-blue"
+                          />
+                          <label
+                            htmlFor={extra.id}
+                            className="text-sm font-medium text-gray-700"
+                          >
+                            Aggiungi
+                          </label>
+                        </div>
+                      )}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
+
         {selectedService && (
-          <div className="p-4  rounded-lg border border-vigil-orange">
-            <h3 className="font-medium">Riepilogo Prenotazione</h3>
-            <div className="mt-2 space-y-1 text-[16px] text-gray-700">
-              <p>
-                Servizio: {selectedService.name}
-                {watchedAddress && ` presso ${watchedAddress}`}
-              </p>
-              <p>
-                Prezzo per&nbsp;
-                {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
-                :&nbsp;
-                {selectedService.currency}
-                {amountDisplay(
-                  selectedService.unit_price +
-                    (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)
-                )}
-              </p>
-              <p>
-                Quantità: {watchedDuration}&nbsp;
-                {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
-              </p>
-              <p className="font-medium">
-                Totale: {selectedService.currency} {amountDisplay(totalAmount)}
-              </p>
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <div className="p-4 rounded-lg border border-vigil-orange">
+              <h3 className="font-medium text-vigil-orange">
+                Riepilogo Prenotazione
+              </h3>
+              <div className="mt-2 space-y-1 text-[16px] text-gray-700">
+                <p>
+                  Servizio:&nbsp;{selectedService.name}
+                  {watchedAddress && ` presso ${watchedAddress}`}
+                </p>
+                <p>
+                  Prezzo per&nbsp;
+                  {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+                  :&nbsp;
+                  {selectedService.currency}
+                  {amountDisplay(
+                    selectedService.unit_price +
+                      (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)
+                  )}
+                </p>
+                <p>
+                  Quantità:&nbsp;{watchedDuration}&nbsp;
+                  {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+                </p>
+                {extraOptions?.length ? (
+                  <div>
+                    Extra:&nbsp;
+                    {serviceCatalog.extra
+                      .filter(
+                        (extra) =>
+                          Object.keys(watchedExtras || {}).includes(extra.id) &&
+                          (watchedExtras || {})[extra.id]
+                      )
+                      .map(
+                        (extra) =>
+                          `${extra.name} (${selectedService.currency}${amountDisplay(extra.fixed_price)})`
+                      )
+                      .join(", ")}
+                    {Object.values(watchedExtras || {}).filter((v) => v)
+                      .length === 0 && "-"}
+                  </div>
+                ) : null}
+                <p className="font-medium pt-2 mt-2 border-t border-gray-200">
+                  Totale:&nbsp;{selectedService.currency}&nbsp;
+                  {amountDisplay(
+                    totalAmount +
+                      (extraOptions?.length
+                        ? serviceCatalog.extra
+                            .filter(
+                              (extra) =>
+                                Object.keys(watchedExtras || {}).includes(
+                                  extra.id
+                                ) && (watchedExtras || {})[extra.id]
+                            )
+                            .map((extra) => extra.fixed_price)
+                            .reduce((acc, price) => acc + price, 0)
+                        : 0)
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         )}

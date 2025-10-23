@@ -12,7 +12,7 @@ import { useEffect } from "react";
 
 const PanoramicaConsumerTab = () => {
   const { consumers, getConsumersDetails } = useConsumerStore();
-  const { user, userDetails } = useUserStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     if (user?.id) {
@@ -32,7 +32,7 @@ const PanoramicaConsumerTab = () => {
 
         <div>
           <p className="leading-relaxed text-sm">
-            {consumer?.information || "-"}
+            {consumer?.information || "Nessuna informazione disponibile."}
           </p>
         </div>
       </Card>

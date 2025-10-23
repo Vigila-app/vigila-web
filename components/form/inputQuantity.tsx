@@ -43,23 +43,25 @@ const InputQuantity = (props: InputI) => {
     <div className="flex flex-col">
       <span
         className={clsx(
-          "pointer-events-none  start-2.5  p-0.5 text-xs text-gray-700 ",
+          "pointer-events-none start-2.5 p-0.5 text-gray-700 ",
           role === RolesEnum.VIGIL && "  text-vigil-orange ",
           error && "text-red-500",
           disabled && "!bg-gray-100"
-        )}>
+        )}
+      >
         {label}
         {required && <>*</>}
       </span>
       <label
         htmlFor={name || label}
         className={clsx(
-          " block inline-flex w-fit items-center gap-2 p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-blue-600",
+          "inline-flex w-fit items-center gap-2 p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-blue-600",
           error && "border-red-500",
           role === RolesEnum.VIGIL &&
             " border-vigil-orange bg-vigil-light-orange text-vigil-orange focus-within:border-vigil-orange  focus-within:ring-vigil-orange ",
           disabled && "!bg-gray-100 cursor-not-allowed"
-        )}>
+        )}
+      >
         <button
           disabled={qty <= min}
           type="button"
@@ -69,7 +71,8 @@ const InputQuantity = (props: InputI) => {
 
             qty <= min && "cursor-not-allowed"
           )}
-          onClick={() => handleChange(qty - 1)}>
+          onClick={() => handleChange(qty - 1)}
+        >
           -
         </button>
         <input
@@ -101,14 +104,16 @@ const InputQuantity = (props: InputI) => {
 
             qty >= max && "cursor-not-allowed"
           )}
-          onClick={() => handleChange(qty + 1)}>
+          onClick={() => handleChange(qty + 1)}
+        >
           +
         </button>
 
         {error ? (
           <p
             role="alert"
-            className="absolute start-2.5 top-12 text-xs text-red-500">
+            className="absolute start-2.5 top-12 text-xs text-red-500"
+          >
             {FormUtils.getErrorByType(error)}
           </p>
         ) : null}

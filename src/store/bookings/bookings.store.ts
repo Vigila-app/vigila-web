@@ -32,7 +32,7 @@ export const useBookingsStore = create<BookingStoreType>()(
               if (
                 force ||
                 !lastUpdate ||
-                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
               ) {
                 const response = await BookingsService.getBookings();
                 if (response) {
@@ -92,7 +92,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                 if (
                   force ||
                   !get().lastUpdate ||
-                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 5
+                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 3
                 ) {
                   const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
                   if (bookingStoreBE?.id) {

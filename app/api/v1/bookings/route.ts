@@ -151,7 +151,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const price = (service.unit_price + serviceCatalog.fee) * body.quantity;
+    const price =
+      (service.unit_price + serviceCatalog.fee) * body.quantity +
+      (body.extras?.length
+        ? serviceCatalog.extra
+            .filter((extra) => (body.extras || []).includes(extra.id))
+            .map((extra) => extra.fixed_price)
+            .reduce((acc, price) => acc + price, 0)
+        : 0);
 
     const formatDate = (date: Date) => {
       const pad = (n: number) => n.toString().padStart(2, "0");

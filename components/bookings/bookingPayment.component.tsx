@@ -9,17 +9,19 @@ import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
-import { BookingsService, PaymentService } from "@/src/services";
 import {
-  PaymentStatusEnum,
-  BookingStatusEnum,
-} from "@/src/enums/booking.enums";
+  BookingsService,
+  PaymentService,
+  ServicesService,
+} from "@/src/services";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { AppConstants } from "@/src/constants";
 import Card from "../card/card";
+import { ServiceCatalogItem } from "@/src/types/services.types";
 
 type PaymentBookingI = {
   bookingId: BookingI["id"];
@@ -48,6 +50,13 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   const vigil = useMemo(
     () => vigils.find((v) => v.id === booking?.vigil_id),
     [vigils, booking?.vigil_id]
+  );
+
+  const serviceCatalog: ServiceCatalogItem = useMemo(
+    () =>
+      service?.info?.catalog_id &&
+      ServicesService.getServiceCatalogById(service.info.catalog_id),
+    [service]
   );
 
   if (error) {
@@ -143,7 +152,6 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         {
           payment_id: paymentIntentId,
           payment_status: PaymentStatusEnum.PAID,
-          status: BookingStatusEnum.CONFIRMED,
         }
       );
       return result;
@@ -207,7 +215,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
         </div>
 
         {/* Riepilogo prenotazione */}
-        <div className="my-6 p-4 bg-vigil-light-orange rounded-exl shadow">
+        <div className="my-6 p-4 bg-pureWhite rounded-3xl shadow">
           <h3 className="font-medium text-vigil-orange mb-3">
             Riepilogo Prenotazione
           </h3>
@@ -245,6 +253,19 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                   : ""}
               </span>
             </div>
+            {booking.extras?.length && serviceCatalog.extra?.length ? (
+              <div className="flex justify-between">
+                <span>Extra:</span>
+                <span>
+                  {serviceCatalog.extra
+                    .filter((extra) =>
+                      (booking.extras || []).includes(extra.id)
+                    )
+                    .map((extra) => extra.name)
+                    .join(", ")}
+                </span>
+              </div>
+            ) : null}
             <div className="flex justify-between font-medium text-lg border-t pt-2">
               <span>Totale:</span>
               <span>
@@ -257,7 +278,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
         {/* Form di pagamento Stripe */}
         {clientSecret && (
-          <div className="my-6 p-4 bg-vigil-light-orange rounded-3xl shadow">
+          <div className="my-6 p-4 bg-pureWhite rounded-3xl shadow">
             <h3 className="font-medium text-vigil-orange mb-3">Pagamento</h3>
             <CheckoutForm
               returnUrl={`${window?.location?.origin || AppConstants.hostUrl}${Routes.paymentBookingConfirm.url}?bookingId=${booking.id}`}

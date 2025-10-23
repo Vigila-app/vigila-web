@@ -32,7 +32,7 @@ const relationships = ["Figlio/a", "Nipote", "Parente", "Amico/a", "Badante"];
 
 const ConsumerOnboardComponent = () => {
   const { showToast } = useAppStore();
-  const { user } = useUserStore();
+  const { user, getUserDetails } = useUserStore();
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
 
   const router = useRouter();
@@ -89,8 +89,8 @@ const ConsumerOnboardComponent = () => {
         message: "Profilo aggiornato con successo",
         type: ToastStatusEnum.SUCCESS,
       });
-      AuthService.renewAuthentication();
-
+      await AuthService.renewAuthentication();
+      await getUserDetails(true);
       router.replace(Routes.home.url);
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
@@ -179,7 +179,7 @@ const ConsumerOnboardComponent = () => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  label="Telefono di contatto"
+                  label="Telefono di contatto della persona cara"
                   placeholder="es. 3331234567"
                   required
                   minLength={FormFieldType.PHONE.minLength}
@@ -261,7 +261,8 @@ const ConsumerOnboardComponent = () => {
                   label="Informazioni aggiuntive"
                   minLength={FormFieldType.NOTE.minLength}
                   maxLength={FormFieldType.NOTE.maxLength}
-                  placeholder="Dicci qualcosa sulla tua persona cara"
+                  required
+                  placeholder="Dicci tutto quello che può esserci utile sapere sulla persona cara (es. patologie, allergie, abitudini, hobby, ecc.)"
                   role={role}
                   error={errors.information}
                 />
