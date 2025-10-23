@@ -175,8 +175,7 @@ const SignupComponent = (props: SignupComponentI) => {
               role === RolesEnum.CONSUMER
                 ? "text-consumer-blue bg-consumer-light-blue"
                 : "text-vigil-orange bg-vigil-light-orange"
-            )}
-          >
+            )}>
             {role === RolesEnum.CONSUMER ? (
               <HeartIcon className="size-6" />
             ) : (
@@ -199,8 +198,7 @@ const SignupComponent = (props: SignupComponentI) => {
                 role === RolesEnum.CONSUMER
                   ? "text-vigil-orange"
                   : "text-consumer-blue"
-              )}
-            >
+              )}>
               Cambia tipo di account
             </Link>
           </div>
@@ -279,8 +277,7 @@ const SignupComponent = (props: SignupComponentI) => {
               icon={
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  type="button"
-                >
+                  type="button">
                   <EyeIcon className="size-4 text-gray-500" />
                 </button>
               }
@@ -305,8 +302,7 @@ const SignupComponent = (props: SignupComponentI) => {
               icon={
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  type="button"
-                >
+                  type="button">
                   <EyeIcon className="size-4 text-gray-500" />
                 </button>
               }
@@ -392,7 +388,7 @@ const SignupComponent = (props: SignupComponentI) => {
         </div>
       </form>
 
-      <div className="login-methods">
+      {/* <div className="login-methods">
         <Divider />
         <div className="social-login space-y-4">
           <ProviderButton
@@ -401,15 +397,15 @@ const SignupComponent = (props: SignupComponentI) => {
             //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
             customClass="rounded-full shadow"
-          />
-          {/* <ProviderButton
+          /> */
+      /* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Registrati con Apple"
-          /> */}
-        </div>
-      </div>
+          /> */
+      /* </div>
+      </div> */}
 
       <div className="space-y-2 mt-6">
         <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
@@ -420,8 +416,7 @@ const SignupComponent = (props: SignupComponentI) => {
               role === RolesEnum.CONSUMER
                 ? "text-consumer-blue"
                 : "text-vigil-orange"
-            )}
-          >
+            )}>
             {Routes.login.label}
           </Link>
         </p>
