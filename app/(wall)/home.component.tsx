@@ -64,7 +64,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Hai bisogno di aiuto?
                 </h3>
                 <p className="text-[12px] text-consumer-blue mt-1">
-                  Trova un Vigil di fiducia nella tua zona
+                  Trova un&apos;Assistente Vigil di fiducia nella tua zona
                 </p>
               </div>
               <ButtonLink
@@ -72,8 +72,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 role={RolesEnum.CONSUMER}
                 full
                 href={primaryAction?.url}
-                type="button"
-              >
+                type="button">
                 {primaryAction?.label || "Trova un vigil vicino a te"}
               </ButtonLink>
 
@@ -86,7 +85,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Vuoi lavorare?
                 </h3>
                 <p className="text-[12px] text-vigil-orange mt-1">
-                  Lavoro flessibile, retribuito e valido per CFU
+                  Lavoro flessibile, retribuito e gratificante
                 </p>
               </div>
               <ButtonLink
@@ -94,8 +93,7 @@ const HomeComponent = (props: HomeComponentI) => {
                 full
                 href={secondaryAction?.url}
                 type="button"
-                role={RolesEnum.VIGIL}
-              >
+                role={RolesEnum.VIGIL}>
                 {secondaryAction?.label || "Diventa un Vigil"}
               </ButtonLink>
             </div>
@@ -135,12 +133,12 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 1 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-consumer-light-blue mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
                   <Stetoscopio />
                 </div>
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Trova un vigil di fiducia nella tua zona
+                  Trova un&apos;Assistente vigil di fiducia nella tua zona
                 </p>
               </div>
             </Card>
@@ -148,7 +146,7 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 2 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-vigil-light-orange mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
                   <CarrelloSpesa />
                 </div>
                 <h3 className="font-semibold text-lg">Spesa insieme</h3>
@@ -161,7 +159,7 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 3 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-vigil-light-orange mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
                   <Automobile />
                 </div>
                 <h3 className="font-semibold text-lg">Viaggi condivisi</h3>
@@ -174,12 +172,12 @@ const HomeComponent = (props: HomeComponentI) => {
             {/* Card 4 */}
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
-                <div className="flex items-center justify-center w-15 h-15 rounded-2xl bg-consumer-light-blue mb-2">
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
                   <Cuore />
                 </div>
                 <h3 className="font-semibold text-lg">Compagnia sincera</h3>
                 <p className="text-[12px] font-normal mt-1">
-                  Conversazioni, risate e momenti di vera connessione
+                  Conversazioni, ascolto e momenti di vera connessione
                 </p>
               </div>
             </Card>
@@ -188,7 +186,7 @@ const HomeComponent = (props: HomeComponentI) => {
         <section className=" py-12 md:py-24 lg:py-32">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-              PERCHÉ VIGILA È NECESSARIA?
+              Perché Vigila è necessaria?
             </h2>
             <p className="text-lg ">I numeri che raccontano un bisogno reale</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
@@ -230,7 +228,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   </li>
                   <li className="flex items-center">
                     <span className="inline-block w-2 h-2 rounded-full bg-consumer-blue mr-2"></span>
-                    Lavoro flessibile per i giovani Vigils
+                    Lavoro flessibile per gli assistenti Vigil
                   </li>
                   <li className="flex items-center">
                     <span className="inline-block w-2 h-2 rounded-full bg-vigil-orange mr-2"></span>
@@ -260,7 +258,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   Per le Famiglie
                 </h3>
                 <p className="text-md  max-w-sm">
-                  Trovare un amico speciale per il tuo caro
+                  Trovare assistenza per il tuo caro
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -270,10 +268,10 @@ const HomeComponent = (props: HomeComponentI) => {
                     1
                   </div>
                   <p className="text-lg font-medium">
-                    Trova un vigil vicino a te
+                    Trova un&apos;Assistente vigil vicino a te
                   </p>
                   <p className="text-[12px]">
-                    cerca nella tua zona e visualizza i profili disponibili
+                    Cerca nella tua zona e visualizza i profili disponibili
                   </p>
                 </div>
                 {/* Step 2 Famiglie */}
@@ -285,7 +283,7 @@ const HomeComponent = (props: HomeComponentI) => {
                     Scegli chi ti ispira fiducia
                   </p>
                   <p className="text-[12px] ">
-                    Leggi recensioni e seleziona il Vigil più adatto
+                    Leggi recensioni e seleziona l&apos;Assistente Vigil più adatto
                   </p>
                 </div>
                 {/* Step 3 Famiglie */}
@@ -310,10 +308,10 @@ const HomeComponent = (props: HomeComponentI) => {
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-vigil-orange">
-                  Per i Giovani
+                  Per gli assistenti Vigil
                 </h3>
                 <p className="text-md max-w-sm">
-                  Trovare un amico speciale per il tuo caro
+                  Trovare un lavoro flessibile e gratificante
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -324,7 +322,7 @@ const HomeComponent = (props: HomeComponentI) => {
                   </div>
                   <p className="text-lg font-medium">Condividi chi sei</p>
                   <p className="text-[12px]">
-                    Raccontaci i tuoi interessi e cosa ti piace fare
+                    Raccontaci chi sei e cosa ti spinge ad essere qui
                   </p>
                 </div>
                 {/* Step 2 Giovani */}
@@ -332,9 +330,9 @@ const HomeComponent = (props: HomeComponentI) => {
                   <div className="w-10 h-10 rounded-full bg-vigil-orange text-white flex items-center justify-center text-lg font-bold">
                     2
                   </div>
-                  <p className="text-lg font-medium">Incontra nuovi amici</p>
+                  <p className="text-lg font-medium">Fai la differenza</p>
                   <p className="text-[12px]">
-                    conosci anziani meravigliosi con storie da raccontare
+                    Conosci anziani e aiutaci a combattere la solitudine
                   </p>
                 </div>
                 {/* Step 3 Giovani */}
@@ -342,9 +340,11 @@ const HomeComponent = (props: HomeComponentI) => {
                   <div className="w-10 h-10 rounded-full bg-vigil-orange text-white flex items-center justify-center text-lg font-bold">
                     3
                   </div>
-                  <p className="text-lg font-medium">Cresci insieme</p>
+                  <p className="text-lg font-medium">
+                    Cresci professionalmente
+                  </p>
                   <p className="text-[12px]">
-                    Scopri quanto è bello imparare l&apos;uno dall&apos;altro
+                    Trasforma la solitudine in opportunità lavorativa
                   </p>
                 </div>
               </div>
