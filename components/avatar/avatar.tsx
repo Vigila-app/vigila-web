@@ -122,8 +122,7 @@ const Avatar = (props: AvatarI) => {
         "relative items-center cursor-pointer",
         inline ? "inline-flex gap-1" : "flex flex-col gap-1",
         className
-      )}
-    >
+      )}>
       {imgUrl || profilePic ? (
         <img alt="avatar" src={imgUrl || profilePic} className={imgStyle} />
       ) : value ? (
@@ -135,13 +134,11 @@ const Avatar = (props: AvatarI) => {
           )}
           style={{
             backgroundColor: `#${BACKGROUND_COLORS[randomKey]}`,
-          }}
-        >
+          }}>
           <span className="sr-only">{value}</span>
           <span
             className="uppercase !no-underline"
-            style={{ color: `#${TEXT_COLORS[randomKey]}` }}
-          >
+            style={{ color: `#${TEXT_COLORS[randomKey]}` }}>
             {String(
               value.includes(" ")
                 ? value
@@ -160,8 +157,7 @@ const Avatar = (props: AvatarI) => {
           className={clsx(
             "text-left text-ellipsis overflow-hidden text-nowrap select-all",
             inline ? "max-w-40" : "max-w-60"
-          )}
-        >
+          )}>
           {label}
         </p>
       ) : null}
