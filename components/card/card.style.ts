@@ -1,11 +1,9 @@
-const baseCardStyle =
-  " p-4 shadow-sm rounded-2xl bg-pureWhite";
+const baseCardStyle = "p-4 shadow-sm rounded-2xl bg-pureWhite";
 
 const borderedCardStyle = "border border-gray-200";
 const shadowCardStyle = "shadow-md";
 const hoverableCardStyle = "hover:shadow-lg hover:scale-[1.01]";
 const fullStyle = "w-full justify-center px-0";
-
 
 const titleStyle = "text-lg font-semibold text-gray-800 mb-2";
 const subtitleStyle = "text-sm text-gray-500 mb-4";
