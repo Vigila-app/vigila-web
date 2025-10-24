@@ -9,12 +9,16 @@ import { VigilDetailsType } from "@/src/types/vigil.types";
 
 export type BookingI = {
   id: string;
+  active: boolean;
   service_id: ServiceI["id"];
   consumer_id: UserType["id"];
   vigil_id: UserType["id"];
   startDate: Date;
   endDate: Date;
   quantity: number;
+  min_unit: number;
+  max_unit?: number;
+  postalCode: string[];
   price: number;
   fee: number;
   currency: string;

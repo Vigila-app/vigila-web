@@ -39,12 +39,19 @@ const InputQuantity = (props: InputI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qty]);
 
+  useEffect(() => {
+    if (props.value !== undefined && props.value !== qty) {
+      setQty(Number(props.value));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.value]);
+
   return (
     <div className="flex flex-col">
       <span
         className={clsx(
-          "pointer-events-none start-2.5 p-0.5 text-gray-700 ",
-          role === RolesEnum.VIGIL && "  text-vigil-orange ",
+          "pointer-events-none start-2.5 p-0.5 text-gray-700",
+          role === RolesEnum.VIGIL && "  text-vigil-orange",
           error && "text-red-500",
           disabled && "!bg-gray-100"
         )}
@@ -58,7 +65,7 @@ const InputQuantity = (props: InputI) => {
           "inline-flex w-fit items-center gap-2 p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-blue-600",
           error && "border-red-500",
           role === RolesEnum.VIGIL &&
-            " border-vigil-orange bg-vigil-light-orange text-vigil-orange focus-within:border-vigil-orange  focus-within:ring-vigil-orange ",
+            " border-vigil-orange bg-vigil-light-orange text-vigil-orange focus-within:border-vigil-orange focus-within:ring-vigil-orange",
           disabled && "!bg-gray-100 cursor-not-allowed"
         )}
       >
@@ -67,9 +74,8 @@ const InputQuantity = (props: InputI) => {
           type="button"
           className={clsx(
             "text-gray-600 transition hover:opacity-75",
-            role === RolesEnum.VIGIL && "  text-vigil-orange ",
-
-            qty <= min && "cursor-not-allowed"
+            role === RolesEnum.VIGIL && " text-vigil-orange",
+            qty <= min && "!cursor-not-allowed !text-gray-400"
           )}
           onClick={() => handleChange(qty - 1)}
         >
@@ -100,9 +106,8 @@ const InputQuantity = (props: InputI) => {
           type="button"
           className={clsx(
             "text-gray-600 transition hover:opacity-75",
-            role === RolesEnum.VIGIL && " text-vigil-orange  ",
-
-            qty >= max && "cursor-not-allowed"
+            role === RolesEnum.VIGIL && " text-vigil-orange",
+            qty >= max && "!cursor-not-allowed !text-gray-400"
           )}
           onClick={() => handleChange(qty + 1)}
         >
