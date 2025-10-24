@@ -55,20 +55,21 @@ const TabGroup = (props: TabGroupI) => {
             </option>
           ))}
         </select> */}
-        <div className="flex justify-center gap-2 ">
+        <div className="flex justify-center gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               role={role}
               onClick={() => setActiveTab(tab)}
               className={clsx(
-               "px-1 md:px-3 py-2 text-sm font-medium transition-colors border rounded-4xl border-transparent text-gray-500 stroke-gray-500",
+                "p-2 md:p-3 text-sm font-medium transition-colors border rounded-4xl border-transparent",
                 activeTab?.id === tab.id
                   ? role === RolesEnum.CONSUMER
-                    ? "!text-consumer-blue bg-white"
-                    : "!text-vigil-orange bg-white"
-                  : null
-              )}>
+                    ? "!text-consumer-blue !stroke-consumer-blue bg-white"
+                    : "!text-vigil-orange !stroke-vigil-orange bg-white"
+                  : "text-gray-500 stroke-gray-500"
+              )}
+            >
               {tab.label}
             </button>
           ))}
@@ -76,16 +77,17 @@ const TabGroup = (props: TabGroupI) => {
       </div>
 
       <div className="hidden sm:block">
-        <div >
+        <div>
           <nav
             className={clsx(
-              " px-6 flex gap-6",
+              "px-6 flex gap-6",
               align === "center"
                 ? "justify-center"
                 : align === "left"
                   ? "justify-start"
                   : "justify-end"
-            )}>
+            )}
+          >
             {tabs.map((tab) =>
               tab.url ? (
                 <Link
@@ -95,15 +97,16 @@ const TabGroup = (props: TabGroupI) => {
                     "shrink-0 p-3 border font-medium text-sm transition",
                     activeTab?.id === tab.id
                       ? role === RolesEnum.CONSUMER
-                        ? "rounded-2xl bg-white !text-consumer-blue"
-                        : "rounded-2xl bg-white !text-vigil-orange"
-                      : null,
-                    "border-transparent text-gray-500 stroke-gray-500 hover:text-black hover:stroke-black",
+                        ? "rounded-2xl bg-white !text-consumer-blue !stroke-consumer-blue"
+                        : "rounded-2xl bg-white !text-vigil-orange !stroke-vigil-orange"
+                      : "text-gray-500 stroke-gray-500",
+                    "border-transparent hover:text-black hover:stroke-black",
                     "hover:rounded-lg hover:border-gray-200"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}>
+                  }}
+                >
                   {tab.label}
                 </Link>
               ) : (
@@ -111,12 +114,17 @@ const TabGroup = (props: TabGroupI) => {
                   key={tab.id}
                   className={clsx(
                     "cursor-pointer shrink-0 p-3 border rounded-3xl whitespace-nowrap font-medium text-sm text-black transition",
-                    activeTab?.id === tab.id &&
-                      "border-transparent bg-pureWhite hover:consumer-blue"
+                    activeTab?.id === tab.id
+                      ? role === RolesEnum.CONSUMER
+                        ? "rounded-2xl bg-white !text-consumer-blue !stroke-consumer-blue"
+                        : "rounded-2xl bg-white !text-vigil-orange !stroke-vigil-orange"
+                      : "text-gray-500 stroke-gray-500",
+                    "border-transparent bg-pureWhite hover:consumer-blue"
                   )}
                   onClick={() => {
                     setActiveTab(tab);
-                  }}>
+                  }}
+                >
                   {tab.label}
                 </span>
               )

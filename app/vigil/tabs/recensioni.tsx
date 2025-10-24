@@ -34,7 +34,8 @@ export default function RecensioniTab({
   const filteredBookings = useMemo(
     () =>
       bookings.filter(
-        (b) => b.vigil_id === vigilId && b.status === BookingStatusEnum.COMPLETED
+        (b) =>
+          b.vigil_id === vigilId && b.status === BookingStatusEnum.COMPLETED
       ),
     [bookings, vigilId]
   );
@@ -72,14 +73,14 @@ export default function RecensioniTab({
         <h2 className="font-semibold text-2xl  text-center">
           Recensioni recenti
         </h2>
-        {isConsumer && vigilIdFromParams && (
+        {isConsumer && vigilIdFromParams && filteredBookings?.length ? (
           <Button
             label="+"
             action={() => setIsModalOpen(true)}
             small
             role={RolesEnum.VIGIL}
           />
-        )}
+        ) : null}
       </div>
 
       {isModalOpen && (
@@ -95,7 +96,8 @@ export default function RecensioniTab({
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700">
+                className="text-gray-500 hover:text-gray-700"
+              >
                 ✕
               </button>
             </div>
