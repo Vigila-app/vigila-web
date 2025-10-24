@@ -9,7 +9,7 @@ import { Avatar, Button } from "@/components";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
 import { BookingsService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -33,6 +33,7 @@ import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
+import clsx from "clsx";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -94,7 +95,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       address: booking?.address || user?.user_metadata?.address || "",
       service_id: booking?.service_id || serviceId,
       consumer_id: booking?.consumer_id || user?.id,
-      quantity: booking?.quantity || 1,
+      quantity: booking?.quantity || booking?.min_unit || 1,
     },
   });
 
@@ -135,6 +136,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   }, [watchedServiceId, services?.length]);
 
   useEffect(() => {
+    if (
+      selectedService?.min_unit &&
+      watchedDuration &&
+      watchedDuration < selectedService.min_unit
+    ) {
+      setValue("quantity", selectedService.min_unit);
+    }
     if (selectedService && watchedDuration) {
       setTotalAmount(
         (selectedService.unit_price +
@@ -142,6 +150,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           watchedDuration
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService, watchedDuration, serviceCatalog, role]);
 
   // useEffect(() => {
@@ -428,40 +437,54 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               <h3 className="text-vigil-orange">Extra disponibili</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {extraOptions.map((extra) => (
-                  <div
-                    key={extra.id}
-                    className="flex flex-col border border-gray-200 rounded-lg p-3"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-medium">{extra.name}</p>
-                      <p className="font-medium text-consumer-blue">
-                        {selectedService?.currency}
-                        {amountDisplay(extra.fixed_price)}
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {extra.description}
-                    </p>
+                  <React.Fragment key={extra.id}>
                     <Controller
                       name={`extras.${extra.id}` as const}
                       control={control}
                       render={({ field }) => (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            {...field}
-                            className="h-4 w-4 text-consumer-blue border-gray-300 rounded focus:ring-consumer-blue"
-                          />
-                          <label
-                            htmlFor={extra.id}
-                            className="text-sm font-medium text-gray-700"
-                          >
-                            Aggiungi
-                          </label>
+                        <div
+                          className={clsx(
+                            "flex flex-col border border-gray-200 rounded-lg p-3 transition",
+                            "hover:bg-gray-100 hover:border-vigil-orange cursor-pointer",
+                            field.value &&
+                              "border-vigil-orange bg-vigil-light-orange/60"
+                          )}
+                          onClick={() => {
+                            setValue(
+                              `extras.${extra.id}` as const,
+                              !field.value
+                            );
+                          }}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="font-medium">{extra.name}</p>
+                            <p className="font-medium text-consumer-blue">
+                              {selectedService?.currency}
+                              {amountDisplay(extra.fixed_price)}
+                            </p>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {extra.description}
+                          </p>
+
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              {...field}
+                              checked={field.value || false}
+                              className="h-4 w-4 text-consumer-blue border-gray-300 rounded focus:ring-consumer-blue"
+                            />
+                            <label
+                              htmlFor={extra.id}
+                              className="text-sm font-medium text-gray-700"
+                            >
+                              {field.value ? "Aggiunto" : "Aggiungi"}
+                            </label>
+                          </div>
                         </div>
                       )}
                     />
-                  </div>
+                  </React.Fragment>
                 ))}
               </div>
             </div>

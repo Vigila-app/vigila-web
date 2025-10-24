@@ -58,7 +58,8 @@ const ProfileComponent = () => {
         <CalendarDaysIcon
           className={clsx(
             "size-6",
-            pendingBookings.length > 0 && "text-red-500 animate-bounce"
+            pendingBookings.length > 0 && "text-red-500",
+            isVigil && pendingBookings.length > 0 && "animate-bounce"
           )}
         />
       ),

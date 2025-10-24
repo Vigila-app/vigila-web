@@ -83,7 +83,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                         { type: "getBookingDetails", bookingId }
                       );
                     }
-                    resolve(bookingStoreBE);
+                    return(bookingStoreBE);
                   } catch (error) {
                     reject(error);
                   }
@@ -92,7 +92,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                 if (
                   force ||
                   !get().lastUpdate ||
-                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 3
+                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 1
                 ) {
                   const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
                   if (bookingStoreBE?.id) {

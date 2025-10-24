@@ -9,6 +9,7 @@ import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
 import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
 type SearchMapFormI = {
   search: string;
@@ -25,6 +26,7 @@ const SearchAddress = (props: {
   autoFocus?: boolean;
   id?: string;
   name?: string;
+  debounce?: number;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -37,11 +39,12 @@ const SearchAddress = (props: {
     autoFocus = true,
     id,
     name,
+    debounce = 1500,
   } = props;
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
     "",
-    500,
+    debounce,
     "searchAddress"
   );
 
@@ -165,7 +168,7 @@ const SearchAddress = (props: {
   }, [debouncedSearchTerm]);
 
   return (
-    <>
+    <div className="w-full relative">
       <form onSubmit={handleSubmit(onSubmit)} className="my-1">
         <Controller
           name="search"
@@ -196,15 +199,32 @@ const SearchAddress = (props: {
               aria-invalid={!!errors.search}
               error={errors.search}
               autoComplete="shipping billing street-address postal-code city"
+              icon={
+                searchTerm ? (
+                  <XCircleIcon
+                    className="size-5 text-gray-500 hover:text-gray-400 transition"
+                    onClick={() => {
+                      field.onChange("");
+                      setSearchTerm("");
+                    }}
+                  />
+                ) : undefined
+              }
             />
           )}
         />
       </form>
       {!submitted && autocompleteResults?.length > 1 ? (
-        <div>
-          <ul>
+        <div className="absolute left-1/2 -translate-x-1/2 top-12 w-[90%] bg-white p-2 border border-gray-200 shadow-sm rounded-2xl z-10 max-h-60 overflow-y-auto">
+          <h6 className="text-black font-semibold mb-2">
+            Seleziona un indirizzo
+          </h6>
+          <ul className="space-y-2">
             {autocompleteResults.map((result, index) => (
-              <li key={index} className="my-2 ">
+              <li
+                key={index}
+                className="bg-transparent hover:bg-gray-100 transition rounded"
+              >
                 <button
                   onClick={() => {
                     const displayName =
@@ -214,8 +234,18 @@ const SearchAddress = (props: {
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-blue-600 hover:underline flex items-center justify-center border-1 rounded-2xl">
-                  {result.display_name}
+                  className="text-consumer-blue border-b-1 text-sm px-1 w-full"
+                >
+                  {result.address
+                    ? [
+                        result.address.road,
+                        result.address.town,
+                        result.address.postcode,
+                        result.address.county,
+                      ]
+                        .filter((v) => !!v)
+                        .join(", ") || result.display_name
+                    : result.display_name}
                 </button>
               </li>
             ))}
@@ -229,7 +259,7 @@ const SearchAddress = (props: {
           Nessun risultato trovato, perfavore perfeziona la ricerca
         </div>
       ) : null}
-    </>
+    </div>
   );
 };
 export default SearchAddress;

@@ -110,8 +110,24 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   }, [booking]);
 
+  const retrieveBookingDetails = async (force = false) => {
+    if (!bookingId) return;
+
+    try {
+      showLoader();
+      await getBookingDetails(bookingId, force);
+    } catch (error) {
+      console.error(
+        "Errore nel recupero dei dettagli della prenotazione:",
+        error
+      );
+    } finally {
+      hideLoader();
+    }
+  };
+
   useEffect(() => {
-    if (bookingId) getBookingDetails(bookingId);
+    if (bookingId) retrieveBookingDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
@@ -130,7 +146,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         status
       );
       if (updatedBooking) {
-        getBookingDetails(bookingId, true);
+        retrieveBookingDetails(true);
         onUpdate(updatedBooking);
 
         showToast({
@@ -170,44 +186,40 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   }
   return (
     <div className="space-y-6 relative ">
-        <span className="absolute top-0 right-0">
-          <Badge
-            label={
-              [
-                BookingStatusEnum.CANCELLED_USER,
-                BookingStatusEnum.CANCELLED_VIGIL,
-                BookingStatusEnum.REJECTED,
-                BookingStatusEnum.REFUNDED,
-                BookingStatusEnum.COMPLETED,
-              ].includes(booking.status as BookingStatusEnum)
+      <span className="absolute top-0 right-0">
+        <Badge
+          label={
+            [
+              BookingStatusEnum.CANCELLED_USER,
+              BookingStatusEnum.CANCELLED_VIGIL,
+              BookingStatusEnum.REJECTED,
+              BookingStatusEnum.REFUNDED,
+              BookingStatusEnum.COMPLETED,
+            ].includes(booking.status as BookingStatusEnum)
+              ? BookingUtils.getStatusText(booking.status as BookingStatusEnum)
+              : booking.payment_status === PaymentStatusEnum.PAID
                 ? BookingUtils.getStatusText(
                     booking.status as BookingStatusEnum
                   )
-                : booking.payment_status === PaymentStatusEnum.PAID
-                  ? BookingUtils.getStatusText(
-                      booking.status as BookingStatusEnum
-                    )
-                  : "Da pagare"
-            }
-            color={
-              [
-                BookingStatusEnum.CANCELLED_USER,
-                BookingStatusEnum.CANCELLED_VIGIL,
-                BookingStatusEnum.REJECTED,
-                BookingStatusEnum.REFUNDED,
-                BookingStatusEnum.COMPLETED,
-              ].includes(booking.status as BookingStatusEnum)
+                : "Da pagare"
+          }
+          color={
+            [
+              BookingStatusEnum.CANCELLED_USER,
+              BookingStatusEnum.CANCELLED_VIGIL,
+              BookingStatusEnum.REJECTED,
+              BookingStatusEnum.REFUNDED,
+              BookingStatusEnum.COMPLETED,
+            ].includes(booking.status as BookingStatusEnum)
+              ? BookingUtils.getStatusColor(booking.status as BookingStatusEnum)
+              : booking.payment_status === PaymentStatusEnum.PAID
                 ? BookingUtils.getStatusColor(
                     booking.status as BookingStatusEnum
                   )
-                : booking.payment_status === PaymentStatusEnum.PAID
-                  ? BookingUtils.getStatusColor(
-                      booking.status as BookingStatusEnum
-                    )
-                  : "yellow"
-            }
-          />
-        </span>
+                : "yellow"
+          }
+        />
+      </span>
       <div className="pt-5 ">
         <h2 className="text-2xl font-bold text-gray-900">
           Dettagli prenotazione
@@ -273,7 +285,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               ) : null}
               {isVigil && (
                 <p>
-                  <span className="font-medium">Prezzo del servizio:</span>
+                  <span className="font-medium">
+                    {isVigil ? "Commissione" : "Prezzo"}&nbsp;del servizio:
+                  </span>
                   &nbsp;
                   {BookingUtils.calculateAmountVigil(booking)}
                   {service?.currency}
@@ -289,17 +303,20 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                   )}
                 </p>
               )}
-              <p>
-                <span className="font-medium">Stato del pagamento:</span>&nbsp;
-                <Badge
-                  label={BookingUtils.getPaymentStatusText(
-                    booking.payment_status as PaymentStatusEnum
-                  )}
-                  color={BookingUtils.getStatusColor(
-                    booking.payment_status as PaymentStatusEnum
-                  )}
-                />
-              </p>
+              {!isVigil && (
+                <p>
+                  <span className="font-medium">Stato del pagamento:</span>
+                  &nbsp;
+                  <Badge
+                    label={BookingUtils.getPaymentStatusText(
+                      booking.payment_status as PaymentStatusEnum
+                    )}
+                    color={BookingUtils.getStatusColor(
+                      booking.payment_status as PaymentStatusEnum
+                    )}
+                  />
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -398,7 +415,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             danger
             label="Annulla Prenotazione"
             action={async () => {
-              await handleStatusUpdate(isConsumer ? BookingStatusEnum.CANCELLED_USER : BookingStatusEnum.CANCELLED_VIGIL);
+              await handleStatusUpdate(
+                isConsumer
+                  ? BookingStatusEnum.CANCELLED_USER
+                  : BookingStatusEnum.CANCELLED_VIGIL
+              );
               router.push(`${Routes.homeConsumer.url}`);
             }}
           />
