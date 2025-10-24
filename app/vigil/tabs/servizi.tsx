@@ -115,7 +115,9 @@ const ServiziTab = () => {
     <div className="w-full mx-auto mt-4">
       <>
         <div className="py-4">
-          <h2 className="font-semibold text-2xl mb-6">I tuoi servizi</h2>
+          <h2 className="font-semibold text-2xl mb-6">
+            {isVigil ? "I tuoi servizi" : "Servizi"}
+          </h2>
           <ul className="space-y-4">
             {(isVigil ? services : personalServices).map((service, i) => (
               <li key={service.id}>

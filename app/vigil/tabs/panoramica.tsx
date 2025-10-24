@@ -175,7 +175,9 @@ const PanoramicaTab = () => {
       <Card>
         <div className="flex flex-row items-center gap-2 pb-2">
           <TrophyIcon className="size-6 text-yellow-500" />
-          <h3 className="text-lg font-semibold">Le mie statistiche</h3>
+          <h3 className="text-lg font-semibold">
+            {isVigil ? "Le mie statistiche" : "Statistiche"}
+          </h3>
         </div>
         <div className="grid grid-cols-2 gap-4 text-center">
           {isVigil && (
@@ -196,7 +198,7 @@ const PanoramicaTab = () => {
           )}
           <div>
             <p className="text-2xl font-bold text-consumer-blue">
-              {vigil?.averageRating}
+              {vigil?.averageRating || "-"}
             </p>
             <p className="text-sm font-medium">Valutazione media</p>
           </div>
@@ -228,7 +230,7 @@ const PanoramicaTab = () => {
           )}
           <div className="flex items-center gap-2">
             <MapPinIcon className="size-4" />
-            <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-36 md:max-w-52">
+            <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-36 md:max-w-full">
               {vigil?.addresses?.map((a) => a.name)?.join(", ")}
             </span>
           </div>
