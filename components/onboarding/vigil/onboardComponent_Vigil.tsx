@@ -64,6 +64,10 @@ const VigilOnboardComponent = () => {
 
   const [addresses, setAddresses] = useState<AddressI[]>([]);
 
+  useEffect(() => {
+    setValue("addresses", addresses, { shouldValidate: true });
+  }, [addresses, setValue]);
+
   const handleServicesChange = useCallback(
     (services: ServiceI[]) => {
       setValue("services", services);
@@ -236,6 +240,10 @@ const VigilOnboardComponent = () => {
               name="addresses"
               control={control}
               defaultValue={[]}
+              rules={{
+                validate: (value) =>
+                  value.length > 0 || "Seleziona almeno un indirizzo",
+              }}
               render={() => (
                 <div>
                   <SearchAddress
