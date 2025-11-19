@@ -241,8 +241,7 @@ const VigilOnboardComponent = () => {
               control={control}
               defaultValue={[]}
               rules={{
-                validate: (value) =>
-                  value.length > 0 || "Seleziona almeno un indirizzo",
+                validate: (value) => value.length > 0,
               }}
               render={() => (
                 <div>
@@ -263,11 +262,11 @@ const VigilOnboardComponent = () => {
                     label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
                   />
                   {addresses.length ? (
-                    <ul className="mt-2 pl-4 text-sm text-gray-700 space-y-1">
+                    <ul className="mt-2 pl-4 text-sm  space-y-1">
                       {addresses.map((addr, i) => (
                         <li
                           key={i}
-                          className="w-full inline-flex items-center gap-2 text-black text-xs">
+                          className="w-full inline-flex items-center gap-2 text-black text-sm">
                           <span>
                             {(addr?.address
                               ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
@@ -290,7 +289,7 @@ const VigilOnboardComponent = () => {
                   ) : null}
 
                   {errors.addresses && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-base">
                       Seleziona almeno un indirizzo
                     </p>
                   )}
@@ -304,12 +303,7 @@ const VigilOnboardComponent = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <div>
-                  <label
-                    className={clsx(
-                      "block font-medium mb-1",
-                      role === RolesEnum.VIGIL && "text-vigil-orange",
-                      role === RolesEnum.CONSUMER && "text-consumer-blue"
-                    )}>
+                  <label className="block  mb-1 text-vigil-orange">
                     Mezzo di trasporto
                   </label>
                   <div className="space-y-2">
@@ -323,8 +317,8 @@ const VigilOnboardComponent = () => {
                       />
                     ))}
                     {errors.transportation && (
-                      <p className="text-red-500 text-sm">
-                        Seleziona un&apos;opzione
+                      <p className="text-red-500 text-base">
+                        Seleziona un&apos;opzione di trasporto
                       </p>
                     )}
                   </div>
@@ -347,7 +341,6 @@ const VigilOnboardComponent = () => {
                 />
               )}
             />
-            {/* TODO chiedere se si deve collegare il field e aggiornare il form con onchange  */}
             <Controller
               name="services"
               control={control}
