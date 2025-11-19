@@ -101,6 +101,8 @@ const VigilOnboardComponent = () => {
         vigil_id: undefined,
       }));
 
+      const cleanPhone = phone.replace(/\s/g, "");
+
       await OnboardService.update(
         {
           role: RolesEnum.VIGIL,
@@ -111,7 +113,7 @@ const VigilOnboardComponent = () => {
             occupation,
             transportation,
             information,
-            phone,
+            phone: cleanPhone,
           },
         },
         servicesWithCaps as unknown as ServiceI[]
@@ -198,13 +200,21 @@ const VigilOnboardComponent = () => {
             <Controller
               name="phone"
               control={control}
-              rules={{ required: true, minLength: 2, maxLength: 30 }}
+              rules={{
+                required: true,
+                minLength: 6,
+                maxLength: 30,
+                pattern: {
+                  value: /^[+0-9\s]*$/,
+                  message: "Inserisci un numero di telefono valido",
+                },
+              }}
               render={({ field }) => (
                 <Input
                   {...field}
                   label="Telefono"
                   placeholder="Inserisci il tuo numero di telefono"
-                  type="text"
+                  type="tel"
                   required
                   role={role}
                   aria-invalid={!!errors.phone}

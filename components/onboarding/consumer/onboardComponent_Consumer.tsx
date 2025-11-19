@@ -70,6 +70,7 @@ const ConsumerOnboardComponent = () => {
         address?.address?.postalCode ||
         address?.address?.cap ||
         "";
+      const cleanPhone = lovedOnePhone.replace(/\s/g, "");
 
       await OnboardService.update({
         role: RolesEnum.CONSUMER,
@@ -77,7 +78,7 @@ const ConsumerOnboardComponent = () => {
           lovedOneName,
           lovedOneAge,
           lovedOneBirthday,
-          lovedOnePhone,
+          lovedOnePhone: cleanPhone,
           relationship,
           address,
           cap,
@@ -117,8 +118,7 @@ const ConsumerOnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-w-lg mx-auto space-y-8"
-          >
+            className="max-w-lg mx-auto space-y-8">
             <Controller
               name="lovedOneName"
               control={control}
@@ -175,7 +175,14 @@ const ConsumerOnboardComponent = () => {
             <Controller
               name="lovedOnePhone"
               control={control}
-              rules={{ required: true, ...FormFieldType.PHONE }}
+              rules={{
+                required: true,
+                ...FormFieldType.PHONE,
+                pattern: {
+                  value: /^[+0-9\s]*$/,
+                  message: "Inserisci un numero di telefono valido",
+                },
+              }}
               render={({ field }) => (
                 <Input
                   {...field}
