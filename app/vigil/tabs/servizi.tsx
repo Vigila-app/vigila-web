@@ -131,26 +131,7 @@ const ServiziTab = () => {
                 />
                 {editingIndex === i && isVigil && (
                   <div className="mt-2 p-4 bg-gray-50 rounded">
-                    {/* <Input
-                      label="Prezzo (€)"
-                      type="number"
-                      role={RolesEnum.CONSUMER}
-                      value={service.unit_price}
-                      min={
-                        ServicesService.getServiceCatalogById(
-                          service.info?.catalog_id
-                        )?.min_hourly_rate
-                      }
-                      max={
-                        ServicesService.getServiceCatalogById(
-                          service.info?.catalog_id
-                        )?.max_hourly_rate
-                      }
-                      onChange={(value) => {
-                        services[i].unit_price = Number(value);
-                        setNewService({ ...service });
-                      }}
-                    /> */}
+                    
                     <div className="flex gap-2 mt-2 flex-wrap">
                       <Button
                         label="Salva"
@@ -189,17 +170,7 @@ const ServiziTab = () => {
                       }
                     }}
                   />
-                  {/* <Input
-                    label="Prezzo (€)"
-                    type="number"
-                    value={newService.unit_price || ""}
-                    onChange={(value) => {
-                      setNewService((ns) => ({
-                        ...ns,
-                        unit_price: Number(value),
-                      }));
-                    }}
-                  /> */}
+                  
                   <div className="flex gap-2 items-center justify-center mt-2">
                     <Button
                       label="Aggiungi"

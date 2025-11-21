@@ -36,6 +36,7 @@ interface ServicesCatalogProps {
 
 const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   role,
+  selectedServices,
   onServicesChange,
 }) => {
   const [internalSelectedServices, setInternalSelectedServices] = useState<
@@ -127,9 +128,13 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   };
 
   const isServiceSelected = (catalogId: number) => {
-    return internalSelectedServices.some(
+    const isInCurrentSelection = internalSelectedServices.some(
       (service) => service.catalogId === catalogId
     );
+    const isAlreadyActive = selectedServices.some(
+      (existingService) => existingService.info?.catalog_id === catalogId
+    );
+    return isInCurrentSelection || isAlreadyActive;
   };
 
   const getCatalogService = (catalogId: number) => {
@@ -197,7 +202,15 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                   role={RolesEnum.VIGIL}
                   customClass="!px-3 "
                   full
-                  label="Aggiungi Servizio"
+                  label={
+                    selectedServices.some(
+                      (s) => s.info?.catalog_id === catalogService.id
+                    )
+                      ? "Servizio attivo"
+                      : isServiceSelected(catalogService.id)
+                        ? "Servizio selezionato"
+                        : "Aggiungi Servizio"
+                  }
                   type="button"
                   action={() => addService(catalogService)}
                   disabled={isServiceSelected(catalogService.id)}
@@ -247,47 +260,6 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                       <label className="block text-[16px] font-medium mb-2">
                         Prezzo orario €{catalogService.min_hourly_rate}
                       </label>
-                      {/* <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateServicePrice(
-                              index,
-                              Math.max(
-                                catalogService.min_hourly_rate,
-                                selectedService.unit_price - 1
-                              )
-                            )
-                          }
-                          disabled={
-                            selectedService.unit_price <=
-                            catalogService.min_hourly_rate
-                          }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
-                          <MinusIcon className="w-4 h-4" />
-                        </button>
-                        <span className="font-medium min-w-[60px] text-center">
-                          €{selectedService.unit_price}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateServicePrice(
-                              index,
-                              Math.min(
-                                catalogService.max_hourly_rate,
-                                selectedService.unit_price + 1
-                              )
-                            )
-                          }
-                          disabled={
-                            selectedService.unit_price >=
-                            catalogService.max_hourly_rate
-                          }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
-                          <PlusIcon className="w-4 h-4" />
-                        </button>
-                      </div> */}
                     </div>
 
                     {/* Opzioni extra */}
