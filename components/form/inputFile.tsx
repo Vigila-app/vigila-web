@@ -27,7 +27,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileI>((props, ref) => {
     error: extError,
     hidden = false,
     id,
-    maxSize = 500000,
+    maxSize = 5 * 1024 * 1024,
     name,
     label,
     type = "file",
