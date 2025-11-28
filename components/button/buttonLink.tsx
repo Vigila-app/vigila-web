@@ -54,7 +54,7 @@ const ButtonLink = (props: ButtonLinkI) => {
       {...{
         ...props,
         action: undefined,
-        customClass: undefined,
+
         primary: undefined,
         secondary: undefined,
         text: undefined,
