@@ -28,11 +28,13 @@ import {
   StarIcon,
   UserGroupIcon,
   UserIcon,
+  WalletIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
 import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import WalletTab from "@/app/(consumer)/tabs/walletTab";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
@@ -81,6 +83,8 @@ const ProfileComponent = () => {
             label: <UserGroupIcon className="size-6" />,
             id: "famiglia",
           },
+
+          { label: <WalletIcon className="size-6" />, id: "wallet" },
         ]),
     {
       label: <StarIcon className="size-6" />,
@@ -195,6 +199,7 @@ const ProfileComponent = () => {
                 {selectedTab?.id === "informazioni" && (
                   <InformazioniConsumerTab />
                 )}
+                {selectedTab?.id === "wallet" && <WalletTab />}
               </div>
             </div>
           </div>

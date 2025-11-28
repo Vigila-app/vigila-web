@@ -1,4 +1,5 @@
-import { Button } from "@/components";
+import { Button, ButtonLink } from "@/components";
+import { Routes } from "@/src/routes";
 import React from "react";
 
 const WalletLanding = () => {
@@ -174,7 +175,7 @@ const WalletLanding = () => {
           {/* Feature payment button */}
         </div>
           <div className="flex items-center justify-center">
-            <Button label="Ricarica" />
+            <ButtonLink label="Ricarica" href={Routes.walletBundles.url} />
           </div>
       </div>
     </div>

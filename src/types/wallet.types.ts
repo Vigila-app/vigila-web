@@ -14,3 +14,12 @@ export type BundleCatalogType = {
 export type BundleCatalog = {
   bundles_catalog: BundleCatalogType[];
 };
+
+export type TransactionType = {
+  id: string;
+  title: string;
+  date: string;
+  amount: number;
+  type: 'credit' | 'debit';
+  status: string;
+};
