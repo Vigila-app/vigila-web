@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components";
-import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import ServiceCard from "@/components/services/serviceCard.component";
 import { ServiceI } from "@/src/types/services.types";
-import { Input } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";

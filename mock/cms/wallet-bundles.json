@@ -1,0 +1,59 @@
+{
+  "wallet_bundles": [
+    {
+      "id": 1,
+      "name": "Starter",
+      "description": "Ricarica base con piccolo bonus",
+      "price": 50,
+      "credit_amount": 55,
+      "bonus_percentage": 10,
+      "savings": 5,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti"
+      ],
+      "is_active": true,
+      "is_popular": false
+    },
+    {
+      "id": 2,
+      "name": "Family",
+      "description": "Pacchetto famiglia con bonus elevato e condivisione",
+      "price": 500,
+      "credit_amount": 650,
+      "bonus_percentage": 30,
+      "savings": 150,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni",
+        "Supporto dedicato 24/7",
+        "Condivisione con familiari"
+      ],
+      "is_active": true,
+      "is_popular": false
+    },
+    {
+      "id": 3,
+      "name": "Standard",
+      "description": "Pacchetto standard bilanciato",
+      "price": 100,
+      "credit_amount": 120,
+      "bonus_percentage": 20,
+      "savings": 20,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni"
+      ],
+      "is_active": true,
+      "is_popular": true
+    }
+  ]
+}

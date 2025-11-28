@@ -176,7 +176,7 @@
     "roles": ["CONSUMER", "VIGIL"]
   },
   "walletPackages": {
-    "url": "/wallet/packages",
+    "url": "/wallet/bundles",
     "label": "Pacchetti wallet",
     "title": "Pacchetti wallet",
     "menu": {
