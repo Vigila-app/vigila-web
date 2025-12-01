@@ -214,10 +214,21 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
     console.error("Error updating wallet balance:", walletError);
     
     // Attempt to rollback by deleting the transaction (best effort)
-    await _admin
+    // Log errors to aid in manual reconciliation if rollback fails
+    const { error: rollbackError } = await _admin
       .from("wallet_transactions")
       .delete()
       .eq("id", transaction.id);
+    
+    if (rollbackError) {
+      console.error("CRITICAL: Failed to rollback transaction after wallet update failure. Manual reconciliation required.", {
+        transactionId: transaction.id,
+        paymentIntentId,
+        wallet_id,
+        amount,
+        rollbackError,
+      });
+    }
 
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,

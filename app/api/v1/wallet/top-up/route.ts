@@ -50,13 +50,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validate currency format
+    // Validate currency - whitelist of supported ISO 4217 currency codes
+    // Using a whitelist to prevent invalid codes and limit to currencies we support
+    const SUPPORTED_CURRENCIES = ["eur", "usd", "gbp", "chf"];
     const normalizedCurrency = currency.toLowerCase();
-    if (!/^[a-z]{3}$/.test(normalizedCurrency)) {
+    if (!SUPPORTED_CURRENCIES.includes(normalizedCurrency)) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.WALLET_TOP_UP_BAD_REQUEST.code,
         success: false,
-        message: "Invalid currency format: must be a 3-letter ISO currency code",
+        message: `Invalid currency: must be one of ${SUPPORTED_CURRENCIES.join(", ").toUpperCase()}`,
       });
     }
 
