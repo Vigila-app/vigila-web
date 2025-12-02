@@ -78,6 +78,30 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   // endregion PAYMENT
 
+  // region WALLET
+  WALLET_TOP_UP_SUCCESS: {
+    code: 8301,
+  },
+  WALLET_TOP_UP_ERROR: {
+    code: 8302,
+  },
+  WALLET_TOP_UP_BAD_REQUEST: {
+    code: 8303,
+  },
+  WALLET_TOP_UP_UNAUTHORIZED: {
+    code: 8304,
+  },
+  WALLET_TOP_UP_NOT_FOUND: {
+    code: 8305,
+  },
+  WALLET_TOP_UP_METHOD_NOT_ALLOWED: {
+    code: 8306,
+  },
+  WALLET_WEBHOOK_DUPLICATE: {
+    code: 8307,
+  },
+  // endregion WALLET
+
   // region CMS
   CMS_CONTENT_SUCCESS: {
     code: 6001,
