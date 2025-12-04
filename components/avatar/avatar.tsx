@@ -117,7 +117,7 @@ const Avatar = (props: AvatarI) => {
 
   return (
     <div
-      // onClick={() => inputRef.current?.click()}
+      onClick={() => inputRef.current?.click()}
       className={clsx(
         "relative items-center cursor-pointer",
         inline ? "inline-flex gap-1" : "flex flex-col gap-1",
