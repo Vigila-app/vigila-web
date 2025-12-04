@@ -3,7 +3,7 @@ import { isMocked } from "@/src/utils/envs.utils";
 
 export const AppConstants = {
   title: "Vigila",
-  description: "Is a simple base-app based on Next.js and Supabase",
+  description: "La piattaforma per trovare, organizzare e gestire l'assistenza domiciliare con famiglie e assistenti.",
   hostUrl: isMocked ? "http://localhost:3000" : "https://vigila.org",
   publicUrl: "https://vigila.org",
   defaultUserRole: RolesEnum.CONSUMER,
