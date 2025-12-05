@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { ApiService } from "@/src/services/api.service";
+// import { ApiService } from "@/src/services/api.service";
+// import { apiCms } from "@/src/constants/api.constants";
+// import { CmsContentType } from "@/src/enums/cms.enums";
 import { ResponseCodesConstants } from "@/src/constants";
-import { apiCms } from "@/src/constants/api.constants";
-import { CmsContentType } from "@/src/enums/cms.enums";
+
 
 const requestHandler = async (
-  req: Request,
-  context: { params: Promise<{ contentType: CmsContentType; contentId: string }> }
+  req: NextRequest,
+  context: { params: Promise<{ contentType: string; contentId: string }> }
 ) => {
   const { contentType, contentId } = await context.params;
   const { method } = req;
@@ -75,8 +76,8 @@ const requestHandler = async (
 };
 
 export async function GET(
-  req: Request,
-  context: { params: Promise<{ contentType: CmsContentType; contentId: string }> }
+  req: NextRequest,
+  context: { params: Promise<{ contentType: string; contentId: string }> }
 ) {
   return requestHandler(req, context);
 }

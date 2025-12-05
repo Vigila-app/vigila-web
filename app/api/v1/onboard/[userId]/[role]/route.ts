@@ -9,11 +9,11 @@ import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { UserDetailsType } from "@/src/types/user.types";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-  req: Request,
-  context: { params: Promise<{ userId: string; role: RolesEnum }> }
+  req: NextRequest,
+  context: { params: Promise<{ userId: string; role: string }> }
 ) {
   try {
     const { userId, role } = await context?.params;
