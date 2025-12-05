@@ -29,7 +29,8 @@ const Checkbox = (props: CheckboxI) => {
       htmlFor={name || label}
       className={clsx(
         "relative flex cursor-pointer items-start gap-2",
-
+        role === RolesEnum.VIGIL && "text-vigil-orange",
+        role === RolesEnum.CONSUMER && "text-consumer-blue",
         error && "!border-red-500",
         disabled && "opacity-75 !cursor-not-allowed"
       )}>
