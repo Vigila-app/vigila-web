@@ -76,7 +76,7 @@ export const ResendService = {
             } catch (e) {
               // fallback: attempt to stringify children or return undefined
               try {
-                return options.react?.props?.children?.toString?.() || undefined;
+                return (options.react?.props as any)?.children?.toString?.() || undefined;
               } catch (ee) {
                 return undefined;
               }
