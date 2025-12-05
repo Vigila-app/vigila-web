@@ -16,7 +16,6 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
-import { User } from "@supabase/supabase-js";
 
 const verifyBookingAccess = async (
   bookingId: string,
