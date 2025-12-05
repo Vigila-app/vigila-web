@@ -20,7 +20,7 @@ export default function Profile() {
     if (user?.user_metadata?.role === RolesEnum.VIGIL) {
       switch (user?.user_metadata?.status) {
         case "active":
-          // router.replace(Routes.profileVigil.url);
+          router.replace(Routes.profileVigil.url)
           break
         default:
           break
