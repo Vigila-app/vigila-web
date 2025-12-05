@@ -64,10 +64,6 @@ const VigilOnboardComponent = () => {
 
   const [addresses, setAddresses] = useState<AddressI[]>([]);
 
-  useEffect(() => {
-    setValue("addresses", addresses, { shouldValidate: true });
-  }, [addresses, setValue]);
-
   const handleServicesChange = useCallback(
     (services: ServiceI[]) => {
       setValue("services", services);
@@ -131,7 +127,7 @@ const VigilOnboardComponent = () => {
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({
-        message: "Sorry, something went wrong",
+        message: "Qualcosa è andato storto",
         type: ToastStatusEnum.ERROR,
       });
     } finally {
@@ -153,7 +149,8 @@ const VigilOnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 ">
+            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 "
+          >
             <Controller
               name="birthday"
               control={control}
@@ -254,9 +251,9 @@ const VigilOnboardComponent = () => {
                             (a) => a.display_name === address.display_name
                           )
                         )
-                          return prev;
-                        return [...prev, address];
-                      });
+                          return prev
+                        return [...prev, address]
+                      })
                     }}
                     placeholder="Inserisci la città con il CAP"
                     label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
@@ -266,7 +263,8 @@ const VigilOnboardComponent = () => {
                       {addresses.map((addr, i) => (
                         <li
                           key={i}
-                          className="w-full inline-flex items-center gap-2 text-black text-sm">
+                          className="w-full inline-flex items-center gap-2 text-black text-sm"
+                        >
                           <span>
                             {(addr?.address
                               ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
@@ -277,10 +275,11 @@ const VigilOnboardComponent = () => {
                             onClick={() => {
                               setAddresses((prev) =>
                                 prev.filter((_, index) => index !== i)
-                              );
+                              )
                             }}
                             className="text-red-500 hover:text-red-700 font-bold"
-                            aria-label="Rimuovi indirizzo">
+                            aria-label="Rimuovi indirizzo"
+                          >
                             <XCircleIcon className="size-3" />
                           </button>
                         </li>
@@ -289,7 +288,7 @@ const VigilOnboardComponent = () => {
                   ) : null}
 
                   {errors.addresses && (
-                    <p className="text-red-500 text-base">
+                    <p className="text-red-500 text-xs">
                       Seleziona almeno un indirizzo
                     </p>
                   )}
@@ -303,7 +302,13 @@ const VigilOnboardComponent = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <div>
-                  <label className="block  mb-1 text-vigil-orange">
+                  <label
+                    className={clsx(
+                      "block font-medium mb-1",
+                      role === RolesEnum.VIGIL && "text-vigil-orange",
+                      role === RolesEnum.CONSUMER && "text-consumer-blue"
+                    )}
+                  >
                     Mezzo di trasporto
                   </label>
                   <div className="space-y-2">
@@ -317,7 +322,7 @@ const VigilOnboardComponent = () => {
                       />
                     ))}
                     {errors.transportation && (
-                      <p className="text-red-500 text-base">
+                      <p className="text-red-500 text-xs">
                         Seleziona un&apos;opzione di trasporto
                       </p>
                     )}
@@ -368,7 +373,7 @@ const VigilOnboardComponent = () => {
         </div>
       </Card>
     </div>
-  );
+  )
 };
 
 export default VigilOnboardComponent;
