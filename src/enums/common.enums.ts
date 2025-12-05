@@ -30,3 +30,21 @@ export enum CurrencyEnum {
   US_DOLLAR = "$",
   GB_POUND = "£",
 }
+
+export enum OccupationEnum {
+  STUDENT = "studente",
+  UNEMPLOYED = "disoccupato",
+  OSS = "oss",
+  NURSE = "infermiere",
+  EMPLOYEE = "impiegato",
+  OTHER = "altro",
+}
+
+export const OccupationLabels: Record<OccupationEnum, string> = {
+  [OccupationEnum.STUDENT]: "Studente",
+  [OccupationEnum.UNEMPLOYED]: "Disoccupato",
+  [OccupationEnum.OSS]: "Operatore Socio Sanitario (OSS)",
+  [OccupationEnum.NURSE]: "Infermiere",
+  [OccupationEnum.EMPLOYEE]: "Impiegato",
+  [OccupationEnum.OTHER]: "Altro",
+};
