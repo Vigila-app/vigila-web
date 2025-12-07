@@ -1,13 +1,25 @@
 import { ApiService } from "@/src/services";
-import { apiPayment } from "@/src/constants/api.constants";
+import { apiPayment, apiWallet } from "@/src/constants/api.constants";
 import { BookingI } from "@/src/types/booking.types";
 import { BookingsService, UpdateBookingPaymentRequest } from "./bookings.service";
+import { TransactionType } from "@/src/types/wallet.types";
 
 export type CreatePaymentIntentRequest = {
   bookingId: string;
   user: string;
   amount: number;
   currency: string;
+};
+
+export type CreateWalletTopUpRequest = {
+  user: string;
+  amount: number;
+  currency: string;
+  metadata: {
+    type: string;
+    bundleId: number;
+    creditAmount: number;
+  };
 };
 
 export type CreatePaymentIntentResponse = {
@@ -49,6 +61,23 @@ export const PaymentService = {
     }
   },
 
+  createWalletTopUpIntent: async (request: CreateWalletTopUpRequest): Promise<CreatePaymentIntentResponse> => {
+    try {
+      const response = (await ApiService.post(
+        apiWallet.TOP_UP(),
+        request
+      )) as CreatePaymentIntentResponse;
+      return response;
+    } catch (error) {
+      console.error("PaymentService createWalletTopUpIntent error", {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : null,
+      });
+      throw error;
+    }
+  },
+
   verifyPaymentIntent: async (paymentIntentId: string): Promise<VerifyPaymentIntentResponse> => {
     try {
       const response = (await ApiService.get(
@@ -61,6 +90,21 @@ export const PaymentService = {
         message: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
+    }
+  },
+
+  getWalletTransactions: async (userId: string): Promise<TransactionType[]> => {
+    try {
+      const response = (await ApiService.get(
+        apiWallet.TRANSACTIONS(userId)
+      )) as { data: TransactionType[] };
+      return response.data || [];
+    } catch (error) {
+      console.error("PaymentService getWalletTransactions error", {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return [];
     }
   },
 };

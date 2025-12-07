@@ -1,9 +1,25 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import bundlesJson from '../../../../mock/cms/wallet-bundles.json';
 import type { BundleCatalogType } from '../../../../src/types/wallet.types';
+import { BundleCard } from "@/components/wallet/bundleCard.component";
+import { WalletPaymentComponent } from "@/components/wallet/walletPaymentComponent";
 
 const WalletBundles: React.FC = () => {
   const bundles: BundleCatalogType[] = (bundlesJson.wallet_bundles || []) as unknown as BundleCatalogType[];
+  const [selectedBundle, setSelectedBundle] = useState<BundleCatalogType | null>(null);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedBundle) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedBundle]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center items-center py-10 px-4 font-sans">
@@ -21,76 +37,26 @@ const WalletBundles: React.FC = () => {
         {/* Lista Pacchetti */}
         <div className="space-y-6">
           {bundles.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`relative border rounded-2xl p-6 transition-all duration-300 hover:shadow-md
-                ${pkg.is_popular ? "border-sky-500 shadow-sm ring-1 ring-sky-100" : "border-gray-200 hover:border-gray-300"}`}>
-              {/* Badge "Più scelto" se necessario */}
-              {pkg.is_popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-sky-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                  <span className="flex items-center gap-1">★ Più scelto</span>
-                </div>
-              )}
-
-              {/* Titolo e Bonus */}
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-gray-900 text-lg">{pkg.name}</h3>
-              </div>
-              <p className="text-xs text-gray-400 font-medium mb-4">
-                {`Bonus +${pkg.bonus_percentage}%`}
-              </p>
-
-              {/* Prezzo */}
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900">
-                  €{pkg.price}
-                </span>
-                <div className="mt-1 flex flex-col">
-                  <span className="text-sky-500 text-sm font-semibold">
-                    → €{pkg.credit_amount} di credito
-                  </span>
-                  <span className="text-gray-400 text-xs">
-                    Risparmi €{pkg.savings}
-                  </span>
-                </div>
-              </div>
-
-              {/* Lista Features */}
-              <ul className="space-y-2 mb-6">
-                {pkg.features.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 text-xs text-gray-600">
-                    <svg
-                      className="w-4 h-4 text-sky-500 shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Bottone */}
-              <button
-                className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors duration-200
-                ${
-                  pkg.is_popular
-                    ? "bg-sky-500 text-white hover:bg-sky-600 shadow-md shadow-sky-200"
-                    : "bg-transparent text-sky-500 border border-sky-500 hover:bg-sky-50"
-                }`}>
-                Acquista ora
-              </button>
-            </div>
+            <BundleCard 
+              key={pkg.id} 
+              bundle={pkg} 
+              onSelect={(bundle) => setSelectedBundle(bundle)} 
+            />
           ))}
         </div>
       </div>
+
+      {/* Modal Pagamento */}
+      {selectedBundle && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center p-4">
+             <WalletPaymentComponent 
+                selectedBundle={selectedBundle} 
+                onCancel={() => setSelectedBundle(null)} 
+             />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

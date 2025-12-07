@@ -92,13 +92,14 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
   const paymentIntentId = paymentIntent.id;
 
   // Extract metadata for reconciliation
-  const { user_id, wallet_id, transaction_type } = paymentIntent.metadata;
+  const { user_id, wallet_id, transaction_type, credit_amount } = paymentIntent.metadata;
 
   console.log(`Processing payment_intent.succeeded`, {
     paymentIntentId,
     user_id,
     wallet_id,
     transaction_type,
+    credit_amount,
     amount: paymentIntent.amount,
     currency: paymentIntent.currency,
   });
@@ -160,7 +161,9 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
 
   // CASE NEW: Process the top-up
   // Use RPC for atomic transaction to ensure ACID compliance
-  const amount = paymentIntent.amount;
+  
+  // Determine the amount to credit: use credit_amount from metadata if available (for bundles), otherwise use paid amount
+  const amountToCredit = credit_amount ? parseInt(credit_amount, 10) : paymentIntent.amount;
   const currency = paymentIntent.currency.toUpperCase();
 
   // Start atomic database transaction
@@ -170,7 +173,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
     .insert({
       wallet_id: wallet_id,
       stripe_payment_id: paymentIntentId,
-      amount: amount,
+      amount: amountToCredit,
       currency: currency,
       status: "COMPLETED",
       type: "TOP_UP",
@@ -207,7 +210,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
   // Using RPC or raw SQL for atomic increment to prevent race conditions
   const { error: walletError } = await _admin.rpc("increment_wallet_balance", {
     p_wallet_id: wallet_id,
-    p_amount: amount,
+    p_amount: amountToCredit,
   });
 
   if (walletError) {
@@ -225,7 +228,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
         transactionId: transaction.id,
         paymentIntentId,
         wallet_id,
-        amount,
+        amount: amountToCredit,
         rollbackError,
       });
     }
@@ -237,7 +240,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
     });
   }
 
-  console.log(`Successfully processed top-up: ${amount} ${currency} for wallet ${wallet_id}`);
+  console.log(`Successfully processed top-up: ${amountToCredit} ${currency} for wallet ${wallet_id}`);
 
   return NextResponse.json(
     {
@@ -246,7 +249,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
       message: "Payment processed successfully",
       data: {
         transactionId: transaction.id,
-        amount: amount,
+        amount: amountToCredit,
         currency: currency,
       },
     },

@@ -8,31 +8,18 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
-// Initialize Stripe with the latest API version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
 });
 
-/**
- * POST /api/v1/wallet/top-up
- * 
- * Initializes a wallet top-up by creating a Stripe PaymentIntent.
- * 
- * Security considerations:
- * - Authenticates user before processing
- * - Creates/reuses Stripe customer ID for secure payment tracking
- * - Uses setup_future_usage for SCA-compliant future payments
- * - Includes metadata for webhook reconciliation
- * - Never stores raw card numbers
- */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { amount, currency = "eur" } = body;
+    const { amount, currency = "eur", metadata } = body;
 
-    console.log(`API POST wallet/top-up`, { amount, currency });
+    console.log(`API POST wallet/top-up`, { amount, currency, metadata });
 
-    // Authenticate user - only CONSUMERs can top up their wallet
+    // 1. Authenticate user
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
       return jsonErrorResponse(401, {
@@ -41,7 +28,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validate input
+    // 2. Validate input
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.WALLET_TOP_UP_BAD_REQUEST.code,
@@ -50,25 +37,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validate currency - whitelist of supported ISO 4217 currency codes
-    // Using a whitelist to prevent invalid codes and limit to currencies we support
-    const SUPPORTED_CURRENCIES = ["eur", "usd", "gbp", "chf"];
-    const normalizedCurrency = currency.toLowerCase();
-    if (!SUPPORTED_CURRENCIES.includes(normalizedCurrency)) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.WALLET_TOP_UP_BAD_REQUEST.code,
-        success: false,
-        message: `Invalid currency: must be one of ${SUPPORTED_CURRENCIES.join(", ").toUpperCase()}`,
-      });
-    }
-
     const _admin = getAdminClient();
 
-    // Fetch the user's consumer record to get/create stripe_customer_id
+    // 3. Get Consumer
     const { data: consumer, error: consumerError } = await _admin
       .from("consumers")
-      .select("id, user_id, stripe_customer_id")
-      .eq("user_id", userObject.id)
+      .select("id, stripe_customer_id")
+      .eq("id", userObject.id) // <--- FIX: id corrisponde a user_id
       .single();
 
     if (consumerError || !consumer) {
@@ -80,28 +55,59 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fetch the user's wallet
-    const { data: wallet, error: walletError } = await _admin
+    // 4. Get Wallet (con gestione Auto-Creazione)
+    // Cerchiamo il wallet collegato a questo consumer
+    let { data: wallet, error: walletError } = await _admin
       .from("wallets")
-      .select("id, user_id, balance_cents, currency")
-      .eq("user_id", userObject.id)
-      .single();
+      .select("id, consumer_id, balance_cents, currency") // <--- FIX: consumer_id
+      .eq("consumer_id", consumer.id) // <--- FIX: consumer_id
+      .maybeSingle(); // Usa maybeSingle per non lanciare errore se non c'è
 
-    if (walletError || !wallet) {
-      console.error("Wallet not found:", walletError);
-      return jsonErrorResponse(404, {
-        code: ResponseCodesConstants.WALLET_TOP_UP_NOT_FOUND.code,
-        success: false,
-        message: "Wallet not found",
+    if (walletError) {
+      console.error("Database error fetching wallet:", walletError);
+      return jsonErrorResponse(500, {
+         code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
+         success: false,
+         message: "Database error fetching wallet"
       });
     }
 
+    // --- LOGICA AUTO-CREAZIONE (LAZY CREATION) ---
+    // Se il wallet non esiste, lo creiamo ora prima di procedere al pagamento
+    if (!wallet) {
+      console.log(`Wallet missing for consumer ${consumer.id}. Creating new wallet...`);
+      
+      const { data: newWallet, error: createError } = await _admin
+        .from("wallets")
+        .insert({
+          consumer_id: consumer.id, // <--- FIX: consumer_id
+          balance_cents: 0,
+          currency: 'eur',
+          // Aggiungi qui altri campi obbligatori se il tuo DB li richiede (es. created_at, updated_at)
+        })
+        .select("id, consumer_id, balance_cents, currency")
+        .single();
+
+      if (createError || !newWallet) {
+        console.error("Failed to auto-create wallet:", createError);
+        return jsonErrorResponse(500, {
+          code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
+          success: false,
+          message: "Failed to create wallet for user", 
+          error: createError.message
+        });
+      }
+      
+      // Assegniamo il nuovo wallet alla variabile wallet per usarla dopo
+      wallet = newWallet;
+      console.log(`Wallet created successfully: ${wallet.id}`);
+    }
+
+    // 5. Stripe Customer Logic
     let stripeCustomerId = consumer.stripe_customer_id;
 
-    // Customer Logic: Create Stripe customer if not exists
     if (!stripeCustomerId) {
       try {
-        // Create a new Stripe customer
         const stripeCustomer = await stripe.customers.create({
           email: userObject.email,
           metadata: {
@@ -112,49 +118,39 @@ export async function POST(req: NextRequest) {
 
         stripeCustomerId = stripeCustomer.id;
 
-        // Save the Stripe customer ID to the consumer record
-        const { error: updateError } = await _admin
+        await _admin
           .from("consumers")
           .update({
             stripe_customer_id: stripeCustomerId,
             updated_at: new Date().toISOString(),
           })
           .eq("id", consumer.id);
-
-        if (updateError) {
-          console.error("Failed to save Stripe customer ID:", updateError);
-          // Continue anyway - the payment can still proceed
-        }
-      } catch (stripeError) {
+          
+      } catch (stripeError: any) {
         console.error("Failed to create Stripe customer:", stripeError);
-        
-        if (stripeError instanceof Stripe.errors.StripeError) {
-          return jsonErrorResponse(500, {
-            code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
-            success: false,
-            message: `Stripe error: ${stripeError.message}`,
-          });
-        }
-        throw stripeError;
+        return jsonErrorResponse(500, {
+             code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
+             success: false,
+             message: `Stripe error: ${stripeError.message}`,
+        });
       }
     }
 
-    // Payment Logic: Create a Stripe PaymentIntent
+    // 6. Create PaymentIntent
     try {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount), // Amount in cents
-        currency: normalizedCurrency,
+        amount: Math.round(amount),
+        currency: currency.toLowerCase(),
         customer: stripeCustomerId,
-        // Enable future off-session payments (handles SCA mandates)
         setup_future_usage: "off_session",
-        automatic_payment_methods: {
-          enabled: true,
-        },
-        // CRITICAL: Metadata for webhook reconciliation
+        automatic_payment_methods: { enabled: true },
         metadata: {
           user_id: userObject.id,
-          wallet_id: wallet.id,
+          wallet_id: wallet.id, // Ora siamo sicuri al 100% che wallet.id esiste
           transaction_type: "TOP_UP",
+          ...(metadata?.bundleId && { bundle_id: metadata.bundleId }),
+          ...(metadata?.creditAmount && { credit_amount: metadata.creditAmount }),
+          ...(metadata?.type && { type: metadata.type }),
         },
         description: `Wallet top-up for user ${userObject.id}`,
       });
@@ -167,34 +163,20 @@ export async function POST(req: NextRequest) {
         },
         { status: 200 }
       );
-    } catch (stripeError) {
+    } catch (stripeError: any) {
       console.error("Failed to create PaymentIntent:", stripeError);
-
-      if (stripeError instanceof Stripe.errors.StripeError) {
-        // Handle specific Stripe errors
-        if (stripeError.type === "StripeCardError") {
-          return jsonErrorResponse(400, {
-            code: ResponseCodesConstants.WALLET_TOP_UP_BAD_REQUEST.code,
-            success: false,
-            message: stripeError.message,
-          });
-        }
-
-        return jsonErrorResponse(500, {
-          code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
-          success: false,
-          message: `Stripe error: ${stripeError.message}`,
-        });
-      }
-
-      throw stripeError;
+      return jsonErrorResponse(500, {
+        code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
+        success: false,
+        message: `Stripe error: ${stripeError.message}`,
+      });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in wallet top-up:", error);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error.message || "Unknown error",
     });
   }
 }

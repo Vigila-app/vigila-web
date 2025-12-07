@@ -1,15 +1,35 @@
 import {Button, ButtonLink } from "@/components";
 import Card from "@/components/card/card";
-import React, { useMemo } from "react";
-import transactionsJson from '@/mock/cms/transactions.json';
+import React, { useMemo, useState, useEffect } from "react";
 import type { TransactionType } from '@/src/types/wallet.types';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { Routes } from "@/src/routes";
 import { RolesEnum } from "@/src/enums/roles.enums";
-
+import { useUserStore } from "@/src/store/user/user.store";
+import { PaymentService } from "@/src/services";
 
 export default function WalletTab() {
-  const transactions: TransactionType[] = transactionsJson as TransactionType[];
+  const { user } = useUserStore();
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (user?.id) {
+        try {
+          setLoading(true);
+          const data = await PaymentService.getWalletTransactions(user.id);
+          setTransactions(data);
+        } catch (error) {
+          console.error("Failed to fetch transactions", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTransactions();
+  }, [user?.id]);
 
   // Calculate stats from transactions
   const stats = useMemo(() => {
@@ -50,7 +70,7 @@ export default function WalletTab() {
           {/* Actions */}
           <div className="flex gap-12 justify-center w-full">
             <ButtonLink label={"Ricarica"} role={RolesEnum.VIGIL}  href={Routes.wallet.url} />
-            <Button label={"Trasferisci"} className="" />
+           
           </div>
 
           {/* Stats row (skeleton like famigliaTab structure) */}
@@ -73,7 +93,9 @@ export default function WalletTab() {
           <div className="mt-4">
             <h2 className="text-sm font-semibold mb-2">Movimenti recenti</h2>
             <ul className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-              {transactions.length > 0 ? (
+              {loading ? (
+                 <li className="py-3 text-xs text-gray-600 text-center">Caricamento movimenti...</li>
+              ) : transactions.length > 0 ? (
                 transactions.map((tx) => (
                   <li key={tx.id} className="py-3 flex items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2 flex-1">
@@ -97,7 +119,7 @@ export default function WalletTab() {
                   </li>
                 ))
               ) : (
-                <li className="py-3 text-xs text-gray-600">Nessun movimento disponibile</li>
+                <li className="py-3 text-xs text-gray-600 text-center">Nessun movimento disponibile</li>
               )}
             </ul>
           </div>
