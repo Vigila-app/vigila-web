@@ -9,12 +9,20 @@ import { BundleCatalogType } from "@/src/types/wallet.types";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes"; 
 
+type WalletPaymentItem = {
+  id: string | number;
+  name: string;
+  price: number;
+  creditAmount: number;
+  metadataType?: string;
+};
+
 type WalletPaymentProps = {
-  selectedBundle: BundleCatalogType;
+  paymentItem: WalletPaymentItem;
   onCancel: () => void;
 };
 
-export const WalletPaymentComponent = ({ selectedBundle, onCancel }: WalletPaymentProps) => {
+export const WalletPaymentComponent = ({ paymentItem, onCancel }: WalletPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [error, setError] = useState<string>("");
   const router = useRouter();
@@ -28,19 +36,19 @@ export const WalletPaymentComponent = ({ selectedBundle, onCancel }: WalletPayme
       setError("");
       showLoader();
 
-      if (user?.id && selectedBundle) {
+      if (user?.id && paymentItem) {
         // Qui chiami il servizio di pagamento. 
         // Nota: Assicurati che il backend supporti un parametro 'metadata' o 'type' 
         // per distinguere tra Booking e Wallet top-up.
         const response = await PaymentService.createWalletTopUpIntent({
           user: user.id,
-          amount: Math.round(selectedBundle.price * 100), // Prezzo del bundle in centesimi
+          amount: Math.round(paymentItem.price * 100), // Prezzo del bundle in centesimi
           currency: "eur", // O dynamic se necessario
           // Passiamo dati extra per dire al backend/webhook che è una ricarica wallet
           metadata: {
-            type: "wallet_topup",
-            bundleId: selectedBundle.id,
-            creditAmount: selectedBundle.credit_amount
+            type: paymentItem.metadataType || "wallet_topup",
+            bundleId: Number(paymentItem.id),
+            creditAmount: paymentItem.creditAmount
           }
         });
 
@@ -61,11 +69,11 @@ export const WalletPaymentComponent = ({ selectedBundle, onCancel }: WalletPayme
 
   // Carica il pagamento appena il componente viene montato
   useEffect(() => {
-    if (selectedBundle && user?.id) {
+    if (paymentItem && user?.id) {
       createWalletPayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBundle, user?.id]);
+  }, [paymentItem, user?.id]);
 
   // 2. Gestione Successo
   const handlePaymentSuccess = async (paymentIntentId: string) => {
@@ -106,10 +114,10 @@ export const WalletPaymentComponent = ({ selectedBundle, onCancel }: WalletPayme
       <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
         <p className="text-sm text-gray-500 mb-1">Stai acquistando:</p>
         <div className="flex justify-between items-end">
-            <span className="font-bold text-lg text-gray-900">{selectedBundle.name}</span>
-            <span className="font-bold text-xl text-sky-600">€{selectedBundle.price}</span>
+            <span className="font-bold text-lg text-gray-900">{paymentItem.name}</span>
+            <span className="font-bold text-xl text-sky-600">€{paymentItem.price}</span>
         </div>
-        <p className="text-xs text-sky-500 mt-1">Riceverai €{selectedBundle.credit_amount} di credito</p>
+        <p className="text-xs text-sky-500 mt-1">Riceverai €{paymentItem.creditAmount} di credito</p>
       </div>
 
       {error && (
@@ -124,7 +132,7 @@ export const WalletPaymentComponent = ({ selectedBundle, onCancel }: WalletPayme
           returnUrl={`${window?.location?.origin}${Routes.wallet?.url || '/wallet'}?payment_success=true`}
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
-          submitLabel={`Paga €${selectedBundle.price}`}
+          submitLabel={`Paga €${paymentItem.price}`}
           clientSecret={clientSecret}
           showCancelButton={false}
         />

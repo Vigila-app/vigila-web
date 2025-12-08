@@ -1,4 +1,3 @@
-
 export type BundleCatalogType = {
   id: number;
   name: string;
@@ -20,6 +19,13 @@ export type TransactionType = {
   title: string;
   date: string;
   amount: number;
-  type: 'credit' | 'debit';
+  type: "credit" | "debit";
   status: string;
 };
+export interface TopUpOption {
+  id: string;
+  payAmount: number; 
+  creditAmount: number; 
+  validity?: string;
+}
+

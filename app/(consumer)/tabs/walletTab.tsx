@@ -91,12 +91,10 @@ export default function WalletTab() {
 
   return (
     <div className="flex flex-col items-center w-full sm:max-h-full">
-      <h1 className="py-3 w-full text-lg font-semibold text-start">
-        Portafoglio
-      </h1>
+      <h1 className="py-3 w-full text-lg font-semibold text-start">Wallet</h1>
       <div className="w-full">
         <div className="flex flex-col gap-2 mb-1 bg-consumer-blue px-4 rounded-2xl">
-          {/* Header / Balance */}
+          {/* bilancio */}
           <div className="flex justify-between items-center pt-4">
             <div className="flex flex-col gap-2 px-2 py-3">
               <p className="text-sm font-medium  text-white">
@@ -111,13 +109,12 @@ export default function WalletTab() {
             </span>
           </div>
 
-          {/* Actions */}
           <div className="flex  gap-12 justify-center w-full mb-4">
             <ButtonLink
               primary={false}
               label={"Ricarica il tuo wallet "}
               customClass={`${ButtonStyle.walletBtnStyle} w-full rounded-full py-3`}
-              href={Routes.wallet.url}
+              href={Routes.walletTopUp.url}
               icon={<PlusIcon className="w-5 h-5 text-consumer-blue" />}
             />
           </div>
@@ -126,17 +123,15 @@ export default function WalletTab() {
         <div>
           <div className="flex mt-3 gap-3 w-full ">
             <div className="bg-white p-5 rounded-3xl shadow-sm flex items-center justify-between w-full">
-              {/* Testi */}
               <div>
                 <h3 className="text-base font-semibold mb-1">
                   {"Totale Ricaricato"}
                 </h3>
                 <p className=" text-sm font-normal">
-               €{stats.totalDeposited.toFixed(2).replace(".", ",")}
+                  €{stats.totalDeposited.toFixed(2).replace(".", ",")}
                 </p>
               </div>
 
-              {/* Icona */}
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center bg-green-100 `}>
                 <ArrowTrendingUpIcon
@@ -148,7 +143,6 @@ export default function WalletTab() {
           </div>
           <div className="flex mt-3 gap-3 w-full">
             <div className="bg-white p-5 rounded-3xl shadow-sm flex items-center justify-between w-full">
-              {/* Testi */}
               <div>
                 <h3 className="text-base font-semibold  mb-1">
                   {"Totale speso"}
@@ -158,7 +152,6 @@ export default function WalletTab() {
                 </p>
               </div>
 
-              {/* Icona */}
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center bg-red-100 `}>
                 <ArrowTrendingDownIcon
@@ -204,14 +197,12 @@ export default function WalletTab() {
               Risparmia con i pacchetti prepagati
             </h3>
 
-            {/* Sottotitolo */}
             <p className="text-vigil-orange text-sm font-medium opacity-80 mb-5">
               Ottieni fino al 30% di bonus ricaricando il tuo wallet
             </p>
 
-            {/* Bottone */}
             <Link
-              href={Routes.wallet.url || "#"}
+              href={Routes.wallet.url}
               className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300">
               Scopri i pacchetti
               <ChevronRightIcon
