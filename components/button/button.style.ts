@@ -20,10 +20,13 @@ const vigilBtnStyle =
 const consumerBtnStyle =
   "shadow border-consumer-blue rounded-4xl bg-consumer-blue text-white hover:text-consumer-blue hover:bg-consumer-light-blue focus-within:border-consumer-blue focus-within:ring-1 focus-within:ring-consumer-blue";
 
+  
+  const walletBtnStyle ="bg-white text-consumer-blue border-transparent hover:bg-gray-50 focus:ring-white/50 shadow-sm font-semibold py-2.5";
 export const ButtonStyle = {
   baseBtnStyle,
   primaryBtnStyle,
   secondaryBtnStyle,
+  walletBtnStyle,
   consumerBtnStyle,
   textBtnStyle,
   vigilBtnStyle,
