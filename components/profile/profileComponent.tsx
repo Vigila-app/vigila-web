@@ -6,9 +6,8 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { StorageUtils } from "@/src/utils/storage.utils";
-import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
-import { TabI } from "@/components/tabGroup/tabGroup";
+import { TabItem } from "@/components/tabGroup/tabGroup";
 import PanoramicaTab from "@/app/vigil/tabs/panoramica";
 import PrenotationTabs from "@/app/vigil/tabs/prenotazioni";
 import InformazioniTab from "@/app/vigil/tabs/informazioni";
@@ -38,7 +37,10 @@ import WalletTab from "@/app/(consumer)/tabs/walletTab";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
-  const [tab, setTab] = useQueryState("tab");
+  
+  const [tab, setTab] = useQueryState("tab", { defaultValue: "panoramica" });
+  const currentTabId = tab || "panoramica";
+
   const { consumers } = useConsumerStore();
   const { vigils } = useVigilStore();
   const { showToast } = useAppStore();
@@ -50,7 +52,8 @@ const ProfileComponent = () => {
   const vigil = vigils?.find((v) => v.id === user?.id);
 
   const pendingBookings = bookings.filter((b) => b.status === "pending");
-  const tabs: TabI[] = [
+
+  const tabs: TabItem[] = [
     {
       label: <UserIcon className="size-6" />,
       id: "panoramica",
@@ -69,10 +72,6 @@ const ProfileComponent = () => {
     },
     ...(isVigil
       ? [
-          // {
-          //   label: <ClockIcon className="size-6" />,
-          //   id: "disponibilita",
-          // },
           {
             label: <BriefcaseIcon className="size-6" />,
             id: "servizi",
@@ -83,7 +82,6 @@ const ProfileComponent = () => {
             label: <UserGroupIcon className="size-6" />,
             id: "famiglia",
           },
-
           { label: <WalletIcon className="size-6" />, id: "wallet" },
         ]),
     {
@@ -96,13 +94,6 @@ const ProfileComponent = () => {
     },
   ];
 
-  const [selectedTab, setSelectedTab] = useState<TabI>(); //per avere tab attive
-
-  useEffect(() => {
-    setSelectedTab(tabs.find((t) => t.id === tab) || tabs[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
-
   const formatRole = (role: string) => {
     if (!role) return "";
     return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
@@ -114,11 +105,6 @@ const ProfileComponent = () => {
   ) => {
     try {
       if (file && user?.id) {
-        /*         const resizedImg = (await resizeImage(
-          base64ProfilePic,
-          150,
-          150
-        )) as string; */
         await StorageUtils.uploadFile("profile-pics", file, user.id, metadata);
         forceUserUpdate();
         showToast({
@@ -133,6 +119,8 @@ const ProfileComponent = () => {
       console.error(error);
     }
   };
+
+  // --- RENDER CONSUMER ---
   if (isConsumer) {
     return (
       <div>
@@ -150,8 +138,8 @@ const ProfileComponent = () => {
                   />
                 </div>
                 <div className="flex-1 ">
-                  <section className="flex flex-col items-center gap-2  ">
-                    <h1 className="text-3xl font-bold  text-center">
+                  <section className="flex flex-col items-center gap-2">
+                    <h1 className="text-3xl font-bold text-center">
                       {consumer?.displayName}
                     </h1>
                     <span className="text-gray-500 font-medium flex items-center text-center">
@@ -161,7 +149,7 @@ const ProfileComponent = () => {
                       {consumer?.address?.name ? (
                         <div className="inline-flex items-center flex-nowrap gap-1">
                           <MapPinIcon className="size-4 text-vigil-orange" />
-                          <span className="text-xs font-medium  text-gray-700 overflow-hidden whitespace-nowrap text-ellipsis max-w-3xs md:max-w-md">
+                          <span className="text-xs font-medium text-gray-700 overflow-hidden whitespace-nowrap text-ellipsis max-w-3xs md:max-w-md">
                             {`${consumer?.address?.address?.road ?? consumer?.address?.display_name}, ${consumer?.address?.address?.suburb ?? ""}, ${consumer?.address?.address?.town ?? ""}, ${consumer?.address?.address?.county ?? ""} `}
                           </span>
                         </div>
@@ -181,25 +169,22 @@ const ProfileComponent = () => {
                   </section>
                 </div>
               </div>
+              
+              {/* --- TAB GROUP E CONTENUTI CONSUMER --- */}
               <div className="mt-2 w-full">
                 <TabGroup
-                  role={role}
-                  tabs={tabs.map((t) => ({
-                    ...t,
-                    active: t.id === tab,
-                  }))}
-                  onTabChange={(tab) => setTab(tab.id as string)}
+                  variant="icons"
+                  tabs={tabs}
+                  selectedId={currentTabId}
+                  onChange={(id:string) => setTab(id)}
                 />
-                {selectedTab?.id === "panoramica" && <PanoramicaConsumerTab />}
-                {selectedTab?.id === "prenotazioni" && (
-                  <PrenotazioniConsumerTabs />
-                )}
-                {selectedTab?.id === "famiglia" && <FamigliaTab />}
-                {selectedTab?.id === "recensioni" && <RecensioniTab />}
-                {selectedTab?.id === "informazioni" && (
-                  <InformazioniConsumerTab />
-                )}
-                {selectedTab?.id === "wallet" && <WalletTab />}
+                
+                {currentTabId === "panoramica" && <PanoramicaConsumerTab />}
+                {currentTabId === "prenotazioni" && <PrenotazioniConsumerTabs />}
+                {currentTabId === "famiglia" && <FamigliaTab />}
+                {currentTabId === "recensioni" && <RecensioniTab />}
+                {currentTabId === "informazioni" && <InformazioniConsumerTab />}
+                {currentTabId === "wallet" && <WalletTab />}
               </div>
             </div>
           </div>
@@ -207,6 +192,8 @@ const ProfileComponent = () => {
       </div>
     );
   }
+
+  // --- RENDER VIGIL ---
   return (
     <div>
       <div className="max-w-7xl mx-auto">
@@ -224,7 +211,7 @@ const ProfileComponent = () => {
               </div>
               <div className="md:flex-1 ">
                 <section className="flex flex-col items-center gap-2 ">
-                  <h1 className="text-3xl font-boldtext-center">
+                  <h1 className="text-3xl font-bold text-center">
                     {vigil?.displayName}
                   </h1>
                   <span className="text-gray-500 font-medium flex items-center text-center">
@@ -259,22 +246,21 @@ const ProfileComponent = () => {
                 </section>
               </div>
             </div>
+            
             <div className="mt-2 w-full">
               <TabGroup
-                role={role}
-                align="center"
-                tabs={tabs.map((t) => ({
-                  ...t,
-                  active: t.id === tab,
-                }))}
-                onTabChange={(tab) => setTab(tab.id as string)}
+                variant="icons"
+                tabs={tabs}
+                selectedId={currentTabId}
+                onChange={(id:string) => setTab(id)}
               />
-              {selectedTab?.id === "panoramica" && <PanoramicaTab />}
-              {selectedTab?.id === "prenotazioni" && <PrenotationTabs />}
-              {selectedTab?.id === "informazioni" && <InformazioniTab />}
-              {/* {selectedTab.id === "disponibilita" && <DisponibilitaTab />} */}
-              {selectedTab?.id === "servizi" && <ServiziTab />}
-              {selectedTab?.id === "recensioni" && <RecensioniTab />}
+
+              {/* Contenuto Condizionale VIGIL */}
+              {currentTabId === "panoramica" && <PanoramicaTab />}
+              {currentTabId === "prenotazioni" && <PrenotationTabs />}
+              {currentTabId === "servizi" && <ServiziTab />}
+              {currentTabId === "recensioni" && <RecensioniTab />}
+              {currentTabId === "informazioni" && <InformazioniTab />}
             </div>
           </div>
         </div>
