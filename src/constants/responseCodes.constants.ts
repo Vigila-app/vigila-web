@@ -97,6 +97,21 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   WALLET_TOP_UP_METHOD_NOT_ALLOWED: {
     code: 8306,
   },
+  WALLET_TRANSACTIONS_SUCCESS: {
+    code: 8311,
+  },
+  WALLET_TRANSACTIONS_ERROR: {
+    code: 8312,
+  },
+  WALLET_TRANSACTIONS_BAD_REQUEST: {
+    code: 8313,
+  },
+  WALLET_TRANSACTIONS_UNAUTHORIZED: {
+    code: 8314,
+  },
+  WALLET_TRANSACTIONS_NOT_FOUND: {
+    code: 8315,
+  },
   WALLET_WEBHOOK_DUPLICATE: {
     code: 8307,
   },
