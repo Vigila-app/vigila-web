@@ -1,59 +1,61 @@
 {
   "wallet_bundles": [
     {
-      "id": 1,
-      "name": "Starter",
-      "description": "Ricarica base con piccolo bonus",
+      "id": "starter_1",
+      "name": "STARTER",
       "price": 50,
-      "credit_amount": 55,
       "bonus_percentage": 10,
-      "savings": 5,
+      "credit_amount": 55,
       "features": [
         "Credito immediato disponibile",
         "Nessuna scadenza",
         "Utilizzo flessibile",
         "Storico movimenti"
-      ],
-      "is_active": true,
-      "is_popular": false
+      ]
     },
     {
-      "id": 2,
-      "name": "Family",
-      "description": "Pacchetto famiglia con bonus elevato e condivisione",
-      "price": 500,
-      "credit_amount": 650,
-      "bonus_percentage": 30,
-      "savings": 150,
-      "features": [
-        "Credito immediato disponibile",
-        "Nessuna scadenza",
-        "Utilizzo flessibile",
-        "Storico movimenti",
-        "Priorità nelle prenotazioni",
-        "Supporto dedicato 24/7",
-        "Condivisione con familiari"
-      ],
-      "is_active": true,
-      "is_popular": false
-    },
-    {
-      "id": 3,
-      "name": "Standard",
-      "description": "Pacchetto standard bilanciato",
+      "id": "standard_1",
+      "name": "STANDARD",
       "price": 100,
-      "credit_amount": 120,
       "bonus_percentage": 20,
-      "savings": 20,
+      "credit_amount": 120,
       "features": [
         "Credito immediato disponibile",
         "Nessuna scadenza",
         "Utilizzo flessibile",
         "Storico movimenti",
         "Priorità nelle prenotazioni"
-      ],
-      "is_active": true,
-      "is_popular": true
+      ]
+    },
+    {
+      "id": "premium_1",
+      "name": "PREMIUM",
+      "price": 200,
+      "bonus_percentage": 25,
+      "credit_amount": 250,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni",
+        "Supporto dedicato 24/7"
+      ]
+    },
+    {
+      "id": "family_1",
+      "name": "FAMILY",
+      "price": 500,
+      "bonus_percentage": 30,
+      "credit_amount": 650,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni",
+        "Supporto dedicato 24/7"
+      ]
     }
   ]
 }
