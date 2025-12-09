@@ -7,7 +7,7 @@ import PanoramicaTab from "../../tabs/panoramica";
 import ServiziTab from "../../tabs/servizi";
 import RecensioniTab from "../../tabs/recensioni";
 import { useEffect, useState } from "react";
-import { TabI } from "@/components/tabGroup/tabGroup";
+import { TabItem } from "@/components/tabGroup/tabGroup";
 import { BriefcaseIcon, StarIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useQueryState } from "nuqs";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
@@ -29,7 +29,7 @@ const VigilProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId]);
 
-  const tabs: TabI[] = [
+  const tabs: TabItem[] = [
     {
       label: <UserIcon className="size-6" />,
       id: "panoramica",
@@ -43,11 +43,11 @@ const VigilProfile = () => {
     {
       label: <StarIcon className="size-6" />,
       id: "recensioni",
-      simplified: true,
+      // simplified: true, // TabItem non ha questa proprietà, rimuovila o estendi il tipo
     },
   ];
 
-  const [selectedTab, setSelectedTab] = useState<TabI>(); //per avere tab attive
+  const [selectedTab, setSelectedTab] = useState<TabItem>(); //per avere tab attive
 
   useEffect(() => {
     setSelectedTab(tabs.find((t) => t.id === tab) || tabs[0]);
@@ -110,12 +110,9 @@ const VigilProfile = () => {
             </div>
             <div className="mt-2 w-full">
               <TabGroup 
-                role={role}
-                tabs={tabs.map((t) => ({
-                  ...t,
-                  active: t.id === tab,
-                }))}
-                onTabChange={(tab) => setTab(tab.id as string)}
+                selectedId={tab || tabs[0].id}
+                tabs={tabs}
+                onChange={(id) => setTab(id)}
               />
               {selectedTab?.id === "panoramica" && <PanoramicaTab />}
               {selectedTab?.id === "servizi" && <ServiziTab />}
