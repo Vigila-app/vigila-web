@@ -1,6 +1,5 @@
 "use client";
 import { ButtonLink } from "@/components";
-import { ButtonStyle } from "@/components/button/button.style";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { Routes } from "@/src/routes";
 import { BundleCatalogType } from "@/src/types/wallet.types";
