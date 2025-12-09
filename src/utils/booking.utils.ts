@@ -175,7 +175,11 @@ export const BookingUtils = {
     }
   },
 
-  refundByWalletId: async (walletId, price) => {
+  refundByWalletId: async (
+    walletId: string,
+    price: number,
+    bookingId: string
+  ) => {
     const supabase = getAdminClient()
 
     const { error: refundError } = await supabase
@@ -185,7 +189,7 @@ export const BookingUtils = {
         amount: price,
         type: EXPENSE_TYPE.DEBIT, //or refund type?
         status: TRANSACTION_STATUS.COMPLETED,
-        description: `Rimborso prenotazione non andata a buon fine #${booking.id}`,
+        description: `Rimborso prenotazione non andata a buon fine #${bookingId}`,
         created_at: new Date().toISOString(),
       })
     if (refundError) {

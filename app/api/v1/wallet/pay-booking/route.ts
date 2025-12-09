@@ -157,7 +157,8 @@ export async function POST(req: NextRequest) {
       //This means we don't need to work with Stripe, but just reset the balance on the wallet.
       const refundError = await BookingUtils.refundByWalletId(
         wallet.id,
-        priceCents
+        priceCents,
+        booking.id
       ) //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
@@ -184,7 +185,8 @@ export async function POST(req: NextRequest) {
       console.error("Error updating booking status:", updateError)
       const refundError = await BookingUtils.refundByWalletId(
         wallet.id,
-        priceCents
+        priceCents,
+        booking.id
       ) //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
