@@ -44,6 +44,7 @@ const transportationOptions = [
 
 // Occupazioni che richiedono documentazione
 const OCCUPATIONS_REQUIRING_DOCUMENTATION = [
+  OccupationEnum.OSA,
   OccupationEnum.OSS,
   OccupationEnum.NURSE,
 ];
