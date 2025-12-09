@@ -13,7 +13,7 @@ export const isValidTransactionType = function (
   return Object.values(TRANSACTION_TYPE).includes(str as TRANSACTION_TYPE)
 }
 
-enum TRANSACTION_STATUS {
+export enum TRANSACTION_STATUS {
   "PENDING",
   "COMPLETED",
   "FAILED",
