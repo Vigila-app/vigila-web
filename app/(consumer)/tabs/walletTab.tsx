@@ -10,7 +10,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { Routes } from "@/src/routes";
 import { useUserStore } from "@/src/store/user/user.store";
-import { PaymentService } from "@/src/services";
 import { TabItem } from "@/components/tabGroup/tabGroup";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
 import TransactionCardComponent from "@/components/wallet/transactionCardComponent";
