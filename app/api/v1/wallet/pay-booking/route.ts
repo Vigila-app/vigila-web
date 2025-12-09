@@ -62,11 +62,22 @@ export async function POST(req: NextRequest) {
           });
     }
 
-    if (booking.status === 'PAID' || booking.payment_status === PaymentStatusEnum.PAID) {
+    if (booking.status === 'PAID' && booking.payment_status === PaymentStatusEnum.PAID) {
         return jsonErrorResponse(400, {
             code: ResponseCodesConstants.GENERIC_ERROR.code,
             success: false,
             message: "Booking is already paid",
+        });
+    }
+    // Inconsistent state: one field is PAID, the other is not
+    if (
+        (booking.status === 'PAID' && booking.payment_status !== PaymentStatusEnum.PAID) ||
+        (booking.status !== 'PAID' && booking.payment_status === PaymentStatusEnum.PAID)
+    ) {
+        return jsonErrorResponse(500, {
+            code: ResponseCodesConstants.INTERNAL_SERVER_ERROR.code,
+            success: false,
+            message: "Booking payment status is inconsistent. Please contact support.",
         });
     }
 
