@@ -76,8 +76,6 @@ const ServiceCard = (props: ServiceCardI) => {
     [service?.info?.catalog_id]
   );
 
-  console.log("vigilDetails", vigilDetails);
-
   return (
     <Card
       customClass={clsx("py-4", !service.active && "!bg-gray-100")}
