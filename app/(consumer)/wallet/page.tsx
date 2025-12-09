@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import { BundleCard } from "@/components/wallet/bundleCard.component";
+import { WalletPaymentComponent } from "@/components/wallet/walletPaymentComponent";
 
 const WalletLanding = () => {
   const steps = [
@@ -75,7 +76,17 @@ const WalletLanding = () => {
   const [selectedBundle, setSelectedBundle] =
     useState<BundleCatalogType | null>(null);
 
-  
+  useEffect(() => {
+    if (selectedBundle) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedBundle]);
+
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center py-10 px-4">
       <div className="max-w-[380px] w-full ">
@@ -168,10 +179,26 @@ const WalletLanding = () => {
             primary={false}
             iconPosition="right"
             role={RolesEnum.CONSUMER}
-            href={Routes.walletBundles.url}
+            href={Routes.home.url}
           />
         </div>
       </div>
+      {selectedBundle && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <WalletPaymentComponent
+              paymentItem={{
+                id: selectedBundle.id,
+                name: selectedBundle.name,
+                price: selectedBundle.price,
+                creditAmount: selectedBundle.credit_amount,
+                metadataType: "wallet_bundle",
+              }}
+              onCancel={() => setSelectedBundle(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
