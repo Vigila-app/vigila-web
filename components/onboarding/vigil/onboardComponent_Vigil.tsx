@@ -2,6 +2,7 @@
 
 import { Button } from "@/components";
 import { Input, TextArea } from "@/components/form";
+import Select from "@/components/form/select";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -18,8 +19,9 @@ import clsx from "clsx";
 import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import { ServiceI } from "@/src/types/services.types";
-import { XCircleIcon } from "@heroicons/react/24/outline";
-import { AuthService, UserService } from "@/src/services";
+import { ExclamationTriangleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { AuthService } from "@/src/services";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
 
 type OnboardFormI = {
   birthday: string;
@@ -40,6 +42,12 @@ const transportationOptions = [
   { label: "Trasporto pubblico", value: "public" },
 ];
 
+// Occupazioni che richiedono documentazione
+const OCCUPATIONS_REQUIRING_DOCUMENTATION = [
+  OccupationEnum.OSS,
+  OccupationEnum.NURSE,
+];
+
 const VigilOnboardComponent = () => {
   const {
     showToast,
@@ -56,6 +64,7 @@ const VigilOnboardComponent = () => {
     formState: { errors, isValid },
     handleSubmit,
     setValue,
+    watch,
   } = useForm<OnboardFormI>();
 
   const redirectHome = () => {
@@ -75,6 +84,8 @@ const VigilOnboardComponent = () => {
     setValue("addresses", addresses);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses]);
+
+  const watchedOccupation = watch("occupation");
 
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
@@ -127,7 +138,7 @@ const VigilOnboardComponent = () => {
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({
-        message: "Sorry, something went wrong",
+        message: "Qualcosa è andato storto",
         type: ToastStatusEnum.ERROR,
       });
     } finally {
@@ -149,7 +160,8 @@ const VigilOnboardComponent = () => {
           </section>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 ">
+            className="w-full mx-auto max-w-lg space-y-10 py-8 px-2 "
+          >
             <Controller
               name="birthday"
               control={control}
@@ -213,21 +225,50 @@ const VigilOnboardComponent = () => {
               )}
             />
 
-            {/* TODO change into Select */}
             <Controller
               name="occupation"
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <Input
-                  {...field}
-                  role={role}
-                  label="Occupazione"
-                  placeholder="Es. Studente, Impiegato..."
-                  required
-                  error={errors.occupation}
-                  aria-invalid={!!errors.occupation}
-                />
+                <>
+                  <Select
+                    {...field}
+                    role={role}
+                    label="Occupazione"
+                    placeholder="Seleziona la tua occupazione"
+                    required
+                    error={errors.occupation}
+                    options={Object.values(OccupationEnum).map((value) => ({
+                      value,
+                      label: OccupationLabels[value],
+                    }))}
+                  />
+                  {field.value &&
+                    OCCUPATIONS_REQUIRING_DOCUMENTATION.includes(
+                      field.value as OccupationEnum
+                    ) && (
+                      <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div className="flex gap-2 items-center">
+                          <ExclamationTriangleIcon className="size-5 min-w-4 text-amber-800" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-amber-800">
+                              Documentazione richiesta
+                            </p>
+                            <p className="text-sm text-amber-700 mt-1">
+                              Per l&apos;occupazione selezionata sarà necessario
+                              inviare la documentazione certificata che attesta
+                              la tua qualifica professionale.
+                            </p>
+                            <p className="text-sm text-amber-700 mt-1">
+                              I servizi professionali verrano attivati solo dopo
+                              la verifica della documentazione da parte del
+                              nostro team.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                </>
               )}
             />
 
@@ -236,6 +277,9 @@ const VigilOnboardComponent = () => {
               name="addresses"
               control={control}
               defaultValue={[]}
+              rules={{
+                validate: (value) => value.length > 0,
+              }}
               render={() => (
                 <div>
                   <SearchAddress
@@ -247,19 +291,20 @@ const VigilOnboardComponent = () => {
                             (a) => a.display_name === address.display_name
                           )
                         )
-                          return prev;
-                        return [...prev, address];
-                      });
+                          return prev
+                        return [...prev, address]
+                      })
                     }}
                     placeholder="Inserisci la città con il CAP"
                     label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
                   />
                   {addresses.length ? (
-                    <ul className="mt-2 pl-4 text-sm text-gray-700 space-y-1">
+                    <ul className="mt-2 pl-4 text-sm  space-y-1">
                       {addresses.map((addr, i) => (
                         <li
                           key={i}
-                          className="w-full inline-flex items-center gap-2 text-black text-xs">
+                          className="w-full inline-flex items-center gap-2 text-black text-sm"
+                        >
                           <span>
                             {(addr?.address
                               ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
@@ -270,10 +315,11 @@ const VigilOnboardComponent = () => {
                             onClick={() => {
                               setAddresses((prev) =>
                                 prev.filter((_, index) => index !== i)
-                              );
+                              )
                             }}
                             className="text-red-500 hover:text-red-700 font-bold"
-                            aria-label="Rimuovi indirizzo">
+                            aria-label="Rimuovi indirizzo"
+                          >
                             <XCircleIcon className="size-3" />
                           </button>
                         </li>
@@ -282,7 +328,7 @@ const VigilOnboardComponent = () => {
                   ) : null}
 
                   {errors.addresses && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-xs">
                       Seleziona almeno un indirizzo
                     </p>
                   )}
@@ -301,7 +347,8 @@ const VigilOnboardComponent = () => {
                       "block font-medium mb-1",
                       role === RolesEnum.VIGIL && "text-vigil-orange",
                       role === RolesEnum.CONSUMER && "text-consumer-blue"
-                    )}>
+                    )}
+                  >
                     Mezzo di trasporto
                   </label>
                   <div className="space-y-2">
@@ -315,8 +362,8 @@ const VigilOnboardComponent = () => {
                       />
                     ))}
                     {errors.transportation && (
-                      <p className="text-red-500 text-sm">
-                        Seleziona un&apos;opzione
+                      <p className="text-red-500 text-xs">
+                        Seleziona un&apos;opzione di trasporto
                       </p>
                     )}
                   </div>
@@ -339,7 +386,6 @@ const VigilOnboardComponent = () => {
                 />
               )}
             />
-            {/* TODO chiedere se si deve collegare il field e aggiornare il form con onchange  */}
             <Controller
               name="services"
               control={control}
@@ -347,6 +393,7 @@ const VigilOnboardComponent = () => {
               render={({ field }) => (
                 <ServicesCatalog
                   role={role}
+                  occupation={watchedOccupation}
                   selectedServices={field.value || []}
                   onServicesChange={handleServicesChange}
                 />
@@ -367,7 +414,7 @@ const VigilOnboardComponent = () => {
         </div>
       </Card>
     </div>
-  );
+  )
 };
 
 export default VigilOnboardComponent;

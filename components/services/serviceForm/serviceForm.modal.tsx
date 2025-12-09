@@ -1,3 +1,5 @@
+"use client"
+
 import { ModalBase } from "@/components/@core/modal";
 import ServiceFormComponent, {
   ServiceFormI,

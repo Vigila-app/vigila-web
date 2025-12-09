@@ -12,8 +12,9 @@ import { amountDisplay, replaceDynamicUrl } from "@/src/utils/common.utils";
 import { useMemo, useState } from "react";
 import {
   CalendarIcon,
+  ExclamationTriangleIcon,
   EyeIcon,
-  HeartIcon,
+  // HeartIcon,
   MapPinIcon,
 } from "@heroicons/react/24/outline";
 import { dateDisplay } from "@/src/utils/date.utils";
@@ -21,6 +22,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import clsx from "clsx";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesService } from "@/src/services";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
 
 type ServiceCardI = {
   service: ServiceI;
@@ -74,10 +76,13 @@ const ServiceCard = (props: ServiceCardI) => {
     [service?.info?.catalog_id]
   );
 
+  console.log("serviceCatalog", serviceCatalog);
+
   return (
     <Card
       customClass={clsx("py-4", !service.active && "!bg-gray-100")}
-      containerClass="space-y-2">
+      containerClass="space-y-2"
+    >
       {!simplified ? (
         <div className="inline-flex flex-nowrap gap-4 w-full">
           <Avatar
@@ -104,7 +109,12 @@ const ServiceCard = (props: ServiceCardI) => {
                 color="green"
               />
               {service?.vigil?.occupation ? (
-                <Badge label={service?.vigil?.occupation} color="blue" />
+                <Badge
+                  label={
+                    OccupationLabels[service.vigil.occupation as OccupationEnum]
+                  }
+                  color="blue"
+                />
               ) : null}
               {/* TODO attributes list */}
             </div>
@@ -213,18 +223,29 @@ const ServiceCard = (props: ServiceCardI) => {
               action={onEdit}
             />
           )} */}
-          {onToggleStatus && (
-            <Button
-              small
-              label={service.active ? "Disattiva" : "Attiva"}
-              type="button"
-              role={RolesEnum.CONSUMER}
-              action={onToggleStatus}
-            />
+          {onToggleStatus &&
+            (!serviceCatalog.professional ||
+              (serviceCatalog.professional && service.active)) && (
+              <Button
+                small
+                label={service.active ? "Disattiva" : "Attiva"}
+                type="button"
+                role={RolesEnum.CONSUMER}
+                action={onToggleStatus}
+              />
+            )}
+          {onToggleStatus && serviceCatalog.professional && !service.active && (
+            <div className="flex gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-amber-700 w-full items-center mb-2">
+              <ExclamationTriangleIcon className="size-4 min-w-4 text-amber-800" />
+              <div className="text-sm">
+                I servizi professionali verrano attivati solo dopo la verifica
+                della documentazione da parte del nostro team.
+              </div>
+            </div>
           )}
           {onDelete && (
             <Button
-              label="Elimina"
+              label="Rimuovi"
               type="button"
               small
               danger

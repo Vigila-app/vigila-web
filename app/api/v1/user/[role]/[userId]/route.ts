@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   jsonErrorResponse,
   authenticateUser,
@@ -11,7 +11,7 @@ import { HeadersEnum } from "@/src/enums/headers.enums";
 import { deepMerge } from "@/src/utils/common.utils";
 import { getPostgresTimestamp } from "@/src/utils/date.utils";
 
-const verifyUserAccess = async (userId: string, role: RolesEnum) => {
+const verifyUserAccess = async (userId: string, role: string) => {
   if (
     !userId ||
     (role?.toUpperCase() !== RolesEnum.CONSUMER &&
@@ -49,8 +49,8 @@ const verifyUserAccess = async (userId: string, role: RolesEnum) => {
 };
 
 export async function DELETE(
-  req: Request,
-  context: { params: Promise<{ userId: string; role: RolesEnum }> }
+  req: NextRequest,
+  context: { params: Promise<{ userId: string; role: string }> }
 ) {
   try {
     const { userId, role } = await context?.params;
@@ -110,8 +110,8 @@ export async function DELETE(
 }
 
 export async function GET(
-  req: Request,
-  context: { params: Promise<{ userId: string; role: RolesEnum }> }
+  req: NextRequest,
+  context: { params: Promise<{ userId: string; role: string }> }
 ) {
   try {
     const { userId, role } = await context?.params;
@@ -177,8 +177,8 @@ export async function GET(
 }
 
 export async function PUT(
-  req: Request,
-  context: { params: Promise<{ userId: string; role: RolesEnum }> }
+  req: NextRequest,
+  context: { params: Promise<{ userId: string; role: string }> }
 ) {
   try {
     const { userId, role } = await context?.params;
