@@ -22,6 +22,8 @@ export type ServiceCatalogItem = {
   max_hourly_rate: number;
   minimum_duration_hours: number;
   extra: ServiceCatalogExtraOption[];
+  occupation: string[];
+  professional?: boolean;
   tags: string[];
   fee: number;
 };

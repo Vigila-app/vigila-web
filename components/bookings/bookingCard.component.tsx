@@ -43,8 +43,8 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   } = useAppStore();
   const { bookings, getBookings, getBookingDetails } = useBookingsStore();
   const { consumers } = useConsumerStore();
-  const { vigils, getVigilsDetails } = useVigilStore();
-  const { services, getServiceDetails } = useServicesStore();
+  const { vigils } = useVigilStore();
+  const { services } = useServicesStore();
   const { user } = useUserStore();
 
   const isConsumer = useMemo(() => {

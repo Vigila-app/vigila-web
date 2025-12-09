@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use, useMemo } from "react";
 import { Button, Card } from "@/components";
+import Badge from "@/components/badge/badge.component";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
@@ -9,13 +10,16 @@ import { ServicesService } from "@/src/services/services.service";
 import clsx from "clsx";
 import {
   XCircleIcon,
-  PlusIcon,
-  MinusIcon,
+  ShieldCheckIcon,
+  // PlusIcon,
+  // MinusIcon,
   ShoppingCartIcon,
   UsersIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 
 type SelectedService = {
+  active: boolean;
   catalogId: number;
   name: string;
   description: string;
@@ -30,12 +34,14 @@ type SelectedService = {
 
 interface ServicesCatalogProps {
   role: RolesEnum;
+  occupation?: string;
   selectedServices: ServiceI[];
   onServicesChange: (services: ServiceI[]) => void;
 }
 
 const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   role,
+  occupation,
   onServicesChange,
 }) => {
   const [internalSelectedServices, setInternalSelectedServices] = useState<
@@ -55,6 +61,11 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
         <ShoppingCartIcon className="w-12 h-12 text-yellow-700" />
       </div>
     ),
+    "Assistenza alla persona": (
+      <div className=" bg-green-200 w-16 h-16 rounded-full p-1 flex items-center justify-center">
+        <UserIcon className="w-12 h-12 text-green-700" />
+      </div>
+    ),
   };
   // Carica il catalogo servizi
   useEffect(() => {
@@ -66,7 +77,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
     const convertedServices: Partial<ServiceI>[] = internalSelectedServices.map(
       (service) => ({
         id: service.catalogId.toString(),
-        active: true,
+        active: service.active,
         name: service.name,
         description: service.description,
         unit_price: service.unit_price,
@@ -95,6 +106,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
       currency: CurrencyEnum.EURO,
       selectedExtras: [],
       type: catalogService.type,
+      active: !catalogService.professional,
     };
 
     setInternalSelectedServices((prev) => [...prev, newService]);
@@ -138,6 +150,20 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
     );
   };
 
+  const filteredServices = useMemo(() => {
+    return servicesCatalog
+      .filter((service: ServiceCatalogItem) => {
+        // Se non c'è un'occupazione selezionata non mostrare i servizi
+        if (!occupation) return false;
+        
+        // Se il servizio non ha requisiti di occupazione, è disponibile per tutti
+        if (!service.occupation || service.occupation.length === 0) return true;
+        
+        // Altrimenti, verifica se l'occupazione corrente è tra quelle richieste
+        return service.occupation.includes(occupation);
+      });
+  }, [occupation, servicesCatalog]);
+
   return (
     <div className="space-y-8">
       <div>
@@ -152,24 +178,48 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
 
         {/* Catalogo servizi disponibili */}
         <div className="grid gap-6 mb-8">
-          {servicesCatalog.map((catalogService: ServiceCatalogItem) => (
+          {!occupation && (
+            <p className="text-gray-500 text-center py-8">
+              Seleziona la tua occupazione per visualizzare i servizi
+              disponibili.
+            </p>
+          )}
+          {occupation && filteredServices.length === 0 && (
+            <p className="text-gray-500 text-center py-8">
+              Nessun servizio disponibile per la tua occupazione al momento.
+            </p>
+          )}
+          {occupation && filteredServices.map((catalogService: ServiceCatalogItem) => (
             <Card key={catalogService.id}>
               <div className="flex flex-col justify-between  ">
                 <div className="flex-1 mb-4">
-                  <p className="font-semibold text-xl text-consumer-blue mb-4">
-                    {catalogService.name}
-                  </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="font-semibold text-xl text-consumer-blue">
+                      {catalogService.name}
+                    </p>
+                    {catalogService.professional && (
+                      <Badge
+                        label={
+                          <span className="inline-flex gap-1 items-center">
+                            <ShieldCheckIcon className="size-4" />
+                            Professionale
+                          </span>
+                        }
+                        color="blue"
+                      />
+                    )}
+                  </div>
 
                   <div className="flex justify-between w-full items-center">
                     {iconMap[catalogService.name] || ""}
                     <div className="flex flex-col gap-1 text-[16px] font-medium justify-center items-end">
                       <div className="flex  gap-2">
                         <span>
-                          {/* €{catalogService.min_hourly_rate}- */}€
-                          {catalogService.max_hourly_rate}/ora
+                          {/* €{catalogService.min_hourly_rate}- */}
+                          €{catalogService.max_hourly_rate}/ora
                         </span>
                         <span>
-                          Min. {catalogService.minimum_duration_hours}h
+                          Min.&nbsp;{catalogService.minimum_duration_hours}h
                         </span>
                       </div>
                       {/* <span className="text-[16px] text-gray-600">
@@ -185,7 +235,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                   {catalogService.extra.length > 0 && (
                     <div className="mt-2">
                       <span className="text-sm text-gray-500">
-                        Opzioni extra disponibili:{" "}
+                        Opzioni extra disponibili:&nbsp;
                         {catalogService.extra
                           .map((e: any) => `${e.name} €${e.fixed_price}`)
                           .join(", ")}
@@ -329,7 +379,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           </div>
         )}
 
-        {internalSelectedServices.length === 0 && (
+        {occupation && filteredServices?.length && internalSelectedServices.length === 0 && (
           <p className="text-gray-500 text-center py-8">
             Seleziona almeno un servizio dal catalogo sopra
           </p>

@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Compagnia e conversazione",
-      "description": "Presenza, dialogo, sorveglianza leggera.",
+      "description": "Presenza in casa, dialogo, lettura, giochi e piccole attività di socializzazione, con una sorveglianza di buon senso ma senza igiene personale o aiuti alla mobilità.",
       "long_description": "<p>Il servizio di <strong>compagnia e conversazione</strong> offre una presenza rassicurante e coinvolgente per chi ha bisogno di socializzazione e supporto emotivo.</p><ul><li><em>Presenza attiva</em> e dialogo stimolante</li><li>Sorveglianza discreta e non invasiva</li><li>Supporto emotivo e ascolto attivo</li><li>Attività di intrattenimento leggero</li></ul><p>Ideale per persone anziane, convalescenti o chiunque abbia bisogno di compagnia qualificata.</p>",
       "type": "companionship",
       "recommended_hourly_rate": 9,
@@ -11,6 +11,8 @@
       "max_hourly_rate": 9,
       "minimum_duration_hours": 1,
       "extra": [],
+      "occupation": [],
+      "professional": false,
       "tags": [
         "compagnia",
         "conversazione",
@@ -26,7 +28,7 @@
     {
       "id": 2,
       "name": "Assistenza leggera",
-      "description": "Include piccole commissioni, accompagnamento a piedi, aiuto pasti, rassetto e compagnia attiva.",
+      "description": "Compagnia e piccolo supporto nella quotidianità: riordino leggero, pasti semplici, promemoria farmaci, brevi accompagnamenti e commissioni, senza interventi diretti su igiene e spostamenti complessi.",
       "long_description": "<p>Il servizio di <strong>assistenza leggera</strong> comprende un supporto pratico quotidiano per mantenere l'autonomia e il benessere della persona assistita.</p><h4>Servizi inclusi:</h4><ul><li><strong>Piccole commissioni:</strong> spesa, farmacia, uffici pubblici</li><li><strong>Accompagnamento a piedi:</strong> passeggiate, visite mediche, attività sociali</li><li><strong>Supporto ai pasti:</strong> preparazione, servizio e compagnia durante i pasti</li><li><strong>Rassetto domestico:</strong> pulizie leggere e riordino degli spazi</li><li><strong>Compagnia attiva:</strong> conversazione, lettura, giochi da tavolo</li></ul><p><em>Perfetto per chi ha bisogno di un supporto pratico ma mantiene una buona autonomia.</em></p>",
       "type": "light_assistance",
       "recommended_hourly_rate": 10,
@@ -42,6 +44,8 @@
           "note": "Distanza massima 25km"
         }
       ],
+      "occupation": [],
+      "professional": false,
       "tags": [
         "assistenza",
         "commissioni",
@@ -49,6 +53,34 @@
         "pasti",
         "rassetto",
         "light_assistance",
+        "errands",
+        "meals",
+        "cleaning",
+        "assistance"
+      ],
+      "fee": 2
+    },
+    {
+      "id": 3,
+      "name": "Assistenza alla persona",
+      "description": "Supporto diretto alla persona: igiene quotidiana semplice, aiuto nella vestizione, trasferimenti letto–sedia non complessi, accompagnamento in bagno, pasti assistiti e sicurezza negli spostamenti per anziani fragili ma ancora collaboranti.",
+      "long_description": "<p>Il servizio di <strong>assistenza alla persona</strong> offre un supporto completo e qualificato per le esigenze quotidiane di igiene e mobilità.</p><h4>Servizi inclusi:</h4><ul><li><strong>Igiene personale:</strong> assistenza nella cura quotidiana, bagno, doccia</li><li><strong>Vestizione:</strong> aiuto nel vestirsi e svestirsi</li><li><strong>Trasferimenti:</strong> supporto nei movimenti letto-sedia e viceversa</li><li><strong>Accompagnamento in bagno:</strong> assistenza sicura e discreta</li><li><strong>Pasti assistiti:</strong> supporto durante i pasti per garantire una corretta alimentazione</li></ul><p><em>Ideale per persone anziane o con disabilità che necessitano di un'assistenza diretta e qualificata.</em></p>",
+      "type": "personal_assistance",
+      "recommended_hourly_rate": 12,
+      "min_hourly_rate": 12,
+      "max_hourly_rate": 12,
+      "minimum_duration_hours": 1,
+      "extra": [],
+      "occupation": [],
+      "professional": false,
+      "tags": [
+        "assistenza",
+        "persona",
+        "oss",
+        "accompagnamento",
+        "pasti",
+        "rassetto",
+        "personal_assistance",
         "errands",
         "meals",
         "cleaning",

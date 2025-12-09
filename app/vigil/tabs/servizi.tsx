@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components";
 import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
@@ -12,11 +12,13 @@ import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesService } from "@/src/services";
 import { useParams } from "next/navigation";
+import { useVigilStore } from "@/src/store/vigil/vigil.store";
 
 const ServiziTab = () => {
   const params = useParams();
   const vigilIdFromParams = params?.vigilId as string | undefined;
   const { user } = useUserStore();
+  const { vigils } = useVigilStore();
   const vigilId =
     user?.user_metadata?.role === RolesEnum.VIGIL
       ? user?.id
@@ -31,6 +33,10 @@ const ServiziTab = () => {
   );
   const [pendingStatusValue, setPendingStatusValue] = useState<boolean | null>(
     null
+  );
+  const vigil = useMemo(
+    () => vigils.find((v) => v.id === vigilId),
+    [vigils, vigilId]
   );
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
   const reloadServices = (fullReload = true) => {
@@ -177,6 +183,7 @@ const ServiziTab = () => {
                   <ServicesCatalog
                     role={user?.user_metadata?.role as RolesEnum}
                     selectedServices={services}
+                    occupation={vigil?.occupation}
                     onServicesChange={(services) => {
                       if (services.length) {
                         setNewService((prev) => {
