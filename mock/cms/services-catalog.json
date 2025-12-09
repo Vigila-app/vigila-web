@@ -12,6 +12,7 @@
       "minimum_duration_hours": 1,
       "extra": [],
       "occupation": [],
+      "professional": false,
       "tags": [
         "compagnia",
         "conversazione",
@@ -44,6 +45,7 @@
         }
       ],
       "occupation": [],
+      "professional": false,
       "tags": [
         "assistenza",
         "commissioni",
@@ -69,8 +71,8 @@
       "max_hourly_rate": 12,
       "minimum_duration_hours": 1,
       "extra": [],
-      "occupation": ["oss", "infermiere"],
-      "professional": true,
+      "occupation": [],
+      "professional": false,
       "tags": [
         "assistenza",
         "persona",
