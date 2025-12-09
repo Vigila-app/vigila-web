@@ -75,32 +75,48 @@ export async function POST(req: NextRequest) {
     // --- LOGICA AUTO-CREAZIONE (LAZY CREATION) ---
     // Se il wallet non esiste, lo creiamo ora prima di procedere al pagamento
     if (!wallet) {
-      console.log(`Wallet missing for consumer ${consumer.id}. Creating new wallet...`);
+      console.log(`Wallet missing for consumer ${consumer.id}. Creating new wallet (with upsert)...`);
       
-      const { data: newWallet, error: createError } = await _admin
+      // Try to insert, but ignore if already exists (upsert)
+      const { error: createError } = await _admin
         .from("wallets")
         .insert({
-          consumer_id: consumer.id, // <--- FIX: consumer_id
+          consumer_id: consumer.id,
           balance_cents: 0,
           currency: 'eur',
-          // Aggiungi qui altri campi obbligatori se il tuo DB li richiede (es. created_at, updated_at)
-        })
-        .select("id, consumer_id, balance_cents, currency")
-        .single();
+          // Add other required fields if needed
+        }, { upsert: true, onConflict: 'consumer_id' });
 
-      if (createError || !newWallet) {
-        console.error("Failed to auto-create wallet:", createError);
+      if (createError) {
+        console.error("Failed to upsert wallet:", createError);
+        // If the error is not a unique violation, fail; otherwise, continue
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
           success: false,
-          message: "Failed to create wallet for user", 
+          message: "Failed to create wallet for user",
           error: createError.message
         });
       }
-      
-      // Assegniamo il nuovo wallet alla variabile wallet per usarla dopo
-      wallet = newWallet;
-      console.log(`Wallet created successfully: ${wallet.id}`);
+
+      // Fetch the wallet again (should exist now)
+      const { data: fetchedWallet, error: fetchError } = await _admin
+        .from("wallets")
+        .select("id, consumer_id, balance_cents, currency")
+        .eq("consumer_id", consumer.id)
+        .maybeSingle();
+
+      if (fetchError || !fetchedWallet) {
+        console.error("Failed to fetch wallet after upsert:", fetchError);
+        return jsonErrorResponse(500, {
+          code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
+          success: false,
+          message: "Failed to fetch wallet after creation",
+          error: fetchError?.message,
+        });
+      }
+
+      wallet = fetchedWallet;
+      console.log(`Wallet created or found successfully: ${wallet.id}`);
     }
 
     // 5. Stripe Customer Logic
