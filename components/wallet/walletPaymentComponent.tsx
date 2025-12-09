@@ -41,15 +41,15 @@ export const WalletPaymentComponent = ({ paymentItem, onCancel }: WalletPaymentP
         // per distinguere tra Booking e Wallet top-up.
         const response = await PaymentService.createWalletTopUpIntent({
           user: user.id,
-          amount: Math.round(paymentItem.price * 100), // Prezzo del bundle in centesimi
+          amount: Math.max(Math.round(paymentItem.price * 100), 0), // Prezzo del bundle in centesimi
           currency: "eur", // O dynamic se necessario
           // Passiamo dati extra per dire al backend/webhook che è una ricarica wallet
           metadata: {
             type: paymentItem.metadataType || "wallet_topup",
             bundleId: Number(paymentItem.id),
-            creditAmount: paymentItem.creditAmount
-          }
-        });
+            creditAmount: paymentItem.creditAmount,
+          },
+        })
 
         if (response.success) {
           setClientSecret(response.clientSecret);

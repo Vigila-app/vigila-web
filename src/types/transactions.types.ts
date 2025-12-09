@@ -6,7 +6,22 @@ enum TRANSACTION_TYPE {
   REFUND = "REFUND",
 }
 
-//helper function - check that string exists inside of enum
+/**
+ * Checks if the provided string matches any value in the `TRANSACTION_TYPE` enum.
+ * 
+ * @param str - The string to validate against the enum values.
+ * @returns `true` if the string is a valid `TRANSACTION_TYPE` enum value, `false` otherwise.
+ *          Narrows the type of `str` to `TRANSACTION_TYPE` when `true`.
+ * 
+ * @example
+ * if (isValidTransactionType(input)) {
+ *   // TypeScript now knows `input` is TRANSACTION_TYPE
+ *   processTransaction(input);
+ * }
+ * 
+ * console.log(isValidTransactionType('deposit')); // true (if exists in enum)
+ * console.log(isValidTransactionType('invalid')); // false
+ */
 export const isValidTransactionType = function (
   str: string
 ): str is TRANSACTION_TYPE {
@@ -25,6 +40,22 @@ export enum EXPENSE_TYPE {
   DEBIT = "DEBIT",
 }
 
+/**
+ * Checks if the provided string matches any value in the `EXPENSE_TYPE` enum.
+ * 
+ * @param str - The string to validate against the enum values.
+ * @returns `true` if the string is a valid `EXPENSE_TYPE` enum value, `false` otherwise.
+ *          Narrows the type of `str` to `EXPENSE_TYPE` when `true`.
+ * 
+ * @example
+ * if (isValidExpenseType(input)) {
+ *   // TypeScript now knows `input` is EXPENSE_TYPE
+ *   processTransaction(input);
+ * }
+ * 
+ * console.log(isValidExpenseType('deposit')); // true (if exists in enum)
+ * console.log(isValidExpenseType('invalid')); // false
+ */
 export const isValidExpenseType = function (str: string): str is EXPENSE_TYPE {
   return Object.values(EXPENSE_TYPE).includes(str as EXPENSE_TYPE)
 }
