@@ -5,7 +5,6 @@ import { CheckoutForm } from "@/components/checkout";
 import { useUserStore } from "@/src/store/user/user.store";
 import { PaymentService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
-import { BundleCatalogType } from "@/src/types/wallet.types"; 
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes"; 
 
