@@ -19,7 +19,7 @@ import { ButtonStyle } from "@/components/button/button.style";
 export default function WalletTab() {
   const { user } = useUserStore();
   const [loading, setLoading] = useState(true);
-  const { transactions, getTransactions, lastUpdate } = useTransactionsStore();
+  const { transactions, getTransactions } = useTransactionsStore();
 
   useEffect(() => {
     const fetchData = async () => {
