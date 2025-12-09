@@ -22,28 +22,23 @@ export async function GET(
       });
     }
 
-    // 2. User check
-    if (userObject.id !== userId) {
-      return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.WALLET_TRANSACTIONS_UNAUTHORIZED.code,
-        success: false,
-        message: "You can only access your own wallet transactions",
-      });
-    }
-
+    // 2. Authorization: Ensure the wallet belongs to the authenticated user
     const supabase = getAdminClient();
 
-    // 3. Get Wallet ID for the user
+    // 3. Get Wallet ID for the authenticated user
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("id")
-      .eq("consumer_id", userId)
+      .eq("consumer_id", userObject.id)
       .single();
 
     if (walletError || !wallet) {
-      console.error("Wallet not found for user:", userId, walletError);
-
-      return NextResponse.json({ data: [] });
+      console.error("Wallet not found for user:", userObject.id, walletError);
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.WALLET_TRANSACTIONS_UNAUTHORIZED.code,
+        success: false,
+        message: "You are not authorized to access these wallet transactions",
+      });
     }
 
     // 4. Get Transactions for the wallet
