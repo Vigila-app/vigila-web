@@ -1,0 +1,22 @@
+[
+    {
+        "id": "1",
+        "payAmount": 5.0,
+        "creditAmount": 5.0
+    },
+    {
+        "id": "2",
+        "payAmount": 10.0,
+        "creditAmount": 10.0
+    },
+    {
+        "id": "3",
+        "payAmount": 20.0,
+        "creditAmount": 21.0
+    },
+    {
+        "id": "4",
+        "payAmount": 35.0,
+        "creditAmount": 38.0
+    }
+]

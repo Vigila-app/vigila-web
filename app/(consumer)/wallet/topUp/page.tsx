@@ -10,12 +10,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 import { WalletPaymentComponent } from "@/components/wallet/walletPaymentComponent";
 
-const MOCK_OPTIONS: TopUpOption[] = [
-  { id: "1", payAmount: 5.0, creditAmount: 5.0 },
-  { id: "2", payAmount: 10.0, creditAmount: 10.0 },
-  { id: "3", payAmount: 20.0, creditAmount: 21.0 },
-  { id: "4", payAmount: 35.0, creditAmount: 38.0 },
-];
+import MOCK_OPTIONS from "@/mock/cms/wallet-topup-options.json"
 
 export default function WalletTopUp() {
   const [selectedId, setSelectedId] = useState<string | null>(null);

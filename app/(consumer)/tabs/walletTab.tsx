@@ -15,77 +15,79 @@ import { useTransactionsStore } from "@/src/store/transactions/transactions.stor
 import TransactionCardComponent from "@/components/wallet/transactionCardComponent";
 import Link from "next/link";
 import { ButtonStyle } from "@/components/button/button.style";
+import { amountDisplay } from "@/src/utils/common.utils"
+import {
+  isValidExpenseType,
+  isValidTransactionType,
+} from "@/src/types/transactions.types"
 
 export default function WalletTab() {
-  const { user } = useUserStore();
-  const [loading, setLoading] = useState(true);
-  const { transactions, getTransactions } = useTransactionsStore();
+  const { user } = useUserStore()
+  const [loading, setLoading] = useState(true)
+  const { transactions, getTransactions } = useTransactionsStore()
 
   useEffect(() => {
     const fetchData = async () => {
       if (user?.id) {
-        setLoading(true);
+        setLoading(true)
         try {
-          await getTransactions(user.id);
+          await getTransactions(user.id)
         } catch (error) {
-          console.error("Errore fetch transactions:", error);
+          console.error("Errore fetch transactions:", error)
         } finally {
-          setLoading(false);
+          setLoading(false)
         }
       }
-    };
+    }
 
-    fetchData();
-  }, [user?.id, getTransactions]);
+    fetchData()
+  }, [user?.id, getTransactions])
 
   const tabs: TabItem[] = [
     { label: "Tutti", id: "all" },
     { label: "Mese", id: "month" },
     { label: "Settimana", id: "week" },
-  ];
-  const [selectedTab, setSelectedTab] = useState("all");
+  ]
+  const [selectedTab, setSelectedTab] = useState("all")
 
+  
   const stats = useMemo(() => {
-    const incomeTypes = ["TOP_UP", "CREDIT", "BONUS", "REFUND"];
-
-    const expenseTypes = ["PAYMENT", "DEBIT"];
-
     const totalDeposited = transactions
-      .filter((tx) => incomeTypes.includes(tx.type))
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+      .filter((tx) => isValidTransactionType(tx.type))
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
 
     const totalSpent = transactions
-      .filter((tx) => expenseTypes.includes(tx.type))
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+      .filter((tx) => isValidExpenseType(tx.type))
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
 
-    return { totalDeposited, totalSpent };
-  }, [transactions]);
+    return { totalDeposited, totalSpent }
+  }, [transactions])
 
   const currentBalance = useMemo(() => {
-    return transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  }, [transactions]);
+    return transactions.reduce((sum, tx) => sum + tx.amount, 0)
+  }, [transactions])
 
   const filteredTransactions = useMemo(() => {
-    const now = new Date();
+    const now = new Date()
 
     return transactions.filter((tx) => {
-      const txDate = new Date(tx.created_at);
+      const txDate = new Date(tx.created_at)
 
       if (selectedTab === "week") {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(now.getDate() - 7);
-        return txDate >= oneWeekAgo;
+        const oneWeekAgo = new Date()
+        oneWeekAgo.setDate(now.getDate() - 7)
+        return txDate >= oneWeekAgo
       }
 
       if (selectedTab === "month") {
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(now.getMonth() - 1);
-        return txDate >= oneMonthAgo;
+        const oneMonthAgo = new Date()
+        oneMonthAgo.setMonth(now.getMonth() - 1)
+        return txDate >= oneMonthAgo
       }
 
-      return true;
-    });
-  }, [selectedTab, transactions]);
+      return true
+    })
+  }, [selectedTab, transactions])
 
   return (
     <div className="flex flex-col items-center w-full sm:max-h-full">
@@ -99,7 +101,7 @@ export default function WalletTab() {
                 Saldo disponibile
               </p>
               <p className="text-5xl font-medium  text-white">
-                €{(currentBalance / 100).toFixed(2).replace(".", ",")}
+                €{amountDisplay(currentBalance)}
               </p>
             </div>
             <span>
@@ -126,12 +128,13 @@ export default function WalletTab() {
                   {"Totale Ricaricato"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{(stats.totalDeposited / 100).toFixed(2).replace(".", ",")}
+                  €{amountDisplay(stats.totalDeposited)}
                 </p>
               </div>
 
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center bg-green-100 `}>
+                className={`w-10 h-10 rounded-full flex items-center justify-center bg-green-100 `}
+              >
                 <ArrowTrendingUpIcon
                   className={`w-6 h-6 text-green-500 `}
                   strokeWidth={2}
@@ -146,12 +149,13 @@ export default function WalletTab() {
                   {"Totale speso"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{(stats.totalSpent / 100).toFixed(2).replace(".", ",")}
+                  €{amountDisplay(stats.totalSpent)}
                 </p>
               </div>
 
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center bg-red-100 `}>
+                className={`w-10 h-10 rounded-full flex items-center justify-center bg-red-100 `}
+              >
                 <ArrowTrendingDownIcon
                   className={`w-6 h-6 text-red-700`}
                   strokeWidth={2}
@@ -201,7 +205,8 @@ export default function WalletTab() {
 
             <Link
               href={Routes.wallet.url}
-              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300">
+              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300"
+            >
               Scopri i pacchetti
               <ChevronRightIcon
                 className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
@@ -212,5 +217,5 @@ export default function WalletTab() {
         </div>
       </div>
     </div>
-  );
+  )
 }
