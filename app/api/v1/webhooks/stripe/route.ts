@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
       case "payment_intent.succeeded":
         return await handlePaymentIntentSucceeded(event);
       default:
-        // Return 200 for unhandled events to acknowledge receipt
         console.log(`Unhandled event type: ${event.type}`);
         return NextResponse.json(
           {
@@ -130,7 +129,6 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
   const _admin = getAdminClient();
 
   // Idempotency Logic: Check if transaction already exists
-  // This prevents double-crediting the wallet if Stripe sends duplicate events
   const { data: existingTransaction, error: checkError } = await _admin
     .from("wallet_transactions")
     .select("id")
@@ -163,7 +161,9 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
   // Use RPC for atomic transaction to ensure ACID compliance
   
   // Determine the amount to credit: use credit_amount from metadata if available (for bundles), otherwise use paid amount
-  const amountToCredit = credit_amount ? parseInt(credit_amount, 10) : paymentIntent.amount;
+  const amountToCredit = credit_amount 
+    ? Math.round(parseFloat(credit_amount) * 100) 
+    : paymentIntent.amount;
   const currency = paymentIntent.currency.toUpperCase();
 
   // Start atomic database transaction

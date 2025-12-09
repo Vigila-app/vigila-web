@@ -78,6 +78,22 @@ export const PaymentService = {
     }
   },
 
+  payBookingWithWallet: async (bookingId: string): Promise<{ success: boolean; data?: any }> => {
+    try {
+      const response = (await ApiService.post(
+        apiWallet.PAY_BOOKING(),
+        { bookingId }
+      )) as { success: boolean; data?: any };
+      return response;
+    } catch (error) {
+      console.error("PaymentService payBookingWithWallet error", {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  },
+
   verifyPaymentIntent: async (paymentIntentId: string): Promise<VerifyPaymentIntentResponse> => {
     try {
       const response = (await ApiService.get(

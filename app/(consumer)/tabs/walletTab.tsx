@@ -38,7 +38,6 @@ export default function WalletTab() {
 
     fetchData();
   }, [user?.id, getTransactions]);
-  console.log("Transactions in WalletTab:", transactions);
 
   const tabs: TabItem[] = [
     { label: "Tutti", id: "all" },
@@ -101,7 +100,7 @@ export default function WalletTab() {
                 Saldo disponibile
               </p>
               <p className="text-5xl font-medium  text-white">
-                €{currentBalance.toFixed(2).replace(".", ",")}
+                €{(currentBalance / 100).toFixed(2).replace(".", ",")}
               </p>
             </div>
             <span>
@@ -128,7 +127,7 @@ export default function WalletTab() {
                   {"Totale Ricaricato"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{stats.totalDeposited.toFixed(2).replace(".", ",")}
+                  €{(stats.totalDeposited / 100).toFixed(2).replace(".", ",")}
                 </p>
               </div>
 
@@ -148,7 +147,7 @@ export default function WalletTab() {
                   {"Totale speso"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{stats.totalSpent.toFixed(2).replace(".", ",")}
+                  €{(stats.totalSpent / 100).toFixed(2).replace(".", ",")}
                 </p>
               </div>
 

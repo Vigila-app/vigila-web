@@ -13,6 +13,7 @@ import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -175,7 +176,7 @@ const CheckoutFormComponent = ({
         {showCancelButton && (
           <Button
             type="button"
-            secondary
+            primary={false}
             full
             label={cancelLabel}
             action={handleCancel}
@@ -186,6 +187,7 @@ const CheckoutFormComponent = ({
         <Button
           type="submit"
           full
+          role={RolesEnum.CONSUMER}
           label={isLoading ? "Elaborazione..." : submitLabel}
           isLoading={isLoading}
           disabled={isFormDisabled || isLoading}

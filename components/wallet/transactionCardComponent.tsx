@@ -62,10 +62,9 @@ export default function TransactionCardComponent({
               : "text-gray-900"
           }`}>
           {isIncome ? "+" : "-"}€
-          {transactionItem.amount.toFixed(2)}
+          {Math.abs(transactionItem.amount / 100).toFixed(2).replace(".", ",")}
         </span>
 
-        {/* <Badge status={transactionItem.status} /> */}
       </div>
     </div>
   );
