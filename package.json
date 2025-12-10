@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
+    "@huggingface/transformers": "^3.8.1",
     "@onesignal/node-onesignal": "^5.0.0-alpha-01",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^3.3.0",

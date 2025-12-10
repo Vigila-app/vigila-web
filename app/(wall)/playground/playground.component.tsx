@@ -6,6 +6,7 @@ import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
 import { UserService } from "@/src/services";
 import { LatLngExpression } from "leaflet";
 import { useEffect, useState } from "react";
+import TestAIComponent from "./testAI.component";
 
 const PlaygroundComponent = (props: { data?: any }) => {
   const { data = "{}" } = props;
@@ -51,6 +52,10 @@ const PlaygroundComponent = (props: { data?: any }) => {
           }}
         />
         {mapPosition ? <MapsComponent center={mapPosition} /> : null}
+      </div>
+      <div className="my-8">
+        <h4>Test AI Integration</h4>
+        <TestAIComponent />
       </div>
     </div>
   );
