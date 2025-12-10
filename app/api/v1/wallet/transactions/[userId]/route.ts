@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   authenticateUser,
   getAdminClient,
+  getPagination,
+  getQueryParams,
   jsonErrorResponse,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
@@ -12,7 +14,14 @@ export async function GET(
 ) {
   try {
     const { userId } = await context.params;
+    const { nextUrl, url } = req;
 
+    const pagination = getPagination(nextUrl);
+    const { from, to, page, itemPerPage } = pagination;
+    const filters = getQueryParams(url, ["page", "pageSize"]);
+    const { orderBy = "created_at", orderDirection = "DESC" } = filters;
+
+     console.log(`API GET transaction`, filters, pagination);
     // 1. Authenticate user
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
@@ -28,7 +37,7 @@ export async function GET(
     // 3. Get Wallet ID for the authenticated user
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
-      .select("id")
+      .select("id,balance_cents")
       .eq("consumer_id", userObject.id)
       .single();
 
@@ -42,11 +51,17 @@ export async function GET(
     }
 
     // 4. Get Transactions for the wallet
-    const { data: transactions, error: txError } = await supabase
+    let db_query = supabase
       .from("wallet_transactions")
-      .select("*")
+      .select("*", { count: "exact" })
       .eq("wallet_id", wallet.id)
       .order("created_at", { ascending: false });
+
+    if (from !== undefined && to !== undefined) {
+      db_query = db_query.range(from, to);
+    }
+
+    const { data: transactions, error: txError, count } = await db_query;
 
     if (txError) {
       console.error("Error fetching transactions:", txError);
@@ -55,6 +70,29 @@ export async function GET(
         success: false,
         message: "Failed to fetch transactions",
       });
+    }
+
+    // Calculate totals (using a separate query to get full sums without pagination limits)
+    // Note: For large datasets, this should be optimized or cached.
+    const { data: allTransactions } = await supabase
+        .from("wallet_transactions")
+        .select("amount, type")
+        .eq("wallet_id", wallet.id);
+
+    let totalDeposited = 0;
+    let totalSpent = 0;
+
+    if (allTransactions) {
+        const incomeTypes = ["TOP_UP", "CREDIT", "BONUS", "REFUND"];
+        const expenseTypes = ["PAYMENT", "DEBIT"];
+
+        totalDeposited = allTransactions
+            .filter((tx) => incomeTypes.includes(tx.type))
+            .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+        totalSpent = allTransactions
+            .filter((tx) => expenseTypes.includes(tx.type))
+            .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
     }
 
     // 5. Map to frontend type
@@ -70,7 +108,16 @@ export async function GET(
       stripe_payment_id: tx.stripe_payment_id || null,
     }));
 
-    return NextResponse.json({ data: mappedTransactions });
+    return NextResponse.json({
+      success: true,
+      data: { 
+        balance: wallet.balance_cents, 
+        totalDeposited,
+        totalSpent,
+        transactions: mappedTransactions, 
+        pagination: { page, pages: Math.ceil((count || 0) / itemPerPage), itemPerPage, count } 
+      },
+    });
   } catch (error) {
     console.error("API GET wallet/transactions error", error);
     return jsonErrorResponse(500, {

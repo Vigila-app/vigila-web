@@ -154,6 +154,8 @@ export const shareContent = ({
 export const getUUID = (root = "") =>
   `${root}${new Date().getTime().toString()}`;
 
+export const EurConverter = (amount: number) => Math.round(amount / 100);
+
 export const amountFormatter = (amount: number) =>
   Math.round((amount + Number.EPSILON) * 100) / 100;
 

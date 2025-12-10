@@ -15,7 +15,7 @@ import { useTransactionsStore } from "@/src/store/transactions/transactions.stor
 import TransactionCardComponent from "@/components/wallet/transactionCardComponent";
 import Link from "next/link";
 import { ButtonStyle } from "@/components/button/button.style";
-import { amountDisplay } from "@/src/utils/common.utils"
+import { amountDisplay, amountFormatter, EurConverter } from "@/src/utils/common.utils"
 import {
   isValidExpenseType,
   isValidTransactionType,
@@ -24,7 +24,7 @@ import {
 export default function WalletTab() {
   const { user } = useUserStore()
   const [loading, setLoading] = useState(true)
-  const { transactions, getTransactions } = useTransactionsStore()
+  const { transactions, balance: storeBalance, totalDeposited, totalSpent, getTransactions } = useTransactionsStore()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +39,7 @@ export default function WalletTab() {
         }
       }
     }
-
+console.log (transactions);
     fetchData()
   }, [user?.id, getTransactions])
 
@@ -50,44 +50,45 @@ export default function WalletTab() {
   ]
   const [selectedTab, setSelectedTab] = useState("all")
 
+  const balance = useMemo(() => {return EurConverter(storeBalance)}, [storeBalance]);
   
-  const stats = useMemo(() => {
-    const totalDeposited = transactions
-      .filter((tx) => isValidTransactionType(tx.type))
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+  // const stats = useMemo(() => {
+  //   const totalDeposited = transactions
+  //     .filter((tx) => isValidTransactionType(tx.type))
+  //     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
 
-    const totalSpent = transactions
-      .filter((tx) => isValidExpenseType(tx.type))
-      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+  //   const totalSpent = transactions
+  //     .filter((tx) => isValidExpenseType(tx.type))
+  //     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
 
-    return { totalDeposited, totalSpent }
-  }, [transactions])
+  //   return { totalDeposited, totalSpent }
+  // }, [transactions])
 
-  const currentBalance = useMemo(() => {
-    return transactions.reduce((sum, tx) => sum + tx.amount, 0)
-  }, [transactions])
+  // const currentBalance = useMemo(() => {
+  //   return transactions.reduce((sum, tx) => sum + tx.amount, 0)
+  // }, [transactions])
 
-  const filteredTransactions = useMemo(() => {
-    const now = new Date()
+  // const filteredTransactions = useMemo(() => {
+  //   const now = new Date()
 
-    return transactions.filter((tx) => {
-      const txDate = new Date(tx.created_at)
+  //   return transactions.filter((tx) => {
+  //     const txDate = new Date(tx.created_at)
 
-      if (selectedTab === "week") {
-        const oneWeekAgo = new Date()
-        oneWeekAgo.setDate(now.getDate() - 7)
-        return txDate >= oneWeekAgo
-      }
+  //     if (selectedTab === "week") {
+  //       const oneWeekAgo = new Date()
+  //       oneWeekAgo.setDate(now.getDate() - 7)
+  //       return txDate >= oneWeekAgo
+  //     }
 
-      if (selectedTab === "month") {
-        const oneMonthAgo = new Date()
-        oneMonthAgo.setMonth(now.getMonth() - 1)
-        return txDate >= oneMonthAgo
-      }
+  //     if (selectedTab === "month") {
+  //       const oneMonthAgo = new Date()
+  //       oneMonthAgo.setMonth(now.getMonth() - 1)
+  //       return txDate >= oneMonthAgo
+  //     }
 
-      return true
-    })
-  }, [selectedTab, transactions])
+  //     return true
+  //   })
+  // }, [selectedTab, transactions])
 
   return (
     <div className="flex flex-col items-center w-full sm:max-h-full">
@@ -101,7 +102,7 @@ export default function WalletTab() {
                 Saldo disponibile
               </p>
               <p className="text-5xl font-medium  text-white">
-                €{amountDisplay(currentBalance)}
+                €{amountDisplay(balance)}
               </p>
             </div>
             <span>
@@ -128,7 +129,7 @@ export default function WalletTab() {
                   {"Totale Ricaricato"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{amountDisplay(stats.totalDeposited)}
+                  €{amountDisplay(totalDeposited / 100)}
                 </p>
               </div>
 
@@ -149,7 +150,7 @@ export default function WalletTab() {
                   {"Totale speso"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{amountDisplay(stats.totalSpent)}
+                  €{amountDisplay(totalSpent / 100)}
                 </p>
               </div>
 
@@ -178,7 +179,7 @@ export default function WalletTab() {
               onChange={setSelectedTab}
             />
           </div>
-          <div className="flex flex-col gap-1 ">
+          {/* <div className="flex flex-col gap-1 ">
             {loading ? (
               <p className="text-center text-gray-400 py-4">Caricamento...</p>
             ) : filteredTransactions.length === 0 ? (
@@ -191,7 +192,7 @@ export default function WalletTab() {
                 <TransactionCardComponent key={tx.id} transactionItem={tx} />
               ))
             )}
-          </div>
+          </div> */}
         </div>
         <div className="w-full mt-6">
           <div className="bg-vigil-light-orange border border-vigil-orange rounded-3xl p-6 text-center shadow-sm">

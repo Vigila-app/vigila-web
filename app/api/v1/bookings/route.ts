@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       db_query = db_query.eq("consumer_id", userObject.id);
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
-      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID);
+      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID);9
     }
 
     if (Object.keys(filters).length) {
