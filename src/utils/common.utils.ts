@@ -154,7 +154,17 @@ export const shareContent = ({
 export const getUUID = (root = "") =>
   `${root}${new Date().getTime().toString()}`;
 
-export const EurConverter = (amount: number) => Math.round(amount / 100);
+export const EurConverter = (cents: number): number => {
+  if (!cents) return 0;
+
+  let num = Math.abs(cents).toString();
+
+  num= num.padStart(3, "0");
+
+  const formatted = num.replace(/^(\d+)(\d{2})$/, "$1.$2");
+  const finalNumber = parseFloat(formatted);
+  return cents < 0 ? -finalNumber : finalNumber;
+};
 
 export const amountFormatter = (amount: number) =>
   Math.round((amount + Number.EPSILON) * 100) / 100;
@@ -235,19 +245,19 @@ export const debounce = (
   if (existingTimeout) {
     clearTimeout(existingTimeout);
   }
-  
+
   // Imposta un nuovo timeout
   const newTimeout = setTimeout(() => {
     callback();
     timeouts.delete(key); // Pulisce la mappa dopo l'esecuzione
   }, delay);
-  
+
   timeouts.set(key, newTimeout);
 };
 
 // Funzione per creare un debouncer con chiave automatica
 export const createDebouncer = (baseKey: string, delay = 500) => {
-  return (callback: (...args: any) => void, suffix = '') => {
+  return (callback: (...args: any) => void, suffix = "") => {
     const key = suffix ? `${baseKey}_${suffix}` : baseKey;
     debounce(key, callback, delay);
   };

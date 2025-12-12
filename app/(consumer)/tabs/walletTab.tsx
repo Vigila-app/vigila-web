@@ -15,81 +15,77 @@ import { useTransactionsStore } from "@/src/store/transactions/transactions.stor
 import TransactionCardComponent from "@/components/wallet/transactionCardComponent";
 import Link from "next/link";
 import { ButtonStyle } from "@/components/button/button.style";
-import { amountDisplay, amountFormatter, EurConverter } from "@/src/utils/common.utils"
+import {
+  amountDisplay,
+  amountFormatter,
+  EurConverter,
+} from "@/src/utils/common.utils";
 import {
   isValidExpenseType,
   isValidTransactionType,
-} from "@/src/types/transactions.types"
+} from "@/src/types/transactions.types";
 
 export default function WalletTab() {
-  const { user } = useUserStore()
-  const [loading, setLoading] = useState(true)
-  const { transactions, balance: storeBalance, totalDeposited, totalSpent, getTransactions } = useTransactionsStore()
+  const { user } = useUserStore();
+  const [loading, setLoading] = useState(true);
+  const {
+    transactions,
+    balance: storeBalance,
+    totalDeposited,
+    totalSpent,
+    getTransactions,
+  } = useTransactionsStore();
 
   useEffect(() => {
     const fetchData = async () => {
       if (user?.id) {
-        setLoading(true)
+        setLoading(true);
         try {
-          await getTransactions(user.id)
+          await getTransactions(user.id);
         } catch (error) {
-          console.error("Errore fetch transactions:", error)
+          console.error("Errore fetch transactions:", error);
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
-console.log (transactions);
-    fetchData()
-  }, [user?.id, getTransactions])
+    };
+    console.log(transactions);
+    fetchData();
+  }, [user?.id, getTransactions]);
 
   const tabs: TabItem[] = [
     { label: "Tutti", id: "all" },
     { label: "Mese", id: "month" },
     { label: "Settimana", id: "week" },
-  ]
-  const [selectedTab, setSelectedTab] = useState("all")
+  ];
+  const [selectedTab, setSelectedTab] = useState("all");
 
-  const balance = useMemo(() => {return EurConverter(storeBalance)}, [storeBalance]);
-  
-  // const stats = useMemo(() => {
-  //   const totalDeposited = transactions
-  //     .filter((tx) => isValidTransactionType(tx.type))
-  //     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+  const balance = useMemo(() => {
+    return EurConverter(storeBalance);
+  }, [storeBalance]);
 
-  //   const totalSpent = transactions
-  //     .filter((tx) => isValidExpenseType(tx.type))
-  //     .reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+  const filteredTransactions = useMemo(() => {
+    const now = new Date();
 
-  //   return { totalDeposited, totalSpent }
-  // }, [transactions])
+    return transactions.filter((tx) => {
+      const txDate = new Date(tx.created_at);
 
-  // const currentBalance = useMemo(() => {
-  //   return transactions.reduce((sum, tx) => sum + tx.amount, 0)
-  // }, [transactions])
+      if (selectedTab === "week") {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+        return txDate >= oneWeekAgo;
+      }
 
-  // const filteredTransactions = useMemo(() => {
-  //   const now = new Date()
+      if (selectedTab === "month") {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(now.getMonth() - 1);
+        return txDate >= oneMonthAgo;
+      }
 
-  //   return transactions.filter((tx) => {
-  //     const txDate = new Date(tx.created_at)
-
-  //     if (selectedTab === "week") {
-  //       const oneWeekAgo = new Date()
-  //       oneWeekAgo.setDate(now.getDate() - 7)
-  //       return txDate >= oneWeekAgo
-  //     }
-
-  //     if (selectedTab === "month") {
-  //       const oneMonthAgo = new Date()
-  //       oneMonthAgo.setMonth(now.getMonth() - 1)
-  //       return txDate >= oneMonthAgo
-  //     }
-
-  //     return true
-  //   })
-  // }, [selectedTab, transactions])
-
+      return true;
+    });
+  }, [selectedTab, transactions]);
+ console.log(storeBalance);
   return (
     <div className="flex flex-col items-center w-full sm:max-h-full">
       <h1 className="py-3 w-full text-lg font-semibold text-start">Wallet</h1>
@@ -129,13 +125,12 @@ console.log (transactions);
                   {"Totale Ricaricato"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{amountDisplay(totalDeposited / 100)}
+                  €{amountDisplay(EurConverter(totalDeposited))}
                 </p>
               </div>
 
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center bg-green-100 `}
-              >
+                className={`w-10 h-10 rounded-full flex items-center justify-center bg-green-100 `}>
                 <ArrowTrendingUpIcon
                   className={`w-6 h-6 text-green-500 `}
                   strokeWidth={2}
@@ -150,13 +145,12 @@ console.log (transactions);
                   {"Totale speso"}
                 </h3>
                 <p className=" text-sm font-normal">
-                  €{amountDisplay(totalSpent / 100)}
+                  €{amountDisplay(EurConverter(totalSpent))}
                 </p>
               </div>
 
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center bg-red-100 `}
-              >
+                className={`w-10 h-10 rounded-full flex items-center justify-center bg-red-100 `}>
                 <ArrowTrendingDownIcon
                   className={`w-6 h-6 text-red-700`}
                   strokeWidth={2}
@@ -179,7 +173,7 @@ console.log (transactions);
               onChange={setSelectedTab}
             />
           </div>
-          {/* <div className="flex flex-col gap-1 ">
+          <div className="flex flex-col gap-1 ">
             {loading ? (
               <p className="text-center text-gray-400 py-4">Caricamento...</p>
             ) : filteredTransactions.length === 0 ? (
@@ -192,7 +186,7 @@ console.log (transactions);
                 <TransactionCardComponent key={tx.id} transactionItem={tx} />
               ))
             )}
-          </div> */}
+          </div>
         </div>
         <div className="w-full mt-6">
           <div className="bg-vigil-light-orange border border-vigil-orange rounded-3xl p-6 text-center shadow-sm">
@@ -206,8 +200,7 @@ console.log (transactions);
 
             <Link
               href={Routes.wallet.url}
-              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300"
-            >
+              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300">
               Scopri i pacchetti
               <ChevronRightIcon
                 className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
@@ -218,5 +211,5 @@ console.log (transactions);
         </div>
       </div>
     </div>
-  )
+  );
 }
