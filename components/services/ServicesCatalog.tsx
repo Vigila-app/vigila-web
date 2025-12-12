@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button, Card } from "@/components";
 import Badge from "@/components/badge/badge.component";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
@@ -16,6 +16,8 @@ import {
   ShoppingCartIcon,
   UsersIcon,
   UserIcon,
+  ExclamationTriangleIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
 type SelectedService = {
@@ -35,7 +37,7 @@ type SelectedService = {
 interface ServicesCatalogProps {
   role: RolesEnum;
   occupation?: string;
-  selectedServices: ServiceI[];
+  selectedServices?: ServiceI[];
   onServicesChange: (services: ServiceI[]) => void;
 }
 
@@ -43,6 +45,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   role,
   occupation,
   onServicesChange,
+  // selectedServices = [],
 }) => {
   const [internalSelectedServices, setInternalSelectedServices] = useState<
     SelectedService[]
@@ -67,8 +70,10 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
       </div>
     ),
   };
+
   // Carica il catalogo servizi
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setServicesCatalog(ServicesService.getServicesCatalog());
   }, []);
 
@@ -112,8 +117,10 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
     setInternalSelectedServices((prev) => [...prev, newService]);
   };
 
-  const removeService = (index: number) => {
-    setInternalSelectedServices((prev) => prev.filter((_, i) => i !== index));
+  const removeService = (catalogId: SelectedService["catalogId"]) => {
+    setInternalSelectedServices((prev) =>
+      prev.filter((service) => service.catalogId !== catalogId)
+    );
   };
 
   const updateServicePrice = (index: number, newPrice: number) => {
@@ -124,10 +131,13 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
     );
   };
 
-  const toggleExtra = (serviceIndex: number, extraId: string) => {
+  const toggleExtra = (
+    catalogId: SelectedService["catalogId"],
+    extraId: string
+  ) => {
     setInternalSelectedServices((prev) =>
       prev.map((service, i) => {
-        if (i === serviceIndex) {
+        if (service.catalogId === catalogId) {
           const selectedExtras = service.selectedExtras.includes(extraId)
             ? service.selectedExtras.filter((id) => id !== extraId)
             : [...service.selectedExtras, extraId];
@@ -151,17 +161,21 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   };
 
   const filteredServices = useMemo(() => {
-    return servicesCatalog
-      .filter((service: ServiceCatalogItem) => {
-        // Se non c'è un'occupazione selezionata non mostrare i servizi
-        if (!occupation) return false;
-        
-        // Se il servizio non ha requisiti di occupazione, è disponibile per tutti
-        if (!service.occupation || service.occupation.length === 0) return true;
-        
-        // Altrimenti, verifica se l'occupazione corrente è tra quelle richieste
-        return service.occupation.includes(occupation);
-      });
+    return servicesCatalog.filter((service: ServiceCatalogItem) => {
+      // Se non c'è un'occupazione selezionata non mostrare i servizi
+      if (!occupation) return false;
+
+      // Se il servizio è già selezionato, non mostrarlo nel catalogo
+      // if (selectedServices.find((s) => s.info?.catalog_id === service.id)) {
+      //   return false;
+      // }
+
+      // Se il servizio non ha requisiti di occupazione, è disponibile per tutti
+      if (!service.occupation || service.occupation.length === 0) return true;
+
+      // Altrimenti, verifica se l'occupazione corrente è tra quelle richieste
+      return service.occupation.includes(occupation);
+    });
   }, [occupation, servicesCatalog]);
 
   return (
@@ -172,218 +186,180 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
             "block font-semibold mb- text-xl mb-4",
             role === RolesEnum.VIGIL && "text-vigil-orange",
             role === RolesEnum.CONSUMER && "text-consumer-blue"
-          )}>
+          )}
+        >
           Scegli i servizi che vuoi offrire
         </label>
 
         {/* Catalogo servizi disponibili */}
-        <div className="grid gap-6 mb-8">
+        <div className="grid gap-6 mb-8 scroll-m-12" id="services-catalog">
           {!occupation && (
-            <p className="text-gray-500 text-center py-8">
-              Seleziona la tua occupazione per visualizzare i servizi
-              disponibili.
-            </p>
+            <a
+              href="#occupazione"
+              className="inline-flex justify-center w-full my-2 items-center gap-1 text-sm animate-pulse"
+            >
+              <ExclamationTriangleIcon className="size-5 min-w-4 text-vigil-orange" />
+              <span>
+                Seleziona la tua occupazione per visualizzare i servizi
+                disponibili.
+              </span>
+            </a>
           )}
           {occupation && filteredServices.length === 0 && (
             <p className="text-gray-500 text-center py-8">
               Nessun servizio disponibile per la tua occupazione al momento.
             </p>
           )}
-          {occupation && filteredServices.map((catalogService: ServiceCatalogItem) => (
-            <Card key={catalogService.id}>
-              <div className="flex flex-col justify-between  ">
-                <div className="flex-1 mb-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="font-semibold text-xl text-consumer-blue">
-                      {catalogService.name}
-                    </p>
-                    {catalogService.professional && (
-                      <Badge
-                        label={
-                          <span className="inline-flex gap-1 items-center">
-                            <ShieldCheckIcon className="size-4" />
-                            Professionale
-                          </span>
-                        }
-                        color="blue"
-                      />
-                    )}
-                  </div>
+          {occupation &&
+            filteredServices.map((catalogService: ServiceCatalogItem) => (
+              <Card
+                key={catalogService.id}
+                customClass={clsx(
+                  isServiceSelected(catalogService.id) &&
+                    "!bg-green-50 !border-green-300"
+                )}
+              >
+                <div className="relative flex flex-col justify-between">
+                  {isServiceSelected(catalogService.id) ? (
+                    <button
+                      type="button"
+                      onClick={() => removeService(catalogService.id)}
+                      className="text-gray-500 hover:text-red-600 p-1 absolute top-0 right-0"
+                      aria-label="Rimuovi servizio"
+                    >
+                      <XCircleIcon className="size-5 min-w-5" />
+                    </button>
+                  ) : null}
+                  <div className="flex-1 mb-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="font-semibold text-xl text-consumer-blue">
+                        {catalogService.name}
+                      </p>
+                      {catalogService.professional && (
+                        <Badge
+                          label={
+                            <span className="inline-flex gap-1 items-center">
+                              <ShieldCheckIcon className="size-4" />
+                              Professionale
+                            </span>
+                          }
+                          color="blue"
+                        />
+                      )}
+                    </div>
 
-                  <div className="flex justify-between w-full items-center">
-                    {iconMap[catalogService.name] || ""}
-                    <div className="flex flex-col gap-1 text-[16px] font-medium justify-center items-end">
-                      <div className="flex  gap-2">
-                        <span>
-                          {/* €{catalogService.min_hourly_rate}- */}
-                          €{catalogService.max_hourly_rate}/ora
-                        </span>
-                        <span>
-                          Min.&nbsp;{catalogService.minimum_duration_hours}h
-                        </span>
-                      </div>
-                      {/* <span className="text-[16px] text-gray-600">
+                    <div className="flex justify-between w-full items-center">
+                      {iconMap[catalogService.name] || ""}
+                      <div className="flex flex-col gap-1 justify-center items-end">
+                        <div className="flex gap-1">
+                          <span>
+                            {/* €{catalogService.min_hourly_rate}- */}€
+                            {catalogService.min_hourly_rate}/h
+                          </span>
+                          |
+                          <span>
+                            min.&nbsp;{catalogService.minimum_duration_hours}h
+                          </span>
+                        </div>
+                        {/* <span className="text-[16px] text-gray-600">
                         Consigliato: €{catalogService.recommended_hourly_rate}
                         /ora
                       </span> */}
-                    </div>
-                  </div>
-                  <p className="text-lg font-semibold my-2">Descrizione:</p>
-                  <p className=" text-[16px] font-medium mb-3">
-                    {catalogService.description}
-                  </p>
-                  {catalogService.extra.length > 0 && (
-                    <div className="mt-2">
-                      <span className="text-sm text-gray-500">
-                        Opzioni extra disponibili:&nbsp;
-                        {catalogService.extra
-                          .map((e: any) => `${e.name} €${e.fixed_price}`)
-                          .join(", ")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <Button
-                  role={RolesEnum.VIGIL}
-                  customClass="!px-3 "
-                  full
-                  label="Aggiungi Servizio"
-                  type="button"
-                  action={() => addService(catalogService)}
-                  disabled={isServiceSelected(catalogService.id)}
-                />
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Servizi selezionati */}
-        {internalSelectedServices.length > 0 && (
-          <div>
-            <p className="font-semibold text-xl mb-3 text-vigil-orange">
-              Servizi selezionati:
-            </p>
-            <div className="space-y-4">
-              {internalSelectedServices.map((selectedService, index) => {
-                const catalogService = getCatalogService(
-                  selectedService.catalogId
-                );
-                if (!catalogService) return null;
-
-                return (
-                  <Card
-                    key={index}
-                    className="p-2 rounded-2xl bg-vigil-light-orange/60">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex flex-col gap-2">
-                        <p className="font-medium text-lg ">
-                          {selectedService.name}
-                        </p>
-                        <p className="text-[16px] font-medium text-gray-600">
-                          {selectedService.description}
-                        </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeService(index)}
-                        className="text-consumer-blue hover:text-blue-800 p-1"
-                        aria-label="Rimuovi servizio">
-                        <XCircleIcon className="w-7 h-7" />
-                      </button>
                     </div>
-
-                    {/* Configurazione prezzo */}
-                    <div className="mb-3">
-                      <label className="block text-[16px] font-medium mb-2">
-                        Prezzo orario €{catalogService.min_hourly_rate}
-                      </label>
-                      {/* <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateServicePrice(
-                              index,
-                              Math.max(
-                                catalogService.min_hourly_rate,
-                                selectedService.unit_price - 1
-                              )
-                            )
-                          }
-                          disabled={
-                            selectedService.unit_price <=
-                            catalogService.min_hourly_rate
-                          }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
-                          <MinusIcon className="w-4 h-4" />
-                        </button>
-                        <span className="font-medium min-w-[60px] text-center">
-                          €{selectedService.unit_price}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateServicePrice(
-                              index,
-                              Math.min(
-                                catalogService.max_hourly_rate,
-                                selectedService.unit_price + 1
-                              )
-                            )
-                          }
-                          disabled={
-                            selectedService.unit_price >=
-                            catalogService.max_hourly_rate
-                          }
-                          className="p-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed">
-                          <PlusIcon className="w-4 h-4" />
-                        </button>
-                      </div> */}
-                    </div>
-
-                    {/* Opzioni extra */}
+                    <p className="my-2">Descrizione:</p>
+                    <p className="font-light mb-3">
+                      {catalogService.description}
+                    </p>
                     {catalogService.extra.length > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Opzioni extra:
-                        </label>
-                        <div className="space-y-2">
-                          {catalogService.extra.map((extra: any) => (
-                            <label
-                              key={extra.id}
-                              className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={selectedService.selectedExtras.includes(
-                                  extra.id
-                                )}
-                                onChange={() => toggleExtra(index, extra.id)}
-                                className="rounded"
-                              />
-                              <span>
-                                {extra.name} (+€{extra.fixed_price})
-                              </span>
-                              {extra.note && (
-                                <span className="text-gray-500 text-xs">
-                                  ({extra.note})
-                                </span>
-                              )}
+                      <div className="mt-2">
+                        {isServiceSelected(catalogService.id) ? (
+                          <>
+                            <label className="block text-sm font-medium mb-2">
+                              Aggiungi opzioni extra:
                             </label>
-                          ))}
-                        </div>
+                            <div className="space-y-2">
+                              {catalogService.extra.map((extra: any) => (
+                                <label
+                                  key={extra.id}
+                                  className="flex items-center gap-2 text-sm"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={internalSelectedServices
+                                      .find(
+                                        (service) =>
+                                          service.catalogId ===
+                                          catalogService.id
+                                      )
+                                      ?.selectedExtras.includes(extra.id)}
+                                    onChange={() =>
+                                      toggleExtra(catalogService.id, extra.id)
+                                    }
+                                    className="rounded"
+                                  />
+                                  <span>
+                                    {extra.name} (+€{extra.fixed_price})
+                                  </span>
+                                  {extra.note && (
+                                    <span className="text-gray-500 text-xs">
+                                      ({extra.note})
+                                    </span>
+                                  )}
+                                </label>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-sm text-gray-500">
+                            Opzioni extra disponibili:&nbsp;
+                            {catalogService.extra
+                              .map(
+                                (extra) => `${extra.name} €${extra.fixed_price}`
+                              )
+                              .join(", ")}
+                          </span>
+                        )}
                       </div>
                     )}
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                  </div>
+                  {isServiceSelected(catalogService.id) ? (
+                    <a
+                      href={`#selected-service-${catalogService.id}`}
+                      className="inline-flex justify-center w-full items-center gap-1 text-sm"
+                    >
+                      <CheckIcon className="size-5 min-w-4 text-green-600" />
+                      <span className="text-green-600">Servizio aggiunto</span>
+                    </a>
+                  ) : (
+                    <Button
+                      role={RolesEnum.VIGIL}
+                      customClass="!px-3"
+                      full
+                      label="Aggiungi Servizio"
+                      type="button"
+                      action={() => addService(catalogService)}
+                      disabled={isServiceSelected(catalogService.id)}
+                    />
+                  )}
+                </div>
+              </Card>
+            ))}
+        </div>
 
-        {occupation && filteredServices?.length && internalSelectedServices.length === 0 && (
-          <p className="text-gray-500 text-center py-8">
-            Seleziona almeno un servizio dal catalogo sopra
-          </p>
-        )}
+        {occupation &&
+        filteredServices?.length &&
+        internalSelectedServices.length === 0 ? (
+          <a
+            href="#services-catalog"
+            className="inline-flex justify-center w-full my-2 items-center gap-1 text-sm animate-pulse"
+          >
+            <ExclamationTriangleIcon className="size-5 min-w-4 text-vigil-orange" />
+            <span className="border-b border-vigil-orange">
+              Aggiungi almeno un servizio per continuare
+            </span>
+          </a>
+        ) : null}
       </div>
     </div>
   );

@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components";
-import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import ServiceCard from "@/components/services/serviceCard.component";
 import { ServiceI } from "@/src/types/services.types";
-import { Input } from "@/components/form";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -211,6 +209,7 @@ const ServiziTab = () => {
                     <Button
                       label="Aggiungi"
                       type="button"
+                      disabled={!newService.name}
                       small
                       customClass="!!px-2"
                       role={RolesEnum.CONSUMER}
@@ -247,16 +246,19 @@ const ServiziTab = () => {
                 <h3 className="text-lg font-bold mb-2">Attenzione</h3>
                 <p className="mb-4">
                   Stai per {pendingStatusValue ? "attivare" : "disattivare"}{" "}
-                  questo servizio. Sei sicuro di voler procedere?
+                  questo servizio.
+                  <br />
+                  Sei sicuro di voler continuare?
                 </p>
                 <div className="flex gap-2 justify-end">
                   <Button
+                    secondary
                     label="Annulla"
                     type="button"
                     action={cancelChangeStatus}
                   />
                   <Button
-                    label="Conferma"
+                    label="Continua"
                     type="button"
                     action={confirmChangeStatus}
                   />

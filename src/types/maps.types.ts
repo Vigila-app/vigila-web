@@ -9,6 +9,7 @@ export type AddressI = {
   state?: string;
   quarter?: string;
   country?: string;
+  neighbourhood?: string;
   postCode?: string;
   postalCode?: string;
   postcode?: string;
