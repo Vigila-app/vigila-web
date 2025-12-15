@@ -83,10 +83,10 @@ export async function POST(req: NextRequest) {
         `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
       )
       /*
-        TODO MONDAY THE 12th: 403 se non hai wallet + guard su frontend
+        // TODO MONDAY THE 15th: 403 se non hai wallet + guard su frontend
         TODO: check "Payment intent does not belong to the authenticated user"
         TODO: consumer_id -> user_id su wallets
-        TODO: change wallet id to uuid\
+        TODO: change wallet id to uuid
         TODO: togliere totalSpent e totalDeposited
         TODO: check count functions on supabase
         TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
