@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
       .select("id, user_id, balance_cents, currency") 
       .eq("user_id", userObject.id) 
       .maybeSingle(); // Usa maybeSingle per non lanciare errore se non c'è
-
     if (walletError) {
       console.error("Database error fetching wallet:", walletError);
       return jsonErrorResponse(500, {
@@ -69,7 +68,7 @@ export async function POST(req: NextRequest) {
       /*
         TODO: usare enum  
         TODO: check "Payment intent does not belong to the authenticated user"
-        TODO: consumer_id -> user_id su wallets 
+        // TODO: consumer_id -> user_id su wallets 
         TODO: change wallet id to uuid
         TODO: check count functions on supabase
         TODO: add user_id to transactions (UUID)
