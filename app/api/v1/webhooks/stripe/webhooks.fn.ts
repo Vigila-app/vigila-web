@@ -1,5 +1,6 @@
 import { getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
+import { TRANSACTION_STATUS, TRANSACTION_TYPE } from "@/src/types/transactions.types";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -68,10 +69,11 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
     .insert({
       wallet_id: wallet_id,
       stripe_payment_id: paymentIntent.id,
+      user_id: user_id,
       amount: amountToCredit,
       currency: currency,
-      status: "COMPLETED",
-      type: "TOP_UP",
+      status: TRANSACTION_STATUS.COMPLETED,
+      type: TRANSACTION_TYPE.TOP_UP,
       description: `Wallet top-up via Stripe`,
       created_at: new Date().toISOString(),
     })

@@ -66,13 +66,13 @@ export async function POST(req: NextRequest) {
         `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
       );
       /*
-        TODO: usare enum  
+        // TODO: usare enum  
         // TODO: check "Payment intent does not belong to the authenticated user"
         // TODO: consumer_id -> user_id su wallets 
-        TODO: change wallet id to uuid
+        // TODO: change wallet id to uuid
         TODO: check count functions on supabase
         TODO: add user_id to transactions (UUID)
-        TODO: change wallet_transaction_id to UUID 
+        // TODO: change wallet_transaction_id to UUID 
         TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
 
         TODO da valutare: db function to create wallet when create consumer 
