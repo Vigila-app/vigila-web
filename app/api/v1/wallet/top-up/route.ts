@@ -44,27 +44,27 @@ export async function POST(req: NextRequest) {
     const _admin = getAdminClient()
 
     // 3. Get Consumer
-    const { data: consumer, error: consumerError } = await _admin
-      .from("consumers")
-      .select("id, stripe_customer_id")
-      .eq("id", userObject.id) // <--- FIX: id corrisponde a user_id
-      .single()
+    // const { data: consumer, error: consumerError } = await _admin
+    //   .from("consumers")
+    //   .select("id")
+    //   .eq("id", userObject.id) // <--- FIX: id corrisponde a user_id
+    //   .single()
 
-    if (consumerError || !consumer) {
-      console.error("Consumer not found:", consumerError)
-      return jsonErrorResponse(404, {
-        code: ResponseCodesConstants.WALLET_TOP_UP_NOT_FOUND.code,
-        success: false,
-        message: "Consumer profile not found",
-      })
-    }
+    // if (consumerError || !consumer) {
+    //   console.error("Consumer not found:", consumerError)
+    //   return jsonErrorResponse(404, {
+    //     code: ResponseCodesConstants.WALLET_TOP_UP_NOT_FOUND.code,
+    //     success: false,
+    //     message: "Consumer profile not found",
+    //   })
+    // }
 
     // 4. Get Wallet (con gestione Auto-Creazione)
     // Cerchiamo il wallet collegato a questo consumer
     let { data: wallet, error: walletError } = await _admin
       .from("wallets")
       .select("id, consumer_id, balance_cents, currency") // <--- FIX: consumer_id
-      .eq("consumer_id", consumer.id) // <--- FIX: consumer_id
+      .eq("consumer_id", userObject.id) // <--- FIX: consumer_id
       .maybeSingle() // Usa maybeSingle per non lanciare errore se non c'è
 
     if (walletError) {
@@ -80,24 +80,24 @@ export async function POST(req: NextRequest) {
     // Se il wallet non esiste, lo creiamo ora prima di procedere al pagamento
     if (!wallet) {
       console.log(
-        `Wallet missing for consumer ${consumer.id}. Creating new wallet (with upsert)...`
+        `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
       )
-
+      /*
+        TODO MONDAY THE 12th: 403 se non hai wallet + guard su frontend
+        TODO: check "Payment intent does not belong to the authenticated user"
+        TODO: consumer_id -> user_id su wallets
+        TODO: change wallet id to uuid\
+        TODO: togliere totalSpent e totalDeposited
+        TODO: check count functions on supabase
+        TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
+      */
+      //
       // Try to insert, but ignore if already exists (upsert)
       const { error: createError } = await _admin.from("wallets").insert({
-        consumer_id: consumer.id,
+        consumer_id: userObject.id,
         balance_cents: 0,
         currency: "eur",
       })
-      // const { error: createError } = await _admin.from("wallets").upsert(
-      //   {
-      //     consumer_id: consumer.id,
-      //     balance_cents: 0,
-      //     currency: "eur",
-      //     // Add other required fields if needed
-      //   },
-      //   { onConflict: "consumer_id" }
-      // )
 
       if (createError) {
         console.error("Failed to create wallet:", createError)
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       const { data: fetchedWallet, error: fetchError } = await _admin
         .from("wallets")
         .select("id, consumer_id, balance_cents, currency")
-        .eq("consumer_id", consumer.id)
+        .eq("consumer_id", userObject.id)
         .maybeSingle()
 
       if (fetchError || !fetchedWallet) {
@@ -131,44 +131,11 @@ export async function POST(req: NextRequest) {
       console.log(`Wallet created or found successfully: ${wallet.id}`)
     }
 
-    // 5. Stripe Customer Logic
-    let stripeCustomerId = consumer.stripe_customer_id
-
-    if (!stripeCustomerId) {
-      try {
-        const stripeCustomer = await stripe.customers.create({
-          email: userObject.email,
-          metadata: {
-            user_id: userObject.id,
-            consumer_id: consumer.id,
-          },
-        })
-
-        stripeCustomerId = stripeCustomer.id
-
-        await _admin
-          .from("consumers")
-          .update({
-            stripe_customer_id: stripeCustomerId,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", consumer.id)
-      } catch (stripeError: any) {
-        console.error("Failed to create Stripe customer:", stripeError)
-        return jsonErrorResponse(500, {
-          code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
-          success: false,
-          message: `Stripe error: ${stripeError.message}`,
-        })
-      }
-    }
-
     // 6. Create PaymentIntent
     try {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount),
         currency: currency.toLowerCase(),
-        customer: stripeCustomerId,
         setup_future_usage: "off_session",
         automatic_payment_methods: { enabled: true },
         metadata: {
