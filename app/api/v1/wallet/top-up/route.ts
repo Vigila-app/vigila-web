@@ -7,7 +7,7 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { WalletDataI } from "@/src/types/transactions.types";
+import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       );
       /*
         TODO: usare enum  
-        TODO: check "Payment intent does not belong to the authenticated user"
+        // TODO: check "Payment intent does not belong to the authenticated user"
         // TODO: consumer_id -> user_id su wallets 
         TODO: change wallet id to uuid
         TODO: check count functions on supabase
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
         metadata: {
           user_id: userObject.id,
           wallet_id: wallet.id, // Ora siamo sicuri al 100% che wallet.id esiste
-          transaction_type: "TOP_UP",
+          transaction_type: TRANSACTION_TYPE.TOP_UP,
           ...(metadata?.bundleId && { bundle_id: metadata.bundleId }),
           ...(metadata?.creditAmount && {
             credit_amount: metadata.creditAmount,

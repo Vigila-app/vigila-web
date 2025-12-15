@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { handleTopUp} from "./webhooks.fn";
+import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
 
 // Initialize Stripe with the latest API version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -106,7 +107,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event): Promise<NextRe
   });
 
   switch (transaction_type) {
-    case "TOP_UP":
+    case TRANSACTION_TYPE.TOP_UP:
       return handleTopUp(paymentIntent)
   
     default:

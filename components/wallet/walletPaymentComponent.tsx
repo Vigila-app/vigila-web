@@ -85,11 +85,9 @@ export const WalletPaymentComponent = ({
       // Possiamo fare un polling o attendere qualche secondo e ricaricare l'utente.
 
       // Opzionale: chiamare una verifica lato server se vuoi feedback immediato
-      const verification =
-        await PaymentService.verifyPaymentIntent(paymentIntentId)
+      await PaymentService.verifyPaymentIntent(paymentIntentId)
 
       // Aggiorniamo i dati utente per vedere il nuovo saldo
-      console.log(verification)
       if (user?.id) await getUserDetails(true)
 
       // Chiudi il modale o reindirizza
