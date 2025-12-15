@@ -1,11 +1,14 @@
 import { getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
-import { TRANSACTION_STATUS, TRANSACTION_TYPE } from "@/src/types/transactions.types";
+import {
+  TRANSACTION_STATUS,
+  TRANSACTION_TYPE,
+} from "@/src/types/transactions.types";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
-  const { user_id, wallet_id, transaction_type, credit_amount,  } =
+  const { user_id, wallet_id, transaction_type, credit_amount } =
     paymentIntent.metadata;
   // Validate required metadata
   if (!user_id || !wallet_id) {
@@ -73,8 +76,9 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
       amount: amountToCredit,
       currency: currency,
       status: TRANSACTION_STATUS.COMPLETED,
-      type: TRANSACTION_TYPE.TOP_UP,
-      description: `Wallet top-up via Stripe`,
+      type: transaction_type as TRANSACTION_TYPE,
+      description:
+        paymentIntent.description || `Wallet top-up for user ${user_id}`,
       created_at: new Date().toISOString(),
     })
     .select()
@@ -108,9 +112,9 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
 
   // Step 2: Atomically update the Wallet balance
   // Using RPC or raw SQL for atomic increment to prevent race conditions
-  const { error: walletError } = await _admin.rpc("increment_wallet_balance", {
-    p_wallet_id: wallet_id,
-    p_amount: amountToCredit,
+  const { error: walletError } = await _admin.rpc("update_wallet_balance", {
+    wallet_id: wallet_id,
+    amount: amountToCredit,
   });
 
   if (walletError) {
