@@ -7,21 +7,21 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { WalletDataI } from "@/src/types/transactions.types"
+import { WalletDataI } from "@/src/types/transactions.types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
-})
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { amount, currency = "eur", metadata } = body
+    const body = await req.json();
+    const { amount, currency = "eur", metadata } = body;
 
-    console.log(`API POST wallet/top-up`, { amount, currency, metadata })
+    console.log(`API POST wallet/top-up`, { amount, currency, metadata });
 
     // 1. Authenticate user
-    const userObject = await authenticateUser(req)
+    const userObject = await authenticateUser(req);
     if (
       !userObject?.id ||
       userObject.user_metadata?.role !== RolesEnum.CONSUMER
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.WALLET_TOP_UP_UNAUTHORIZED.code,
         success: false,
-      })
+      });
     }
 
     // 2. Validate input
@@ -38,42 +38,26 @@ export async function POST(req: NextRequest) {
         code: ResponseCodesConstants.WALLET_TOP_UP_BAD_REQUEST.code,
         success: false,
         message: "Invalid amount: must be a positive number in cents",
-      })
+      });
     }
 
-    const _admin = getAdminClient()
-
-    // 3. Get Consumer
-    // const { data: consumer, error: consumerError } = await _admin
-    //   .from("consumers")
-    //   .select("id")
-    //   .eq("id", userObject.id) // <--- FIX: id corrisponde a user_id
-    //   .single()
-
-    // if (consumerError || !consumer) {
-    //   console.error("Consumer not found:", consumerError)
-    //   return jsonErrorResponse(404, {
-    //     code: ResponseCodesConstants.WALLET_TOP_UP_NOT_FOUND.code,
-    //     success: false,
-    //     message: "Consumer profile not found",
-    //   })
-    // }
+    const _admin = getAdminClient();
 
     // 4. Get Wallet (con gestione Auto-Creazione)
     // Cerchiamo il wallet collegato a questo consumer
     let { data: wallet, error: walletError } = await _admin
       .from("wallets")
-      .select("id, consumer_id, balance_cents, currency") // <--- FIX: consumer_id
-      .eq("consumer_id", userObject.id) // <--- FIX: consumer_id
-      .maybeSingle() // Usa maybeSingle per non lanciare errore se non c'è
+      .select("id, user_id, balance_cents, currency") 
+      .eq("user_id", userObject.id) 
+      .maybeSingle(); // Usa maybeSingle per non lanciare errore se non c'è
 
     if (walletError) {
-      console.error("Database error fetching wallet:", walletError)
+      console.error("Database error fetching wallet:", walletError);
       return jsonErrorResponse(500, {
         code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
         success: false,
         message: "Database error fetching wallet",
-      })
+      });
     }
 
     // --- LOGICA AUTO-CREAZIONE (LAZY CREATION) ---
@@ -81,54 +65,57 @@ export async function POST(req: NextRequest) {
     if (!wallet) {
       console.log(
         `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
-      )
+      );
       /*
-        // TODO MONDAY THE 15th: 403 se non hai wallet + guard su frontend
+        TODO: usare enum  
         TODO: check "Payment intent does not belong to the authenticated user"
-        TODO: consumer_id -> user_id su wallets
+        TODO: consumer_id -> user_id su wallets 
         TODO: change wallet id to uuid
-        TODO: togliere totalSpent e totalDeposited
         TODO: check count functions on supabase
+        TODO: add user_id to transactions (UUID)
+        TODO: change wallet_transaction_id to UUID 
         TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
+
+        TODO da valutare: db function to create wallet when create consumer 
       */
-      //
+
       // Try to insert, but ignore if already exists (upsert)
       const { error: createError } = await _admin.from("wallets").insert({
-        consumer_id: userObject.id,
+        user_id: userObject.id,
         balance_cents: 0,
         currency: "eur",
-      })
+      });
 
       if (createError) {
-        console.error("Failed to create wallet:", createError)
+        console.error("Failed to create wallet:", createError);
         // If the error is not a unique violation, fail; otherwise, continue
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
           success: false,
           message: "Failed to create wallet for user",
           error: createError.message,
-        })
+        });
       }
 
       // Fetch the wallet again (should exist now)
       const { data: fetchedWallet, error: fetchError } = await _admin
         .from("wallets")
-        .select("id, consumer_id, balance_cents, currency")
-        .eq("consumer_id", userObject.id)
-        .maybeSingle()
+        .select("id, user_id, balance_cents, currency")
+        .eq("user_id", userObject.id)
+        .maybeSingle();
 
       if (fetchError || !fetchedWallet) {
-        console.error("Failed to fetch wallet after upsert:", fetchError)
+        console.error("Failed to fetch wallet after upsert:", fetchError);
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
           success: false,
           message: "Failed to fetch wallet after creation",
           error: fetchError?.message,
-        })
+        });
       }
 
-      wallet = fetchedWallet
-      console.log(`Wallet created or found successfully: ${wallet.id}`)
+      wallet = fetchedWallet;
+      console.log(`Wallet created or found successfully: ${wallet.id}`);
     }
 
     // 6. Create PaymentIntent
@@ -149,7 +136,7 @@ export async function POST(req: NextRequest) {
           ...(metadata?.type && { type: metadata.type }),
         },
         description: `Wallet top-up for user ${userObject.id}`,
-      })
+      });
 
       return NextResponse.json(
         {
@@ -158,21 +145,21 @@ export async function POST(req: NextRequest) {
           success: true,
         },
         { status: 200 }
-      )
+      );
     } catch (stripeError: any) {
-      console.error("Failed to create PaymentIntent:", stripeError)
+      console.error("Failed to create PaymentIntent:", stripeError);
       return jsonErrorResponse(500, {
         code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
         success: false,
         message: `Stripe error: ${stripeError.message}`,
-      })
+      });
     }
   } catch (error: any) {
-    console.error("Error in wallet top-up:", error)
+    console.error("Error in wallet top-up:", error);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
       success: false,
       error: error.message || "Unknown error",
-    })
+    });
   }
 }

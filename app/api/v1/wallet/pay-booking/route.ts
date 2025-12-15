@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     // 2. Get Booking Details
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
-      .select("id, price, status, payment_status, consumer_id")
+      .select("id, price, status, payment_status, user_id")
       .eq("id", bookingId)
       .single()
 
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       .eq("id", userObject.id)
       .single()
 
-    if (!consumer || consumer.id !== booking.consumer_id) {
+    if (!consumer || consumer.id !== booking.user_id) {
       return jsonErrorResponse(403, {
         code: ResponseCodesConstants.FORBIDDEN.code,
         success: false,

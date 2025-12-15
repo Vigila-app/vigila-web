@@ -38,7 +38,7 @@ export async function GET(
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("id,balance_cents")
-      .eq("consumer_id", userObject.id)
+      .eq("user_id", userObject.id)
       .single();
 
     if (walletError || !wallet) {
@@ -85,7 +85,7 @@ export async function GET(
     if (allTransactions) {
         const incomeTypes = ["TOP_UP", "CREDIT", "BONUS", "REFUND"];
         const expenseTypes = ["PAYMENT", "DEBIT"];
-
+        //SELECT SUM(amount) FROM wallet_transactions WHERE user_id = wallet.user_id AND type=top_up
         totalDeposited = allTransactions
             .filter((tx) => incomeTypes.includes(tx.type))
             .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);

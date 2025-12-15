@@ -1,4 +1,4 @@
-enum TRANSACTION_TYPE {
+export enum TRANSACTION_TYPE {
   TOP_UP = "TOP_UP",
   CREDIT = "CREDIT",
   DEBIT = "DEBIT",
