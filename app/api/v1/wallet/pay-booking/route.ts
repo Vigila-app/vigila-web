@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       .from("bookings")
       .update({
         payment_status: PaymentStatusEnum.PAID,
-        status: "pending",
+        status: BookingStatusEnum.PENDING,
         payment_method: "WALLET",
         updated_at: new Date().toISOString(),
       })
