@@ -112,8 +112,8 @@ export async function POST(req: NextRequest) {
     const { data: newBalance, error: rpcError } = await supabase.rpc(
       "update_wallet_balance",
       {
-        p_wallet_id: wallet.id,
-        p_amount: -priceCents,
+        wallet_id: wallet.id,
+        amount: -priceCents,
       }
     );
 
