@@ -11,22 +11,30 @@ import {
 import Link from "next/link";
 import { BookingCardComponent } from "@/components/bookings";
 import Card from "@/components/card/card";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import BookingCounterComponent from "@/components/bookings/bookingCounter.component";
 import { ServicesComponent } from "@/components/services";
 import { Routes } from "@/src/routes";
+import WalletBalanceCard from "@/components/wallet/walletBalanceCard";
+import { EurConverter } from "@/src/utils/common.utils";
+import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
+import { useUserStore } from "@/src/store/user/user.store";
 
 export default function HomeConsumer() {
+  const { user } = useUserStore();
   const { bookings, getBookings } = useBookingsStore();
-
-  const handleGetBookings = async (force = false) => {
-    getBookings(force);
-  };
+  const { balance: storeBalance, getTransactions } = useTransactionsStore();
+  const balance = useMemo(() => {
+    return EurConverter(storeBalance);
+  }, [storeBalance]);
 
   useEffect(() => {
-    handleGetBookings();
+    getBookings();
+    if (user?.id) {
+      getTransactions(user.id);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id]);
 
   return (
     <div className="my-6 md:max-w-3xl mx-auto w-full px-4">
@@ -47,9 +55,14 @@ export default function HomeConsumer() {
         </div>
         <ServicesComponent />
       </section>
+      <WalletBalanceCard
+        balance={balance}
+        url={`${Routes.profileConsumer.url}?tab=wallet`}
+        icon={false}
+      />
       <BookingCounterComponent />
       <Card>
-        <section className="bg-consumer-light-blue rounded-2xl p-4 text-center space-y-3 border-consumer-blue border-2">
+        <section className="bg-consumer-light-blue rounded-2xl mt-3 p-4 text-center space-y-3 border-consumer-blue border-2">
           <h2 className="text-xl font-bold text-consumer-blue">
             Stai riscontrando delle difficoltà?
           </h2>
@@ -72,7 +85,7 @@ export default function HomeConsumer() {
             </div>
 
             <Link
-              href={`${Routes.profileConsumer.url}`}
+              href={`${Routes.profileConsumer.url}?tab=prenotazioni`}
               className="text-primary-red flex items-center text-sm">
               <ChevronRightIcon className="size-4 text-vigil-orange" />
             </Link>

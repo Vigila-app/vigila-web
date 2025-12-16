@@ -1,12 +1,9 @@
-import { ButtonLink, TabGroup } from "@/components";
+import { TabGroup } from "@/components";
 import React, { useMemo, useState, useEffect } from "react";
-import type { TransactionType } from "@/src/types/wallet.types";
 import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   ChevronRightIcon,
-  PlusIcon,
-  WalletIcon,
 } from "@heroicons/react/24/outline";
 import { Routes } from "@/src/routes";
 import { useUserStore } from "@/src/store/user/user.store";
@@ -14,16 +11,10 @@ import { TabItem } from "@/components/tabGroup/tabGroup";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
 import TransactionCardComponent from "@/components/wallet/transactionCardComponent";
 import Link from "next/link";
-import { ButtonStyle } from "@/components/button/button.style";
-import {
-  amountDisplay,
-  amountFormatter,
-  EurConverter,
-} from "@/src/utils/common.utils";
-import {
-  isValidExpenseType,
-  isValidTransactionType,
-} from "@/src/types/transactions.types";
+
+import { amountDisplay, EurConverter } from "@/src/utils/common.utils";
+
+import WalletBalanceCard from "@/components/wallet/walletBalanceCard";
 
 export default function WalletTab() {
   const { user } = useUserStore();
@@ -49,7 +40,6 @@ export default function WalletTab() {
         }
       }
     };
-    console.log(transactions);
     fetchData();
   }, [user?.id, getTransactions]);
 
@@ -67,55 +57,25 @@ export default function WalletTab() {
   const filteredTransactions = useMemo(() => {
     const now = new Date();
 
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
+
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
     return transactions.filter((tx) => {
+      if (selectedTab === "all") return true;
       const txDate = new Date(tx.created_at);
-
-      if (selectedTab === "week") {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(now.getDate() - 7);
-        return txDate >= oneWeekAgo;
-      }
-
-      if (selectedTab === "month") {
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(now.getMonth() - 1);
-        return txDate >= oneMonthAgo;
-      }
-
+      if (selectedTab === "week") return txDate >= oneWeekAgo;
+      if (selectedTab === "month") return txDate >= oneMonthAgo;
       return true;
     });
   }, [selectedTab, transactions]);
- console.log(storeBalance);
   return (
     <div className="flex flex-col items-center w-full sm:max-h-full">
       <h1 className="py-3 w-full text-lg font-semibold text-start">Wallet</h1>
       <div className="w-full">
-        <div className="flex flex-col gap-2 mb-1 bg-consumer-blue px-4 rounded-2xl">
-          {/* bilancio */}
-          <div className="flex justify-between items-center pt-4">
-            <div className="flex flex-col gap-2 px-2 py-3">
-              <p className="text-sm font-medium  text-white">
-                Saldo disponibile
-              </p>
-              <p className="text-5xl font-medium  text-white">
-                €{amountDisplay(balance)}
-              </p>
-            </div>
-            <span>
-              <WalletIcon className="w-9 h-9 text-white" />
-            </span>
-          </div>
-
-          <div className="flex  gap-12 justify-center w-full mb-4">
-            <ButtonLink
-              primary={false}
-              label={"Ricarica il tuo wallet "}
-              customClass={`${ButtonStyle.walletBtnStyle} w-full rounded-full py-3`}
-              href={Routes.walletTopUp.url}
-              icon={<PlusIcon className="w-5 h-5 text-consumer-blue" />}
-            />
-          </div>
-        </div>
+        <WalletBalanceCard balance={balance} />
         {/* Recap movimenti */}
         <div>
           <div className="flex mt-3 gap-3 w-full ">
