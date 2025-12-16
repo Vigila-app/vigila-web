@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("id, balance_cents")
-      .eq("consumer_id", consumer.id)
+      .eq("user_id", consumer.id)
       .single();
 
     if (walletError || !wallet) {
