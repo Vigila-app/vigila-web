@@ -115,6 +115,9 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   WALLET_WEBHOOK_DUPLICATE: {
     code: 8307,
   },
+  WALLET_NOT_FOUND: {
+    code: 8316,
+  },
   // endregion WALLET
 
   // region CMS
@@ -535,4 +538,4 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 7906,
   },
   // endregion VIGIL
-};
+}
