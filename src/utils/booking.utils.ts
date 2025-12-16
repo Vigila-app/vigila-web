@@ -175,11 +175,11 @@ export const BookingUtils = {
     }
   },
 
-  
   refundByWalletId: async (
     walletId: string,
     price: number,
-    bookingId: string
+    bookingId: string,
+    userId: string
   ) => {
     const supabase = getAdminClient()
 
@@ -187,6 +187,7 @@ export const BookingUtils = {
       .from("wallet_transactions")
       .insert({
         wallet_id: walletId,
+        user_id: userId,
         amount: price,
         type: EXPENSE_TYPE.DEBIT, //or refund type?
         status: TRANSACTION_STATUS.COMPLETED,

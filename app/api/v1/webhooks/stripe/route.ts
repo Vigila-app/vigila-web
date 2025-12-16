@@ -25,43 +25,42 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 export async function POST(req: NextRequest) {
   try {
     // Get the raw body for signature verification
-    //TODO: install stripe cli
-    const body = await req.text();
-    const signature = req.headers.get("stripe-signature");
+    const body = await req.text()
+    const signature = req.headers.get("stripe-signature")
 
     if (!signature) {
-      console.error("Missing stripe-signature header");
+      console.error("Missing stripe-signature header")
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
         success: false,
         message: "Missing stripe-signature header",
-      });
+      })
     }
 
     // Security: Verify the event signature using the official Stripe library
     // This prevents replay attacks and ensures the event is authentic
-    let event: Stripe.Event;
+    let event: Stripe.Event
     try {
-      event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
+      event = stripe.webhooks.constructEvent(body, signature, endpointSecret)
     } catch (err) {
-      console.error("Webhook signature verification failed:", err);
+      console.error("Webhook signature verification failed:", err)
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.PAYMENT_WEBHOOK_UNAUTHORIZED.code,
         success: false,
         message: "Webhook signature verification failed",
-      });
+      })
     }
 
     console.log(`Stripe webhook received: ${event.type}`, {
       eventId: event.id,
-    });
+    })
 
     // Handle specific event types
     switch (event.type) {
       case "payment_intent.succeeded":
-        return await handlePaymentIntentSucceeded(event);
+        return await handlePaymentIntentSucceeded(event)
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`Unhandled event type: ${event.type}`)
         return NextResponse.json(
           {
             code: ResponseCodesConstants.PAYMENT_WEBHOOK_UNMANAGED.code,
@@ -69,7 +68,7 @@ export async function POST(req: NextRequest) {
             message: `Event type ${event.type} not handled`,
           },
           { status: 200 }
-        );
+        )
     }
   } catch (error) {
     console.error("Error processing Stripe webhook:", error);

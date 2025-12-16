@@ -136,26 +136,27 @@ export async function POST(req: NextRequest) {
         status: TRANSACTION_STATUS.COMPLETED,
         description: `Pagamento prenotazione #${booking.id}`,
         created_at: new Date().toISOString(),
-        // metadata? booking_id?
-      });
+        user_id: userObject.id,
+      })
 
     if (txError) {
-      console.error("Error recording transaction:", txError);
+      console.error("Error recording transaction:", txError)
 
       //Solving: since this is a wallet situation, the money have already been spent.
       //This means we don't need to work with Stripe, but just reset the balance on the wallet.
       const refundError = await BookingUtils.refundByWalletId(
         wallet.id,
         priceCents,
-        booking.id
-      ); //logging handled in the utils function
+        booking.id,
+        userObject.id
+      ) //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.INTERNAL_SERVER_ERROR.code,
           success: false,
           message:
             "Critical error: payment deducted but failed to record transaction — manual reconciliation required.",
-        });
+        })
       }
     }
 
@@ -168,22 +169,23 @@ export async function POST(req: NextRequest) {
         payment_method: "WALLET",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", bookingId);
+      .eq("id", bookingId)
 
     if (updateError) {
-      console.error("Error updating booking status:", updateError);
+      console.error("Error updating booking status:", updateError)
       const refundError = await BookingUtils.refundByWalletId(
         wallet.id,
         priceCents,
-        booking.id
-      ); //logging handled in the utils function
+        booking.id,
+        userObject.id
+      ) //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.INTERNAL_SERVER_ERROR.code,
           success: false,
           message:
             "Critical error: payment deducted but failed to record transaction — manual reconciliation required.",
-        });
+        })
       }
     }
 

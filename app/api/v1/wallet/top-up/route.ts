@@ -64,15 +64,10 @@ export async function POST(req: NextRequest) {
     if (!wallet) {
       console.log(
         `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
-      );
+      )
       /*
-        // TODO: usare enum  
-        // TODO: check "Payment intent does not belong to the authenticated user"
-        // TODO: consumer_id -> user_id su wallets 
-        // TODO: change wallet id to uuid
         TODO: check count functions on supabase
         TODO: add user_id to transactions (UUID)
-        // TODO: change wallet_transaction_id to UUID 
         TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
 
         TODO da valutare: db function to create wallet when create consumer 
@@ -83,17 +78,17 @@ export async function POST(req: NextRequest) {
         user_id: userObject.id,
         balance_cents: 0,
         currency: "eur",
-      });
+      })
 
       if (createError) {
-        console.error("Failed to create wallet:", createError);
+        console.error("Failed to create wallet:", createError)
         // If the error is not a unique violation, fail; otherwise, continue
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
           success: false,
           message: "Failed to create wallet for user",
           error: createError.message,
-        });
+        })
       }
 
       // Fetch the wallet again (should exist now)
@@ -101,20 +96,20 @@ export async function POST(req: NextRequest) {
         .from("wallets")
         .select("id, user_id, balance_cents, currency")
         .eq("user_id", userObject.id)
-        .maybeSingle();
+        .maybeSingle()
 
       if (fetchError || !fetchedWallet) {
-        console.error("Failed to fetch wallet after upsert:", fetchError);
+        console.error("Failed to fetch wallet after upsert:", fetchError)
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.WALLET_TOP_UP_ERROR.code,
           success: false,
           message: "Failed to fetch wallet after creation",
           error: fetchError?.message,
-        });
+        })
       }
 
-      wallet = fetchedWallet;
-      console.log(`Wallet created or found successfully: ${wallet.id}`);
+      wallet = fetchedWallet
+      console.log(`Wallet created or found successfully: ${wallet.id}`)
     }
 
     // 6. Create PaymentIntent
