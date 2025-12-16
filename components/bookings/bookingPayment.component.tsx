@@ -74,7 +74,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   const { bookings, getBookingDetails } = useBookingsStore();
   const { services, getServiceDetails } = useServicesStore();
   const { vigils, getVigilsDetails } = useVigilStore();
-  const { transactions, getTransactions } = useTransactionsStore();
+  const { balance, getTransactions } = useTransactionsStore();
 
   const { showLoader, hideLoader } = useAppStore();
 
@@ -83,14 +83,10 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     [bookings, bookingId]
   );
 
-  const walletBalance = useMemo(() => {
-    return transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  }, [transactions]);
-
   const canPayWithWallet = useMemo(() => {
     if (!booking) return false;
-    return walletBalance >= booking.price * 100;
-  }, [walletBalance, booking]);
+    return balance >= booking.price * 100;
+  }, [balance, booking]);
 
   const service = useMemo(
     () => services.find((s) => s.id === booking?.service_id),
@@ -141,19 +137,25 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
     if (booking?.id && service?.id && paymentMethod === "stripe") {
       loadBookingAndCreatePayment();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.id, service?.id, paymentMethod]);
 
   useEffect(() => {
     if (bookingId) getBookingDetails(bookingId, true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
+
   useEffect(() => {
     if (user?.id) getTransactions(user.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
   useEffect(() => {
     if (booking?.id) {
       getServiceDetails(booking.service_id);
       getVigilsDetails([booking.vigil_id]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.id]);
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
@@ -294,7 +296,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                 Usa credito wallet
               </p>
               <p className="text-xs text-gray-500">
-                Saldo residuo: {amountDisplay(walletBalance / 100)} €
+                Saldo residuo: {amountDisplay(balance / 100)} €
               </p>
             </div>
           </div>
