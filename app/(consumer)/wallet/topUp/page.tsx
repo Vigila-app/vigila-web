@@ -72,11 +72,11 @@ export default function WalletTopUp() {
             role={RolesEnum.CONSUMER}
           />
 
-          <div className="text-center mt-4">
+          {/* <div className="text-center mt-4">
             <button className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors">
               Hai un codice? Riscatta qui
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
           }),
           ...(metadata?.type && { type: metadata.type }),
         },
-        description: `Wallet top-up for user ${userObject.id}`,
+        description: "Ricarica wallet",
       });
 
       return NextResponse.json(

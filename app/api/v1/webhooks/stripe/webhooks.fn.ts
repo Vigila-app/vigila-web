@@ -78,7 +78,7 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
       status: TRANSACTION_STATUS.COMPLETED,
       type: transaction_type as TRANSACTION_TYPE,
       description:
-        paymentIntent.description || `Wallet top-up for user ${user_id}`,
+        paymentIntent.description || "Ricarica wallet",
       created_at: new Date().toISOString(),
     })
     .select()
