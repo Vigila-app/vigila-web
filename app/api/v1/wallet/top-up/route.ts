@@ -65,13 +65,7 @@ export async function POST(req: NextRequest) {
       console.log(
         `Wallet missing for consumer ${userObject.id}. Creating new wallet (with upsert)...`
       )
-      /*
-        TODO: check count functions on supabase
-        TODO: add user_id to transactions (UUID)
-        TODO: Manuel -> dove c'e' paginazione add calc totale speso e depositato 
 
-        TODO da valutare: db function to create wallet when create consumer 
-      */
 
       // Try to insert, but ignore if already exists (upsert)
       const { error: createError } = await _admin.from("wallets").insert({
