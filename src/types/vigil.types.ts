@@ -3,6 +3,7 @@ import { AddressI } from "./maps.types";
 
 export type VigilDetailsType = {
   displayName?: string;
+  verified?: boolean;
   photoURL?: string;
   name?: string;
   surname?: string;

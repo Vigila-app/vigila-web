@@ -99,19 +99,24 @@ const ServiceCard = (props: ServiceCardI) => {
               {/* {<span>(età)</span>} */}
             </div>
             <div className="inline-flex items-center flex-nowrap gap-2 w-full">
-              <Badge
-                label={
-                  <span className="inline-flex gap-1 items-center">
-                    <ShieldCheckIcon className="size-3" />
-                    Verificato
-                  </span>
-                }
-                color="green"
-              />
-              {service?.vigil?.occupation ? (
+              {vigilDetails?.verified ? (
                 <Badge
                   label={
-                    OccupationLabels[service.vigil.occupation as OccupationEnum]
+                    <span className="inline-flex gap-1 items-center">
+                      <ShieldCheckIcon className="size-3" />
+                      Verificato
+                    </span>
+                  }
+                  color="green"
+                />
+              ) : null}
+              {service?.vigil?.occupation &&
+              service.vigil?.occupation !== OccupationEnum.OTHER ? (
+                <Badge
+                  label={
+                    OccupationLabels[
+                      service.vigil.occupation.trim() as OccupationEnum
+                    ]
                   }
                   color="blue"
                 />

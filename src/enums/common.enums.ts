@@ -34,6 +34,7 @@ export enum CurrencyEnum {
 export enum OccupationEnum {
   STUDENT = "studente",
   UNEMPLOYED = "disoccupato",
+  OSA = "osa",
   OSS = "oss",
   NURSE = "infermiere",
   EMPLOYEE = "impiegato",
@@ -43,6 +44,7 @@ export enum OccupationEnum {
 export const OccupationLabels: Record<OccupationEnum, string> = {
   [OccupationEnum.STUDENT]: "Studente",
   [OccupationEnum.UNEMPLOYED]: "Disoccupato",
+  [OccupationEnum.OSA]: "Operatore Socio Assistenziale (OSA)",
   [OccupationEnum.OSS]: "Operatore Socio Sanitario (OSS)",
   [OccupationEnum.NURSE]: "Infermiere",
   [OccupationEnum.EMPLOYEE]: "Impiegato",
