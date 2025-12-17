@@ -71,8 +71,8 @@
       "max_hourly_rate": 12,
       "minimum_duration_hours": 1,
       "extra": [],
-      "occupation": [],
-      "professional": false,
+      "occupation": ["oss", "osa", "infermiere"],
+      "professional": true,
       "tags": [
         "assistenza",
         "persona",
