@@ -23,7 +23,11 @@ import { useUserStore } from "@/src/store/user/user.store";
 export default function HomeConsumer() {
   const { user } = useUserStore();
   const { bookings, getBookings } = useBookingsStore();
-  const { balance: storeBalance, getTransactions } = useTransactionsStore();
+  const {
+    balance: storeBalance,
+    getTransactions,
+    transactions,
+  } = useTransactionsStore();
   const balance = useMemo(() => {
     return EurConverter(storeBalance);
   }, [storeBalance]);
@@ -57,7 +61,11 @@ export default function HomeConsumer() {
       </section>
       <WalletBalanceCard
         balance={balance}
-        url={`${Routes.profileConsumer.url}?tab=wallet`}
+        url={
+          balance === 0
+            ? `${Routes.wallet.url}`
+            : `${Routes.profileConsumer.url}?tab=wallet`
+        }
         icon={false}
       />
       <BookingCounterComponent />

@@ -149,18 +149,18 @@ export default function WalletTab() {
           </div>
         </div>
         <div className="w-full mt-6">
-          <div className="bg-vigil-light-orange border border-vigil-orange rounded-3xl p-6 text-center shadow-sm">
-            <h3 className="text-vigil-orange font-bold text-lg mb-1">
+          <div className="bg-consumer-light-blue border border-consumer-blue rounded-3xl p-6 text-center shadow-sm">
+            <h3 className="text-consumer-blue font-bold text-lg mb-1">
               Risparmia con i pacchetti prepagati
             </h3>
 
-            <p className="text-vigil-orange text-sm font-medium opacity-80 mb-5">
+            <p className="text-consumer-blue text-sm font-medium opacity-80 mb-5">
               Ottieni fino al 30% di bonus ricaricando il tuo wallet
             </p>
 
             <Link
               href={Routes.wallet.url}
-              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-[#E85C3A] text-[#E85C3A] font-semibold text-sm hover:bg-[#E85C3A] hover:text-white transition-all duration-300">
+              className="group flex items-center justify-center w-full py-3 px-4 rounded-full border border-consumer-blue text-consumer-blue font-semibold text-sm hover:bg-consumer-blue hover:text-white transition-all duration-300">
               Scopri i pacchetti
               <ChevronRightIcon
                 className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"

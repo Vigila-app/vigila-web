@@ -15,8 +15,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { BundleCard } from "@/components/wallet/bundleCard.component";
 import { WalletPaymentComponent } from "@/components/wallet/walletPaymentComponent";
+import { useUserStore } from "@/src/store/user/user.store";
+import { useRouter } from "next/navigation";
 
 const WalletLanding = () => {
+  const { user } = useUserStore();
+  const router = useRouter();
   const steps = [
     {
       id: 1,
@@ -74,6 +78,14 @@ const WalletLanding = () => {
     []) as unknown as BundleCatalogType[];
   const [selectedBundle, setSelectedBundle] =
     useState<BundleCatalogType | null>(null);
+
+  const handleBundleSelection = (bundle: BundleCatalogType) => {
+    if (user?.id) {
+      setSelectedBundle(bundle);
+    } else {
+      router.push(Routes.registration.url);
+    }
+  };
 
   useEffect(() => {
     if (selectedBundle) {
@@ -140,7 +152,7 @@ const WalletLanding = () => {
                 <BundleCard
                   key={pkg.id}
                   bundle={pkg}
-                  onSelect={(bundle) => setSelectedBundle(bundle)}
+                  onSelect={handleBundleSelection}
                 />
               ))}
             </div>

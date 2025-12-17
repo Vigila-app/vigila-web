@@ -19,7 +19,7 @@ interface WalletBalanceCardProps {
 export const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
   balance,
   label = "Ricarica il tuo wallet",
-  url = Routes.wallet.url,
+  url = Routes.walletTopUp.url,
   icon = true,
 }) => {
   return (
