@@ -63,8 +63,8 @@ const apiControllers = {
     `${apiBase.V1(isMock)}/wallet/top-up`,
   PAY_BOOKING: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/wallet/pay-booking`,
-  TRANSACTIONS: (userId: string, isMock?: boolean): string =>
-    `${apiBase.V1(isMock)}/wallet/transactions/${userId}`,
+  TRANSACTIONS: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/wallet/transactions/`,
   // endregion WALLET
 
   // region WEBHOOKS
@@ -193,8 +193,8 @@ export const apiPayment = {
 export const apiWallet = {
   TOP_UP: (isMock?: boolean): string => apiControllers.WALLET_TOP_UP(isMock),
   PAY_BOOKING: (isMock?: boolean): string => apiControllers.PAY_BOOKING(isMock),
-  TRANSACTIONS: (userId: string, isMock?: boolean): string =>
-    apiControllers.TRANSACTIONS(userId, isMock),
+  TRANSACTIONS: (isMock?: boolean): string =>
+    apiControllers.TRANSACTIONS(isMock),
 };
 
 export const apiWebhooks = {

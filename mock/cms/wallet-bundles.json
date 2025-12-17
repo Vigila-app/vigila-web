@@ -18,8 +18,8 @@
       "id": "standard_1",
       "name": "STANDARD",
       "price": 100,
-      "bonus_percentage": 20,
-      "credit_amount": 120,
+      "bonus_percentage": 10,
+      "credit_amount": 110,
       "features": [
         "Credito immediato disponibile",
         "Nessuna scadenza",
@@ -32,8 +32,8 @@
       "id": "premium_1",
       "name": "PREMIUM",
       "price": 200,
-      "bonus_percentage": 25,
-      "credit_amount": 250,
+      "bonus_percentage": 10,
+      "credit_amount": 220,
       "features": [
         "Credito immediato disponibile",
         "Nessuna scadenza",
@@ -47,8 +47,8 @@
       "id": "family_1",
       "name": "FAMILY",
       "price": 500,
-      "bonus_percentage": 30,
-      "credit_amount": 650,
+      "bonus_percentage": 10,
+      "credit_amount": 550,
       "features": [
         "Credito immediato disponibile",
         "Nessuna scadenza",

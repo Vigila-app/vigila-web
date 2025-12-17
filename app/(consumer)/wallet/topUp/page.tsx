@@ -2,26 +2,35 @@
 import React, { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import Button from "@/components/button/button"; // Il tuo bottone
+import Button from "@/components/button/button"; 
 import { Routes } from "@/src/routes";
-import { TopUpOption } from "@/src/types/wallet.types";
 import TopUpCard from "@/components/wallet/topUpCard.component";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 import { WalletPaymentComponent } from "@/components/wallet/walletPaymentComponent";
 
-import MOCK_OPTIONS from "@/mock/cms/wallet-topup-options.json"
+import MOCK_BUNDLES from "@/mock/cms/wallet-bundles.json";
+import { TopUpOption } from "@/src/types/wallet.types";
 
 export default function WalletTopUp() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
+
+  // Normalizziamo i bundle del CMS nel formato TopUpOption (payAmount/creditAmount)
+  const bundles: TopUpOption[] = (MOCK_BUNDLES.wallet_bundles || []).map(
+    (bundle) => ({
+      id: String(bundle.id),
+      payAmount: bundle.price,
+      creditAmount: bundle.credit_amount,
+    })
+  );
 
   const handleContinue = () => {
     if (!selectedId) return;
     setShowPayment(true);
   };
 
-  const selectedOption = MOCK_OPTIONS.find((opt) => opt.id === selectedId);
+  const selectedBundle = bundles.find((bun) => bun.id === selectedId);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 flex justify-center font-sans">
@@ -52,11 +61,11 @@ export default function WalletTopUp() {
         </div>
 
         <div className="flex flex-col gap-4 mb-8">
-          {MOCK_OPTIONS.map((option) => (
+          {bundles.map((bundle) => (
             <TopUpCard
-              key={option.id}
-              option={option}
-              isSelected={selectedId === option.id}
+              key={bundle.id}
+              option={bundle}
+              isSelected={selectedId === bundle.id}
               onSelect={setSelectedId}
             />
           ))}
@@ -81,15 +90,15 @@ export default function WalletTopUp() {
       </div>
 
       {/* Modal Pagamento */}
-      {showPayment && selectedOption && (
+      {showPayment && selectedBundle && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm">
           <div className="flex min-h-full items-center justify-center p-4">
             <WalletPaymentComponent
               paymentItem={{
-                id: selectedOption.id,
-                name: `Ricarica €${selectedOption.creditAmount}`,
-                price: selectedOption.payAmount,
-                creditAmount: selectedOption.creditAmount,
+                id: selectedBundle.id,
+                name: `Ricarica €${selectedBundle.creditAmount}`,
+                price: selectedBundle.payAmount,
+                creditAmount: selectedBundle.creditAmount,
                 metadataType: "wallet_topup",
               }}
               onCancel={() => setShowPayment(false)}

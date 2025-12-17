@@ -6,9 +6,9 @@ export const TransactionsService = {
   getTransactions: async (userId: string) =>
     new Promise<WalletDataI>(async (resolve, reject) => {
       try {
-        const result = (await ApiService.get(
-          apiWallet.TRANSACTIONS(userId)
-        )) as { data: WalletDataI };
+        const result = (await ApiService.get(apiWallet.TRANSACTIONS())) as {
+          data: WalletDataI;
+        };
         const { data: response } = result;
         resolve(response);
       } catch (error) {
