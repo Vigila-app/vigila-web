@@ -14,7 +14,6 @@ import {
   CalendarIcon,
   ExclamationTriangleIcon,
   EyeIcon,
-  // HeartIcon,
   MapPinIcon,
 } from "@heroicons/react/24/outline";
 import { dateDisplay } from "@/src/utils/date.utils";
@@ -70,6 +69,7 @@ const ServiceCard = (props: ServiceCardI) => {
   }, [vigilDetails?.averageRating, vigilDetails?.reviews]);
 
   const serviceCatalog: ServiceCatalogItem = useMemo(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     () =>
       service?.info?.catalog_id &&
       ServicesService.getServiceCatalogById(service.info.catalog_id),
@@ -175,14 +175,27 @@ const ServiceCard = (props: ServiceCardI) => {
               </div>
             ) : null}
           </div>
-          <div className="text-sm text-gray-600 ">
-            <p>{service?.description}</p>
+          <div className="text-sm font-light text-gray-600 ">
+            <p>{serviceCatalog?.description}</p>
             {simplified && role === RolesEnum.VIGIL && (
-              <p>
-                Prezzo: &nbsp;
-                {service?.unit_price}
-                {service?.currency}
-              </p>
+              <>
+                {service.info?.extras?.length ? (
+                  <p className="font-normal my-2">
+                    Extra attivi: &nbsp;
+                    {serviceCatalog.extra
+                      .filter((extra) =>
+                        service.info?.extras?.includes(extra.id)
+                      )
+                      .map((extra) => `${extra.name} €${extra.fixed_price}`)
+                      .join(", ")}
+                  </p>
+                ) : null}
+                <p className="font-normal my-2">
+                  Tariffa: &nbsp;
+                  {service?.currency}
+                  {service?.unit_price}/h
+                </p>
+              </>
             )}
           </div>
         </div>
@@ -260,20 +273,21 @@ const ServiceCard = (props: ServiceCardI) => {
       {showDeleteModal && onDelete && (
         <div className="fixed inset-0  bg-white/10 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <h3 className="text-lg font-bold mb-2">Conferma eliminazione</h3>
+            <h3 className="text-lg font-bold mb-2">Conferma rimozione</h3>
             <p className="mb-4">
-              Sei sicuro di voler eliminare il servizio <b>{service.name}</b>?
-              Questa azione non può essere annullata.
+              Sei sicuro di voler rimuovere il servizio <b>{service.name}</b>?
+              <br />
             </p>
             <div className="flex gap-6 justify-center">
               <Button
+                secondary
                 label="Annulla"
                 role={RolesEnum.CONSUMER}
                 type="button"
                 action={() => setShowDeleteModal(false)}
               />
               <Button
-                label="Elimina"
+                label="Rimuovi"
                 type="button"
                 danger
                 action={() => {

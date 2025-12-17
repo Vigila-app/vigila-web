@@ -27,6 +27,8 @@ const SearchAddress = (props: {
   id?: string;
   name?: string;
   debounce?: number;
+  addressTypes?: string[];
+  resetOnSubmit?: boolean;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -40,6 +42,8 @@ const SearchAddress = (props: {
     id,
     name,
     debounce = 1500,
+    addressTypes,
+    resetOnSubmit = false,
   } = props;
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
@@ -64,6 +68,10 @@ const SearchAddress = (props: {
 
   const submit = (address: AddressI) => {
     eOnSubmit(address);
+    if (resetOnSubmit) {
+      setSearchTerm("");
+      setSubmitted(false);
+    }
   };
 
   const validateAddress = async (address: Partial<AddressI>) => {
@@ -129,7 +137,7 @@ const SearchAddress = (props: {
       if (debouncedSearchTerm?.length >= minLength) {
         setIsLoading(true);
         const results =
-          await MapsService.autocompleteAddress(debouncedSearchTerm);
+          await MapsService.autocompleteAddress(debouncedSearchTerm, addressTypes);
         setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
@@ -183,6 +191,7 @@ const SearchAddress = (props: {
                 field.onChange(value);
                 setSearchTerm(value as string);
               }}
+              disabled={isLoading}
               value={searchTerm}
               autoFocus={autoFocus}
               label={label}
@@ -254,7 +263,7 @@ const SearchAddress = (props: {
       ) : null}
       {submitted && !autocompleteResults.length ? (
         <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
-      ) : !autocompleteResults.length && !isLoading ? (
+      ) : searchTerm && !autocompleteResults.length && !isLoading ? (
         <div className="text-gray-500">
           Nessun risultato trovato, perfavore perfeziona la ricerca
         </div>

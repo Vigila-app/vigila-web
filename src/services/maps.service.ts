@@ -17,7 +17,7 @@ export const MapsService = {
           resolve(response.data[0]);
         } else {
           useAppStore.getState().showToast({
-            message: "Address not found!",
+            message: "Indirizzo non trovato!",
             type: ToastStatusEnum.ERROR,
           });
           reject(
@@ -31,7 +31,10 @@ export const MapsService = {
         reject(error);
       }
     }),
-  autocompleteAddress: async (search: string): Promise<AddressI[]> =>
+  autocompleteAddress: async (
+    search: string,
+    addresstypes = ["road", "village", "town", "suburb", "neighbourhood"]
+  ): Promise<AddressI[]> =>
     new Promise(async (resolve, reject) => {
       try {
         const response = (await ApiService.post(apiMaps.VALIDATE(), {
@@ -45,11 +48,7 @@ export const MapsService = {
               (result) =>
                 result?.lat &&
                 result?.lon &&
-                (((result.addresstype === "road" ||
-                  result.addresstype === "village" ||
-                  result.addresstype === "town" ||
-                  result.addresstype === "suburb" ||
-                  result.addresstype === "neighbourhood") &&
+                ((addresstypes.includes(result.addresstype) &&
                   result.importance > 0.03) ||
                   result.addresstype === "place") &&
                 result.address?.country_code === "it" &&

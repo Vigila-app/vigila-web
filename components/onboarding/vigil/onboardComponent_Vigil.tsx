@@ -19,7 +19,10 @@ import clsx from "clsx";
 import Card from "@/components/card/card";
 import { ServicesCatalog } from "@/components";
 import { ServiceI } from "@/src/types/services.types";
-import { ExclamationTriangleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationTriangleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
 import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
 
@@ -201,7 +204,7 @@ const VigilOnboardComponent = () => {
                   }
                   required
                   role={role}
-                  autoComplete="given-date"
+                  autoComplete="bday"
                   error={errors.birthday}
                   aria-invalid={!!errors.birthday}
                 />
@@ -222,6 +225,7 @@ const VigilOnboardComponent = () => {
                   role={role}
                   aria-invalid={!!errors.phone}
                   error={errors.phone}
+                  autoComplete="tel"
                 />
               )}
             />
@@ -285,6 +289,15 @@ const VigilOnboardComponent = () => {
                 <div>
                   <SearchAddress
                     role={RolesEnum.VIGIL}
+                    autoFocus={false}
+                    addressTypes={[
+                      "road",
+                      "village",
+                      "town",
+                      "suburb",
+                      "neighbourhood",
+                      "postcode",
+                    ]}
                     onSubmit={(address) => {
                       setAddresses((prev) => {
                         if (
@@ -292,41 +305,52 @@ const VigilOnboardComponent = () => {
                             (a) => a.display_name === address.display_name
                           )
                         )
-                          return prev
-                        return [...prev, address]
-                      })
+                          return prev;
+                        return [...prev, address];
+                      });
                     }}
-                    placeholder="Inserisci la città con il CAP"
-                    label="Scegli tutte le zone in cui vorresti offrire i tuoi servizi"
+                    resetOnSubmit
+                    placeholder="Inserisci il CAP e il nome della città in cui offri i tuoi servizi"
+                    label="Area operativa dei tuoi servizi"
                   />
                   {addresses.length ? (
-                    <ul className="mt-2 pl-4 text-sm  space-y-1">
-                      {addresses.map((addr, i) => (
-                        <li
-                          key={i}
-                          className="w-full inline-flex items-center gap-2 text-black text-sm"
-                        >
-                          <span>
-                            {(addr?.address
-                              ? `${addr.address.city || addr.address.town || addr.address.village || addr.address.suburb}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
-                              : null) || addr.display_name}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAddresses((prev) =>
-                                prev.filter((_, index) => index !== i)
-                              )
-                            }}
-                            className="text-red-500 hover:text-red-700 font-bold"
-                            aria-label="Rimuovi indirizzo"
+                    <div>
+                      <h4>Aree operative scelte:</h4>
+                      <ul className="mt-2 pl-4 text-sm flex flex-col gap-2">
+                        {addresses.map((addr, i) => (
+                          <li
+                            key={i}
+                            className="w-fit inline-flex items-center gap-2 text-black text-sm border rounded-full px-2 py-1 bg-consumer-blue/10 border-consumer-blue/30"
                           >
-                            <XCircleIcon className="size-3" />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
+                            <span>
+                              {(addr?.address
+                                ? `${addr.address.neighbourhood || addr.address.suburb ? `${addr.address.neighbourhood || addr.address.suburb}, ` : ""}${addr.address.city || addr.address.town || addr.address.village}${addr.address.city !== addr.address.county ? ` (${addr.address.county})` : ""}, ${addr.address.postcode || ""}`
+                                : null) || addr.display_name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAddresses((prev) =>
+                                  prev.filter((_, index) => index !== i)
+                                );
+                              }}
+                              className="text-red-500 hover:text-red-700 font-bold"
+                              aria-label="Rimuovi indirizzo"
+                            >
+                              <XCircleIcon className="size-5" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <a href="#search" className="inline-flex justify-center w-full my-2 items-center gap-1 text-sm animate-pulse">
+                      <ExclamationTriangleIcon className="size-5 min-w-4 text-vigil-orange" />
+                      <span className="border-b border-vigil-orange">
+                        Aggiungi almeno un&apos;area per continuare
+                      </span>
+                    </a>
+                  )}
 
                   {errors.addresses && (
                     <p className="text-red-500 text-xs">
@@ -379,7 +403,7 @@ const VigilOnboardComponent = () => {
                 <TextArea
                   {...field}
                   label="La tua esperienza"
-                  placeholder="Raccontaci se hai mai avuto nonni, parenti anziani, o se è la tua prima volta..."
+                  placeholder="Raccontaci se hai mai avuto esperienza di assistenza a nonni, parenti anziani, o se è la tua prima volta in questo ambito. Puoi anche indicarci eventuali competenze particolari che possiedi."
                   type="text"
                   required
                   role={role}
@@ -415,7 +439,7 @@ const VigilOnboardComponent = () => {
         </div>
       </Card>
     </div>
-  )
+  );
 };
 
 export default VigilOnboardComponent;

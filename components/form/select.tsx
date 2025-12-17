@@ -14,6 +14,7 @@ type Option = {
 
 type SelectProps = {
   label?: string;
+  id?: string;
   placeholder?: string;
   error?: FieldError;
   options: Option[];
@@ -26,6 +27,7 @@ type SelectProps = {
 
 const Select = ({
   label,
+  id,
   placeholder,
   error,
   options,
@@ -74,17 +76,19 @@ const Select = ({
       <button
         type="button"
         role="select"
+        id={id || label?.toLowerCase().replace(/\s+/g, "-")}
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={clsx(
           "w-full p-3 text-left rounded-4xl border bg-white shadow-sm",
           "focus:outline-none",
           role === RolesEnum.CONSUMER &&
-            "text-consumer-blue border-consumer-blue focus:ring-1 focus:ring-consumer-blue",
+            "border-consumer-blue focus:ring-1 focus:ring-consumer-blue",
           role === RolesEnum.VIGIL &&
-            "text-vigil-orange border-vigil-orange focus:ring-1 focus:ring-vigil-orange",
+            "border-vigil-orange focus:ring-1 focus:ring-vigil-orange",
           error && "border-red-500",
-          disabled && "!bg-gray-100 cursor-not-allowed"
+          disabled && "!bg-gray-100 cursor-not-allowed",
+          "scroll-m-12"
         )}
       >
         {selected ? selected.label : placeholder || "Seleziona..."}
@@ -92,14 +96,15 @@ const Select = ({
 
       {/* Dropdown Options */}
       {open && (
-        <ul className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-60 overflow-auto">
+        <ul className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-64 overflow-auto">
           {options.map((option) => (
             <li
               key={option.value}
               className={clsx(
-                "cursor-pointer px-4 py-2 text-sm text-vigil-orange hover:bg-gray-100",
+                "cursor-pointer px-4 py-2 text-sm hover:bg-gray-100",
                 option.disabled && "text-gray-400 cursor-not-allowed",
-                option.value === value && "font-semibold"
+                option.value === value &&
+                  "font-semibold underline underline-offset-2"
               )}
               onClick={() => {
                 if (option.disabled) return;

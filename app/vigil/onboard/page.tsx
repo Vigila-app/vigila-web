@@ -1,6 +1,6 @@
 "use client";
 
-import { RolesEnum } from "@/src/enums/roles.enums";
+import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { Routes } from "@/src/routes";
 import { useUserStore } from "@/src/store/user/user.store";
 import dynamic from "next/dynamic";
@@ -19,11 +19,11 @@ export default function Profile() {
   useEffect(() => {
     if (user?.user_metadata?.role === RolesEnum.VIGIL) {
       switch (user?.user_metadata?.status) {
-        case "active":
-          router.replace(Routes.profileVigil.url)
-          break
+        case UserStatusEnum.ACTIVE:
+          router.replace(Routes.profileVigil.url);
+          break;
         default:
-          break
+          break;
       }
     }
   }, [user, router]);
