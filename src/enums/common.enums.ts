@@ -38,6 +38,8 @@ export enum OccupationEnum {
   OSS = "oss",
   NURSE = "infermiere",
   EMPLOYEE = "impiegato",
+  PART_TIME_EMPLOYEE = "impiegato-part-time",
+  FAMILY_CAREGIVER = "assistente-familiare",
   OTHER = "altro",
 }
 
@@ -48,5 +50,7 @@ export const OccupationLabels: Record<OccupationEnum, string> = {
   [OccupationEnum.OSS]: "Operatore Socio Sanitario (OSS)",
   [OccupationEnum.NURSE]: "Infermiere",
   [OccupationEnum.EMPLOYEE]: "Impiegato",
+  [OccupationEnum.PART_TIME_EMPLOYEE]: "Impiegato Part-Time",
+  [OccupationEnum.FAMILY_CAREGIVER]: "Assistente Familiare",
   [OccupationEnum.OTHER]: "Altro",
 };
