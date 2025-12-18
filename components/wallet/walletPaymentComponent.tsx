@@ -1,42 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { CheckoutForm } from "@/components/checkout"
-import { useUserStore } from "@/src/store/user/user.store"
-import { PaymentService } from "@/src/services"
-import { useAppStore } from "@/src/store/app/app.store"
-import { useRouter } from "next/navigation"
-import { Routes } from "@/src/routes"
+import { useState, useEffect } from "react";
+import { CheckoutForm } from "@/components/checkout";
+import { useUserStore } from "@/src/store/user/user.store";
+import { PaymentService } from "@/src/services";
+import { useAppStore } from "@/src/store/app/app.store";
+import { useRouter } from "next/navigation";
+import { Routes } from "@/src/routes";
 
 type WalletPaymentItem = {
-  id: string | number
-  name: string
-  price: number
-  creditAmount: number
-  metadataType?: string
-}
+  id: string | number;
+  name: string;
+  price: number;
+  creditAmount: number;
+  metadataType?: string;
+};
 
 type WalletPaymentProps = {
-  paymentItem: WalletPaymentItem
-  onCancel: () => void
-}
+  paymentItem: WalletPaymentItem;
+  onCancel: () => void;
+  onSuccess?: (paymentIntentId: string) => void;
+};
 
 export const WalletPaymentComponent = ({
   paymentItem,
   onCancel,
+  onSuccess,
 }: WalletPaymentProps) => {
-  const [clientSecret, setClientSecret] = useState<string>("")
-  const [error, setError] = useState<string>("")
-  const router = useRouter()
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const router = useRouter();
 
-  const { user, getUserDetails } = useUserStore() // getUserDetails per aggiornare il saldo dopo
-  const { showLoader, hideLoader } = useAppStore()
+  const { user, getUserDetails } = useUserStore(); // getUserDetails per aggiornare il saldo dopo
+  const { showLoader, hideLoader } = useAppStore();
 
   // 1. Creazione del Payment Intent per il Wallet
   const createWalletPayment = async () => {
     try {
-      setError("")
-      showLoader()
+      setError("");
+      showLoader();
 
       if (user?.id && paymentItem) {
         // Qui chiami il servizio di pagamento.
@@ -52,58 +54,61 @@ export const WalletPaymentComponent = ({
             bundleId: Number(paymentItem.id),
             creditAmount: paymentItem.creditAmount,
           },
-        })
+        });
 
         if (response.success) {
-          setClientSecret(response.clientSecret)
+          setClientSecret(response.clientSecret);
         } else {
-          console.error("Payment intent creation failed:", response)
-          setError("Errore durante la creazione del pagamento")
+          console.error("Payment intent creation failed:", response);
+          setError("Errore durante la creazione del pagamento");
         }
       }
     } catch (err) {
-      console.error("Error creating wallet payment:", err)
-      setError("Si è verificato un errore imprevisto.")
+      console.error("Error creating wallet payment:", err);
+      setError("Si è verificato un errore imprevisto.");
     } finally {
-      hideLoader()
+      hideLoader();
     }
-  }
+  };
 
   // Carica il pagamento appena il componente viene montato
   useEffect(() => {
     if (paymentItem && user?.id) {
-      createWalletPayment()
+      createWalletPayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentItem, user?.id])
+  }, [paymentItem, user?.id]);
 
   // 2. Gestione Successo
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
-      showLoader()
+      showLoader();
 
       // Possiamo fare un polling o attendere qualche secondo e ricaricare l'utente.
 
       // Opzionale: chiamare una verifica lato server se vuoi feedback immediato
-      await PaymentService.verifyPaymentIntent(paymentIntentId)
+      await PaymentService.verifyPaymentIntent(paymentIntentId);
 
       // Aggiorniamo i dati utente per vedere il nuovo saldo
-      if (user?.id) await getUserDetails(true)
+      if (user?.id) await getUserDetails(true);
 
-      // Chiudi il modale o reindirizza
-      onCancel() // Chiude il modale di pagamento
-      router.refresh() // Ricarica la pagina per mostrare nuovo saldo se necessario
+      if (onSuccess) {
+        onSuccess(paymentIntentId);
+      } else {
+     
+        onCancel();
+      }
     } catch (error) {
-      console.error("Error post-payment wallet:", error)
+      console.error("Error post-payment wallet:", error);
     } finally {
-      hideLoader()
+      hideLoader();
     }
-  }
+  };
 
   const handlePaymentError = (err: string) => {
-    console.error("Wallet payment error:", err)
-    setError(err)
-  }
+    console.error("Wallet payment error:", err);
+    setError(err);
+  };
 
   return (
     <div className="bg-white p-6 rounded-3xl shadow-xl w-full max-w-md mx-auto">
@@ -111,8 +116,7 @@ export const WalletPaymentComponent = ({
         <h3 className="font-bold text-xl text-gray-800">Pagamento Ricarica</h3>
         <button
           onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600"
-        >
+          className="text-gray-400 hover:text-gray-600">
           ✕
         </button>
       </div>
@@ -156,5 +160,5 @@ export const WalletPaymentComponent = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

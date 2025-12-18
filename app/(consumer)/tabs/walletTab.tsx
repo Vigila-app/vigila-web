@@ -155,7 +155,7 @@ export default function WalletTab() {
             </h3>
 
             <p className="text-consumer-blue text-sm font-medium opacity-80 mb-5">
-              Ottieni fino al 30% di bonus ricaricando il tuo wallet
+              Ottieni fino al 10% di bonus ricaricando il tuo wallet
             </p>
 
             <Link

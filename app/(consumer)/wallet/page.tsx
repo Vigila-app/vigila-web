@@ -98,13 +98,20 @@ const WalletLanding = () => {
     };
   }, [selectedBundle]);
 
+  const handleWalletSuccess = () => {
+  setSelectedBundle(null); // Chiudi modale
+  router.refresh(); // Aggiorna i dati
+  // Logica specifica Wallet: Vai al tab wallet
+  router.push(`${Routes.profileConsumer.url}?tab=wallet`);
+};
+  
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center py-10 px-4">
       <div className="max-w-[380px] w-full ">
         {/* Header Section */}
         <div className="text-center mb-8 flex flex-col items-center">
           <div className="bg-vigil-orange text-white text-lg font-semibold px-3 py-1.5 rounded-full mb-4 inline-block">
-            Risparmia fino al 30%
+            Risparmia fino al 10%
           </div>
 
           <h1 className="text-4xl font-bold  leading-tight mb-4">
@@ -186,7 +193,7 @@ const WalletLanding = () => {
         <div className="flex items-center justify-center mt-8">
           <ButtonLink
             icon={<ArrowRightIcon className="w-6 h-6" />}
-            label="Inizia il tuo viaggio"
+            label="Esplora la rete di Vigila"
             primary={false}
             iconPosition="right"
             role={RolesEnum.CONSUMER}
@@ -206,6 +213,7 @@ const WalletLanding = () => {
                 metadataType: "wallet_bundle",
               }}
               onCancel={() => setSelectedBundle(null)}
+              onSuccess={handleWalletSuccess}
             />
           </div>
         </div>

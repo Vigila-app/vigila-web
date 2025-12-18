@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import Button from "@/components/button/button"; 
+import Button from "@/components/button/button";
 import { Routes } from "@/src/routes";
 import TopUpCard from "@/components/wallet/topUpCard.component";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -11,11 +11,13 @@ import { WalletPaymentComponent } from "@/components/wallet/walletPaymentCompone
 
 import MOCK_BUNDLES from "@/mock/cms/wallet-bundles.json";
 import { TopUpOption } from "@/src/types/wallet.types";
-
+import { useRouter } from "next/navigation";
 export default function WalletTopUp() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedBundle, setSelectedBundle] = useState<TopUpOption | null>(
+    null
+  );
   const [showPayment, setShowPayment] = useState(false);
-
+  const router = useRouter();
   // Normalizziamo i bundle del CMS nel formato TopUpOption (payAmount/creditAmount)
   const bundles: TopUpOption[] = (MOCK_BUNDLES.wallet_bundles || []).map(
     (bundle) => ({
@@ -26,18 +28,22 @@ export default function WalletTopUp() {
   );
 
   const handleContinue = () => {
-    if (!selectedId) return;
+    if (!selectedBundle) return;
     setShowPayment(true);
   };
-
-  const selectedBundle = bundles.find((bun) => bun.id === selectedId);
+  const handleWalletSuccess = () => {
+    setSelectedBundle(null); // Chiudi modale
+    router.refresh(); // Aggiorna i dati
+    // Logica specifica Wallet: Vai al tab wallet
+    router.push(`${Routes.profileConsumer.url}?tab=wallet`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 flex justify-center font-sans">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-between mb-6">
           <Link
-            href={Routes.wallet.url}
+            href={`${Routes.profileConsumer.url}?tab=wallet`}
             className="flex items-center text-sm font-medium text-consumer-blue hover:underline">
             <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Torna al wallet
@@ -65,8 +71,10 @@ export default function WalletTopUp() {
             <TopUpCard
               key={bundle.id}
               option={bundle}
-              isSelected={selectedId === bundle.id}
-              onSelect={setSelectedId}
+              isSelected={selectedBundle?.id === bundle.id}
+              onSelect={(id) =>
+                setSelectedBundle(bundles.find((bun) => bun.id === id) || null)
+              }
             />
           ))}
         </div>
@@ -76,7 +84,7 @@ export default function WalletTopUp() {
             label="Continua"
             full
             primary={false}
-            disabled={!selectedId}
+            disabled={!selectedBundle}
             action={handleContinue}
             role={RolesEnum.CONSUMER}
           />
@@ -102,6 +110,7 @@ export default function WalletTopUp() {
                 metadataType: "wallet_topup",
               }}
               onCancel={() => setShowPayment(false)}
+              onSuccess={handleWalletSuccess}
             />
           </div>
         </div>

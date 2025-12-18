@@ -38,10 +38,6 @@ const TopUpCard = ({
             al prezzo di {option.payAmount.toFixed(2)} €
           </span>
         </div>
-
-        <p className="text-xs text-gray-400 mt-2 font-medium">
-          Valido fino al 31/12/2030
-        </p>
       </div>
 
       <div
