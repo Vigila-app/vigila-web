@@ -44,9 +44,8 @@ export const verifyPaymentWithStripe = async (
     if (!paymentIntent) {
       throw new Error("Payment intent not found");
     }
-
     // Verifica che il payment intent appartenga all'utente autenticato
-    if (userId && paymentIntent.metadata?.userId !== userId) {
+    if (userId && paymentIntent.metadata?.user_id !== userId) {
       throw new Error(
         "Payment intent does not belong to the authenticated user"
       );

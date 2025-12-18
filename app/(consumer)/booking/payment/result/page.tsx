@@ -15,7 +15,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 function BookingPaymentResultContent() {
   const {
-    params: { bookingId, payment_intent },
+    params: { bookingId, payment_intent, payment_method, status },
   } = useQueryParams();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -46,12 +46,11 @@ function BookingPaymentResultContent() {
         throw new Error("Il pagamento non è stato completato con successo");
       }
 
-      // Verifica che il bookingId corrisponda
+      
       if (paymentData.bookingId !== bookingId) {
         throw new Error("Errore nella corrispondenza dei dati di pagamento");
       }
 
-      // Se la verifica è ok, aggiorna lo stato della prenotazione
       const result = await BookingsService.updateBookingPaymentStatus(
         bookingId,
         {
@@ -79,14 +78,21 @@ function BookingPaymentResultContent() {
   };
 
   useEffect(() => {
-    if (bookingId && payment_intent) {
-      verifyAndUpdatePayment();
+    if (bookingId) {
+      if (payment_method === "wallet" && status === "success") {
+        setPaymentVerified(true);
+        setIsLoading(false);
+      } else if (payment_intent) {
+        verifyAndUpdatePayment();
+      } else {
+        setIsLoading(false);
+      }
     } else {
       setIsLoading(false);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingId, payment_intent]);
+  }, [bookingId, payment_intent, payment_method, status]);
 
   return (
     <div className="container mx-auto px-4 py-8">

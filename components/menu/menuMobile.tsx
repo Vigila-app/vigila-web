@@ -20,6 +20,8 @@ import {
   UserIcon,
   XMarkIcon,
   QuestionMarkCircleIcon,
+  WalletIcon,
+  GiftIcon,
 } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -160,6 +162,32 @@ const MenuMobile = () => {
                   false
                 )}
               </li>
+              {user?.user_metadata?.role === RolesEnum.CONSUMER && (
+                <>
+                  {" "}
+                  <li className="block ">
+                    {MenuLinkItem(
+                      {
+                        ...Routes.profileConsumer,
+                        url: `${Routes.profileConsumer.url}?tab=wallet`,
+                        label: "Wallet",
+                      },
+                      WalletIcon
+                    )}
+                  </li>
+                  <li className="block ">
+                    {MenuLinkItem(
+                      {
+                        ...Routes.walletBundles,
+                        url: `${Routes.wallet.url}`,
+                        label: "Pacchetti",
+                      },
+                      GiftIcon
+                    )}
+                  </li>
+                </>
+              )}
+
               <li className="block ">
                 {MenuLinkItem(
                   {
@@ -197,15 +225,6 @@ const MenuMobile = () => {
               <li className="block ">
                 {MenuLinkItem(Routes.customerCare, QuestionMarkCircleIcon)}
               </li>
-              {/* {user?.user_metadata?.role === RolesEnum.VIGIL && (
-                <li className="block py-2">
-                  {MenuLinkItem(Routes.services, WrenchScrewdriverIcon)}
-                </li>
-              )} */}
-
-              {/* <li className="block py-2">
-                {MenuLinkItem(Routes.bookings, CalendarDaysIcon)}
-              </li> */}
             </ul>
           </>
         ) : null}

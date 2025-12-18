@@ -5,7 +5,7 @@ import {
   BookingStatusEnum,
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
-import { useBookingsStore } from "../store/bookings/bookings.store";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 export type UpdateBookingPaymentRequest = {
   payment_id: string;

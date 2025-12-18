@@ -1,0 +1,62 @@
+{
+  
+  "wallet_bundles": [
+    {
+      "id": "starter_1",
+      "name": "STARTER",
+      "price": 50,
+      "bonus_percentage": 10,
+      "credit_amount": 55,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti"
+      ]
+    },
+    {
+      "id": "standard_1",
+      "name": "STANDARD",
+      "price": 100,
+      "bonus_percentage": 10,
+      "credit_amount": 110,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni"
+      ]
+    },
+    {
+      "id": "premium_1",
+      "name": "PREMIUM",
+      "price": 200,
+      "bonus_percentage": 10,
+      "credit_amount": 220,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni",
+        "Supporto dedicato 24/7"
+      ]
+    },
+    {
+      "id": "family_1",
+      "name": "FAMILY",
+      "price": 500,
+      "bonus_percentage": 10,
+      "credit_amount": 550,
+      "features": [
+        "Credito immediato disponibile",
+        "Nessuna scadenza",
+        "Utilizzo flessibile",
+        "Storico movimenti",
+        "Priorità nelle prenotazioni",
+        "Supporto dedicato 24/7"
+      ]
+    }
+  ]
+}
