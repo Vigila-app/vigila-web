@@ -92,7 +92,7 @@ export const BundleCard: React.FC<BundleCardProps> = ({ bundle, onSelect }) => {
             theme.primary
           )}>
             <span className="text-3xl font-bold text-white">€{bundle.price}</span>
-            <span className="text-xs text-white/90 font-medium">al mese</span> {/* o "una tantum" se preferisci */}
+           
           </div>
 
           {/* Freccia e Credito Totale */}

@@ -109,10 +109,10 @@ export const PaymentService = {
     }
   },
 
-  getWalletTransactions: async (userId: string): Promise<TransactionType[]> => {
+  getWalletTransactions: async (): Promise<TransactionType[]> => {
     try {
       const response = (await ApiService.get(
-        apiWallet.TRANSACTIONS(userId)
+        apiWallet.TRANSACTIONS()
       )) as { data: TransactionType[] };
       return response.data || [];
     } catch (error) {

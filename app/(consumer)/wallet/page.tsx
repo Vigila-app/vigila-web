@@ -48,7 +48,7 @@ const WalletLanding = () => {
     {
       id: 1,
       title: "Bonus immediato",
-      description: "Ottieni fino al 30% di credito extra",
+      description: "Ottieni fino al 10% di credito extra",
       icon: <ArrowTrendingUpIcon className="w-6 h-6 " strokeWidth={2} />,
       theme: "blue",
     },
