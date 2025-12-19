@@ -75,6 +75,7 @@
     "private": false,
     "roles": []
   },
+  
   "onBoard": {
     "url": "/onboard",
     "label": "onboard",
@@ -109,10 +110,10 @@
     "roles": []
   },
   "updatePassword": {
-    "url": "/auth/update-password",
+    "url": "/update-password",
     "label": "Aggiorna password",
     "title": "Aggiorna Password",
-    "private": false,
+    "private": true,
     "roles": []
   },
   "confirmEmail": {
