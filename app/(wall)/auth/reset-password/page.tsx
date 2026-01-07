@@ -20,7 +20,6 @@ export default function ResetPasswordPage() {
   const [email, setEmail] = useState<string>("")
   const handleSubmit: FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault()
-    console.log(email)
     AuthService.passwordReset(email)
     
   }
@@ -41,21 +40,7 @@ export default function ResetPasswordPage() {
                 isForm
                 value={email} //input is state controlled
                 onChange={(val) => setEmail(val as string)} //input is type email, it will never be a number
-                // TODO: delete the overthinkging at 1AM
-                //pattern="/^.*@[a-zA-Z]*\.[a-z]{0,3}$" //tentative regex -> the first part + presence of @ is checked by html, I want to make sure it has the extension and the correct structure
-                //alternatives: ^[\w\d!#$%&'*+\-\/=?^_`{|}~]*@[a-zA-Z]*\.[a-z]{0,3}$ -> this isn't 100% precise to standard (see below) but should cover most basic-user emails.
-                //ideally this can be outsourced to an api or we can trust html's validation
-                //by RFC standard emails have such a big range of possibilities, including + for sub-locals and ip addresses for the domain, which is why HTML doesn't require the extension.
-                //!as a secondary, less invasive check we can check if the domain has only \d and /. -> it's an IP, no extension is required
-                // example: (^.*@(?:[a-zA-Z]+\.)+[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})*|^.*@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$)$ -> can probably be optimized
-                //matches:
-                // firstname.lastname@example.com.uk -> OK
-                // firstname.lastname@example.com -> OK
-                // firstname.lastname@example -> NO
-                // email@123.123.123.123 -> OK
-                // email@123.123.123.123.com -> NO
-                //!this is me overthinking, HTML validation is probably ok lol
-                //note: a backend check should be implemented using the same regex + input sanitazation
+                required
               />
               <Button label="Inizia il processo di recupero">
                 Inizia il processo di recupero
