@@ -16,6 +16,8 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
 import { isReleased } from "@/src/utils/envs.utils";
+import { ProviderEnum } from "../enums/common.enums";
+import { ToastStatusEnum } from "../enums/toast.enum";
 
 export const AuthInstance = AppInstance;
 
@@ -156,45 +158,54 @@ export const AuthService = {
     }),
 
   // region 3RD PARTIES SIGN-IN PROVIDERS
-  // googleLogin: async () =>
-  //   new Promise((resolve, reject) => {
-  //     const provider: GoogleAuthProvider = new GoogleAuthProvider();
-  //     signInWithPopup(AuthInstance, provider)
-  //       .then((result) => {
-  //         const credential = GoogleAuthProvider.credentialFromResult(result);
-  //         if (credential) {
-  //           // The signed-in user info.
-  //           const user = result.user;
-  //           const userDetails: AdditionalUserInfo | null =
-  //             getAdditionalUserInfo(result);
-  //           if (userDetails?.isNewUser && userDetails?.profile) {
-  //             const { email, family_name, given_name, locale, picture } =
-  //               userDetails.profile;
+  providerLogin: async (provider: ProviderEnum, role: RolesEnum) =>
+    new Promise(async (resolve, reject) => {
+      try {
+        useAppStore.getState().showLoader();
+        
+        // Costruiamo l'URL di redirect.
+        // Assicurati che Routes.login.url o una pagina callback esista
+        // window.location.origin ottiene "http://localhost:3000" o il tuo dominio
+        const redirectTo = `${window.location.origin}/auth/callback`; 
 
-  //             UserService.updateUser(
-  //               {
-  //                 displayName: `${given_name} ${family_name}`,
-  //                 photoURL: picture?.toString(),
-  //               },
-  //               {
-  //                 name: given_name?.toString() || "",
-  //                 surname: family_name?.toString() || "",
-  //                 email: email?.toString() || "",
-  //                 /*other: {
-  //                   locale: locale?.toString() || "",
-  //                 },*/
-  //               }
-  //             );
-  //           }
-  //           resolve(user);
-  //         } else {
-  //           reject();
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         reject(error);
-  //       });
-  //   }),
+        const { data, error } = await AppInstance.auth.signInWithOAuth({
+          provider: provider === ProviderEnum.GOOGLE ? 'google' : 'apple',
+          options: {
+            redirectTo: redirectTo,
+            queryParams: {
+              // Forza la selezione dell'account per facilitare i test
+              prompt: 'select_account',
+            },
+            // QUI PASSA LA MAGIA: Passiamo il ruolo ai metadati dell'utente
+            data: {
+              role: role, 
+              // Possiamo assumere che se si registrano con Google, accettano i termini
+              terms_accepted: true, 
+            } 
+          }as any,
+        });
+
+        if (error) throw error;
+        
+        // Nota: signInWithOAuth reindirizza l'utente fuori dal sito,
+        // quindi tecnicamente il codice qui sotto potrebbe non essere raggiunto subito.
+        resolve(true);
+
+      } catch (error) {
+        console.error(
+          "Error authenticating user with provider",
+          provider.toUpperCase(),
+          error
+        );
+        useAppStore.getState().showToast({
+          message: "Sorry, something went wrong with social login",
+          type: ToastStatusEnum.ERROR,
+        });
+        reject(error);
+      } finally {
+        useAppStore.getState().hideLoader();
+      }
+    }),
   // appleLogin: async () =>
   //   new Promise((resolve, reject) => {
   //     const provider: OAuthProvider = new OAuthProvider("apple.com");
@@ -234,58 +245,6 @@ export const AuthService = {
   //         reject(error);
   //       });
   //   }),
-  // providerLogin: async (provider: ProviderEnum) =>
-  //   new Promise(async (resolve, reject) => {
-  //     try {
-  //       useAppStore.getState().showLoader();
-  //       switch (provider) {
-  //         case ProviderEnum.GOOGLE: {
-  //           try {
-  //             await AuthService.googleLogin();
-  //             resolve(true);
-  //           } catch (error) {
-  //             console.error(
-  //               "Error authenticating user with provider",
-  //               provider.toUpperCase(),
-  //               error
-  //             );
-  //             useAppStore.getState().showToast({
-  //               message: "Sorry, something went wrong",
-  //               type: ToastStatusEnum.ERROR,
-  //             });
-  //             reject();
-  //           }
-  //           break;
-  //         }
-  //         case ProviderEnum.APPLE: {
-  //           try {
-  //             await AuthService.appleLogin();
-  //             resolve(true);
-  //           } catch (error) {
-  //             console.error(
-  //               "Error authenticating user with provider",
-  //               provider.toUpperCase(),
-  //               error
-  //             );
-  //             useAppStore.getState().showToast({
-  //               message: "Sorry, something went wrong",
-  //               type: ToastStatusEnum.ERROR,
-  //             });
-  //             reject();
-  //           }
-  //           break;
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error(
-  //         "AuthService providerLogin error",
-  //         provider.toUpperCase(),
-  //         error
-  //       );
-  //       reject(error);
-  //     } finally {
-  //       useAppStore.getState().hideLoader();
-  //     }
-  //   }),
+  // 
   // endregion 3RD PARTIES SIGN-IN PROVIDERS
 };
