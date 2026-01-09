@@ -163,7 +163,7 @@ export const AuthService = {
         const { data, error } = await AppInstance.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${AppConstants.hostUrl}/update-password`,
+            redirectTo: Routes.resetPassword.url,
           }
         );
         console.log(data);

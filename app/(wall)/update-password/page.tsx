@@ -6,10 +6,9 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { AuthService, UserService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useRouter } from "next/navigation";
 import { EyeIcon } from "@heroicons/react/24/outline";
-
 import { Controller, useForm } from "react-hook-form";
+
 type UpdatePasswordPageI = {
   password: string;
   confirmPassword: string;

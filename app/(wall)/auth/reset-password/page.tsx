@@ -2,26 +2,46 @@
 import { Button, ButtonLink } from "@/components"
 import { Input } from "@/components/form"
 import { AppConstants } from "@/src/constants"
+import { FormFieldType } from "@/src/constants/form.constants"
+import { ToastStatusEnum } from "@/src/enums/toast.enum"
 import { AuthService } from "@/src/services"
-import {
-  ChangeEventHandler,
-  FormEvent,
-  FormEventHandler,
-  useState,
-} from "react"
+import { useAppStore } from "@/src/store/app/app.store"
+import { EnvelopeIcon } from "@heroicons/react/24/outline"
+import { Controller, useForm } from "react-hook-form"
 
+type RequestPasswordResetI = {
+  email: string
+}
 export default function ResetPasswordPage() {
-  /* 
+  const {
+    control,
+    formState: { errors, isValid },
+    handleSubmit,
+    reset,
+  } = useForm<RequestPasswordResetI>();
+  const { showToast } = useAppStore();
 
-    UX flow checklist: https://www.checklist.design/flows/resetting-password
-    Supabase: https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail
 
-  */
-  const [email, setEmail] = useState<string>("")
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (ev) => {
-    ev.preventDefault()
-    AuthService.passwordReset(email)
-    
+  const onSubmit = (formData: RequestPasswordResetI) => {
+    try {
+      if (isValid) {
+        AuthService.passwordReset(formData.email)
+        showToast({
+          message: "Controlla la tua email per recuperare la password",
+          type: ToastStatusEnum.SUCCESS,
+        })
+        
+      }
+      else throw new Error("Qualcosa è andato storto")
+    } catch (error) {
+      console.error("Error requesting password reset", error)
+      showToast({
+        message: "Qualcosa è andato storto",
+        type: ToastStatusEnum.ERROR,
+      })
+    } finally {
+      reset()
+    }
   }
 
   return (
@@ -31,24 +51,43 @@ export default function ResetPasswordPage() {
           <h2 className="text-2xl font-semibold mb-4">Password dimenticata?</h2>
           <p className="text-sm text-gray-600 mb-6"> </p>
           <p className="text-sm text-gray-600 mb-6">
-            <form onSubmit={handleSubmit}>
-              <Input
-                id="password-recovery"
-                label="Inserisci l'email associata al tuo account Vigila"
-                type="email"
-                placeholder="email@provider.it"
-                isForm
-                value={email} //input is state controlled
-                onChange={(val) => setEmail(val as string)} //input is type email, it will never be a number
-                required
-              />
-              <Button label="Inizia il processo di recupero">
-                Inizia il processo di recupero
-              </Button>
+            <form onSubmit={handleSubmit(onSubmit)}
+              className="w-full mx-auto max-w-lg space-y-8"
+            >
+              <Controller
+                name="email"
+                control={control}
+                rules={{ required: true, ...FormFieldType.EMAIL }}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="email"
+                    label="Inserisci l'email associata al tuo account Vigila"
+                    type="email"
+                    placeholder="email@provider.it"
+                    isForm
+                    required
+                    autoComplete="email"
+                    aria-invalid={!!errors.email}
+                    error={errors.email}
+                    icon={<EnvelopeIcon className="h-4 w-4 text-gray-500" />}
+
+                  />
+                )}
+              >
+
+              </Controller>
+              <div className="flex items-center justify-center">
+
+                <Button type="submit" primary label="Inizia il processo di recupero">
+                  Inizia il processo di recupero
+                </Button>
+              </div>
             </form>
           </p>
           <p>Non ricordi la mail? </p>
           <ButtonLink
+            secondary
             label="Contatta assistenza"
             href={AppConstants.whatsappUrl}
             target="_blank"
