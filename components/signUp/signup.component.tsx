@@ -394,7 +394,7 @@ const SignupComponent = (props: SignupComponentI) => {
           <ProviderButton
             provider={ProviderEnum.GOOGLE}
             full
-            action={() => AuthService.providerLogin(ProviderEnum.GOOGLE,role)}
+            action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
             customClass="rounded-full shadow"
           /> 

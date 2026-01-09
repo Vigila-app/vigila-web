@@ -158,7 +158,7 @@ export const AuthService = {
     }),
 
   // region 3RD PARTIES SIGN-IN PROVIDERS
-  providerLogin: async (provider: ProviderEnum, role: RolesEnum) =>
+  providerLogin: async (provider: ProviderEnum) =>
     new Promise(async (resolve, reject) => {
       try {
         useAppStore.getState().showLoader();
@@ -177,11 +177,7 @@ export const AuthService = {
               prompt: 'select_account',
             },
             // QUI PASSA LA MAGIA: Passiamo il ruolo ai metadati dell'utente
-            data: {
-              role: role, 
-              // Possiamo assumere che se si registrano con Google, accettano i termini
-              terms_accepted: true, 
-            } 
+           
           }as any,
         });
 

@@ -49,6 +49,19 @@
     "private": false,
     "roles": []
   },
+  "registrationRole": {
+    "url": "/auth/registration/role-registration",
+    "label": "Completa la registrazione",
+    "title": "completa la registrazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
   "registrationConsumer": {
     "url": "/auth/registration/consumer",
     "label": "Sign up",
