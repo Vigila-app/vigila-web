@@ -11,7 +11,7 @@ import { AltchaService } from "@/src/services/altcha.service"
 import { useAppStore } from "@/src/store/app/app.store"
 import { EnvelopeIcon } from "@heroicons/react/24/outline"
 import dynamic from "next/dynamic"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -27,6 +27,7 @@ export default function ResetPasswordPage() {
     reset,
   } = useForm<RequestPasswordResetI>()
   const { showToast } = useAppStore()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { challenge, isVerified, onStateChange } = useAltcha()
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit = async (formData: RequestPasswordResetI) => {
     try {
+      setIsLoading(true)
       if (isValid) {
         if (challenge) {
           await AltchaService.verifyChallenge(challenge)
@@ -57,6 +59,7 @@ export default function ResetPasswordPage() {
       })
     } finally {
       reset()
+      setIsLoading(false)
     }
   }
 
@@ -97,6 +100,7 @@ export default function ResetPasswordPage() {
                 <Button
                   type="submit"
                   primary
+                  isLoading={isLoading}
                   label="Inizia il processo di recupero"
                 >
                   Inizia il processo di recupero
