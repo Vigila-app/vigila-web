@@ -59,7 +59,7 @@
       "header": false,
       "footer": false
     },
-    "private": false,
+    "private": true,
     "roles": []
   },
   "registrationConsumer": {
