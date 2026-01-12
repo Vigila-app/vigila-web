@@ -163,7 +163,7 @@ export const AuthService = {
         const { data, error } = await AppInstance.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${AppConstants.hostUrl}${Routes.updatePassword.url}`,
+            redirectTo: `${AppConstants.hostUrl}?redirectUserTo=${Routes.updatePassword.url}`,
           }
         )
         if (error) return reject(error)
