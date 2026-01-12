@@ -162,31 +162,23 @@ export const AuthService = {
     new Promise(async (resolve, reject) => {
       try {
         useAppStore.getState().showLoader();
-        
-        // Costruiamo l'URL di redirect.
-        // Assicurati che Routes.login.url o una pagina callback esista
-        // window.location.origin ottiene "http://localhost:3000" o il tuo dominio
-        const redirectTo = `${window.location.origin}/auth/callback`; 
+        const redirectTo = `${window.location.origin}/auth/callback`;
 
-        const { data, error } = await AppInstance.auth.signInWithOAuth({
-          provider: provider === ProviderEnum.GOOGLE ? 'google' : 'apple',
+        const { error } = await AppInstance.auth.signInWithOAuth({
+          provider: provider === ProviderEnum.GOOGLE ? "google" : "apple",
           options: {
             redirectTo: redirectTo,
             queryParams: {
-              // Forza la selezione dell'account per facilitare i test
-              prompt: 'select_account',
+              prompt: "select_account",
             },
-            // QUI PASSA LA MAGIA: Passiamo il ruolo ai metadati dell'utente
-           
-          }as any,
+          } as any,
         });
 
         if (error) throw error;
-        
+
         // Nota: signInWithOAuth reindirizza l'utente fuori dal sito,
         // quindi tecnicamente il codice qui sotto potrebbe non essere raggiunto subito.
         resolve(true);
-
       } catch (error) {
         console.error(
           "Error authenticating user with provider",
@@ -241,6 +233,6 @@ export const AuthService = {
   //         reject(error);
   //       });
   //   }),
-  // 
+  //
   // endregion 3RD PARTIES SIGN-IN PROVIDERS
 };
