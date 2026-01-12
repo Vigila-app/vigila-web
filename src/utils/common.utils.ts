@@ -159,7 +159,7 @@ export const EurConverter = (cents: number): number => {
 
   let num = Math.abs(cents).toString();
 
-  num= num.padStart(3, "0");
+  num = num.padStart(3, "0");
 
   const formatted = num.replace(/^(\d+)(\d{2})$/, "$1.$2");
   const finalNumber = parseFloat(formatted);
@@ -275,3 +275,38 @@ export const getCurrency = (currency: CurrencyEnum) => {
       return (currency as string).toLowerCase();
   }
 };
+
+export function mergeGoogleAndFormData(googleRawData: any, formData: any) {
+  // formData contiene: { role, terms, userId } che arrivano dal tuo modal/API
+
+  const sourceName = (
+    googleRawData.full_name ||
+    googleRawData.name ||
+    ""
+  ).trim();
+  let finalName = sourceName || "";
+  let finalSurname = "";
+
+  const lastSpaceIndex = sourceName.lastIndexOf(" ");
+
+  if (lastSpaceIndex !== -1) {
+    finalName = sourceName.slice(0, lastSpaceIndex);
+
+    finalSurname = sourceName.slice(lastSpaceIndex + 1);
+  }
+
+  return {
+    ...googleRawData,
+
+    // --- Dati Iniettati 
+    user_id: formData.userId,
+    name: finalName,
+    surname: finalSurname,
+    role: formData.role,
+    level: "BASE",
+    status: "pending",
+    displayName: sourceName,
+    terms: formData.terms,
+    email_verified: true, 
+  };
+}
