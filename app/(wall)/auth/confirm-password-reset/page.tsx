@@ -5,7 +5,7 @@ import { isServer } from "@/src/utils/common.utils"
 import Link from "next/link"
 
 export default function ConfirmPasswordResetPage() {
-  const params = new URLSearchParams(isServer ? location.search : "")
+  const params = new URLSearchParams(isServer ? window.location.search : "")
   return (
     <section className="py-16">
       <div className="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
