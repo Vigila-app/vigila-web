@@ -277,7 +277,7 @@ export const getCurrency = (currency: CurrencyEnum) => {
 };
 
 export function mergeGoogleAndFormData(googleRawData: any, formData: any) {
-  // formData contiene: { role, terms, userId } che arrivano dal tuo modal/API
+  // formData contiene: { role, terms, userId } che arrivano dal modal/API
 
   const sourceName = (
     googleRawData.full_name ||
@@ -298,7 +298,6 @@ export function mergeGoogleAndFormData(googleRawData: any, formData: any) {
   return {
     ...googleRawData,
 
-    // --- Dati Iniettati 
     user_id: formData.userId,
     name: finalName,
     surname: finalSurname,
