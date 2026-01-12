@@ -1,11 +1,11 @@
 "use client"
 
 import { Routes } from "@/src/routes"
+import { isServer } from "@/src/utils/common.utils"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 
 export default function ConfirmPasswordResetPage() {
-  const params = useSearchParams()
+  const params = new URLSearchParams(isServer ? location.search : "")
   return (
     <section className="py-16">
       <div className="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
