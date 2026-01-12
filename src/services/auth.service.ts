@@ -155,6 +155,26 @@ export const AuthService = {
       }
     }),
 
+  passwordReset: (email: string) => {
+    new Promise(async (resolve, reject) => {
+      try {
+        if (!email) return reject(new Error("Email required"));
+
+        const { data, error } = await AppInstance.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: Routes.resetPassword.url,
+          }
+        )
+        if (error) return reject(error);
+        resolve(true);
+      } catch (error) {
+        console.error("AuthService resendConfirmation error", error);
+        reject(error);
+      }
+    });
+  },
+
   // region 3RD PARTIES SIGN-IN PROVIDERS
   // googleLogin: async () =>
   //   new Promise((resolve, reject) => {
