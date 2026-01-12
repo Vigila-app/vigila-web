@@ -40,7 +40,9 @@ export default async function Registration() {
           </h3>
           <div className="my-4">
             <Link href={Routes.registrationConsumer.url}>
-              <Card customClass="mb-4" containerClass="text-consumer-blue flex flex-col items-center justify-center p-4 hover:scale-95 transition">
+              <Card
+                customClass="mb-4"
+                containerClass="text-consumer-blue flex flex-col items-center justify-center p-4 hover:scale-95 transition">
                 <HeartIcon className="size-6" />
                 <h4 className="font-bold">Hai bisogno di aiuto?</h4>
                 <p className="text-gray-500 text-[12px]">

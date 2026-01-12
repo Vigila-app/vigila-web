@@ -1,10 +1,6 @@
 import { initAdmin } from "@/server/supabaseAdmin";
 import { ResponseCodesConstants } from "@/src/constants";
-import {
-  AccessLevelsEnum,
-  RolesEnum,
-  UserStatusEnum,
-} from "@/src/enums/roles.enums";
+import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,12 +11,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log(`API POST auth/complete-google`, body);
 
-    // NOTA: Non chiediamo più name/surname al frontend, li calcoliamo da Google
     const { role, terms } = body;
 
-    // ------------------------------------------------------------------
-    // 1. SICUREZZA: IDENTIFICAZIONE UTENTE TRAMITE TOKEN (USING ADMIN CLIENT)
-    // ------------------------------------------------------------------
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       return jsonErrorResponse(401, {
@@ -54,9 +46,6 @@ export async function POST(req: NextRequest) {
     const userId = user.id;
     const googleRawMeta = user.user_metadata || {};
 
-    // ------------------------------------------------------------------
-    // 2. VALIDAZIONE INPUT
-    // ------------------------------------------------------------------
     if (!terms) {
       return NextResponse.json(
         {
@@ -75,20 +64,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ------------------------------------------------------------------
-    // 3. PREPARAZIONE DATI (FUSIONE)
-    // ------------------------------------------------------------------
-    // Qui usiamo la utility per creare un oggetto identico a quello del Sign-up diretto
     const cleanMetadata = mergeGoogleAndFormData(googleRawMeta, {
       role,
       terms,
       userId,
     });
 
-    
-    // ------------------------------------------------------------------
-    // 4. UPDATE AUTH METADATA (auth.users)
-    // ------------------------------------------------------------------
     const { error: authError } = await _admin.auth.admin.updateUserById(
       userId,
       {
@@ -104,11 +85,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ------------------------------------------------------------------
-    // 5. UPDATE DB PUBBLICO (consumers / vigils)
-    // ------------------------------------------------------------------
-
-    // Replicato dal tuo codice user/signup: inseriamo solo id, displayName, status.
     const { error: dbError } = await _admin
       .from(
         role === RolesEnum.CONSUMER
@@ -125,7 +101,7 @@ export async function POST(req: NextRequest) {
 
     if (dbError) {
       console.error("Error updating public table:", dbError);
-      // Nota: idealmente qui servirebbe un rollback, ma per ora va bene così
+
       return jsonErrorResponse(500, { success: false, code: dbError.message });
     }
 

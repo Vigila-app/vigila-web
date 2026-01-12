@@ -121,7 +121,7 @@ export default function GoogleRoleSelector() {
           className="cursor-pointer group">
           <Card
             containerClass={clsx(
-              "flex flex-col items-center justify-center p-6 transition duration-200 border-2",
+              "flex flex-col items-center justify-center p-6 transition duration-200 border-2 rounded-2xl",
               "group-hover:scale-[1.02] group-hover:shadow-md",
               selectedRole === RolesEnum.CONSUMER
                 ? "border-consumer-blue bg-consumer-light-blue/10"
@@ -142,13 +142,13 @@ export default function GoogleRoleSelector() {
           className="cursor-pointer group">
           <Card
             containerClass={clsx(
-              "flex flex-col items-center justify-center p-6 transition duration-200 border-2",
+              "flex flex-col items-center justify-center p-6 transition duration-200 border-2 rounded-2xl",
               "group-hover:scale-[1.02] group-hover:shadow-md",
               selectedRole === RolesEnum.VIGIL
                 ? "border-vigil-orange bg-vigil-light-orange/10"
                 : "border-transparent bg-white"
             )}>
-            <div className="text-vigil-orange flex flex-col items-center">
+            <div className="text-vigil-orange flex flex-col  items-center">
               <FaceSmileIcon className="h-10 w-10 mb-3" />
               <h4 className="font-bold text-lg">Vigil (Operatore)</h4>
               <p className="text-gray-600 text-sm mt-1 text-center">

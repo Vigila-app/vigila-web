@@ -30,16 +30,16 @@ export default async function GoogleRoleSelection() {
         <div className="bg-white w-full mx-auto max-w-xl p-8 rounded-3xl shadow-xl">
           {/* Header CMS */}
           <div className="text-center mb-8">
-            <h2 className="font-bold text-3xl text-gray-900">
+            <h2 className="font-bold text-3xl text-gray-900 ">
               {title || "Benvenuto in Vigila"}
             </h2>
-            <p className="text-gray-600 mt-3 text-lg">
+            <p className="mt-3 text-lg font-normal">
               {text ||
                 "Il tuo account Google è connesso. Per iniziare, dicci come vuoi usare la piattaforma."}
             </p>
           </div>
 
-          <h3 className="text-center font-semibold text-xs uppercase tracking-wider text-gray-400 mb-4">
+          <h3 className="text-center font-semibold text-xs uppercase tracking-wider text-gray-600 mb-4">
             Seleziona il tuo ruolo
           </h3>
 
@@ -48,7 +48,7 @@ export default async function GoogleRoleSelection() {
 
           {/* Footer Informativo */}
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p className="text-xs text-gray-400 max-w-sm mx-auto">
+            <p className="text-sm font-medium text-gray-600 max-w-sm mx-auto">
               Fai attenzione a scegliere il ruolo corretto: una volta
               selezionato dovrai contattare l'assistenza per modificarlo.
             </p>

@@ -20,7 +20,17 @@ export default function AuthLayout({
   const isOnboardingPage = allowedAuthRoutes.some((route) =>
     pathname?.includes(route)
   );
-  if (user?.id && !isOnboardingPage) redirect(Routes.home.url);
+  if (user?.id) {
+    const hasRole = !!user.user_metadata?.role;
+
+    if (hasRole) {
+      redirect(Routes.home.url);
+    }
+
+    if (!isOnboardingPage) {
+      redirect(Routes.home.url);
+    }
+  }
 
   return (
     <>
