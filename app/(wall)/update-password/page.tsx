@@ -1,13 +1,16 @@
-"use client";
-import { Button } from "@/components";
-import { Input } from "@/components/form";
-import { FormFieldType } from "@/src/constants/form.constants";
+"use client"
+import { Button } from "@/components"
+import { Input } from "@/components/form"
+import { FormFieldType } from "@/src/constants/form.constants"
 import { RolesEnum } from "@/src/enums/roles.enums"
 import { ToastStatusEnum } from "@/src/enums/toast.enum"
+import { Routes } from "@/src/routes"
 import { AuthService, UserService } from "@/src/services"
 import { useAppStore } from "@/src/store/app/app.store"
 import { useUserStore } from "@/src/store/user/user.store"
 import { EyeIcon } from "@heroicons/react/24/outline"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 
 type UpdatePasswordPageI = {
@@ -18,13 +21,14 @@ type UpdatePasswordPageI = {
 export default function UpdatePasswordPage() {
   const { user } = useUserStore()
   const { showToast } = useAppStore()
+  const navigation = useRouter()
   const onSubmit = async (formData: UpdatePasswordPageI) => {
     const { password, confirmPassword } = formData
     if (isValid && password === confirmPassword && user?.email) {
       try {
         await UserService.updatePassword(password)
         reset()
-        AuthService.logout()
+        navigation.push(Routes.passwordResetConfirmation.url)
       } catch (err) {
         console.error("Error updating user password", err)
         showToast({
@@ -47,6 +51,9 @@ export default function UpdatePasswordPage() {
     setError,
     reset,
   } = useForm<UpdatePasswordPageI>()
+
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <section className="py-16">
       <div className="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
@@ -70,13 +77,20 @@ export default function UpdatePasswordPage() {
                     id="update-password-password"
                     label="Nuova password"
                     placeholder="Inserisci la nuova password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     role={RolesEnum.CONSUMER}
                     autoComplete="password"
                     aria-invalid={!!errors.password}
                     error={errors.password}
-                    icon={<EyeIcon className="h-4 w-4 text-gray-500" />}
+                    icon={
+                      <button
+                        onClick={() => setShowPassword(!showPassword)}
+                        type="button"
+                      >
+                        <EyeIcon className="size-4 text-gray-500" />
+                      </button>
+                    }
                   />
                 )}
               />
@@ -90,13 +104,20 @@ export default function UpdatePasswordPage() {
                     id="update-password-confirm-password"
                     label="Conferma nuova password"
                     placeholder="Reinserisci la nuova password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     role={RolesEnum.CONSUMER}
                     required
                     autoComplete="password"
                     aria-invalid={!!errors.confirmPassword}
                     error={errors.confirmPassword}
-                    icon={<EyeIcon className="h-4 w-4 text-gray-500" />}
+                    icon={
+                      <button
+                        onClick={() => setShowPassword(!showPassword)}
+                        type="button"
+                      >
+                        <EyeIcon className="size-4 text-gray-500" />
+                      </button>
+                    }
                   />
                 )}
               />
