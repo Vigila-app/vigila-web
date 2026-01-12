@@ -1,10 +1,10 @@
 "use client"
 
 import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums"
-import { useQueryParams } from "@/src/hooks/useQueryParams"
 import { Routes } from "@/src/routes"
 import { useAppStore } from "@/src/store/app/app.store"
 import { useUserStore } from "@/src/store/user/user.store"
+import { isServer } from "@/src/utils/common.utils"
 import { NavigationUtils } from "@/src/utils/navigation.utils"
 import { PermitGuardUtils } from "@/src/utils/permit-guard.utils"
 import { usePathname } from "next/navigation"
@@ -17,7 +17,7 @@ const PermitGuardComponent = () => {
   const user = useUserStore((state) => state.user)
   const [hide, setHide] = useState(true)
   const { showLoader, hideLoader } = useAppStore()
-  const { params } = useQueryParams()
+  const params = new URLSearchParams(isServer ? "" : window.location.search)
 
   const handleNotAuthorized = () => {
     console.error("Not authorized, redirecting..")
@@ -31,8 +31,8 @@ const PermitGuardComponent = () => {
       if (!isAuthorized) {
         handleNotAuthorized()
       } else {
-        if (params.redirectUserTo) {
-          router.replace(params.redirectUserTo)
+        if (params.get("redirectUserTo")) {
+          router.replace(params.get("redirectUserTo") as string)
         } else {
           setHide(false)
 
