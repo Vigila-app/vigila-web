@@ -6,11 +6,13 @@ import { FormFieldType } from "@/src/constants/form.constants"
 import { RolesEnum } from "@/src/enums/roles.enums"
 import { ToastStatusEnum } from "@/src/enums/toast.enum"
 import useAltcha from "@/src/hooks/useAltcha"
+import { Routes } from "@/src/routes"
 import { AuthService } from "@/src/services"
 import { AltchaService } from "@/src/services/altcha.service"
 import { useAppStore } from "@/src/store/app/app.store"
 import { EnvelopeIcon } from "@heroicons/react/24/outline"
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
@@ -29,6 +31,7 @@ export default function ResetPasswordPage() {
   const { showToast } = useAppStore()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { challenge, isVerified, onStateChange } = useAltcha()
+  const navigation = useRouter()
 
   useEffect(() => {
     if (isVerified) {
@@ -45,10 +48,7 @@ export default function ResetPasswordPage() {
           await AltchaService.verifyChallenge(challenge)
 
           await AuthService.passwordReset(formData.email)
-          showToast({
-            message: "Controlla la tua email per recuperare la password",
-            type: ToastStatusEnum.SUCCESS,
-          })
+          navigation.replace(`${Routes.confirmPasswordReset.url}?email=${formData.email}`)
         }
       } else throw new Error("Qualcosa è andato storto")
     } catch (error) {

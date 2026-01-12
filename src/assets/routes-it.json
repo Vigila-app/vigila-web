@@ -21,7 +21,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "login": {
     "url": "/auth/login",
@@ -75,7 +77,6 @@
     "private": false,
     "roles": []
   },
-  
   "onBoard": {
     "url": "/onboard",
     "label": "onboard",
@@ -87,7 +88,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "onBoardVigil": {
     "url": "/vigil/onboard",
@@ -100,7 +103,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["VIGIL"]
+    "roles": [
+      "VIGIL"
+    ]
   },
   "resetPassword": {
     "url": "/auth/reset-password",
@@ -120,6 +125,20 @@
     "url": "/auth/confirm-email",
     "label": "Conferma email",
     "title": "Conferma email",
+    "private": false,
+    "roles": []
+  },
+  "confirmPasswordReset": {
+    "url": "/auth/confirm-password-reset",
+    "label": "Conferma recupero password",
+    "title": "Conferma recupero password",
+    "private": false,
+    "roles": []
+  },
+  "passwordResetConfirmation": {
+    "url": "/password-updated-confirmation",
+    "label": "Password cambiata",
+    "title": "Password cambiata",
     "private": false,
     "roles": []
   },
@@ -147,7 +166,10 @@
       "footer": true
     },
     "private": true,
-    "roles": ["CONSUMER", "VIGIL"]
+    "roles": [
+      "CONSUMER",
+      "VIGIL"
+    ]
   },
   "bookingDetails": {
     "url": "/booking/:bookingId",
@@ -161,7 +183,10 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER", "VIGIL"]
+    "roles": [
+      "CONSUMER",
+      "VIGIL"
+    ]
   },
   "wallet": {
     "url": "/wallet",
@@ -170,13 +195,12 @@
     "menu": {
       "mobile": false,
       "desktop": false,
-      "header":true,
+      "header": true,
       "footer": true
     },
-    "private":false,
+    "private": false,
     "roles": []
   },
- 
   "walletTopUp": {
     "url": "/wallet/topUp",
     "label": "Ricarica wallet",
@@ -184,11 +208,13 @@
     "menu": {
       "mobile": false,
       "desktop": false,
-      "header":true,
+      "header": true,
       "footer": true
     },
     "private": true,
-    "roles": ["CONSUMER" ]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "admin": {
     "url": "/dashboard-admin",
@@ -201,7 +227,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminOverview": {
     "url": "/dashboard-admin/overview",
@@ -214,7 +242,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminBookings": {
     "url": "/dashboard-admin/bookings",
@@ -227,7 +257,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminPayments": {
     "url": "/dashboard-admin/payments",
@@ -240,7 +272,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminVigils": {
     "url": "/dashboard-admin/vigils",
@@ -253,7 +287,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminConsumers": {
     "url": "/dashboard-admin/consumers",
@@ -266,7 +302,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminServices": {
     "url": "/dashboard-admin/services",
@@ -279,7 +317,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminAnalytics": {
     "url": "/dashboard-admin/analytics",
@@ -292,7 +332,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "adminReviews": {
     "url": "/dashboard-admin/reviews",
@@ -305,7 +347,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["ADMIN"]
+    "roles": [
+      "ADMIN"
+    ]
   },
   "createBooking": {
     "url": "/booking/create",
@@ -318,7 +362,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "paymentBooking": {
     "url": "/booking/payment",
@@ -331,7 +377,9 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "paymentBookingConfirm": {
     "url": "/booking/payment/result",
@@ -344,21 +392,27 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "profileConsumer": {
     "url": "/user/profile",
     "label": "Profilo",
     "title": "Profilo",
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "profileVigil": {
     "url": "/vigil/user/profile",
     "label": "Profilo",
     "title": "Profilo",
     "private": true,
-    "roles": ["VIGIL"]
+    "roles": [
+      "VIGIL"
+    ]
   },
   "vigilDetails": {
     "url": "/vigil/:vigilId/profile",
@@ -366,7 +420,9 @@
     "title": "Dettagli Vigil",
     "matchingUrl": "/vigil/",
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "services": {
     "url": "/services",
@@ -379,7 +435,9 @@
       "footer": true
     },
     "private": true,
-    "roles": ["CONSUMER"]
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "notifications": {
     "url": "/notifications",
@@ -392,7 +450,10 @@
       "footer": false
     },
     "private": true,
-    "roles": ["CONSUMER", "VIGIL"]
+    "roles": [
+      "CONSUMER",
+      "VIGIL"
+    ]
   },
   "about": {
     "url": "/about",
