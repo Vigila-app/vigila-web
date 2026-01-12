@@ -9,7 +9,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { AuthService } from "@/src/services";
+import { AuthService, ApiService } from "@/src/services";
+import { apiUser } from "@/src/constants/api.constants";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { Routes } from "@/src/routes";
@@ -54,33 +55,21 @@ export default function GoogleRoleSelector() {
 
       const token = await AuthService.getAuthToken();
 
-      const response = await fetch("/api/v1/user/completeGoogle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      const response = (await ApiService.post(
+        apiUser.COMPLETE_GOOGLE(),
+        {
           role: selectedRole,
           terms: terms,
-        }),
-      });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )) as any;
 
-      let data: any = {};
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = {};
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            data?.code ||
-            response.statusText ||
-            "Errore durante il salvataggio"
-        );
-      }
+      // ApiService.responseMiddlewares already throws on non-ok responses
+      const data = response || {};
 
       showToast({
         message: "Profilo completato con successo!",

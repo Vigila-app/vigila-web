@@ -2,6 +2,7 @@ import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ToastI } from "@/src/types/toast.type";
+import { AccessLevelsEnum, UserStatusEnum } from "../enums/roles.enums";
 
 export const isServer = typeof window === "undefined";
 
@@ -302,8 +303,8 @@ export function mergeGoogleAndFormData(googleRawData: any, formData: any) {
     name: finalName,
     surname: finalSurname,
     role: formData.role,
-    level: "BASE",
-    status: "pending",
+    level: AccessLevelsEnum.BASE,
+    status: UserStatusEnum.PENDING,
     displayName: sourceName,
     terms: formData.terms,
     email_verified: true, 
