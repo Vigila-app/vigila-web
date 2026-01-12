@@ -165,8 +165,7 @@ export const AuthService = {
           {
             redirectTo: Routes.resetPassword.url,
           }
-        );
-        console.log(data);
+        )
         if (error) return reject(error);
         resolve(true);
       } catch (error) {
