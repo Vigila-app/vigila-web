@@ -11,7 +11,7 @@ export const revalidate = 3600;
 
 const getCmsData = cache(async () => {
   try {
-    // Uso una chiave specifica per questo step intermedio
+   
     const response = await CmsService.getLocalPage("google_role_selection");
     return response;
   } catch (error) {
@@ -75,7 +75,7 @@ export default async function GoogleRoleSelection() {
             </Link>
           </div>
 
-          {/* Footer: Invece del login, mettiamo un'opzione di uscita nel caso abbiano sbagliato account Google */}
+         
           <div className="space-y-2 mt-8  pt-4">
             <p className="justify-center text-sm text-gray-600 inline-flex items-center w-full">
               Fai attenzione a scegliere il ruolo corretto: una volta

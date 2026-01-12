@@ -13,14 +13,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const { user } = useUserStore();
-  const pathname = usePathname(); 
+  const pathname = usePathname();
 
-  // Definisci qui le rotte che un utente LOGGATO può visitare dentro la cartella Auth
-  const allowedAuthRoutes = [
-    Routes.registrationRole.url, 
-    Routes.registrationConsumer.url, 
-    Routes.registrationVigil.url, 
-  ];
+  const allowedAuthRoutes = [Routes.registrationRole.url];
 
   const isOnboardingPage = allowedAuthRoutes.some((route) =>
     pathname?.includes(route)
