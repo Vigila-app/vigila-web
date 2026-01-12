@@ -49,9 +49,9 @@ export default function ResetPasswordPage() {
       <div className="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
         <div className="bg-pureWhite w-full mx-auto my-6 p-6 md:p-8 rounded-3xl shadow-lg text-center">
           <h2 className="text-2xl font-semibold mb-4">Password dimenticata?</h2>
-          <p className="text-sm text-gray-600 mb-6"> </p>
           <p className="text-sm text-gray-600 mb-6">
-            <form onSubmit={handleSubmit(onSubmit)}
+            <form
+              onSubmit={handleSubmit(onSubmit)}
               className="w-full mx-auto max-w-lg space-y-8"
             >
               <Controller
@@ -71,15 +71,15 @@ export default function ResetPasswordPage() {
                     aria-invalid={!!errors.email}
                     error={errors.email}
                     icon={<EnvelopeIcon className="h-4 w-4 text-gray-500" />}
-
                   />
                 )}
-              >
-
-              </Controller>
+              ></Controller>
               <div className="flex items-center justify-center">
-
-                <Button type="submit" primary label="Inizia il processo di recupero">
+                <Button
+                  type="submit"
+                  primary
+                  label="Inizia il processo di recupero"
+                >
                   Inizia il processo di recupero
                 </Button>
               </div>
