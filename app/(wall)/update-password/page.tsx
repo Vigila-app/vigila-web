@@ -2,42 +2,43 @@
 import { Button } from "@/components";
 import { Input } from "@/components/form";
 import { FormFieldType } from "@/src/constants/form.constants";
-import { ToastStatusEnum } from "@/src/enums/toast.enum";
-import { AuthService, UserService } from "@/src/services";
-import { useAppStore } from "@/src/store/app/app.store";
-import { useUserStore } from "@/src/store/user/user.store";
-import { EyeIcon } from "@heroicons/react/24/outline";
-import { Controller, useForm } from "react-hook-form";
+import { RolesEnum } from "@/src/enums/roles.enums"
+import { ToastStatusEnum } from "@/src/enums/toast.enum"
+import { AuthService, UserService } from "@/src/services"
+import { useAppStore } from "@/src/store/app/app.store"
+import { useUserStore } from "@/src/store/user/user.store"
+import { EyeIcon } from "@heroicons/react/24/outline"
+import { Controller, useForm } from "react-hook-form"
 
 type UpdatePasswordPageI = {
-  password: string;
-  confirmPassword: string;
-};
+  password: string
+  confirmPassword: string
+}
 
 export default function UpdatePasswordPage() {
-  const { user } = useUserStore();
-  const { showToast } = useAppStore();
+  const { user } = useUserStore()
+  const { showToast } = useAppStore()
   const onSubmit = async (formData: UpdatePasswordPageI) => {
-    const { password, confirmPassword } = formData;
+    const { password, confirmPassword } = formData
     if (isValid && password === confirmPassword && user?.email) {
       try {
-        await UserService.updatePassword(password);
-        reset();
-        AuthService.logout();
+        await UserService.updatePassword(password)
+        reset()
+        AuthService.logout()
       } catch (err) {
-        console.error("Error updating user password", err);
+        console.error("Error updating user password", err)
         showToast({
           message: "Qualcosa è andato storto",
           type: ToastStatusEnum.ERROR,
-        });
+        })
       }
     } else if (password !== confirmPassword) {
       setError("confirmPassword", {
         type: "custom",
         message: "Le password non corrispondono",
-      });
+      })
     }
-  };
+  }
 
   const {
     control,
@@ -45,12 +46,14 @@ export default function UpdatePasswordPage() {
     handleSubmit,
     setError,
     reset,
-  } = useForm<UpdatePasswordPageI>();
+  } = useForm<UpdatePasswordPageI>()
   return (
     <section className="py-16">
       <div className="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
-        <div className="bg-pureWhite w-full mx-auto my-6 p-6 md:p-8 rounded-3xl shadow-lg text-center">
-          <h2 className="text-2xl font-semibold mb-4">Password dimenticata?</h2>
+        <div className="bg-pureWhite w-full mx-auto my-6 p-6 md:p-8 rounded-3xl shadow-lg ">
+          <h2 className="text-2xl font-semibold mb-4 text-center">
+            Password dimenticata?
+          </h2>
           <p className="text-sm text-gray-600 mb-6"> </p>
           <p className="text-sm text-gray-600 mb-6">
             <form
@@ -69,6 +72,7 @@ export default function UpdatePasswordPage() {
                     placeholder="Inserisci la nuova password"
                     type="password"
                     required
+                    role={RolesEnum.CONSUMER}
                     autoComplete="password"
                     aria-invalid={!!errors.password}
                     error={errors.password}
@@ -87,6 +91,7 @@ export default function UpdatePasswordPage() {
                     label="Conferma nuova password"
                     placeholder="Reinserisci la nuova password"
                     type="password"
+                    role={RolesEnum.CONSUMER}
                     required
                     autoComplete="password"
                     aria-invalid={!!errors.confirmPassword}
@@ -97,12 +102,12 @@ export default function UpdatePasswordPage() {
               />
 
               <div className="flex items-center justify-end">
-                <Button type="submit" primary label="Update password" />
+                <Button type="submit" primary label="Aggiorna password" />
               </div>
             </form>
           </p>
         </div>
       </div>
     </section>
-  );
+  )
 }
