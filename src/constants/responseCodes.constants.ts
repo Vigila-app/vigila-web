@@ -78,6 +78,48 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   // endregion PAYMENT
 
+  // region WALLET
+  WALLET_TOP_UP_SUCCESS: {
+    code: 8301,
+  },
+  WALLET_TOP_UP_ERROR: {
+    code: 8302,
+  },
+  WALLET_TOP_UP_BAD_REQUEST: {
+    code: 8303,
+  },
+  WALLET_TOP_UP_UNAUTHORIZED: {
+    code: 8304,
+  },
+  WALLET_TOP_UP_NOT_FOUND: {
+    code: 8305,
+  },
+  WALLET_TOP_UP_METHOD_NOT_ALLOWED: {
+    code: 8306,
+  },
+  WALLET_TRANSACTIONS_SUCCESS: {
+    code: 8311,
+  },
+  WALLET_TRANSACTIONS_ERROR: {
+    code: 8312,
+  },
+  WALLET_TRANSACTIONS_BAD_REQUEST: {
+    code: 8313,
+  },
+  WALLET_TRANSACTIONS_UNAUTHORIZED: {
+    code: 8314,
+  },
+  WALLET_TRANSACTIONS_NOT_FOUND: {
+    code: 8315,
+  },
+  WALLET_WEBHOOK_DUPLICATE: {
+    code: 8307,
+  },
+  WALLET_NOT_FOUND: {
+    code: 8316,
+  },
+  // endregion WALLET
+
   // region CMS
   CMS_CONTENT_SUCCESS: {
     code: 6001,
@@ -496,4 +538,4 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 7906,
   },
   // endregion VIGIL
-};
+}

@@ -163,6 +163,33 @@
     "private": true,
     "roles": ["CONSUMER", "VIGIL"]
   },
+  "wallet": {
+    "url": "/wallet",
+    "label": "wallet",
+    "title": "wallet digitale",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header":true,
+      "footer": true
+    },
+    "private":false,
+    "roles": []
+  },
+ 
+  "walletTopUp": {
+    "url": "/wallet/topUp",
+    "label": "Ricarica wallet",
+    "title": "Ricarica wallet",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header":true,
+      "footer": true
+    },
+    "private": true,
+    "roles": ["CONSUMER" ]
+  },
   "admin": {
     "url": "/dashboard-admin",
     "label": "Admin Dashboard",

@@ -14,6 +14,7 @@ type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   text?: boolean;
   inline?: boolean;
   icon?: React.ReactNode;
+  iconPosition?: "left" | "right";
 };
 
 const ButtonLink = (props: ButtonLinkI) => {
@@ -29,6 +30,7 @@ const ButtonLink = (props: ButtonLinkI) => {
     full = false,
     inline = false,
     icon,
+    iconPosition = "left",
   } = props;
 
   const btnClass = clsx(
@@ -54,7 +56,7 @@ const ButtonLink = (props: ButtonLinkI) => {
       {...{
         ...props,
         action: undefined,
-        customClass: undefined,
+
         primary: undefined,
         secondary: undefined,
         text: undefined,
@@ -63,8 +65,15 @@ const ButtonLink = (props: ButtonLinkI) => {
         icon: undefined,
       }}
       href={href}>
-      {icon ? <span className="mr-2">{icon}</span> : null}
+      {icon && iconPosition === "left" ? (
+        <span className="mr-2">{icon}</span>
+      ) : null}
+
       {label}
+
+      {icon && iconPosition === "right" ? (
+        <span className="ml-2">{icon}</span>
+      ) : null}
     </Link>
   );
 };

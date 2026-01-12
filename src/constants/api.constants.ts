@@ -58,6 +58,20 @@ const apiControllers = {
     }`,
   // endregion CHECKOUT
 
+  // region WALLET
+  WALLET_TOP_UP: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/wallet/top-up`,
+  PAY_BOOKING: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/wallet/pay-booking`,
+  TRANSACTIONS: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/wallet/transactions/`,
+  // endregion WALLET
+
+  // region WEBHOOKS
+  STRIPE_WEBHOOK: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/webhooks/stripe`,
+  // endregion WEBHOOKS
+
   // region CMS
   CONTENT: (
     contentType: CmsContentType,
@@ -174,6 +188,17 @@ export const apiPayment = {
     apiControllers.VERIFY_PAYMENT_INTENT(isMock),
   INTENT: (paymentIntentId?: string, isMock?: boolean): string =>
     apiControllers.PAYMENT_INTENT(paymentIntentId, isMock),
+};
+
+export const apiWallet = {
+  TOP_UP: (isMock?: boolean): string => apiControllers.WALLET_TOP_UP(isMock),
+  PAY_BOOKING: (isMock?: boolean): string => apiControllers.PAY_BOOKING(isMock),
+  TRANSACTIONS: (isMock?: boolean): string =>
+    apiControllers.TRANSACTIONS(isMock),
+};
+
+export const apiWebhooks = {
+  STRIPE: (isMock?: boolean): string => apiControllers.STRIPE_WEBHOOK(isMock),
 };
 
 export const apiRecaptcha = {
