@@ -1,11 +1,8 @@
-import { initAdmin } from "@/server/supabaseAdmin";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
 import { authenticateUser, getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
 import { NextRequest, NextResponse } from "next/server";
-
 import { mergeGoogleAndFormData } from "@/src/utils/common.utils";
-import { AuthService } from "@/src/services";
 
 export async function POST(req: NextRequest) {
   try {
