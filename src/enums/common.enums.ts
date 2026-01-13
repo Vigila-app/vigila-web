@@ -16,7 +16,7 @@ export enum FrequencyEnum {
 
 export enum ProviderEnum {
   GOOGLE = "google",
-  APPLE = "apple",
+  // APPLE = "apple",
 }
 
 export enum RecaptchaActionEnum {

@@ -140,6 +140,7 @@ const apiControllers = {
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
+  COMPLETE_GOOGLE: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/completeGoogle`,
   DETAILS: (id: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
       isMock ? "user" : id

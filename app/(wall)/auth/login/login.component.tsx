@@ -168,24 +168,24 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
         <Altcha floating onStateChange={onStateChange} />
       </form>
 
-      {/* <div className="login-methods"> */
-      /* <Divider />
+      <div className="login-methods">
+        <Divider />
         <div className="social-login space-y-4">
           <ProviderButton
             provider={ProviderEnum.GOOGLE}
             full
-            //action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
+            action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
-            customClass="rounded-full shadow"
-          /> */
-      /* <ProviderButton
+            customClass="rounded-full shadow !hidden"
+          />
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Accedi con Apple"
-          /> */
-      /* </div>
-      </div> */}
+          />  */}
+        </div>
+      </div>
 
       <div className="space-y-2 mt-6">
         <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
