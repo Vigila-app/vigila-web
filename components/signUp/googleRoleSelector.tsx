@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, Button } from "@/components"; 
+import { Card, Button } from "@/components";
 import {
   FaceSmileIcon,
   HeartIcon,
@@ -53,41 +53,23 @@ export default function GoogleRoleSelector() {
       setIsSubmitting(true);
       showLoader();
 
-      const token = await AuthService.getAuthToken();
-
-      const response = (await ApiService.post(
-        apiUser.COMPLETE_GOOGLE(),
-        {
-          role: selectedRole,
-          terms: terms,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )) as any;
-
-      // ApiService.responseMiddlewares already throws on non-ok responses
-      const data = response || {};
+      (await ApiService.post(apiUser.COMPLETE_GOOGLE(), {
+        role: selectedRole,
+        terms: terms,
+      })) as any;
 
       showToast({
         message: "Profilo completato con successo!",
         type: ToastStatusEnum.SUCCESS,
       });
 
-      try {
-        await AuthService.renewAuthentication();
-      } catch (e) {
-        console.warn("Session refresh failed:", e);
-      }
+      await AuthService.renewAuthentication();
 
       const nextRoute =
         selectedRole === RolesEnum.CONSUMER
           ? Routes.onBoard.url
           : Routes.onBoardVigil.url;
 
-      router.refresh();
       router.replace(nextRoute);
     } catch (error: any) {
       console.error(error);
@@ -107,7 +89,8 @@ export default function GoogleRoleSelector() {
       <div className="my-6 space-y-4">
         <div
           onClick={() => handleRoleSelect(RolesEnum.CONSUMER)}
-          className="cursor-pointer group">
+          className="cursor-pointer group"
+        >
           <Card
             containerClass={clsx(
               "flex flex-col items-center justify-center p-6 transition duration-200 border-2 rounded-2xl",
@@ -115,7 +98,8 @@ export default function GoogleRoleSelector() {
               selectedRole === RolesEnum.CONSUMER
                 ? "border-consumer-blue bg-consumer-light-blue/10"
                 : "border-transparent bg-white"
-            )}>
+            )}
+          >
             <div className="text-consumer-blue flex flex-col items-center">
               <HeartIcon className="h-10 w-10 mb-3" />
               <h4 className="font-bold text-lg">Famiglia</h4>
@@ -128,7 +112,8 @@ export default function GoogleRoleSelector() {
 
         <div
           onClick={() => handleRoleSelect(RolesEnum.VIGIL)}
-          className="cursor-pointer group">
+          className="cursor-pointer group"
+        >
           <Card
             containerClass={clsx(
               "flex flex-col items-center justify-center p-6 transition duration-200 border-2 rounded-2xl",
@@ -136,7 +121,8 @@ export default function GoogleRoleSelector() {
               selectedRole === RolesEnum.VIGIL
                 ? "border-vigil-orange bg-vigil-light-orange/10"
                 : "border-transparent bg-white"
-            )}>
+            )}
+          >
             <div className="text-vigil-orange flex flex-col  items-center">
               <FaceSmileIcon className="h-10 w-10 mb-3" />
               <h4 className="font-bold text-lg">Vigil (Operatore)</h4>
@@ -153,7 +139,8 @@ export default function GoogleRoleSelector() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
               <XMarkIcon className="h-6 w-6" />
             </button>
 
@@ -164,7 +151,8 @@ export default function GoogleRoleSelector() {
                   selectedRole === RolesEnum.CONSUMER
                     ? "bg-consumer-light-blue text-consumer-blue"
                     : "bg-vigil-light-orange text-vigil-orange"
-                )}>
+                )}
+              >
                 {selectedRole === RolesEnum.CONSUMER ? (
                   <HeartIcon className="h-7 w-7" />
                 ) : (
@@ -183,7 +171,8 @@ export default function GoogleRoleSelector() {
             <div className="space-y-4 mb-8 text-sm text-gray-700 bg-gray-50 p-4 rounded-xl">
               <label
                 htmlFor="terms-and-conditions-1"
-                className="flex gap-3 cursor-pointer items-start">
+                className="flex gap-3 cursor-pointer items-start"
+              >
                 <input
                   id="terms-and-conditions-1"
                   type="checkbox"
@@ -195,7 +184,8 @@ export default function GoogleRoleSelector() {
                   Accetto i{" "}
                   <Link
                     href={Routes.termsConditions?.url || "#"}
-                    className="underline font-medium">
+                    className="underline font-medium"
+                  >
                     Termini e Condizioni
                   </Link>{" "}
                   *
@@ -213,7 +203,8 @@ export default function GoogleRoleSelector() {
                   Ho letto la{" "}
                   <Link
                     href={Routes.privacyPolicy?.url || "#"}
-                    className="underline font-medium">
+                    className="underline font-medium"
+                  >
                     Privacy Policy
                   </Link>{" "}
                   *
@@ -222,7 +213,8 @@ export default function GoogleRoleSelector() {
 
               <label
                 htmlFor="marketing-1"
-                className="flex gap-3 cursor-pointer items-start opacity-80">
+                className="flex gap-3 cursor-pointer items-start opacity-80"
+              >
                 <input
                   id="marketing-1"
                   type="checkbox"
@@ -238,7 +230,8 @@ export default function GoogleRoleSelector() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="w-1/3 py-2.5 rounded-lg border border-gray-300 font-medium text-gray-700 hover:bg-gray-50 transition">
+                className="w-1/3 py-2.5 rounded-lg border border-gray-300 font-medium text-gray-700 hover:bg-gray-50 transition"
+              >
                 Annulla
               </button>
               <div className="w-2/3">
