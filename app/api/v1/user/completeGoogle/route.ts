@@ -1,55 +1,35 @@
 import { initAdmin } from "@/server/supabaseAdmin";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum, UserStatusEnum } from "@/src/enums/roles.enums";
-import { jsonErrorResponse } from "@/server/api.utils.server";
+import { authenticateUser, getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { mergeGoogleAndFormData } from "@/src/utils/common.utils";
+import { AuthService } from "@/src/services";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log(`API POST auth/complete-google`, body);
 
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id)
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.USER_SIGNUP_UNAUTHORIZED.code,
+        success: false,
+      });
+
+    const _admin = getAdminClient();
+
     const { role, terms } = body;
 
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      return jsonErrorResponse(401, {
-        success: false,
-        code: "Missing Authorization Header",
-      });
-    }
-
-    const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
-
-    const _admin = initAdmin();
-    if (!_admin) {
-      return NextResponse.json(
-        { code: "SERVICE_UNAVAILABLE", success: false },
-        { status: 503 }
-      );
-    }
-
-    const {
-      data: { user },
-      error: userError,
-    } = await _admin.auth.getUser(accessToken);
-
-    if (userError || !user) {
-      return jsonErrorResponse(401, {
-        success: false,
-        code: "Unauthorized / Invalid Token",
-      });
-    }
-
-    const userId = user.id;
-    const googleRawMeta = user.user_metadata || {};
+    const userId = userObject.id;
+    const googleRawMeta = userObject.user_metadata || {};
 
     if (!terms) {
       return NextResponse.json(
         {
-          code: "BAD_REQUEST",
+        code: ResponseCodesConstants.USER_SIGNUP_BAD_REQUEST.code,
           success: false,
           error: "Terms must be accepted",
         },
@@ -57,9 +37,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (role !== RolesEnum.CONSUMER && role !== RolesEnum.VIGIL) {
+    if ((role !== RolesEnum.CONSUMER && role !== RolesEnum.VIGIL) || userObject.user_metadata?.role) {
       return NextResponse.json(
-        { code: "BAD_REQUEST", success: false, error: "Invalid Role" },
+        { code: ResponseCodesConstants.USER_SIGNUP_BAD_REQUEST.code, success: false, error: "Invalid Role" },
         { status: 400 }
       );
     }

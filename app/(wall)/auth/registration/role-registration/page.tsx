@@ -50,7 +50,7 @@ export default async function GoogleRoleSelection() {
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
             <p className="text-sm font-medium text-gray-600 max-w-sm mx-auto">
               Fai attenzione a scegliere il ruolo corretto: una volta
-              selezionato dovrai contattare l'assistenza per modificarlo.
+              selezionato dovrai contattare l&apos;assistenza per modificarlo.
             </p>
           </div>
         </div>
