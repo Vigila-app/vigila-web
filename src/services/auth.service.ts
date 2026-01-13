@@ -181,7 +181,8 @@ export const AuthService = {
     new Promise(async (resolve, reject) => {
       try {
         useAppStore.getState().showLoader();
-        const redirectTo = `${window.location.origin}/auth/callback`;
+        // const redirectTo = `${AppConstants.hostUrl}/auth/callback`;
+        const redirectTo = `${AppConstants.hostUrl}?redirectUserTo=${Routes.registrationRole.url}`;
 
         const { error } = await AppInstance.auth.signInWithOAuth({
           provider: provider === ProviderEnum.GOOGLE ? "google" : "apple",
