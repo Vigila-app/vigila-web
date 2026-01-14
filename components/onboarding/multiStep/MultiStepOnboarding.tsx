@@ -237,7 +237,7 @@ const MultiStepOnboarding = ({
                     question={question}
                     value={field.value}
                     onChange={field.onChange}
-                    error={errors[question.id]}
+                    error={errors[question.id] as any}
                     role={role}
                   />
                 )}

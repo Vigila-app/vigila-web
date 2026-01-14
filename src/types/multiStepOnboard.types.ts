@@ -25,8 +25,8 @@ export interface ValidationRules {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
-  min?: number;
-  max?: number;
+  min?: number | string;
+  max?: number | string;
   pattern?: RegExp;
   validate?: (value: any) => boolean | string;
 }
