@@ -31,6 +31,18 @@ const QuestionRenderer = ({
     }
   }, [address, onChange, question.type]);
 
+  // Helper to get HTML input type from question type
+  const getInputType = (questionType: QuestionType): string => {
+    switch (questionType) {
+      case QuestionType.EMAIL:
+        return "email";
+      case QuestionType.PHONE:
+        return "tel";
+      default:
+        return "text";
+    }
+  };
+
   // Render based on question type
   switch (question.type) {
     case QuestionType.TEXT:
@@ -42,7 +54,7 @@ const QuestionRenderer = ({
           placeholder={question.placeholder}
           value={value || ""}
           onChange={(val) => onChange(val)}
-          type={question.type === QuestionType.EMAIL ? "email" : question.type === QuestionType.PHONE ? "tel" : "text"}
+          type={getInputType(question.type)}
           required={question.validation?.required}
           minLength={question.validation?.minLength}
           maxLength={question.validation?.maxLength}

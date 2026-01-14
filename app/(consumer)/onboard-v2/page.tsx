@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 
 const ConsumerMultiStepOnboarding = dynamic(
   () => import("@/components/onboarding/consumer/ConsumerMultiStepOnboarding"),
-  { ssr: !!false }
+  { ssr: false }
 );
 
 export default function ConsumerOnboardPage() {

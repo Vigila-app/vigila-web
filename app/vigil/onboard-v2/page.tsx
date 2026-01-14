@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const VigilMultiStepOnboarding = dynamic(
   () => import("@/components/onboarding/vigil/VigilMultiStepOnboarding"),
-  { ssr: !!false }
+  { ssr: false }
 );
 
 export default function VigilOnboardPage() {

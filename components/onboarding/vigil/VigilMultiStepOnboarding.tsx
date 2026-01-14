@@ -39,13 +39,13 @@ const VigilMultiStepOnboarding = () => {
         
         // Prepare addresses array (for now, single address)
         const addresses = address ? [address] : [];
-        const caps = address?.address?.postcode ? [address.address.postcode] : [];
+        const caps = cap ? [cap] : [];
 
         // Prepare data for API
         const onboardData: any = {
           birthday,
-          addresses: [address],
-          cap: [cap],
+          addresses,
+          cap: caps,
           occupation: data.occupation,
           transportation: data.transportation,
           information: data.information || "",
