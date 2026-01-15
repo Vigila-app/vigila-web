@@ -91,7 +91,7 @@
     "roles": []
   },
   "onBoard": {
-    "url": "/onboard",
+    "url": "/onboard-v2",
     "label": "onboard",
     "title": "onboard",
     "menu": {
@@ -106,7 +106,7 @@
     ]
   },
   "onBoardVigil": {
-    "url": "/vigil/onboard",
+    "url": "/vigil/onboard-v2",
     "label": "onboard",
     "title": "onboard",
     "menu": {
