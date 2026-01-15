@@ -181,7 +181,7 @@ export const AuthService = {
     new Promise(async (resolve, reject) => {
       try {
         useAppStore.getState().showLoader();
-        // const redirectTo = `${AppConstants.hostUrl}?redirectUserTo=${Routes.registrationRole.url}`;
+        
         const redirectTo = AppConstants.hostUrl;
 
         const { error } = await AppInstance.auth.signInWithOAuth({
