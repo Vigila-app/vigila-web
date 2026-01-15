@@ -24,18 +24,18 @@ export const AuthInstance = AppInstance;
 export const AuthService = {
   signup: async (
     formData: {
-      email: string
-      password: string
-      name: string
-      surname: string
-      role: RolesEnum
+      email: string;
+      password: string;
+      name: string;
+      surname: string;
+      role: RolesEnum;
     },
     terms: UserTermsType
   ) =>
     new Promise(async (resolve, reject) => {
       try {
         // await RecaptchaService.checkAppToken(RecaptchaActionEnum.SIGNUP);
-        const { email, password, name, surname, role } = formData
+        const { email, password, name, surname, role } = formData;
         const response = (await ApiService.post(apiUser.SIGNUP(), {
           email,
           password,
@@ -43,18 +43,18 @@ export const AuthService = {
           surname,
           terms,
           role,
-        })) as { data: { user: User } }
+        })) as { data: { user: User } };
         if (response?.data?.user?.id) {
           if (!isReleased) {
-            await AuthService.login(email, password)
+            await AuthService.login(email, password);
           }
-          resolve(response.data)
+          resolve(response.data);
         } else {
-          reject()
+          reject();
         }
       } catch (error) {
-        console.error("AuthService signup error", error)
-        reject(error)
+        console.error("AuthService signup error", error);
+        reject(error);
       }
     }),
   login: async (email: string, password: string) =>
@@ -66,74 +66,74 @@ export const AuthService = {
             email,
             password,
           }
-        )
-        if (!error && user) resolve(user)
-        reject()
+        );
+        if (!error && user) resolve(user);
+        reject();
       } catch (error) {
-        console.error("AuthService login error", error)
-        reject(error)
+        console.error("AuthService login error", error);
+        reject(error);
       }
     }),
   logout: async () =>
     new Promise(async (resolve, reject) => {
       try {
-        await AppInstance.auth.signOut()
-        resolve(true)
+        await AppInstance.auth.signOut();
+        resolve(true);
       } catch (error) {
-        console.error("AuthService logout error", error)
-        reject(error)
+        console.error("AuthService logout error", error);
+        reject(error);
       } finally {
-        useAppStore.getState().onLogout()
-        useBookingsStore.getState().onLogout()
-        useConsumerStore.getState().onLogout()
-        useVigilStore.getState().onLogout()
-        useModalStore.getState().onLogout()
-        useServicesStore.getState().onLogout()
-        useUserStore.getState().onLogout()
+        useAppStore.getState().onLogout();
+        useBookingsStore.getState().onLogout();
+        useConsumerStore.getState().onLogout();
+        useVigilStore.getState().onLogout();
+        useModalStore.getState().onLogout();
+        useServicesStore.getState().onLogout();
+        useUserStore.getState().onLogout();
       }
     }),
   getAuthToken: async () =>
     new Promise(async (resolve, reject) => {
       try {
         if (AuthInstance) {
-          const { data, error } = await AppInstance.auth.getSession()
+          const { data, error } = await AppInstance.auth.getSession();
 
-          const token = data.session?.access_token
-          if (token) resolve(token)
-          reject()
+          const token = data.session?.access_token;
+          if (token) resolve(token);
+          reject();
         } else {
-          const check = await UserService.getUser()
-          if (!check) reject()
-          if (!isServer) resolve(AuthService.getAuthToken())
+          const check = await UserService.getUser();
+          if (!check) reject();
+          if (!isServer) resolve(AuthService.getAuthToken());
         }
       } catch (error) {
-        console.error("AuthService getAuthToken error", error)
-        reject(error)
+        console.error("AuthService getAuthToken error", error);
+        reject(error);
       }
     }),
   renewAuthentication: async () =>
     new Promise<Session>(async (resolve, reject) => {
       try {
         if (AuthInstance) {
-          const { data, error } = await AppInstance.auth.refreshSession()
-          if (error) reject(error)
-          const { session, user } = data
-          if (session && user) resolve(session)
-          reject()
+          const { data, error } = await AppInstance.auth.refreshSession();
+          if (error) reject(error);
+          const { session, user } = data;
+          if (session && user) resolve(session);
+          reject();
         } else {
-          reject()
+          reject();
         }
       } catch (error) {
-        console.error("AuthService reauthenticate error", error)
-        reject(error)
+        console.error("AuthService reauthenticate error", error);
+        reject(error);
       }
     }),
   getAuthHeaders: (headers: Headers) => {
-    const appToken = headers?.get(HeadersEnum.APP_TOKEN)
-    const authToken = headers?.get(HeadersEnum.AUTH_TOKEN)
-    const user = headers?.get(HeadersEnum.USER)
+    const appToken = headers?.get(HeadersEnum.APP_TOKEN);
+    const authToken = headers?.get(HeadersEnum.AUTH_TOKEN);
+    const user = headers?.get(HeadersEnum.USER);
 
-    return { appToken, authToken, user }
+    return { appToken, authToken, user };
   },
 
   resendConfirmation: async (
@@ -142,37 +142,37 @@ export const AuthService = {
   ) =>
     new Promise(async (resolve, reject) => {
       try {
-        if (!email) return reject(new Error("Email required"))
-        const options = redirectUrl ? { emailRedirectTo: redirectUrl } : {}
+        if (!email) return reject(new Error("Email required"));
+        const options = redirectUrl ? { emailRedirectTo: redirectUrl } : {};
         const { error } = await AppInstance.auth.resend({
           type: "signup",
           email,
           options,
-        })
-        if (error) return reject(error)
-        resolve(true)
+        });
+        if (error) return reject(error);
+        resolve(true);
       } catch (error) {
-        console.error("AuthService resendConfirmation error", error)
-        reject(error)
+        console.error("AuthService resendConfirmation error", error);
+        reject(error);
       }
     }),
 
   passwordReset: async (email: string) =>
     new Promise(async (resolve, reject) => {
       try {
-        if (!email) return reject(new Error("Email required"))
+        if (!email) return reject(new Error("Email required"));
 
         const { data, error } = await AppInstance.auth.resetPasswordForEmail(
           email,
           {
             redirectTo: `${AppConstants.hostUrl}?redirectUserTo=${Routes.updatePassword.url}`,
           }
-        )
-        if (error) return reject(error)
-        resolve(true)
+        );
+        if (error) return reject(error);
+        resolve(true);
       } catch (error) {
-        console.error("AuthService resendConfirmation error", error)
-        reject(error)
+        console.error("AuthService resendConfirmation error", error);
+        reject(error);
       }
     }),
 
@@ -181,7 +181,7 @@ export const AuthService = {
     new Promise(async (resolve, reject) => {
       try {
         useAppStore.getState().showLoader();
-        
+
         const redirectTo = AppConstants.hostUrl;
 
         const { error } = await AppInstance.auth.signInWithOAuth({
@@ -255,4 +255,4 @@ export const AuthService = {
   //   }),
   //
   // endregion 3RD PARTIES SIGN-IN PROVIDERS
-}
+};
