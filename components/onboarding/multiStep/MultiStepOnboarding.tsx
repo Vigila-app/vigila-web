@@ -72,7 +72,7 @@ const MultiStepOnboarding = ({
         const answer = stepAnswers[question.id]
         if (question.nextStep) {
           if (typeof question.nextStep === "function") {
-            const nextId = question.nextStep(answer, state.answers)
+            const nextId = question.nextStep(answer, stepAnswers)
             if (nextId) return nextId
           } else {
             return question.nextStep
@@ -83,14 +83,14 @@ const MultiStepOnboarding = ({
       // Use step-level nextStep
       if (currentStepData.nextStep) {
         if (typeof currentStepData.nextStep === "function") {
-          return currentStepData.nextStep(state.answers)
+          return currentStepData.nextStep(stepAnswers)
         }
         return currentStepData.nextStep
       }
 
       return null
     },
-    [state.answers]
+    []
   )
 
   // Handle moving to next step
@@ -142,9 +142,7 @@ const MultiStepOnboarding = ({
   ])
 
   // Handle moving to previous step
-  console.log(state)
   const handleBack = useCallback(() => {
-    console.log("ciao", state)
     if (state.visitedSteps.length <= 1) return
 
     const newVisitedSteps = [...state.visitedSteps]

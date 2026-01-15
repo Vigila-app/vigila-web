@@ -1,9 +1,9 @@
-import { RolesEnum } from "@/src/enums/roles.enums";
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
+import { RolesEnum } from "@/src/enums/roles.enums"
+import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums"
 import {
   OnboardingFlowConfig,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types";
+} from "@/src/types/multiStepOnboard.types"
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -15,11 +15,13 @@ export const createVigilOnboardingConfig = (
   role: RolesEnum.VIGIL,
   initialStepId: "welcome",
   onComplete,
+  //Nota: ho modificare leggermente il primo step rispetto a figma: alcune info le abbiamo dal form di registrazione
   steps: [
     {
       id: "welcome",
       title: "Benvenuto su Vigila!",
-      description: "Iniziamo a conoscerti",
+      description:
+        "Abbiamo bisogno di qualche info in più per creare un'esperienza su misura. Questo step richiede meno di cinque minuti.",
       questions: [
         {
           id: "birthday",
@@ -36,13 +38,6 @@ export const createVigilOnboardingConfig = (
           },
           autoFocus: true,
         },
-      ],
-      nextStep: "contact",
-    },
-    {
-      id: "contact",
-      title: "Informazioni di contatto",
-      questions: [
         {
           id: "phone",
           type: QuestionType.PHONE,
@@ -55,19 +50,11 @@ export const createVigilOnboardingConfig = (
           },
           autoFocus: true,
         },
-      ],
-      nextStep: "occupation",
-    },
-    {
-      id: "occupation",
-      title: "La tua occupazione",
-      description: "Seleziona la tua occupazione attuale",
-      questions: [
         {
           id: "occupation",
           type: QuestionType.SELECT,
-          label: "Occupazione",
-          placeholder: "Seleziona la tua occupazione",
+          label: "Professione",
+          placeholder: "Seleziona la tua professione",
           options: Object.values(OccupationEnum).map((value) => ({
             value,
             label: OccupationLabels[value],
@@ -76,8 +63,17 @@ export const createVigilOnboardingConfig = (
             required: true,
           },
         },
+        {
+          id: "information",
+          type: QuestionType.TEXTAREA,
+          label: "Perchè vuoi aiutare gli anziani?",
+          placeholder: "Condividi la tua motivazione...",
+          validation: {
+            required: true,
+            maxLength: 650,
+          },
+        },
       ],
-      // Conditional routing based on occupation
       nextStep: (answers) => {
         const requiresDocs = [
           OccupationEnum.OSA,
@@ -87,9 +83,10 @@ export const createVigilOnboardingConfig = (
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
           return "professional-docs-info"
         }
-        return "experience"
+        return "hobbies"
       },
     },
+
     {
       id: "professional-docs-info",
       title: "Documentazione professionale",
@@ -108,22 +105,28 @@ export const createVigilOnboardingConfig = (
           },
         },
       ],
-      nextStep: "experience",
+      nextStep: "hobbies",
     },
     {
-      id: "experience",
-      title: "La tua esperienza",
-      description: "Raccontaci del tuo background",
+      id: "hobbies",
+      title: "Quali sono i tuoi interessi?",
+      description:
+        "Condividi le tue passioni per creare delle connessioni autentiche",
       questions: [
         {
-          id: "information",
-          type: QuestionType.TEXTAREA,
-          label: "Esperienza e competenze",
-          placeholder:
-            "Raccontaci se hai mai avuto esperienza di assistenza a nonni, parenti anziani, o se è la tua prima volta in questo ambito. Puoi anche indicarci eventuali competenze particolari che possiedi.",
+          id: "hobbies",
+          type: QuestionType.MULTI_CHECKBOX,
+          label: "Hobby e passioni:",
+          options: [
+            { label: "Lettura", value: "reading" },
+            { label: "Musica", value: "music" },
+            { label: "Arte e creatività", value: "art" },
+            { label: "Natura e passeggiate", value: "nature" },
+            { label: "Cucina", value: "cooking" },
+            { label: "Sport e movimento", value: "sport" },
+          ],
           validation: {
             required: true,
-            maxLength: 650,
           },
         },
       ],
@@ -131,9 +134,23 @@ export const createVigilOnboardingConfig = (
     },
     {
       id: "transportation",
-      title: "Come ti sposti?",
-      description: "Seleziona il tuo mezzo di trasporto principale",
+      title: "Quanto tempo puoi dedicare?",
+      description: "Aiutaci a capire la tua disponibilità",
       questions: [
+        {
+          id: "time-committment",
+          type: QuestionType.RADIO,
+          label: "Quanto tempo puoi dedicare?",
+          options: [
+            { label: "1-2 ore a settimana", value: "1-2_hours" },
+            { label: "3-5 ore a settimana", value: "3-5_hours" },
+            { label: "5-10 ore a settimana", value: "5-10_hours" },
+            { label: "Più di 10 ore", value: "10+_hours" },
+          ],
+          validation: {
+            required: true,
+          },
+        },
         {
           id: "transportation",
           type: QuestionType.RADIO,
@@ -150,50 +167,33 @@ export const createVigilOnboardingConfig = (
         },
       ],
       // Conditional routing based on transportation
-      nextStep: (answers) => {
-        // If they have a car or moto, they might cover a wider area
-        if (
-          answers.transportation === "auto" ||
-          answers.transportation === "moto"
-        ) {
-          return "service-area-wide"
-        }
-        return "service-area-local"
-      },
+      nextStep: "activities",
     },
     {
-      id: "service-area-wide",
-      title: "Area di servizio",
-      description: "Avendo un mezzo proprio, puoi coprire più aree",
+      id: "activities",
+      title: "Parlaci di te",
+      description: "Aiutaci a capire come puoi aiutare gli anziani",
       questions: [
         {
-          id: "wideAreaCoverage",
-          type: QuestionType.RADIO,
-          label: "Preferisci offrire i tuoi servizi",
-          options: [
-            { label: "In una zona specifica vicino a me", value: "local" },
-            { label: "In più zone della mia città", value: "city" },
-            { label: "In tutta la provincia", value: "province" },
-          ],
+          id: "experience",
+          type: QuestionType.TEXTAREA, //TODO: make multi
+          label: "La tua esperienza",
+          placeholder:
+            "Raccontaci se hai mai avuto nonni,parenti anziani, o se è la tua prima volta....",
           validation: {
             required: true,
           },
         },
-      ],
-      nextStep: "address",
-    },
-    {
-      id: "service-area-local",
-      title: "Area di servizio",
-      description: "Concentrati sulla tua zona locale",
-      questions: [
         {
-          id: "wideAreaCoverage",
-          type: QuestionType.RADIO,
-          label: "Preferisci offrire i tuoi servizi",
+          id: "activities", //TODO: possibilmente ridondante rispetto allo step prima
+          type: QuestionType.MULTI_CHECKBOX,
+          label: "Quali attività vuoi fare con gli anziani?",
           options: [
-            { label: "Nel mio quartiere", value: "local" },
-            { label: "In tutta la mia città", value: "city" },
+            { label: "Ascoltare", value: "listening" },
+            { label: "Cucinare", value: "cooking" },
+            { label: "Tecnologia", value: "tech" },
+            { label: "Leggere", value: "reading" },
+            { label: "Giocare", value: "games" },
           ],
           validation: {
             required: true,
@@ -218,7 +218,56 @@ export const createVigilOnboardingConfig = (
           },
         },
       ],
+      nextStep: (answers) => {
+        // If they have a car or moto, they might cover a wider area
+        if (
+          answers.transportation === "auto" ||
+          answers.transportation === "moto"
+        ) {
+          return "service-area-wide"
+        }
+        return "service-area-local"
+      },
       // No nextStep means this is the final step
+    },
+    {
+      id: "service-area-wide",
+      title: "Area di servizio",
+      description: "Avendo un mezzo proprio, puoi coprire più aree",
+      questions: [
+        {
+          id: "wideAreaCoverage",
+          type: QuestionType.RADIO,
+          label: "Preferisci offrire i tuoi servizi",
+          options: [
+            { label: "In una zona specifica vicino a me", value: "local" },
+            { label: "In più zone della mia città", value: "city" },
+            { label: "In tutta la provincia", value: "province" },
+          ],
+          validation: {
+            required: true,
+          },
+        },
+      ],
+    },
+    {
+      id: "service-area-local",
+      title: "Area di servizio",
+      description: "Concentrati sulla tua zona locale",
+      questions: [
+        {
+          id: "wideAreaCoverage",
+          type: QuestionType.RADIO,
+          label: "Preferisci offrire i tuoi servizi",
+          options: [
+            { label: "Nel mio quartiere", value: "local" },
+            { label: "In tutta la mia città", value: "city" },
+          ],
+          validation: {
+            required: true,
+          },
+        },
+      ],
     },
   ],
 })
