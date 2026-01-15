@@ -39,18 +39,19 @@ export const createConsumerOnboardingConfig = (
       title: "Informazioni sulla persona cara",
       description: "Dicci qualcosa di più",
       questions: [
-        {
-          id: "lovedOneAge",
-          type: QuestionType.NUMBER,
-          label: "Età della persona cara",
-          placeholder: "Es. 85",
-          validation: {
-            required: true,
-            min: 18,
-            max: 120,
-          },
-          autoFocus: true,
-        },
+        // {
+        //   id: "lovedOneAge",
+        //   type: QuestionType.NUMBER,
+        //   label: "Età della persona cara",
+        //   placeholder: "Es. 85",
+        //   validation: {
+        //     required: true,
+        //     min: 18,
+        //     max: 120,
+        //   },
+        //   autoFocus: true,
+        // },
+        //TODO: calculate age by code
         {
           id: "lovedOneBirthday",
           type: QuestionType.DATE,
@@ -106,9 +107,9 @@ export const createConsumerOnboardingConfig = (
       nextStep: (answers) => {
         // If the relationship is "Badante", ask for professional details
         if (answers.relationship === "Badante") {
-          return "professional-details";
+          return "professional-details"
         }
-        return "address";
+        return "address"
       },
     },
     {
@@ -156,7 +157,8 @@ export const createConsumerOnboardingConfig = (
           id: "information",
           type: QuestionType.TEXTAREA,
           label: "Raccontaci di più",
-          placeholder: "Dicci tutto quello che può esserci utile sapere sulla persona cara (es. patologie, allergie, abitudini, hobby, ecc.)",
+          placeholder:
+            "Dicci tutto quello che può esserci utile sapere sulla persona cara (es. patologie, allergie, abitudini, hobby, ecc.)",
           validation: {
             required: false,
             ...FormFieldType.NOTE,
@@ -166,4 +168,4 @@ export const createConsumerOnboardingConfig = (
       // No nextStep means this is the final step
     },
   ],
-});
+})

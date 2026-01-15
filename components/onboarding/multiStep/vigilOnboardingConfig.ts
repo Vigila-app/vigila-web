@@ -8,6 +8,7 @@ import {
 /**
  * Multi-step onboarding flow configuration for VIGIL users
  */
+//TODO: add figma questions
 export const createVigilOnboardingConfig = (
   onComplete: (data: Record<string, any>) => Promise<void>
 ): OnboardingFlowConfig => ({
@@ -23,17 +24,13 @@ export const createVigilOnboardingConfig = (
         {
           id: "birthday",
           type: QuestionType.DATE,
-          label: "Data di nascita",
+          label: "Data di nascita", //TODO: better error message + eu format
           validation: {
             required: true,
-            min: new Date(
-              new Date().setFullYear(new Date().getFullYear() - 80)
-            )
+            min: new Date(new Date().setFullYear(new Date().getFullYear() - 80))
               .toISOString()
               .split("T")[0],
-            max: new Date(
-              new Date().setFullYear(new Date().getFullYear() - 18)
-            )
+            max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
               .toISOString()
               .split("T")[0],
           },
@@ -86,22 +83,24 @@ export const createVigilOnboardingConfig = (
           OccupationEnum.OSA,
           OccupationEnum.OSS,
           OccupationEnum.NURSE,
-        ];
+        ]
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
-          return "professional-docs-info";
+          return "professional-docs-info"
         }
-        return "experience";
+        return "experience"
       },
     },
     {
       id: "professional-docs-info",
       title: "Documentazione professionale",
-      description: "Per l'occupazione selezionata è richiesta documentazione certificata",
+      description:
+        "Per l'occupazione selezionata è richiesta documentazione certificata", //TODO: doesnt work
       questions: [
         {
           id: "understandsDocRequirement",
           type: QuestionType.CHECKBOX,
-          label: "Comprendo che dovrò inviare la documentazione che attesta la mia qualifica professionale",
+          label:
+            "Comprendo che dovrò inviare la documentazione che attesta la mia qualifica professionale",
           validation: {
             required: true,
             validate: (value) =>
@@ -120,7 +119,8 @@ export const createVigilOnboardingConfig = (
           id: "information",
           type: QuestionType.TEXTAREA,
           label: "Esperienza e competenze",
-          placeholder: "Raccontaci se hai mai avuto esperienza di assistenza a nonni, parenti anziani, o se è la tua prima volta in questo ambito. Puoi anche indicarci eventuali competenze particolari che possiedi.",
+          placeholder:
+            "Raccontaci se hai mai avuto esperienza di assistenza a nonni, parenti anziani, o se è la tua prima volta in questo ambito. Puoi anche indicarci eventuali competenze particolari che possiedi.",
           validation: {
             required: true,
             maxLength: 650,
@@ -152,10 +152,13 @@ export const createVigilOnboardingConfig = (
       // Conditional routing based on transportation
       nextStep: (answers) => {
         // If they have a car or moto, they might cover a wider area
-        if (answers.transportation === "auto" || answers.transportation === "moto") {
-          return "service-area-wide";
+        if (
+          answers.transportation === "auto" ||
+          answers.transportation === "moto"
+        ) {
+          return "service-area-wide"
         }
-        return "service-area-local";
+        return "service-area-local"
       },
     },
     {
@@ -206,9 +209,10 @@ export const createVigilOnboardingConfig = (
       questions: [
         {
           id: "address",
-          type: QuestionType.ADDRESS,
+          type: QuestionType.ADDRESS, //TODO: make multi
           label: "Area operativa",
-          placeholder: "Inserisci il CAP e il nome della città in cui offri i tuoi servizi",
+          placeholder:
+            "Inserisci il CAP o la città o quartiere in cui offri i tuoi servizi",
           validation: {
             required: true,
           },
@@ -217,4 +221,4 @@ export const createVigilOnboardingConfig = (
       // No nextStep means this is the final step
     },
   ],
-});
+})
