@@ -1,5 +1,6 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { FieldError } from "react-hook-form";
+import { ForwardRefExoticComponent, SVGProps } from "react"
+import { FieldError } from "react-hook-form"
 
 /**
  * Question types supported in the multi-step onboarding
@@ -22,21 +23,22 @@ export enum QuestionType {
  * Validation rules for a question
  */
 export interface ValidationRules {
-  required?: boolean;
-  minLength?: number;
-  maxLength?: number;
-  min?: number | string;
-  max?: number | string;
-  pattern?: RegExp;
-  validate?: (value: any) => boolean | string;
+  required?: boolean
+  minLength?: number
+  maxLength?: number
+  min?: number | string
+  max?: number | string
+  pattern?: RegExp
+  validate?: (value: any) => boolean | string
 }
 
 /**
  * Option for select, radio, or checkbox questions
  */
 export interface QuestionOption {
-  label: string;
-  value: string | number;
+  label: string
+  value: string | number
+  icon?: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">> //as for icon library
 }
 
 /**

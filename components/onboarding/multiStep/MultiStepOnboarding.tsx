@@ -63,7 +63,7 @@ const MultiStepOnboarding = ({
 
     return false
   }, [currentStep, state.answers])
-
+  console.log(state.answers) //TODO
   // Determine the next step based on current answers
   const getNextStepId = useCallback(
     (currentStepData: OnboardingStep, stepAnswers: Record<string, any>) => {

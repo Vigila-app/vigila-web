@@ -4,6 +4,14 @@ import {
   OnboardingFlowConfig,
   QuestionType,
 } from "@/src/types/multiStepOnboard.types"
+import {
+  BoltIcon,
+  BookOpenIcon,
+  CakeIcon,
+  MusicalNoteIcon,
+  PaintBrushIcon,
+  SunIcon,
+} from "@heroicons/react/24/outline"
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -117,13 +125,14 @@ export const createVigilOnboardingConfig = (
           id: "hobbies",
           type: QuestionType.MULTI_CHECKBOX,
           label: "Hobby e passioni:",
+          //TODO: icons from figma
           options: [
-            { label: "Lettura", value: "reading" },
-            { label: "Musica", value: "music" },
-            { label: "Arte e creatività", value: "art" },
-            { label: "Natura e passeggiate", value: "nature" },
-            { label: "Cucina", value: "cooking" },
-            { label: "Sport e movimento", value: "sport" },
+            { label: "Lettura", value: "reading", icon: BookOpenIcon },
+            { label: "Musica", value: "music", icon: MusicalNoteIcon },
+            { label: "Arte e creatività", value: "art", icon: PaintBrushIcon },
+            { label: "Natura e passeggiate", value: "nature", icon: SunIcon },
+            { label: "Cucina", value: "cooking", icon: CakeIcon },
+            { label: "Sport e movimento", value: "sport", icon: BoltIcon },
           ],
           validation: {
             required: true,
@@ -194,6 +203,7 @@ export const createVigilOnboardingConfig = (
             { label: "Tecnologia", value: "tech" },
             { label: "Leggere", value: "reading" },
             { label: "Giocare", value: "games" },
+            { label: "Guidare", value: "drive" },
           ],
           validation: {
             required: true,
