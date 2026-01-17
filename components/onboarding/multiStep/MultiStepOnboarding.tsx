@@ -178,10 +178,10 @@ const MultiStepOnboarding = ({
 
           {/* Step header */}
           {currentStep.title && (
-            <section className="flex flex-col items-center gap-2 mb-6">
+            <section className="flex flex-col items-center gap-2 mb-8">
               <h1
                 className={clsx(
-                  "font-semibold text-[26px]",
+                  "font-semibold text-2xl",
                   role === RolesEnum.CONSUMER && "text-consumer-blue",
                   role === RolesEnum.VIGIL && "text-vigil-orange"
                 )}
@@ -189,7 +189,7 @@ const MultiStepOnboarding = ({
                 {currentStep.title}
               </h1>
               {currentStep.description && (
-                <span className="font-normal text-[15px] text-center">
+                <span className="font-normal text-sm text-center">
                   {currentStep.description}
                 </span>
               )}
@@ -234,7 +234,7 @@ const MultiStepOnboarding = ({
                 )}
               />
             ))}
-
+            <hr/>
             {/* Navigation buttons */}
             <div className="flex justify-between items-center pt-4">
               {state.visitedSteps.length > 1 ? (

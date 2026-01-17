@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Input, TextArea } from "@/components/form"
-import Checkbox from "@/components/form/checkbox"
-import Select from "@/components/form/select"
-import SearchAddress from "@/components/maps/searchAddress.component"
-import { RolesEnum } from "@/src/enums/roles.enums"
+import { Input, TextArea } from "@/components/form";
+import Checkbox from "@/components/form/checkbox";
+import Select from "@/components/form/select";
+import SearchAddress from "@/components/maps/searchAddress.component";
+import { RolesEnum } from "@/src/enums/roles.enums";
 import {
   QuestionRendererProps,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import { AddressI } from "@/src/types/maps.types"
-import { useState, useEffect } from "react"
-import clsx from "clsx"
+} from "@/src/types/multiStepOnboard.types";
+import { AddressI } from "@/src/types/maps.types";
+import { useState, useEffect } from "react";
+import clsx from "clsx";
 
 /**
  * Component that renders a single question based on its type
@@ -23,25 +23,25 @@ const QuestionRenderer = ({
   error,
   role,
 }: QuestionRendererProps) => {
-  const [address, setAddress] = useState<AddressI | null>(value || null)
+  const [address, setAddress] = useState<AddressI | null>(value || null);
 
   useEffect(() => {
     if (question.type === QuestionType.ADDRESS && address) {
-      onChange(address)
+      onChange(address);
     }
-  }, [address, onChange, question.type])
+  }, [address, onChange, question.type]);
 
   // Helper to get HTML input type from question type
   const getInputType = (questionType: QuestionType): string => {
     switch (questionType) {
       case QuestionType.EMAIL:
-        return "email"
+        return "email";
       case QuestionType.PHONE:
-        return "tel"
+        return "tel";
       default:
-        return "text"
+        return "text";
     }
-  }
+  };
 
   // Render based on question type
   switch (question.type) {
@@ -62,7 +62,7 @@ const QuestionRenderer = ({
           error={error}
           autoFocus={question.autoFocus}
         />
-      )
+      );
 
     case QuestionType.NUMBER:
       return (
@@ -79,7 +79,7 @@ const QuestionRenderer = ({
           error={error}
           autoFocus={question.autoFocus}
         />
-      )
+      );
 
     case QuestionType.DATE:
       return (
@@ -94,7 +94,7 @@ const QuestionRenderer = ({
           error={error}
           autoFocus={question.autoFocus}
         />
-      )
+      );
 
     case QuestionType.TEXTAREA:
       return (
@@ -109,7 +109,7 @@ const QuestionRenderer = ({
           role={role}
           error={error}
         />
-      )
+      );
 
     case QuestionType.SELECT:
       return (
@@ -123,47 +123,40 @@ const QuestionRenderer = ({
           error={error}
           options={question.options || []}
         />
-      )
+      );
 
     case QuestionType.RADIO:
       return (
         <div>
           <label
             className={clsx(
-              "block font-medium mb-2",
+              "block font-medium mb-2 text-center text-xl",
               role === RolesEnum.VIGIL && "text-vigil-orange",
               role === RolesEnum.CONSUMER && "text-consumer-blue"
-            )}
-          >
+            )}>
             {question.label}
-            {question.validation?.required && "*"}
           </label>
-          {question.description && (
-            <p className="text-sm text-gray-600 mb-3">{question.description}</p>
-          )}
-          <div className="grid grid-cols-2 gap-2">
+
+          <div className="  flex flex-col gap-4 mt-2">
             {question.options?.map((option) => {
-              const isChecked = value === option.value
+              const isChecked = value === option.value;
               return (
                 <div
                   key={option.value}
-                  className={`p-2 border-1 border-grey-200 rounded-3xl py-3 ${
+                  className={`cursor-pointer p-2 border-2 border-grey-200  rounded-3xl py-3 ${
                     isChecked
                       ? clsx(
-                          "text-white",
                           role === RolesEnum.VIGIL &&
-                            "border-vigil-orange bg-vigil-orange",
+                            "border-vigil-orange bg-vigil-light-orange text-vigil-orange",
                           role === RolesEnum.CONSUMER &&
-                            "border-consumer-blue bg-vigil-blue"
+                            "border-consumer-blue bg-consumer-light-blue text-consumer-blue"
                         )
                       : ""
-                  }`}
-                >
+                  }`}>
                   <label
                     key={option.value}
                     htmlFor={option.label}
-                    className="flex flex-col items-center gap-2"
-                  >
+                    className=" cursor-pointer flex flex-col items-center gap-2">
                     {option.icon && (
                       <option.icon
                         className={`text-gray-400 max-w-1/15 ${
@@ -190,12 +183,83 @@ const QuestionRenderer = ({
                     </div>
                   </label>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
-      )
+      );
+    case QuestionType.CARD:
+      return (
+        <div>
+          <label
+            className={clsx(
+              "block font-medium mb-2 text-center text-xl",
+              role === RolesEnum.VIGIL && "text-vigil-orange",
+              role === RolesEnum.CONSUMER && "text-consumer-blue"
+            )}>
+            {question.label}
+          </label>
 
+          <div className="flex flex-col gap-4 mt-2">
+            {" "}
+            {question.options?.map((option) => {
+              const isChecked = value === option.value;
+
+              return (
+                <div
+                  key={option.value}
+                  onClick={() => onChange(option.value)}
+                  className={clsx(
+                    "cursor-pointer relative w-full p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[100px]",
+
+                    !isChecked &&
+                      "bg-white border-gray-200 text-gray-500 hover:border-gray-300",
+
+                    isChecked &&
+                      role === RolesEnum.VIGIL &&
+                      "border-vigil-orange bg-vigil-light-orange text-vigil-orange",
+                    isChecked &&
+                      role === RolesEnum.CONSUMER &&
+                      "border-consumer-blue bg-consumer-light-blue text-consumer-blue"
+                  )}>
+                  {option.icon && (
+                    <option.icon
+                      className={clsx(
+                        "w-8 h-8",
+                        isChecked ? "text-current" : "text-gray-400"
+                      )}
+                    />
+                  )}
+
+                  <span className="font-medium text-lg ">{option.label}</span>
+                  {option.description && (
+                    <span className="text-sm text-center">
+                      {option.description}
+                    </span>
+                  )}
+
+                  <input
+                    type="radio"
+                    name={question.id}
+                    value={option.value}
+                    checked={isChecked}
+                    onChange={() => onChange(option.value)}
+                    className="hidden"
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          {error && (
+            <p className="text-red-500 text-sm mt-2 text-center">
+              {question.validation?.required
+                ? "Effettua una scelta per procedere"
+                : "Campo non valido"}
+            </p>
+          )}
+        </div>
+      );
     case QuestionType.CHECKBOX:
       return (
         <Checkbox
@@ -205,7 +269,7 @@ const QuestionRenderer = ({
           onChange={(checked) => onChange(checked)}
           error={error}
         />
-      )
+      );
 
     case QuestionType.MULTI_CHECKBOX:
       return (
@@ -215,8 +279,7 @@ const QuestionRenderer = ({
               "block font-medium mb-2",
               role === RolesEnum.VIGIL && "text-vigil-orange",
               role === RolesEnum.CONSUMER && "text-consumer-blue"
-            )}
-          >
+            )}>
             {question.label}
             {question.validation?.required && "*"}
           </label>
@@ -228,11 +291,10 @@ const QuestionRenderer = ({
               question.options?.[0].icon
                 ? "space-y-2"
                 : "grid grid-cols-2 gap-2"
-            )}
-          >
+            )}>
             {question.options?.map((option) => {
               const isChecked =
-                Array.isArray(value) && value.includes(option.value)
+                Array.isArray(value) && value.includes(option.value);
               return (
                 <div
                   key={option.value}
@@ -247,13 +309,11 @@ const QuestionRenderer = ({
                     isChecked &&
                       role === RolesEnum.CONSUMER &&
                       "border-consumer-blue bg-vigil-light-blue"
-                  )}
-                >
+                  )}>
                   <label
                     key={option.value}
                     htmlFor={option.label}
-                    className="flex flex-col items-center gap-2"
-                  >
+                    className="flex flex-col items-center gap-2">
                     {option.icon && (
                       <option.icon
                         className={`text-gray-400 max-w-1/15 ${
@@ -277,13 +337,13 @@ const QuestionRenderer = ({
                         onChange={(checked) => {
                           const currentValues = Array.isArray(value)
                             ? value
-                            : []
+                            : [];
                           if (checked) {
-                            onChange([...currentValues, option.value])
+                            onChange([...currentValues, option.value]);
                           } else {
                             onChange(
                               currentValues.filter((v) => v !== option.value)
-                            )
+                            );
                           }
                         }}
                         error={error}
@@ -291,11 +351,11 @@ const QuestionRenderer = ({
                     </div>
                   </label>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
-      )
+      );
 
     case QuestionType.ADDRESS:
       return (
@@ -303,7 +363,7 @@ const QuestionRenderer = ({
           <SearchAddress
             role={role}
             onSubmit={(selectedAddress) => {
-              setAddress(selectedAddress)
+              setAddress(selectedAddress);
             }}
             placeholder={question.placeholder}
             label={question.label}
@@ -327,15 +387,15 @@ const QuestionRenderer = ({
             </p>
           )}
         </div>
-      )
+      );
 
     default:
       return (
         <div className="text-red-500">
           Unsupported question type: {question.type}
         </div>
-      )
+      );
   }
-}
+};
 
-export default QuestionRenderer
+export default QuestionRenderer;
