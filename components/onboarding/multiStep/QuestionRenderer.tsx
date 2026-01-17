@@ -250,14 +250,6 @@ const QuestionRenderer = ({
               );
             })}
           </div>
-
-          {error && (
-            <p className="text-red-500 text-sm mt-2 text-center">
-              {question.validation?.required
-                ? "Effettua una scelta per procedere"
-                : "Campo non valido"}
-            </p>
-          )}
         </div>
       );
     case QuestionType.CHECKBOX:
