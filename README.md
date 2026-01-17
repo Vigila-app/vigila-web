@@ -23,6 +23,7 @@ Vigila Web è una moderna applicazione web sviluppata con [Next.js](https://next
 - `/public`: Asset statici (icone, immagini, manifest, worker push).
 - `/src`: Store Zustand, servizi, utility, costanti, tipi.
 - `/server`: Funzioni server-side e admin.
+- `/.github`: Instruzioni, prompts e documentazione per AI.
 - Configurazioni: `next.config.js`, `postcss.config.js`, `tailwind.config.css`, `tsconfig.json`, `.env*`.
 
 ## Come iniziare
@@ -64,6 +65,7 @@ Consulta la [documentazione Next.js sul deploy](https://nextjs.org/docs/deployme
 
 ## Risorse utili
 
+- Documentazione AI: `.github/copilot-instructions`
 - [Documentazione Next.js](https://nextjs.org/docs)
 - [Learn Next.js](https://nextjs.org/learn)
 - [Repository GitHub Next.js](https://github.com/vercel/next.js/)
