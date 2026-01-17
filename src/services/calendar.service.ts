@@ -216,9 +216,9 @@ export class AvailabilityEngine {
     }
 
     // For each date, find consecutive slot sequences
-    for (const [date, dateSlots] of slotsByDate) {
+    for (const [date, dateSlots] of Array.from(slotsByDate)) {
       // Sort by start_hour
-      dateSlots.sort((a, b) => a.start_hour - b.start_hour);
+      dateSlots.sort((a: TimeSlotI, b: TimeSlotI) => a.start_hour - b.start_hour);
 
       // Find consecutive sequences of required length
       for (let i = 0; i <= dateSlots.length - serviceDurationHours; i++) {
@@ -293,8 +293,8 @@ export const CalendarService = {
    */
   getConsumerCalendar: async (): Promise<ConsumerCalendarResponseI> => {
     try {
-      const { data } = await ApiService.get("/api/calendar/consumer");
-      return data;
+      const response = await ApiService.get("/api/calendar/consumer") as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.getConsumerCalendar error", error);
       throw error;
@@ -310,8 +310,8 @@ export const CalendarService = {
    */
   getVigilAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
     try {
-      const { data } = await ApiService.get("/api/vigil/availability-rules");
-      return data;
+      const response = await ApiService.get("/api/vigil/availability-rules") as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.getVigilAvailabilityRules error", error);
       throw error;
@@ -325,8 +325,8 @@ export const CalendarService = {
     rule: VigilAvailabilityRuleFormI
   ): Promise<VigilAvailabilityRuleI> => {
     try {
-      const { data } = await ApiService.post("/api/vigil/availability-rules", rule);
-      return data;
+      const response = await ApiService.post("/api/vigil/availability-rules", rule) as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.createVigilAvailabilityRule error", error);
       throw error;
@@ -354,8 +354,8 @@ export const CalendarService = {
    */
   getVigilUnavailabilities: async (): Promise<VigilUnavailabilityI[]> => {
     try {
-      const { data } = await ApiService.get("/api/vigil/unavailabilities");
-      return data;
+      const response = await ApiService.get("/api/vigil/unavailabilities") as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.getVigilUnavailabilities error", error);
       throw error;
@@ -369,11 +369,11 @@ export const CalendarService = {
     unavailability: VigilUnavailabilityFormI
   ): Promise<VigilUnavailabilityI> => {
     try {
-      const { data } = await ApiService.post(
+      const response = await ApiService.post(
         "/api/vigil/unavailabilities",
         unavailability
-      );
-      return data;
+      ) as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.createVigilUnavailability error", error);
       throw error;
@@ -389,8 +389,8 @@ export const CalendarService = {
    */
   getVigilCalendar: async (): Promise<VigilCalendarResponseI> => {
     try {
-      const { data } = await ApiService.get("/api/calendar/vigil/bookings");
-      return data;
+      const response = await ApiService.get("/api/calendar/vigil/bookings") as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.getVigilCalendar error", error);
       throw error;
@@ -410,10 +410,10 @@ export const CalendarService = {
     try {
       const { vigil_id, ...queryParams } = params;
       const query = new URLSearchParams(queryParams as any).toString();
-      const { data } = await ApiService.get(
+      const response = await ApiService.get(
         `/api/vigil/${vigil_id}/available-slots?${query}`
-      );
-      return data;
+      ) as any;
+      return response.data;
     } catch (error) {
       console.error("CalendarService.getAvailableSlots error", error);
       throw error;

@@ -30,10 +30,10 @@ import { FrequencyEnum } from "@/src/enums/common.enums";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { vigilId: string } }
+  { params }: { params: Promise<{ vigilId: string }> }
 ) {
   try {
-    const { vigilId } = params;
+    const { vigilId } = await params;
     const { searchParams } = new URL(req.url);
 
     // Authenticate user (consumers and vigils can check availability)

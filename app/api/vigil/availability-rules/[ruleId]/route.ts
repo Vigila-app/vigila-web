@@ -14,10 +14,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { ruleId: string } }
+  { params }: { params: Promise<{ ruleId: string }> }
 ) {
   try {
-    const { ruleId } = params;
+    const { ruleId } = await params;
 
     // Authenticate user
     const userObject = await authenticateUser(req);
