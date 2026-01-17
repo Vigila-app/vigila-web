@@ -7,7 +7,7 @@
 
 /**
  * Weekday enum (0=Sunday, 6=Saturday)
- * Follows ISO 8601 standard
+ * Follows JavaScript Date.getDay() convention
  */
 export enum WeekdayEnum {
   SUNDAY = 0,

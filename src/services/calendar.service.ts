@@ -20,6 +20,10 @@ import {
   WeekdayEnum,
 } from "@/src/types/calendar.types";
 import { BookingI } from "@/src/types/booking.types";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
 
 /**
  * Availability Engine Algorithm
@@ -145,8 +149,8 @@ export class AvailabilityEngine {
     for (const booking of bookings) {
       // Only confirmed/paid bookings block slots
       if (
-        booking.status === "confirmed" ||
-        booking.payment_status === "paid"
+        booking.status === BookingStatusEnum.CONFIRMED ||
+        booking.payment_status === PaymentStatusEnum.PAID
       ) {
         conflicts.push({
           type: "booking",
@@ -218,7 +222,7 @@ export class AvailabilityEngine {
     // For each date, find consecutive slot sequences
     for (const [date, dateSlots] of Array.from(slotsByDate)) {
       // Sort by start_hour
-      dateSlots.sort((a: TimeSlotI, b: TimeSlotI) => a.start_hour - b.start_hour);
+      dateSlots.sort((a, b) => a.start_hour - b.start_hour);
 
       // Find consecutive sequences of required length
       for (let i = 0; i <= dateSlots.length - serviceDurationHours; i++) {
