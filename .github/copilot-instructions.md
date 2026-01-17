@@ -7,7 +7,7 @@ The project follows a modular architecture with clear separation of concerns, ma
 For more details, refer to the main README.md file.
 
 ## Architecture & Structure
-- **Monorepo** with modular structure: core app, components, SSR, srvices, utilities, and store.
+- **Monorepo** with modular structure: core app, components, SSR, services, utilities, and store.
 - **Major directories:**
   - `app`: Next.js App-Router structure with server and client components.
   - `components`: Frontend UI components, organized by feature and shared components.
