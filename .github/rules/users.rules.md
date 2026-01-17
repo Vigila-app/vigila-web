@@ -1,7 +1,7 @@
 # Copilot Instructions and Rules for Vigila App Users
 
 ## Users Overview
-There are diffent kinds of Users, diffentiate by ROLE and LEVEL.
+There are different kinds of Users, differentiated by ROLE and LEVEL.
 There are Enums that list the Roles and the Levels here `src/enums/roles.enums.ts`.
 - **LEVELS**
     - **BASE**: is the default level associated to every user
