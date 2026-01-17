@@ -14,6 +14,7 @@ The system models a **caregiving services marketplace** where:
 * **Bookings** track service usage
 * **Reviews** are linked one-to-one with bookings
 * **Wallets** and **wallet transactions** manage payments and balances
+* **Calendar & Availability** system manages vigil schedules and slot availability
 
 ---
 
@@ -238,10 +239,78 @@ Represents money movements within wallets.
 
 ---
 
+### 8. `vigil_availability_rules`
+
+Stores weekly recurring availability patterns for Vigils.
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `vigil_id` → `vigils.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `vigil_id` (uuid, FK)
+* `weekday` (smallint, 0-6, where 0=Sunday)
+* `start_hour` (smallint, 0-23)
+* `end_hour` (smallint, 1-24)
+* `valid_from` (date)
+* `valid_to` (date, nullable)
+
+**Relationships**:
+
+* One vigil → many `vigil_availability_rules`
+
+**Constraints**:
+
+* `weekday` must be between 0 and 6
+* `start_hour` must be between 0 and 23
+* `end_hour` must be between 1 and 24
+* `end_hour` must be greater than `start_hour`
+* If `valid_to` is set, it must be >= `valid_from`
+
+---
+
+### 9. `vigil_unavailabilities`
+
+Stores specific date/time ranges when a Vigil is unavailable (overrides availability rules).
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `vigil_id` → `vigils.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `vigil_id` (uuid, FK)
+* `start_at` (timestamptz)
+* `end_at` (timestamptz)
+* `reason` (text, nullable)
+
+**Relationships**:
+
+* One vigil → many `vigil_unavailabilities`
+
+**Constraints**:
+
+* `end_at` must be greater than `start_at`
+
+---
+
 ## Key Relationships Summary
 
 * **Consumer → Booking**: one-to-many
 * **Vigil → Service**: one-to-many
+* **Vigil → Availability Rules**: one-to-many
+* **Vigil → Unavailabilities**: one-to-many
 * **Service → Booking**: one-to-many
 * **Booking → Review**: one-to-one
 * **Consumer → Wallet**: one-to-one
@@ -256,3 +325,5 @@ Represents money movements within wallets.
 * Status fields are string-based enums (no DB-level enum enforcement)
 * JSON / JSONB fields are used for flexible, semi-structured data
 * Referential integrity is enforced via foreign keys
+* **Calendar System**: All times are stored in UTC; slot granularity is 1 hour
+* **Availability Priority**: Unavailabilities override availability rules; bookings always block slots
