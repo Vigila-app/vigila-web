@@ -213,14 +213,14 @@ const QuestionRenderer = ({
                     "cursor-pointer relative w-full p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[100px]",
 
                     !isChecked &&
-                      "bg-white border-gray-200 text-gray-500 hover:border-gray-300",
+                      "bg-white border-gray-200  hover:border-gray-300",
 
                     isChecked &&
                       role === RolesEnum.VIGIL &&
-                      "border-vigil-orange bg-vigil-light-orange text-vigil-orange",
+                      "border-vigil-orange bg-vigil-light-orange ",
                     isChecked &&
                       role === RolesEnum.CONSUMER &&
-                      "border-consumer-blue bg-consumer-light-blue text-consumer-blue"
+                      "border-consumer-blue bg-consumer-light-blue "
                   )}>
                   {option.icon && (
                     <option.icon
