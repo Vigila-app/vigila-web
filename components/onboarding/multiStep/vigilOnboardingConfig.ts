@@ -21,7 +21,7 @@ export const createVigilOnboardingConfig = (
   onComplete: (data: Record<string, any>) => Promise<void>
 ): OnboardingFlowConfig => ({
   role: RolesEnum.VIGIL,
-  initialStepId: "service-areas",
+  initialStepId: "welcome",
   onComplete,
   //Nota: ho modificare leggermente il primo step rispetto a figma: alcune info le abbiamo dal form di registrazione
   steps: [
