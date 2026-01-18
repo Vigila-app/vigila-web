@@ -1,9 +1,9 @@
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums"
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
 import {
   OnboardingFlowConfig,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
+} from "@/src/types/multiStepOnboard.types";
 import {
   BoltIcon,
   BookOpenIcon,
@@ -11,7 +11,7 @@ import {
   MusicalNoteIcon,
   PaintBrushIcon,
   SunIcon,
-} from "@heroicons/react/24/outline"
+} from "@heroicons/react/24/outline";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -21,7 +21,7 @@ export const createVigilOnboardingConfig = (
   onComplete: (data: Record<string, any>) => Promise<void>
 ): OnboardingFlowConfig => ({
   role: RolesEnum.VIGIL,
-  initialStepId: "welcome",
+  initialStepId: "service-areas",
   onComplete,
   //Nota: ho modificare leggermente il primo step rispetto a figma: alcune info le abbiamo dal form di registrazione
   steps: [
@@ -87,11 +87,11 @@ export const createVigilOnboardingConfig = (
           OccupationEnum.OSA,
           OccupationEnum.OSS,
           OccupationEnum.NURSE,
-        ]
+        ];
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
-          return "professional-docs-info"
+          return "professional-docs-info";
         }
-        return "hobbies"
+        return "hobbies";
       },
     },
 
@@ -136,6 +136,25 @@ export const createVigilOnboardingConfig = (
           ],
           validation: {
             required: true,
+          },
+        },
+      ],
+      nextStep: "transportation",
+    },
+    {
+      id: "service-areas",
+      title: "In quali zone sei disponibile ad operare?",
+      description:
+        "Seleziona tutte le zone di Napoli dove sei disposto ad offire i tuoi servizi.",
+      questions: [
+        {
+          id: "addresses",
+          type: QuestionType.MULTI_ADDRESS,
+          label: "Aree operative",
+          placeholder: "Cerca città o CAP...",
+          validation: {
+            required: true,
+            validate: (value) => value && value.length > 0,
           },
         },
       ],
@@ -214,15 +233,15 @@ export const createVigilOnboardingConfig = (
     },
     {
       id: "address",
-      title: "Dove offri i tuoi servizi?",
-      description: "Inserisci almeno una zona in cui vuoi operare",
+      title: "Qual è il tuo indirizzo di residenza?",
+      description:
+        "Questo indirizzo non sarà visibile alle famiglie. Servirà per verifiche interne.",
       questions: [
         {
           id: "address",
-          type: QuestionType.ADDRESS, //TODO: make multi
-          label: "Area operativa",
-          placeholder:
-            "Inserisci il CAP o la città o quartiere in cui offri i tuoi servizi",
+          type: QuestionType.ADDRESS,
+          label: "",
+          placeholder: "Inserisci il CAP o città...",
           validation: {
             required: true,
           },
@@ -234,9 +253,9 @@ export const createVigilOnboardingConfig = (
           answers.transportation === "auto" ||
           answers.transportation === "moto"
         ) {
-          return "service-area-wide"
+          return "service-area-wide";
         }
-        return "service-area-local"
+        return "service-area-local";
       },
       // No nextStep means this is the final step
     },
@@ -280,4 +299,4 @@ export const createVigilOnboardingConfig = (
       ],
     },
   ],
-})
+});

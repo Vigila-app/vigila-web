@@ -1,6 +1,6 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ForwardRefExoticComponent, SVGProps } from "react"
-import { FieldError } from "react-hook-form"
+import { ForwardRefExoticComponent, SVGProps } from "react";
+import { FieldError } from "react-hook-form";
 
 /**
  * Question types supported in the multi-step onboarding
@@ -16,29 +16,32 @@ export enum QuestionType {
   CHECKBOX = "checkbox",
   RADIO = "radio",
   ADDRESS = "address",
+  MULTI_ADDRESS = "multi_address",
   MULTI_CHECKBOX = "multi_checkbox",
+  CARD = "card",
 }
 
 /**
  * Validation rules for a question
  */
 export interface ValidationRules {
-  required?: boolean
-  minLength?: number
-  maxLength?: number
-  min?: number | string
-  max?: number | string
-  pattern?: RegExp
-  validate?: (value: any) => boolean | string
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number | string;
+  max?: number | string;
+  pattern?: RegExp;
+  validate?: (value: any) => boolean | string;
 }
 
 /**
  * Option for select, radio, or checkbox questions
  */
 export interface QuestionOption {
-  label: string
-  value: string | number
-  icon?: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">> //as for icon library
+  label: string;
+  value: string | number;
+  icon?: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">>; //as for icon library
+  description?: string;
 }
 
 /**
@@ -52,7 +55,9 @@ export interface OnboardingQuestion {
   description?: string;
   options?: QuestionOption[];
   validation?: ValidationRules;
-  nextStep?: string | ((answer: any, allAnswers: Record<string, any>) => string | null);
+  nextStep?:
+    | string
+    | ((answer: any, allAnswers: Record<string, any>) => string | null);
   autoFocus?: boolean;
 }
 
