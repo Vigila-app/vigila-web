@@ -141,25 +141,25 @@ export const createVigilOnboardingConfig = (
       ],
       nextStep: "transportation",
     },
-    {
-      id: "service-areas",
-      title: "In quali zone sei disponibile ad operare?",
-      description:
-        "Seleziona tutte le zone di Napoli dove sei disposto ad offire i tuoi servizi.",
-      questions: [
-        {
-          id: "addresses",
-          type: QuestionType.MULTI_ADDRESS,
-          label: "Aree operative",
-          placeholder: "Cerca città o CAP...",
-          validation: {
-            required: true,
-            validate: (value) => value && value.length > 0,
-          },
-        },
-      ],
-      nextStep: "transportation",
-    },
+    // {
+    //   id: "service-areas",
+    //   title: "In quali zone sei disponibile ad operare?",
+    //   description:
+    //     "Seleziona tutte le zone di Napoli dove sei disposto ad offire i tuoi servizi.",
+    //   questions: [
+    //     {
+    //       id: "addresses",
+    //       type: QuestionType.MULTI_ADDRESS,
+    //       label: "Aree operative",
+    //       placeholder: "Cerca città o CAP...",
+    //       validation: {
+    //         required: true,
+    //         validate: (value) => value && value.length > 0,
+    //       },
+    //     },
+    //   ],
+    //   nextStep: "transportation",
+    // },
     {
       id: "transportation",
       title: "Quanto tempo puoi dedicare?",
