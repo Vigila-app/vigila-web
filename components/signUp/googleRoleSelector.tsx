@@ -16,7 +16,7 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { Routes } from "@/src/routes";
 import clsx from "clsx";
 import Link from "next/link";
-import { ButtonStyle } from "../button/button.style";
+
 
 // Stato iniziale dei termini
 const defaultTerms = {
