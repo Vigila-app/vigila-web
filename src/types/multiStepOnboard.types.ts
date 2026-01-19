@@ -19,19 +19,31 @@ export enum QuestionType {
   MULTI_ADDRESS = "multi_address",
   MULTI_CHECKBOX = "multi_checkbox",
   CARD = "card",
+  FILE = "file",
+  SELECT_MULTI = "select_multi",
+  AVAILABILITIES = "availabilities",
+}
+
+/**
+ * File validation rules for file upload questions
+ */
+export interface FileValidation {
+  maxSize?: number // in bytes
+  allowedMimes?: string[] // e.g., ['image/jpeg', 'image/png']
 }
 
 /**
  * Validation rules for a question
  */
 export interface ValidationRules {
-  required?: boolean;
-  minLength?: number;
-  maxLength?: number;
-  min?: number | string;
-  max?: number | string;
-  pattern?: RegExp;
-  validate?: (value: any) => boolean | string;
+  required?: boolean
+  minLength?: number
+  maxLength?: number
+  min?: number | string
+  max?: number | string
+  pattern?: RegExp
+  validate?: (value: any) => boolean | string
+  file?: FileValidation
 }
 
 /**
@@ -55,6 +67,7 @@ export interface OnboardingQuestion {
   description?: string;
   options?: QuestionOption[];
   validation?: ValidationRules;
+  max?: number
   nextStep?:
     | string
     | ((answer: any, allAnswers: Record<string, any>) => string | null);
