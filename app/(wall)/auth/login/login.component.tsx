@@ -176,7 +176,7 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
             full
             action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
-            customClass="rounded-full shadow !hidden"
+            customClass="rounded-full shadow"
           />
           {/* <ProviderButton
             provider={ProviderEnum.APPLE}

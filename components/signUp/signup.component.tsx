@@ -396,16 +396,16 @@ const SignupComponent = (props: SignupComponentI) => {
             full
             action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
             label="Continua con Google"
-            customClass="rounded-full shadow !hidden"
-          /> 
-       {/* <ProviderButton
+            customClass="rounded-full shadow"
+          />
+          {/* <ProviderButton
             provider={ProviderEnum.APPLE}
             full
             //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
             label="Registrati con Apple"
           />  */}
-       </div>
-      </div> 
+        </div>
+      </div>
 
       <div className="space-y-2 mt-6">
         <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
