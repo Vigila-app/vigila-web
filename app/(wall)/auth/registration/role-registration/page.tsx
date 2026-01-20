@@ -14,7 +14,7 @@ const getCmsData = cache(async () => {
     return {
       main: {
         title: "Benvenuto in Vigila",
-        text: "Il tuo account Google è connesso. Per iniziare, dicci come vuoi usare la piattaforma.",
+        text: "Per iniziare, dicci come vorresti usare la piattaforma.",
       },
     } as CmsPageI;
   }
@@ -43,14 +43,13 @@ export default async function GoogleRoleSelection() {
             Seleziona il tuo ruolo
           </h3>
 
-          {/* Componente Client Interattivo */}
           <GoogleRoleSelector />
 
-          {/* Footer Informativo */}
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
             <p className="text-sm font-medium text-gray-600 max-w-sm mx-auto">
-              Fai attenzione a scegliere il ruolo corretto: una volta
-              selezionato dovrai contattare l&apos;assistenza per modificarlo.
+              Scegli con cura: il ruolo definisce le funzionalità del tuo
+              account e potrà essere modificato solo contattando
+              l&apos;assistenza.
             </p>
           </div>
         </div>

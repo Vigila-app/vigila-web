@@ -34,4 +34,4 @@ Style configurations in `app/tailwind.config.js` and global styles in `app/globa
 - Use mocks for local development and testing.
 - Follow the established directory and naming conventions.
 - Prefer updating existing scripts/utilities over duplicating logic.
-- Always consult `.github/rules/` and `.github/features/` to enforce context.
+- Always consult `.github/database/`, `.github/rules/` and `.github/features/` to enforce context.
