@@ -1,5 +1,5 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ForwardRefExoticComponent, SVGProps } from "react";
+import { ComponentType, ForwardRefExoticComponent, ReactElement, SVGProps } from "react";
 import { FieldError } from "react-hook-form";
 
 /**
@@ -50,10 +50,10 @@ export interface ValidationRules {
  * Option for select, radio, or checkbox questions
  */
 export interface QuestionOption {
-  label: string;
-  value: string | number;
-  icon?: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref">>; //as for icon library
-  description?: string;
+  label: string
+  value: string | number
+  icon?: ComponentType<SVGProps<SVGSVGElement> & { className?: string }> 
+  description?: string
 }
 
 /**

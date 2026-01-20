@@ -1,32 +1,35 @@
-export default function Automobile() {
+type AutomobileProps = { className?: string }
+export default function Automobile({ className }: AutomobileProps) {
   return (
     <svg
       width="40"
       height="30"
       viewBox="0 0 40 30"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
       <path
         d="M6 24C6 25.0609 6.42143 26.0783 7.17157 26.8284C7.92172 27.5786 8.93913 28 10 28C11.0609 28 12.0783 27.5786 12.8284 26.8284C13.5786 26.0783 14 25.0609 14 24C14 22.9391 13.5786 21.9217 12.8284 21.1716C12.0783 20.4214 11.0609 20 10 20C8.93913 20 7.92172 20.4214 7.17157 21.1716C6.42143 21.9217 6 22.9391 6 24Z"
-        stroke="#E94E34"
+        stroke="currentColor"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M26 24C26 25.0609 26.4214 26.0783 27.1716 26.8284C27.9217 27.5786 28.9391 28 30 28C31.0609 28 32.0783 27.5786 32.8284 26.8284C33.5786 26.0783 34 25.0609 34 24C34 22.9391 33.5786 21.9217 32.8284 21.1716C32.0783 20.4214 31.0609 20 30 20C28.9391 20 27.9217 20.4214 27.1716 21.1716C26.4214 21.9217 26 22.9391 26 24Z"
-        stroke="#E94E34"
+        stroke="currentColor"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M6 24H2V12M2 12L6 2H24L32 12M2 12H32M32 12H34C35.0609 12 36.0783 12.4214 36.8284 13.1716C37.5786 13.9217 38 14.9391 38 16V24H34M26 24H14M20 12V2"
-        stroke="#E94E34"
+        stroke="currentColor"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

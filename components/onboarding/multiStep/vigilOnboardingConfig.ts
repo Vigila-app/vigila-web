@@ -5,28 +5,28 @@ import {
   QuestionType,
 } from "@/src/types/multiStepOnboard.types"
 import {
-  BoltIcon,
-  BookOpenIcon,
-  CakeIcon,
-  ChatBubbleBottomCenterIcon,
-  CheckBadgeIcon,
+
   CheckCircleIcon,
-  FireIcon,
   HeartIcon,
   HomeIcon,
-  MusicalNoteIcon,
-  NewspaperIcon,
-  PaintBrushIcon,
-  ShoppingBagIcon,
-  SparklesIcon,
-  SunIcon,
+
   XCircleIcon,
 } from "@heroicons/react/24/outline"
+import Caffe from "@/components/svg/Caffe"
+import Wheelchair from "@/components/svg/Wheelchair"
+import Cutlery from "@/components/svg/Cutlery"
+import Spray from "@/components/svg/Spray"
+import CarrelloSpesa from "@/components/svg/CarrelloSpesa"
+import Vasca from "@/components/svg/Vasca"
+import Bed from "@/components/svg/Bed"
+import Diaper from "@/components/svg/Diaper"
+import Tree from "@/components/svg/Tree"
+import Stetoscopio from "@/components/svg/Stetoscopio"
+import Automobile from "@/components/svg/Automobile"
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
  */
-//TODO: add figma questions
 export const createVigilOnboardingConfig = (
   onComplete: (data: Record<string, any>) => Promise<void>,
 ): OnboardingFlowConfig => ({
@@ -110,6 +110,9 @@ export const createVigilOnboardingConfig = (
             { label: "Soccavo", value: "soccavo" },
             { label: "Arenella", value: "arenella" },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "transportation",
@@ -223,6 +226,9 @@ export const createVigilOnboardingConfig = (
             { label: "3-5 anni", value: "3-5_yrs" },
             { label: "5+ anni", value: "gte_5" },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "about",
@@ -252,16 +258,18 @@ export const createVigilOnboardingConfig = (
       title: "In cosa puoi aiutare nella vita quotidiana?",
       description: "Seleziona tutti i servizi che offri",
       questions: [
-        //TODO: cambiare icone
         {
           id: "services",
           type: QuestionType.MULTI_CHECKBOX,
           label: "",
+          validation: {
+            required: true,
+          },
           options: [
             {
               label: "Compagnia e conversazione",
               value: "company",
-              icon: ChatBubbleBottomCenterIcon,
+              icon: Caffe,
             },
             {
               label: "Sorveglianza non sanitaria",
@@ -271,22 +279,23 @@ export const createVigilOnboardingConfig = (
             {
               label: "Aiuto negli spostamenti in casa",
               value: "moving",
-              icon: NewspaperIcon,
+              icon: Wheelchair,
             },
             {
               label: "Preparazione piatti semplici",
               value: "food",
-              icon: FireIcon,
+              icon: Cutlery,
             },
+
             {
               label: "Riordino leggero di ambienti",
               value: "cleaning",
-              icon: SparklesIcon,
+              icon: Spray,
             },
             {
               label: "Spese e piccole commissioni",
               value: "grocery",
-              icon: ShoppingBagIcon,
+              icon: CarrelloSpesa,
             },
           ],
         },
@@ -298,7 +307,6 @@ export const createVigilOnboardingConfig = (
       title: "Ti occupi di igene personale?",
       description: "Seleziona tutto ciò in cui puoi aiutare",
       questions: [
-        //TODO: icone
         {
           id: "services",
           label: "",
@@ -307,28 +315,31 @@ export const createVigilOnboardingConfig = (
             {
               label: "Aiuto in bagno (lavarsi, vestirsi)",
               value: "bathroom_help",
-              icon: HomeIcon,
+              icon: Vasca,
             },
             {
               label: "Igiene a letto",
               value: "bed_help",
-              icon: HomeIcon,
+              icon: Bed,
             },
             {
               label: "Cambio pannolone",
               value: "diaper_help",
-              icon: HomeIcon,
+              icon: Diaper,
             },
             {
               label: "No, non mi occupo di igiene personale",
               value: "none",
-              icon: HomeIcon,
+              icon: XCircleIcon,
             },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: (answers) => {
-        if (answers.services.includes("none")) {
+        if (answers.services?.includes("none")) {
           answers.services = answers.services.filter((s: string) => s == "none") //if "none" is selected, ignore everything else
         }
         return "outside"
@@ -339,7 +350,6 @@ export const createVigilOnboardingConfig = (
       title: "Puoi accompagnare fuori casa?",
       description: "Seleziona le attività di accompagnamento che offri",
       questions: [
-        //TODO: icone
         {
           id: "outdoor_activities",
           label: "",
@@ -348,33 +358,36 @@ export const createVigilOnboardingConfig = (
             {
               label: "Passeggiate",
               value: "walks",
-              icon: HomeIcon,
+              icon: Tree,
             },
             {
               label: "Spesa al supermercato",
               value: "groceries",
-              icon: HomeIcon,
+              icon: CarrelloSpesa,
             },
             {
               label: "Visite mediche / esami",
               value: "doctor_apps",
-              icon: HomeIcon,
+              icon: Stetoscopio,
             },
             {
               label: "Accompagnamento in auto",
               value: "car_driving",
-              icon: HomeIcon,
+              icon: Automobile,
             },
             {
               label: "No, non accompagno fuori casa",
               value: "none",
-              icon: HomeIcon,
+              icon: XCircleIcon,
             },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: (answers) => {
-        if (answers.outside.includes("none")) {
+        if (answers.outside?.includes("none")) {
           answers.outside = answers.outside.filter((s: string) => s == "none") //if "none" is selected, ignore everything else
         }
         return "past_exp"
@@ -423,6 +436,9 @@ export const createVigilOnboardingConfig = (
               value: "none",
             },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "service_type",
@@ -442,6 +458,9 @@ export const createVigilOnboardingConfig = (
             { label: "Notte in presenza", value: "night" },
             { label: "Notte in sorveglianza", value: "night_away" },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "hours",
@@ -543,6 +562,9 @@ export const createVigilOnboardingConfig = (
               value: "ontime",
             },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "languages",
@@ -580,6 +602,9 @@ export const createVigilOnboardingConfig = (
             { label: "Persiano (Farsi)", value: "persian" },
             { label: "Altri", value: "other" },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "propic",
@@ -591,8 +616,11 @@ export const createVigilOnboardingConfig = (
       questions: [
         {
           id: "photo",
-          type: QuestionType.FILE, 
+          type: QuestionType.FILE,
           label: "",
+          validation: {
+            required: true,
+          },
         },
       ],
     },
