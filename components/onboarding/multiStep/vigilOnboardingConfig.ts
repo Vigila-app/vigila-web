@@ -42,7 +42,7 @@ export const createVigilOnboardingConfig = (
         "Abbiamo bisogno di qualche info in più per creare un'esperienza su misura. Questo step richiede meno di cinque minuti.",
       questions: [
         {
-          id: "birthday",
+          id: "birthday", //anagrafica
           type: QuestionType.DATE,
           label: "Data di nascita", //TODO: better error message + eu format
           validation: {
@@ -57,7 +57,7 @@ export const createVigilOnboardingConfig = (
           autoFocus: true,
         },
         {
-          id: "gender",
+          id: "gender", //anagrafica
           type: QuestionType.SELECT,
           label: "Genere",
           options: [
@@ -72,7 +72,7 @@ export const createVigilOnboardingConfig = (
       nextStep: "address",
     },
     {
-      id: "address",
+      id: "address", //anagrafica
       title: "Qual è il tuo indirizzo di residenza?",
       description:
         "Questo indirizzo non sarà visibile alle famiglie. Servirà per verifiche interne.",
@@ -90,7 +90,7 @@ export const createVigilOnboardingConfig = (
       nextStep: "zones",
     },
     {
-      id: "zones",
+      id: "zones", //non slavare per ora
       title: "In quali zone sei disponibile a lavorare?",
       description:
         "Seelzione tutte le zone di Napoli in cui puoi offrire i tuoi servizi",
@@ -118,7 +118,7 @@ export const createVigilOnboardingConfig = (
       nextStep: "transportation",
     },
     {
-      id: "transportation",
+      id: "transportation", 
       title: "Hai un mezzo di trasporto?",
       description:
         "Questo aiuta le famiglie a capire se puoi accompagnare fuori casa.",
@@ -141,10 +141,10 @@ export const createVigilOnboardingConfig = (
         },
       ],
       // Conditional routing based on transportation
-      nextStep: "job",
+      nextStep: "occupation",
     },
     {
-      id: "job",
+      id: "occupation",
       title: "Come descriveresti il tuo ruolo principale?",
       description: "Seleziona quello che ti rappresenta meglio",
       questions: [
@@ -197,7 +197,7 @@ export const createVigilOnboardingConfig = (
         "Es. OSS, corso assistente familiare, altri corsi... Lascia vuoto se non ne hai.",
       questions: [
         {
-          id: "information",
+          id: "courses",
           type: QuestionType.TEXTAREA,
           label: "",
           placeholder:
@@ -217,7 +217,7 @@ export const createVigilOnboardingConfig = (
       description: "Seleziona al fascia che ti rappresenta",
       questions: [
         {
-          id: "exp",
+          id: "experience_years",
           type: QuestionType.RADIO,
           label: "",
           options: [
@@ -240,7 +240,7 @@ export const createVigilOnboardingConfig = (
         "3-4 righe che appariranno sul tuo profilo. Massimo 400 caratteri. ",
       questions: [
         {
-          id: "experience",
+          id: "bio", //anagrafica
           type: QuestionType.TEXTAREA,
           label: "",
           placeholder:
@@ -308,7 +308,7 @@ export const createVigilOnboardingConfig = (
       description: "Seleziona tutto ciò in cui puoi aiutare",
       questions: [
         {
-          id: "services",
+          id: "hygene_services",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
           options: [
@@ -351,7 +351,7 @@ export const createVigilOnboardingConfig = (
       description: "Seleziona le attività di accompagnamento che offri",
       questions: [
         {
-          id: "outdoor_activities",
+          id: "outdoor_services",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
           options: [
@@ -399,7 +399,7 @@ export const createVigilOnboardingConfig = (
       description: "Seleziona tutte le situazioni con cui hai familiarità",
       questions: [
         {
-          id: "exp",
+          id: "past_experience",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
           options: [
@@ -444,7 +444,7 @@ export const createVigilOnboardingConfig = (
       nextStep: "service_type",
     },
     {
-      id: "service_type",
+      id: "service_type", //dont save for now - keep for future matching algo
       title: "Che tipo di servizio offri?",
       description: "Puoi selezionare più opzioni",
       questions: [
@@ -509,7 +509,7 @@ export const createVigilOnboardingConfig = (
       id: "urgent",
       questions: [
         {
-          id: "urgent",
+          id: "urgent_requests",
           type: QuestionType.RADIO,
           label: "",
           options: [
