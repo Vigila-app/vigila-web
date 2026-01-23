@@ -11,20 +11,21 @@ import { Routes } from "@/src/routes"
 import { AuthService } from "@/src/services"
 import MultiStepOnboarding from "../multiStep/MultiStepOnboarding"
 import { createVigilOnboardingConfig } from "../multiStep/vigilOnboardingConfig"
+import { StorageUtils } from "@/src/utils/storage.utils"
 
 /**
  * New multi-step onboarding component for VIGIL users
  */
 const VigilMultiStepOnboarding = () => {
   const { showToast } = useAppStore()
-  const { getUserDetails } = useUserStore()
+  const { getUserDetails, user } = useUserStore()
   const router = useRouter()
 
   const handleComplete = useCallback(
     async (data: Record<string, any>) => {
       try {
-        const { address } = data
-
+        const { address, propic } = data
+        
         // Extract postal code from address
         const cap =
           address?.address?.postcode || address?.address?.postalCode || ""
@@ -42,6 +43,12 @@ const VigilMultiStepOnboarding = () => {
 
         delete onboardData.language_confirmation
         delete onboardData.understandsDocRequirement
+        if (propic && user?.id) {
+          await StorageUtils.uploadFile("profile-pics", propic, user.id, {
+            contentType: propic.type || "image/png",
+          })
+        }
+        delete onboardData.propic
 
         await OnboardService.update({
           role: RolesEnum.VIGIL,
