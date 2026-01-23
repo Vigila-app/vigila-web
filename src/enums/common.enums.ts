@@ -1,8 +1,16 @@
 export enum GenderEnum {
-  FEMALE = "female",
   MALE = "male",
+  FEMALE = "female",
+  NB = "non_binary",
   OTHER = "other",
-  NOT_PROVIDED = "not-provided",
+  NA = "not-specified",
+}
+export const GenderLabels: Record<GenderEnum, string> = {
+  [GenderEnum.FEMALE]: "Donna",
+  [GenderEnum.MALE]: "Uomo",
+  [GenderEnum.NB]: "Non Binario",
+  [GenderEnum.OTHER]: "Altro",
+  [GenderEnum.NA]: "Preferisco non specificare",
 }
 
 export enum FrequencyEnum {
@@ -42,19 +50,3 @@ export enum CurrencyEnum {
 //   FAMILY_CAREGIVER = "assistente-familiare",
 //   OTHER = "altro",
 // }
-
-export enum OccupationEnum {
-  FULLTIME_CAREGIVER = "badante",
-  PROFESSIONAL = "oss_ota_osa",
-  NURSE = "infermiere",
-  FAMILY_CAREGIVER = "assistente-familiare",
-  COMPANY = "compagnia-e-supporto",
-}
-
-export const OccupationLabels: Record<OccupationEnum, string> = {
-  [OccupationEnum.FULLTIME_CAREGIVER]: "Badante convivente",
-  [OccupationEnum.PROFESSIONAL]: "OSS/OTA/OSA",
-  [OccupationEnum.NURSE]: "Infermiere",
-  [OccupationEnum.FAMILY_CAREGIVER]: "Assistente familiare a ore",
-  [OccupationEnum.COMPANY]: "Operatore/trice per compagnia e supporto leggero",
-}

@@ -14,6 +14,7 @@ export const OnboardService = {
         const { role, data } = formInput;
 
         const user = await UserService.getUser();
+        console.log(data)
         if (user?.id) {
           const response = await ApiService.post(
             apiOnboard.ONBOARD(user?.id, role),

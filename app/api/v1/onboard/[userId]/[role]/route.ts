@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(
   req: NextRequest,
-  context: { params: Promise<{ userId: string; role: string }> }
+  context: { params: Promise<{ userId: string; role: string }> },
 ) {
   try {
     const { userId, role } = await context?.params
@@ -44,14 +44,96 @@ export async function POST(
     const table =
       role.toUpperCase() === RolesEnum.CONSUMER ? "consumers" : "vigils"
     const _admin = getAdminClient()
-    console.log(originalUser.id, userId)
+
+    if (role.toUpperCase() === RolesEnum.VIGIL) {
+      const anagraficaKeys = new Set([
+        "birthday",
+        "gender",
+        "addresses",
+        "cap",
+        "bio",
+        "propic",
+      ])
+      const nonSavableKeys = new Set(["zones", "time_committment", "type"])
+
+      const vigilProfileData = Object.fromEntries(
+        Object.entries(onBoardUser).filter(([key]) => anagraficaKeys.has(key)),
+      )
+
+      const vigilExtraData = Object.fromEntries(
+        Object.entries(onBoardUser).filter(
+          ([key]) => !anagraficaKeys.has(key) && !nonSavableKeys.has(key),
+        ),
+      )
+      console.log(vigilExtraData)
+      const { data, error } = await _admin
+        .from("vigils")
+        .update({
+          ...vigilProfileData,
+          status: UserStatusEnum.ACTIVE,
+          updated_at: getPostgresTimestamp(),
+        })
+        .eq("id", userId)
+        .select()
+        .maybeSingle()
+      if (error || !data)
+        throw error || new Error("No data returned from update")
+
+      if (Object.keys(vigilExtraData).length > 0) {
+        const { error: vigilDataError } = await _admin
+          .from("vigils_data")
+          .upsert(
+            {
+              vigil_id: userId,
+              ...vigilExtraData,
+              updated_at: getPostgresTimestamp(),
+            },
+            { onConflict: "id" },
+          )
+          .select()
+          .maybeSingle()
+
+        if (vigilDataError) throw vigilDataError
+      }
+
+      if (userStatus === UserStatusEnum.PENDING) {
+        const { error: authError } = await _admin.auth.admin.updateUserById(
+          userId,
+          {
+            user_metadata: deepMerge(originalUser.user_metadata, {
+              status: UserStatusEnum.ACTIVE,
+            }),
+          },
+        )
+        if (authError) throw authError
+      }
+
+      if (originalUser.email) {
+        await EmailService.sendProfileActiveEmail(
+          {
+            to: originalUser.email,
+            subject:
+              userRole === RolesEnum.CONSUMER
+                ? "Il tuo profilo Vigila è pronto 🥳"
+                : "Benvenuto/a in Vigila 🧡",
+          },
+          originalUser as UserDetailsType,
+        )
+      }
+
+      return NextResponse.json({
+        code: ResponseCodesConstants.USER_DETAILS_SUCCESS.code,
+        data,
+        success: true,
+      })
+    }
+
     const { data, error } = await _admin
       .from(table)
       .update({
         ...onBoardUser,
         status: UserStatusEnum.ACTIVE,
         updated_at: getPostgresTimestamp(),
-        // id: originalUser.id,
       })
       .eq("id", userId)
       .select()
@@ -65,7 +147,7 @@ export async function POST(
           user_metadata: deepMerge(originalUser.user_metadata, {
             status: UserStatusEnum.ACTIVE,
           }),
-        }
+        },
       )
       if (authError) throw authError
     }
@@ -79,7 +161,7 @@ export async function POST(
               ? "Il tuo profilo Vigila è pronto 🥳"
               : "Benvenuto/a in Vigila 🧡",
         },
-        originalUser as UserDetailsType
+        originalUser as UserDetailsType,
       )
     }
 

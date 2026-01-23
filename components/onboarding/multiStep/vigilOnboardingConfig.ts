@@ -1,28 +1,41 @@
 import { RolesEnum } from "@/src/enums/roles.enums"
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums"
 import {
   OnboardingFlowConfig,
   QuestionType,
 } from "@/src/types/multiStepOnboard.types"
 import {
-
   CheckCircleIcon,
-  HeartIcon,
-  HomeIcon,
-
   XCircleIcon,
 } from "@heroicons/react/24/outline"
-import Caffe from "@/components/svg/Caffe"
-import Wheelchair from "@/components/svg/Wheelchair"
-import Cutlery from "@/components/svg/Cutlery"
-import Spray from "@/components/svg/Spray"
-import CarrelloSpesa from "@/components/svg/CarrelloSpesa"
-import Vasca from "@/components/svg/Vasca"
-import Bed from "@/components/svg/Bed"
-import Diaper from "@/components/svg/Diaper"
-import Tree from "@/components/svg/Tree"
-import Stetoscopio from "@/components/svg/Stetoscopio"
-import Automobile from "@/components/svg/Automobile"
+
+import {
+  OccupationEnum,
+  OccupationLabels,
+  VigilCharacterTraitEnum,
+  VigilCharacterTraitLabels,
+  VigilDailyServiceEnum,
+  VigilDailyServiceIcons,
+  VigilDailyServiceLabels,
+  VigilExperienceLabels,
+  VigilExperienceYearsEnum,
+  VigilHygieneServiceEnum,
+  VigilHygieneServiceIcons,
+  VigilHygieneServiceLabels,
+  VigilOutdoorServiceEnum,
+  VigilOutdoorServiceIcons,
+  VigilOutdoorServiceLabels,
+  VigilPastExperienceEnum,
+  VigilPastExperienceLabels,
+  VigilServiceTypeEnum,
+  VigilServiceTypeLabels,
+  VigilTimeCommitmentEnum,
+  VigilTimeCommitmentLabels,
+  VigilTransportationEnum,
+  VigilTransportationLabels,
+  VigilZoneEnum,
+  VigilZoneLabels,
+} from "@/src/enums/onboarding.enums"
+import { GenderEnum, GenderLabels } from "@/src/enums/common.enums"
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -60,26 +73,23 @@ export const createVigilOnboardingConfig = (
           id: "gender", //anagrafica
           type: QuestionType.SELECT,
           label: "Genere",
-          options: [
-            { value: "male", label: "Maschio" },
-            { value: "female", label: "Femmina" },
-            { value: "nb", label: "Non Binario" },
-            { value: "other", label: "Altro" },
-            { value: "na", label: "Preferisco non specificare" },
-          ],
+          options: Object.values(GenderEnum).map((value) => ({
+            value,
+            label: GenderLabels[value],
+          })),
         },
       ],
       nextStep: "address",
     },
     {
-      id: "address", //anagrafica
+      id: "address",
       title: "Qual è il tuo indirizzo di residenza?",
       description:
         "Questo indirizzo non sarà visibile alle famiglie. Servirà per verifiche interne.",
       questions: [
         {
-          id: "address",
-          type: QuestionType.ADDRESS,
+          id: "addresses", //anagrafica
+          type: QuestionType.MULTI_ADDRESS,
           label: "",
           placeholder: "Inserisci il CAP o città...",
           validation: {
@@ -88,9 +98,10 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: "zones",
+      
     },
     {
-      id: "zones", //non slavare per ora
+      id: "zones", //non salvare per ora
       title: "In quali zone sei disponibile a lavorare?",
       description:
         "Seelzione tutte le zone di Napoli in cui puoi offrire i tuoi servizi",
@@ -99,17 +110,10 @@ export const createVigilOnboardingConfig = (
           id: "zones",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
-          options: [
-            { label: "Centro Storico", value: "centro_storico" },
-            { label: "Vomero", value: "vomero" },
-            { label: "Chiaia", value: "chiaia" },
-            { label: "Posilippo", value: "posilippo" },
-            { label: "Fuorigrotta", value: "fuorigrotta" },
-            { label: "Bagnoli", value: "bagnoli" },
-            { label: "Pianura", value: "pianura" },
-            { label: "Soccavo", value: "soccavo" },
-            { label: "Arenella", value: "arenella" },
-          ],
+          options: Object.values(VigilZoneEnum).map((value) => ({
+            value,
+            label: VigilZoneLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -118,29 +122,24 @@ export const createVigilOnboardingConfig = (
       nextStep: "transportation",
     },
     {
-      id: "transportation", 
+      id: "transportation",
       title: "Hai un mezzo di trasporto?",
       description:
         "Questo aiuta le famiglie a capire se puoi accompagnare fuori casa.",
       questions: [
         {
-          id: "transportation",
+          id: "transportation_mode",
           type: QuestionType.RADIO,
           label: "Mezzo di trasporto",
-          options: [
-            { label: "Auto", value: "auto" },
-            { label: "Moto", value: "moto" },
-            { label: "Bicicletta", value: "bike" },
-            { label: "Trasporto pubblico", value: "public" },
-            { label: "Nessuno", value: "none" },
-            { label: "Altro", value: "other" },
-          ],
+          options: Object.values(VigilTransportationEnum).map((value) => ({
+            value,
+            label: VigilTransportationLabels[value],
+          })),
           validation: {
             required: true,
           },
         },
       ],
-      // Conditional routing based on transportation
       nextStep: "occupation",
     },
     {
@@ -163,15 +162,15 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: (answers) => {
-        const requiresDocs = [OccupationEnum.PROFESSIONAL]
+        const requiresDocs = [OccupationEnum.PROFESSIONAL, OccupationEnum.NURSE]
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
-          return "professional-docs-info"
+          return "professional_docs_info"
         }
         return "courses"
       },
     },
     {
-      id: "professional-docs-info",
+      id: "professional_docs_info",
       title: "Documentazione professionale",
       description:
         "Per l'occupazione selezionata è richiesta documentazione certificata",
@@ -220,12 +219,10 @@ export const createVigilOnboardingConfig = (
           id: "experience_years",
           type: QuestionType.RADIO,
           label: "",
-          options: [
-            { label: "< 1 anno", value: "lt_1" },
-            { label: "1-3 anni", value: "1-3_yrs" },
-            { label: "3-5 anni", value: "3-5_yrs" },
-            { label: "5+ anni", value: "gte_5" },
-          ],
+          options: Object.values(VigilExperienceYearsEnum).map((value) => ({
+            value,
+            label: VigilExperienceLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -265,39 +262,11 @@ export const createVigilOnboardingConfig = (
           validation: {
             required: true,
           },
-          options: [
-            {
-              label: "Compagnia e conversazione",
-              value: "company",
-              icon: Caffe,
-            },
-            {
-              label: "Sorveglianza non sanitaria",
-              value: "surveillance",
-              icon: HeartIcon,
-            },
-            {
-              label: "Aiuto negli spostamenti in casa",
-              value: "moving",
-              icon: Wheelchair,
-            },
-            {
-              label: "Preparazione piatti semplici",
-              value: "food",
-              icon: Cutlery,
-            },
-
-            {
-              label: "Riordino leggero di ambienti",
-              value: "cleaning",
-              icon: Spray,
-            },
-            {
-              label: "Spese e piccole commissioni",
-              value: "grocery",
-              icon: CarrelloSpesa,
-            },
-          ],
+          options: Object.values(VigilDailyServiceEnum).map((value) => ({
+            value,
+            label: VigilDailyServiceLabels[value],
+            icon: VigilDailyServiceIcons[value],
+          })),
         },
       ],
       nextStep: "hygene",
@@ -311,36 +280,21 @@ export const createVigilOnboardingConfig = (
           id: "hygene_services",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
-          options: [
-            {
-              label: "Aiuto in bagno (lavarsi, vestirsi)",
-              value: "bathroom_help",
-              icon: Vasca,
-            },
-            {
-              label: "Igiene a letto",
-              value: "bed_help",
-              icon: Bed,
-            },
-            {
-              label: "Cambio pannolone",
-              value: "diaper_help",
-              icon: Diaper,
-            },
-            {
-              label: "No, non mi occupo di igiene personale",
-              value: "none",
-              icon: XCircleIcon,
-            },
-          ],
+          options: Object.values(VigilHygieneServiceEnum).map((value) => ({
+            value,
+            label: VigilHygieneServiceLabels[value],
+            icon: VigilHygieneServiceIcons[value],
+          })),
           validation: {
             required: true,
           },
         },
       ],
       nextStep: (answers) => {
-        if (answers.services?.includes("none")) {
-          answers.services = answers.services.filter((s: string) => s == "none") //if "none" is selected, ignore everything else
+        if (answers.services?.includes(VigilHygieneServiceEnum.NONE)) {
+          answers.services = answers.services.filter(
+            (s: string) => s == VigilHygieneServiceEnum.NONE,
+          ) //if "none" is selected, ignore everything else
         }
         return "outside"
       },
@@ -354,41 +308,21 @@ export const createVigilOnboardingConfig = (
           id: "outdoor_services",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
-          options: [
-            {
-              label: "Passeggiate",
-              value: "walks",
-              icon: Tree,
-            },
-            {
-              label: "Spesa al supermercato",
-              value: "groceries",
-              icon: CarrelloSpesa,
-            },
-            {
-              label: "Visite mediche / esami",
-              value: "doctor_apps",
-              icon: Stetoscopio,
-            },
-            {
-              label: "Accompagnamento in auto",
-              value: "car_driving",
-              icon: Automobile,
-            },
-            {
-              label: "No, non accompagno fuori casa",
-              value: "none",
-              icon: XCircleIcon,
-            },
-          ],
+          options: Object.values(VigilOutdoorServiceEnum).map((value) => ({
+            value,
+            label: VigilOutdoorServiceLabels[value],
+            icon: VigilOutdoorServiceIcons[value],
+          })),
           validation: {
             required: true,
           },
         },
       ],
       nextStep: (answers) => {
-        if (answers.outside?.includes("none")) {
-          answers.outside = answers.outside.filter((s: string) => s == "none") //if "none" is selected, ignore everything else
+        if (answers.outside?.includes(VigilOutdoorServiceEnum.NONE)) {
+          answers.outside = answers.outside.filter(
+            (s: string) => s == VigilOutdoorServiceEnum.NONE,
+          ) //if "none" is selected, ignore everything else
         }
         return "past_exp"
       },
@@ -402,40 +336,10 @@ export const createVigilOnboardingConfig = (
           id: "past_experience",
           label: "",
           type: QuestionType.MULTI_CHECKBOX,
-          options: [
-            {
-              label: "Anziani autosufficienti",
-              value: "selfsufficient",
-            },
-            {
-              label: "Anziani con mobilità ridotta",
-              value: "reduced_mobility",
-            },
-            {
-              label: "Anziani con carrozzina",
-              value: "wheelchair",
-            },
-            {
-              label: "Alzheimer / demenza",
-              value: "alzheimer",
-            },
-            {
-              label: "Parkinson",
-              value: "parkinson",
-            },
-            {
-              label: "Post-operatorio",
-              value: "post-op",
-            },
-            {
-              label: "Assistenza notturna",
-              value: "night",
-            },
-            {
-              label: "Nessuna",
-              value: "none",
-            },
-          ],
+          options: Object.values(VigilPastExperienceEnum).map((value) => ({
+            value,
+            label: VigilPastExperienceLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -452,12 +356,10 @@ export const createVigilOnboardingConfig = (
           type: QuestionType.MULTI_CHECKBOX,
           label: "",
           id: "type",
-          options: [
-            { label: "A ore (giorno)", value: "hourly_day" },
-            { label: "A ore (sera/notte)", value: "hourly_night" },
-            { label: "Notte in presenza", value: "night" },
-            { label: "Notte in sorveglianza", value: "night_away" },
-          ],
+          options: Object.values(VigilServiceTypeEnum).map((value) => ({
+            value,
+            label: VigilServiceTypeLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -471,15 +373,13 @@ export const createVigilOnboardingConfig = (
       description: "Questo ci aiuta a proporti offerte adatte?",
       questions: [
         {
-          id: "time-committment",
+          id: "time_committment",
           type: QuestionType.RADIO,
           label: "",
-          options: [
-            { label: "Fino a 10 ore", value: "lte_10" },
-            { label: "10-20 ore", value: "gt_10_lt_20" },
-            { label: "20-30 ore", value: "gt_20_lt_30" },
-            { label: "30+ ore", value: "gt_30" },
-          ],
+          options: Object.values(VigilTimeCommitmentEnum).map((value) => ({
+            value,
+            label: VigilTimeCommitmentLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -536,32 +436,14 @@ export const createVigilOnboardingConfig = (
       id: "character",
       questions: [
         {
-          id: "char",
+          id: "character",
           type: QuestionType.MULTI_CHECKBOX,
           label: "",
           max: 3,
-          options: [
-            {
-              label: "Molto paziente",
-              value: "patient",
-            },
-            {
-              label: "Tranquillo/a e riservato/a",
-              value: "reserved",
-            },
-            {
-              label: "Chiacchierone/a e socievole",
-              value: "chatty",
-            },
-            {
-              label: "Molto organizzato/a",
-              value: "organized",
-            },
-            {
-              label: "Molto puntuale",
-              value: "ontime",
-            },
-          ],
+          options: Object.values(VigilCharacterTraitEnum).map((value) => ({
+            value,
+            label: VigilCharacterTraitLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -570,44 +452,46 @@ export const createVigilOnboardingConfig = (
       nextStep: "languages",
     },
     {
-      title: "Quali lingue parli?",
-      description:
-        "L'italiano è obbligatorio. Aggiungi altre lingue se ne parli.",
+      title: "Parli italiano fluentemente?",
+      description: "",
       id: "languages",
       questions: [
         {
-          id: "char",
-          type: QuestionType.SELECT_MULTI,
-          label: "",
-          options: [
-            { label: "Italiano", value: "italian", icon: HomeIcon }, //TODO: add flags
-            { label: "Inglese", value: "english" },
-            { label: "Rumeno", value: "romanian" },
-            { label: "Arabo", value: "arabic" },
-            { label: "Albanese", value: "albanian" },
-            { label: "Spagnolo", value: "spanish" },
-            { label: "Francese", value: "french" },
-            { label: "Cinese", value: "chinese" },
-            { label: "Ucraino", value: "ukrainian" },
-            { label: "Filippino (Tagalog)", value: "tagalog" },
-            { label: "Hindi", value: "hindi" },
-            { label: "Tedesco", value: "german" },
-            { label: "Portoghese", value: "portuguese" },
-            { label: "Bengalese", value: "bengali" },
-            { label: "Russo", value: "russian" },
-            { label: "Polacco", value: "polish" },
-            { label: "Serbo", value: "serbian" },
-            { label: "Urdu", value: "urdu" },
-            { label: "Punjabi", value: "punjabi" },
-            { label: "Persiano (Farsi)", value: "persian" },
-            { label: "Altri", value: "other" },
-          ],
+          id: "language_confirmation",
+          // type: QuestionType.SELECT_MULTI,
+          type: QuestionType.CHECKBOX,
+          label: "Confermo di saper parlare italiano fluentemente.",
+          // options: [
+          //   { label: "Italiano", value: "italian", icon: HomeIcon }, //TODO: add flags
+          //   { label: "Inglese", value: "english" },
+          //   { label: "Rumeno", value: "romanian" },
+          //   { label: "Arabo", value: "arabic" },
+          //   { label: "Albanese", value: "albanian" },
+          //   { label: "Spagnolo", value: "spanish" },
+          //   { label: "Francese", value: "french" },
+          //   { label: "Cinese", value: "chinese" },
+          //   { label: "Ucraino", value: "ukrainian" },
+          //   { label: "Filippino (Tagalog)", value: "tagalog" },
+          //   { label: "Hindi", value: "hindi" },
+          //   { label: "Tedesco", value: "german" },
+          //   { label: "Portoghese", value: "portuguese" },
+          //   { label: "Bengalese", value: "bengali" },
+          //   { label: "Russo", value: "russian" },
+          //   { label: "Polacco", value: "polish" },
+          //   { label: "Serbo", value: "serbian" },
+          //   { label: "Urdu", value: "urdu" },
+          //   { label: "Punjabi", value: "punjabi" },
+          //   { label: "Persiano (Farsi)", value: "persian" },
+          //   { label: "Altri", value: "other" },
+          // ],
           validation: {
             required: true,
+            validate: (value) =>
+              value === true || "Devi confermare per continuare",
           },
         },
       ],
-      nextStep: "propic",
+      nextStep: "propic", //todo: redirect to a sorry page if not checked
     },
     {
       id: "propic",
@@ -615,7 +499,7 @@ export const createVigilOnboardingConfig = (
       description: "Una foto sorridente aiuta le famiglie a conoscerti meglio.",
       questions: [
         {
-          id: "photo",
+          id: "propic",
           type: QuestionType.FILE,
           label: "",
           validation: {
