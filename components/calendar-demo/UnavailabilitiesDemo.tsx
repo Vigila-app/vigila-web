@@ -7,7 +7,6 @@ import {
   VigilUnavailabilityFormI,
 } from "@/src/types/calendar.types";
 import {
-  formatDateTimeToISO,
   calculateDurationHours,
 } from "@/src/utils/calendar.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
@@ -50,11 +49,22 @@ export const UnavailabilitiesDemo = () => {
     setLoading(true);
     setError(null);
     try {
+      // Validate datetime range
+      if (formData.end_at && formData.start_at && formData.end_at <= formData.start_at) {
+        setError("End date/time must be after start date/time");
+        setLoading(false);
+        return;
+      }
+
+      // Convert datetime-local format to ISO datetime
+      const startAtISO = new Date(formData.start_at!).toISOString();
+      const endAtISO = new Date(formData.end_at!).toISOString();
+
       // Note: In a real scenario, vigil_id would come from authenticated user
       const unavailabilityData: VigilUnavailabilityFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
-        start_at: formData.start_at!,
-        end_at: formData.end_at!,
+        start_at: startAtISO,
+        end_at: endAtISO,
         reason: formData.reason || undefined,
       };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CalendarService } from "@/src/services";
 import {
   AvailableSlotsRequestI,
@@ -35,25 +35,39 @@ export const AvailableSlotsDemo = () => {
     setError(null);
     setSlotsData(null);
     
+    // Validate date range
+    if (formData.end_date < formData.start_date) {
+      setError("End date must be after or equal to start date");
+      setLoading(false);
+      return;
+    }
+    
     try {
       const data = await CalendarService.getAvailableSlots(formData);
       setSlotsData(data);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch available slots");
+      // Provide helpful error messages for demo
+      if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
+        setError("Authentication required. This is expected in demo mode - in production, you would be authenticated.");
+      } else {
+        setError(err.message || "Failed to fetch available slots");
+      }
       console.error("Error fetching slots:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Group slots by date for better display
-  const slotsByDate = slotsData?.slots.reduce((acc, slot) => {
-    if (!acc[slot.date]) {
-      acc[slot.date] = [];
-    }
-    acc[slot.date].push(slot);
-    return acc;
-  }, {} as Record<string, TimeSlotI[]>) || {};
+  // Group slots by date for better display - memoized for performance
+  const groupedSlotsByDate = useMemo(() => {
+    return slotsData?.slots.reduce((acc, slot) => {
+      if (!acc[slot.date]) {
+        acc[slot.date] = [];
+      }
+      acc[slot.date].push(slot);
+      return acc;
+    }, {} as Record<string, TimeSlotI[]>) || {};
+  }, [slotsData]);
 
   return (
     <div className="space-y-6">
@@ -177,7 +191,7 @@ export const AvailableSlotsDemo = () => {
               </p>
             ) : (
               <div className="space-y-4">
-                {Object.entries(slotsByDate).map(([date, slots]) => (
+                {Object.entries(groupedSlotsByDate).map(([date, slots]) => (
                   <div key={date} className="border border-gray-200 rounded-lg p-4">
                     <h4 className="font-semibold text-lg mb-2">
                       {new Date(date).toLocaleDateString("en-US", {
@@ -197,10 +211,15 @@ export const AvailableSlotsDemo = () => {
                               : "bg-gray-100 text-gray-500 border border-gray-300"
                           }`}
                         >
-                          {formatTimeRange(slot.start_hour, slot.end_hour)}
+                          <div className="font-medium">
+                            {formatTimeRange(slot.start_hour, slot.end_hour)}
+                          </div>
                           {slot.duration_hours > 1 && (
                             <div className="text-xs">({slot.duration_hours}h)</div>
                           )}
+                          <div className="text-xs mt-1">
+                            {slot.available ? "✓ Available" : "✗ Unavailable"}
+                          </div>
                         </div>
                       ))}
                     </div>

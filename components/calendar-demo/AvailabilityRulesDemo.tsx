@@ -58,6 +58,20 @@ export const AvailabilityRulesDemo = () => {
     setLoading(true);
     setError(null);
     try {
+      // Validate hour range
+      if (formData.end_hour! <= formData.start_hour!) {
+        setError("End hour must be greater than start hour");
+        setLoading(false);
+        return;
+      }
+
+      // Validate date range if valid_to is provided
+      if (formData.valid_to && formData.valid_to < formData.valid_from!) {
+        setError("Valid To date must be after or equal to Valid From date");
+        setLoading(false);
+        return;
+      }
+
       // Note: In a real scenario, vigil_id would come from authenticated user
       const ruleData: VigilAvailabilityRuleFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
