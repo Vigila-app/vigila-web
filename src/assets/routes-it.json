@@ -11,6 +11,18 @@
     "private": false,
     "roles": []
   },
+  "landing": {
+    "url": "/landing",
+    "label": "Landing",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
   "homeConsumer": {
     "url": "/home",
     "label": "Home",
