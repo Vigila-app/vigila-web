@@ -113,6 +113,69 @@ Final call-to-action section.
 />
 ```
 
+### LandingFAQ
+Frequently asked questions section with expandable items.
+
+```tsx
+<LandingFAQ
+  sectionTitle="Domande Frequenti"
+  sectionSubtitle="Trova le risposte alle domande più comuni"
+  faqs={[
+    {
+      question: "Come funziona Vigila?",
+      answer: "Vigila è una piattaforma che mette in contatto..."
+    },
+    // ... more FAQs
+  ]}
+  defaultOpenIndex={0}
+  bgColor="bg-white"
+/>
+```
+
+### LandingImageSlider
+Image carousel/slider with auto-play and navigation controls.
+
+```tsx
+<LandingImageSlider
+  slides={[
+    {
+      image: "/path/to/image.jpg",
+      alt: "Image description",
+      title: "Slide Title",
+      description: "Slide description"
+    },
+    // ... more slides
+  ]}
+  autoPlay={true}
+  autoPlayInterval={5000}
+  showControls={true}
+  showIndicators={true}
+  bgColor="bg-gray-50"
+/>
+```
+
+### LandingGetInTouch
+Contact form with name, email, phone, and message fields.
+
+```tsx
+<LandingGetInTouch
+  sectionTitle="Contattaci"
+  sectionSubtitle="Siamo qui per aiutarti"
+  namePlaceholder="Il tuo nome"
+  emailPlaceholder="La tua email"
+  phonePlaceholder="Il tuo numero di telefono"
+  messagePlaceholder="Scrivi il tuo messaggio..."
+  buttonText="Invia Messaggio"
+  onSubmit={async (data) => {
+    console.log(data);
+    // Handle form submission
+  }}
+  showPhone={true}
+  showEmail={true}
+  bgColor="bg-white"
+/>
+```
+
 ## Styling
 
 All components use:
@@ -132,7 +195,10 @@ import {
   LandingHowItWorks,
   LandingStats,
   LandingTestimonials,
-  LandingCTA
+  LandingCTA,
+  LandingFAQ,
+  LandingImageSlider,
+  LandingGetInTouch
 } from "@/components/landing";
 ```
 
