@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-sync-scripts */
 import "@/app/globals.css";
 import { Metadata } from "next";
 import { AppConstants } from "@/src/constants";
