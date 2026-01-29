@@ -88,7 +88,7 @@ export const MultiAddressInput = ({
         )}
       >
         {question.label}
-        {question.validation?.required && "*"}
+        {/* {question.validation?.required } */}
       </label>
 
       <SearchAddress

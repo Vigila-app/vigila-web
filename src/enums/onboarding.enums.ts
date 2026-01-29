@@ -87,7 +87,7 @@ export enum VigilExperienceYearsEnum {
 }
 
 export const VigilExperienceLabels = {
-  [VigilExperienceYearsEnum.LT_1]: "< 1anno",
+  [VigilExperienceYearsEnum.LT_1]: "< 1 anno",
   [VigilExperienceYearsEnum.GTE_1_LT_3]: "1-3 anni",
   [VigilExperienceYearsEnum.GTE_3_LT_5]: "3-5 anni",
   [VigilExperienceYearsEnum.GTE_5]: "5+ anni",
@@ -259,3 +259,17 @@ export const OccupationLabels: Record<OccupationEnum, string> = {
   [OccupationEnum.COMPANY]: "Operatore/trice per compagnia e supporto leggero",
 }
 
+
+export enum ConsumerNeedsEnum {
+  COMPANY = "Compagnia",
+  ESCORT = "Accompagnamento",
+  DAILY_ACTIVITIES = "Aiuto Attività Quotidiane",
+  FULL_HELP = "Assistenza intensa",
+  
+}
+export const ConsumerNeedsLabels: Record<ConsumerNeedsEnum, string> = {
+  [ConsumerNeedsEnum.COMPANY]: "Compagnia / Sorveglianza",
+  [ConsumerNeedsEnum.ESCORT]: "Accompagnamento (commissioni, visite)",
+  [ConsumerNeedsEnum.DAILY_ACTIVITIES]: "Aiuto Attività Quotidiane (farmaci,pasti,mobilità)",
+  [ConsumerNeedsEnum.FULL_HELP]: "Assistenza intensa (sollevamento, igiene, allettato)",
+}

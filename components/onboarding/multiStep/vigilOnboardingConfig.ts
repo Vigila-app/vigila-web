@@ -52,7 +52,7 @@ export const createVigilOnboardingConfig = (
       id: "welcome",
       title: "Benvenuto su Vigila!",
       description:
-        "Abbiamo bisogno di qualche info in più per creare un'esperienza su misura. Questo step richiede meno di cinque minuti.",
+        "Questi dati consentono di gestire al meglio preferenze ed abbinamenti.",
       questions: [
         {
           id: "birthday", //anagrafica
@@ -130,7 +130,7 @@ export const createVigilOnboardingConfig = (
         {
           id: "transportation_mode",
           type: QuestionType.RADIO,
-          label: "Mezzo di trasporto",
+          label: "",
           options: Object.values(VigilTransportationEnum).map((value) => ({
             value,
             label: VigilTransportationLabels[value],
@@ -410,7 +410,7 @@ export const createVigilOnboardingConfig = (
       questions: [
         {
           id: "urgent_requests",
-          type: QuestionType.RADIO,
+          type: QuestionType.CARD,
           label: "",
           options: [
             {
