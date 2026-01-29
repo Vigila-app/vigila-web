@@ -49,10 +49,41 @@ Represents end users who book services.
 * One consumer → many `bookings`
 * One consumer → many `wallet_transactions`
 * One consumer → one `wallet`
+* One consumer → one `consumers-data`
 
 ---
 
-### 2. `vigils`
+### 2. `consumers-data`
+
+Extension table for consumer onboarding information.
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `consumer_id` → `consumers.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `consumer_id` (uuid, FK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `autonomy` (text)
+* `needs` (text[], variable-length multidimensional array)
+* `gender-preference` (text)
+* `attitude` (text[], variable-length multidimensional array)
+* `qualificatios` (text)
+* `transportation` (text)
+* `experience` (text)
+
+**Relationships**:
+
+* One consumers-data → one `consumer`
+
+---
+
+### 3. `vigils`
 
 Represents service providers.
 
@@ -83,7 +114,7 @@ Represents service providers.
 
 ---
 
-### 3. `services`
+### 4. `services`
 
 Defines services offered by vigils.
 
@@ -117,7 +148,7 @@ Defines services offered by vigils.
 
 ---
 
-### 4. `bookings`
+### 5. `bookings`
 
 Represents a service booking made by a consumer.
 
@@ -156,7 +187,7 @@ Represents a service booking made by a consumer.
 
 ---
 
-### 5. `reviews`
+### 6. `reviews`
 
 Stores feedback left after a booking.
 
@@ -186,7 +217,7 @@ Stores feedback left after a booking.
 
 ---
 
-### 6. `wallets`
+### 7. `wallets`
 
 Tracks balances for consumers.
 
@@ -212,7 +243,7 @@ Tracks balances for consumers.
 
 ---
 
-### 7. `wallet_transactions`
+### 8. `wallet_transactions`
 
 Represents money movements within wallets.
 
@@ -241,6 +272,7 @@ Represents money movements within wallets.
 ## Key Relationships Summary
 
 * **Consumer → Booking**: one-to-many
+* **Consumer → Consumers-Data**: one-to-one
 * **Vigil → Service**: one-to-many
 * **Service → Booking**: one-to-many
 * **Booking → Review**: one-to-one
