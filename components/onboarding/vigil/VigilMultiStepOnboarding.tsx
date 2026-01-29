@@ -25,7 +25,7 @@ const VigilMultiStepOnboarding = () => {
     async (data: Record<string, any>) => {
       try {
         const { address, propic } = data
-        
+
         // Extract postal code from address
         const cap =
           address?.address?.postcode || address?.address?.postalCode || ""
@@ -43,6 +43,7 @@ const VigilMultiStepOnboarding = () => {
 
         delete onboardData.language_confirmation
         delete onboardData.understandsDocRequirement
+        delete onboardData.availabilities
         if (propic && user?.id) {
           await StorageUtils.uploadFile("profile-pics", propic, user.id, {
             contentType: propic.type || "image/png",
@@ -62,7 +63,7 @@ const VigilMultiStepOnboarding = () => {
 
         await AuthService.renewAuthentication()
         await getUserDetails(true)
-        router.replace(Routes.profileVigil.url)
+        router.replace(Routes.onBoardVigilComplete.url)
       } catch (err) {
         console.error("Errore durante la registrazione dei dati", err)
         showToast({

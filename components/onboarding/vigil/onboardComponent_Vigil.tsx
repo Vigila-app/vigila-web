@@ -24,7 +24,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/onboarding.enums";
 
 type OnboardFormI = {
   birthday: string;
@@ -47,8 +47,7 @@ const transportationOptions = [
 
 // Occupazioni che richiedono documentazione
 const OCCUPATIONS_REQUIRING_DOCUMENTATION = [
-  OccupationEnum.OSA,
-  OccupationEnum.OSS,
+  OccupationEnum.PROFESSIONAL,
   OccupationEnum.NURSE,
 ];
 

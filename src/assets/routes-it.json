@@ -120,6 +120,21 @@
       "VIGIL"
     ]
   },
+  "onBoardVigilComplete": {
+    "url": "/vigil/onboard-v2/complete",
+    "label": "Registrazione completata",
+    "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "VIGIL"
+    ]
+  },
   "resetPassword": {
     "url": "/auth/reset-password",
     "label": "Reset password",
