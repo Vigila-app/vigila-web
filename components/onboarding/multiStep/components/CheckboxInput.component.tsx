@@ -33,7 +33,6 @@ export const MulticheckboxInput = ({
 }: QuestionRendererProps) => {
   const currentValues = Array.isArray(value) ? value : [];
   const reachedMax = question.max && currentValues.length >= question.max;
-  console.log(reachedMax)
   return (
     <div>
       <label
@@ -44,7 +43,7 @@ export const MulticheckboxInput = ({
         )}
       >
         {question.label}
-        {question.validation?.required && "*"}
+        {question.validation?.required }
       </label>
       {question.description && (
         <p className="text-sm text-gray-600 mb-3">{question.description}</p>
@@ -53,7 +52,7 @@ export const MulticheckboxInput = ({
         className={clsx(
           question.options?.[0].icon
             ? "space-y-2"
-            : `grid grid-cols-2 align-center gap-2 justify-center`,
+            : `flex flex-col align-center gap-2 justify-center`,
         )}
       >
         {question.options?.map((option) => {
@@ -70,7 +69,7 @@ export const MulticheckboxInput = ({
                   "border-vigil-orange bg-vigil-light-orange",
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
-                  "border-consumer-blue bg-vigil-light-blue",
+                  "border-consumer-blue bg-consumer-light-blue text-consumer-blue",
                 isDisabled && "opacity-50 pointer-events-none"
               )}
             >
@@ -112,7 +111,6 @@ export const MulticheckboxInput = ({
                         newValues = currentValues.filter((v) => v !== option.value);
                         onChange(newValues);
                       }
-                      console.log(newValues);
                     }}
                     error={error}
                   />
