@@ -32,6 +32,9 @@ export const MulticheckboxInput = ({
   
 }: QuestionRendererProps) => {
   const currentValues = Array.isArray(value) ? value : [];
+  const noneValue = question.options?.find(
+    (option) => String(option.value).toLowerCase() === "none",
+  )?.value;
   const reachedMax = question.max && currentValues.length >= question.max;
   return (
     <div>
@@ -57,7 +60,9 @@ export const MulticheckboxInput = ({
       >
         {question.options?.map((option) => {
           const isChecked = currentValues.includes(option.value);
-          const isDisabled = !!(!isChecked && reachedMax);
+          const isNoneOption =
+            noneValue !== undefined && option.value === noneValue;
+          const isDisabled = !!(!isChecked && reachedMax && !isNoneOption);
           return (
             <div
               key={option.value}
@@ -99,16 +104,32 @@ export const MulticheckboxInput = ({
                     checked={isChecked}
                     disabled={isDisabled}
                     onChange={(checked) => {
-                      let newValues;
+                      let newValues: Array<string | number>;
+                      const isNoneOption =
+                        noneValue !== undefined && option.value === noneValue;
                       if (checked) {
-                        if (!reachedMax) {
-                          newValues = [...currentValues, option.value];
+                        if (isNoneOption) {
+                          newValues = [option.value];
                           onChange(newValues);
+                          return;
+                        }
+
+                        if (noneValue !== undefined) {
+                          newValues = currentValues.filter(
+                            (v) => v !== noneValue,
+                          );
                         } else {
-                          newValues = currentValues;
+                          newValues = [...currentValues];
+                        }
+
+                        if (!reachedMax || isNoneOption) {
+                          newValues = [...newValues, option.value];
+                          onChange(newValues);
                         }
                       } else {
-                        newValues = currentValues.filter((v) => v !== option.value);
+                        newValues = currentValues.filter(
+                          (v) => v !== option.value,
+                        );
                         onChange(newValues);
                       }
                     }}
