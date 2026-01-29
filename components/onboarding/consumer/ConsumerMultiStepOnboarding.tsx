@@ -25,13 +25,13 @@ const ConsumerMultiStepOnboarding = () => {
       try {
         const {
           lovedOneName,
-          lovedOneAge,
-          lovedOneBirthday,
-          lovedOnePhone,
+            // lovedOneAge,
+          birthday,
+          // lovedOnePhone,
           relationship,
           address,
           information,
-          professionalExperience,
+          experience,
         } = data;
 
         // Extract city and postal code from address
@@ -43,20 +43,17 @@ const ConsumerMultiStepOnboarding = () => {
 
         // Prepare data for API
         const onboardData: any = {
+          ...data,
           lovedOneName,
-          lovedOneAge,
-          lovedOneBirthday,
-          lovedOnePhone,
+          // lovedOneAge,
+          birthday,
+          // lovedOnePhone,
           relationship,
           address,
           cap,
-          information: information || "",
+          information,
         };
 
-        // Add professional experience if provided (for badante)
-        if (professionalExperience !== undefined) {
-          onboardData.professionalExperience = professionalExperience;
-        }
 
         await OnboardService.update({
           role: RolesEnum.CONSUMER,
@@ -80,7 +77,7 @@ const ConsumerMultiStepOnboarding = () => {
         throw err;
       }
     },
-    [showToast, getUserDetails, router]
+    [showToast, getUserDetails, router],
   );
 
   const config = createConsumerOnboardingConfig(handleComplete);
