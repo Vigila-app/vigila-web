@@ -1,6 +1,6 @@
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
-import clsx from "clsx"
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
+import clsx from "clsx";
 
 export const CardInput = ({
   question,
@@ -15,15 +15,14 @@ export const CardInput = ({
           "block font-medium mb-2 text-center text-xl",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
-        )}
-      >
+        )}>
         {question.label}
       </label>
 
       <div className="flex flex-col gap-4 mt-2">
         {" "}
         {question.options?.map((option) => {
-          const isChecked = value === option.value
+          const isChecked = value === option.value;
 
           return (
             <div
@@ -36,24 +35,29 @@ export const CardInput = ({
 
                 isChecked &&
                   role === RolesEnum.VIGIL &&
-                  "border-vigil-orange bg-vigil-light-orange ",
+                  "border-vigil-orange bg-vigil-light-orange text-vigil-orange ",
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
-                  "border-consumer-blue bg-consumer-light-blue ",
-              )}
-            >
+                  "border-consumer-blue bg-consumer-light-blue text-consumer-blue ",
+              )}>
               {option.icon && (
                 <option.icon
                   className={clsx(
                     "w-8 h-8",
-                    isChecked ? "text-current" : "text-gray-400",
+                    !isChecked && "text-gray-400",
+                    isChecked &&
+                      role === RolesEnum.VIGIL &&
+                      "text-vigil-orange ",
+                    isChecked &&
+                      role === RolesEnum.CONSUMER &&
+                      "text-consumer-blue ",
                   )}
                 />
               )}
 
               <span className="font-medium text-lg ">{option.label}</span>
               {option.description && (
-                <span className="text-sm text-center">
+                <span className="text-xs text-center">
                   {option.description}
                 </span>
               )}
@@ -67,9 +71,9 @@ export const CardInput = ({
                 className="hidden"
               />
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
-}
+  );
+};
