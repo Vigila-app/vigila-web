@@ -4,10 +4,17 @@ import Link from "next/link";
 import { ArrowLeftIcon, CheckIcon, FaceSmileIcon } from "@heroicons/react/24/outline";
 import { ButtonLink, Logo } from "@/components";
 import { Routes } from "@/src/routes";
-
+import { Poppins } from "next/font/google"
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+})
 export default function VigilOnboardingCompletePage() {
   return (
-    <section className="min-h-[calc(100vh-4rem)] bg-gray-50">
+    <section
+      className={"min-h-[calc(100vh-4rem)] bg-gray-50 " + poppins.className}
+    >
       <div className="mx-auto w-full max-w-screen-sm px-4 py-8">
         <div className="flex items-center justify-between">
           <Logo size="small" />
@@ -39,8 +46,8 @@ export default function VigilOnboardingCompletePage() {
           </p>
 
           <div className="mx-auto mt-6 rounded-2xl bg-sky-100 px-4 py-3 text-sm text-consumer-blue">
-            <span className="font-semibold">Prossimo passo:</span> Verifica i tuoi
-            documenti per iniziare a ricevere richieste di assistenza.
+            <span className="font-semibold">Prossimo passo:</span> Verifica i
+            tuoi documenti per iniziare a ricevere richieste di assistenza.
           </div>
 
           <div className="mt-8 flex justify-center">
@@ -54,5 +61,5 @@ export default function VigilOnboardingCompletePage() {
         </div>
       </div>
     </section>
-  );
+  )
 }
