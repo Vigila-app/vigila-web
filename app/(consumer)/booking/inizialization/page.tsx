@@ -44,7 +44,7 @@ const FirstBookingSelection = () => {
 
     if (selected === "recurring") {
       //todo pagina con calendario ecc
-      router.push("/");
+      router.push("/booking/recurrence");
     } else {
       router.push("/home");
     }

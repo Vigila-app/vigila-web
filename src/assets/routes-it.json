@@ -423,6 +423,20 @@
     "roles": [
       "CONSUMER"
     ]
+  },"recurrenceBooking": {
+    "url": "/recurrence",
+    "label": "Prenotazione Ricorrente",
+    "title": "Prenotazione Ricorrente",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
   },
   "paymentBooking": {
     "url": "/booking/payment",
