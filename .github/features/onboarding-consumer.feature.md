@@ -19,7 +19,7 @@ The system uses a flexible, step-based architecture that supports conditional lo
   - Coordinates with `OnboardService` to save data to the backend
   - Triggers authentication renewal after successful completion
   - Displays success/error toasts via `useAppStore`
-  - Redirects to home page on successful completion
+  - Redirects to onboard complete page on successful completion
   - Extracts postal code/CAP from address object
 
 #### 2. **MultiStepOnboarding** (`components/onboarding/multiStep/MultiStepOnboarding.tsx`)
