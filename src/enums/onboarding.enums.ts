@@ -64,6 +64,7 @@ export enum VigilOccupationEnum {
   NURSE = "infermiere",
   FAMILY_CAREGIVER = "assistente-familiare",
   COMPANY = "compagnia-e-supporto",
+  OTHER="altro",
 }
 
 export const VigilOccupationLabels: Record<VigilOccupationEnum, string> = {
@@ -72,6 +73,7 @@ export const VigilOccupationLabels: Record<VigilOccupationEnum, string> = {
   [VigilOccupationEnum.NURSE]: "Infermiere",
   [VigilOccupationEnum.FAMILY_CAREGIVER]: "Assistente familiare a ore",
   [VigilOccupationEnum.COMPANY]: "Operatore/trice per compagnia e supporto leggero",
+  [VigilOccupationEnum.OTHER]: "Altro",
 }
 
 export enum VigilDocRequirementEnum {
@@ -249,6 +251,7 @@ export enum OccupationEnum {
   NURSE = "infermiere",
   FAMILY_CAREGIVER = "assistente-familiare",
   COMPANY = "compagnia-e-supporto",
+  OTHER="altro",
 }
 
 export const OccupationLabels: Record<OccupationEnum, string> = {
@@ -257,6 +260,7 @@ export const OccupationLabels: Record<OccupationEnum, string> = {
   [OccupationEnum.NURSE]: "Infermiere",
   [OccupationEnum.FAMILY_CAREGIVER]: "Assistente familiare a ore",
   [OccupationEnum.COMPANY]: "Operatore/trice per compagnia e supporto leggero",
+  [OccupationEnum.OTHER]: "Altro",
 }
 
 
