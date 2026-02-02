@@ -1,6 +1,5 @@
-import { Input } from "@/components/form"
-import { getInputType } from "../questionType.utils"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
+import { Input } from "@/components/form";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
 
 export const NumericInput = ({
   question,
@@ -22,4 +21,4 @@ export const NumericInput = ({
     error={error}
     autoFocus={question.autoFocus}
   />
-)
+);

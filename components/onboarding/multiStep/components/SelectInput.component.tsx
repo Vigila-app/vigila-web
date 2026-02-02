@@ -1,9 +1,12 @@
-import { Input, Select } from "@/components/form"
-import { getInputType } from "../questionType.utils"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { ExclamationTriangleIcon, MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/24/outline"
+import { Select } from "@/components/form";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import {
+  ExclamationTriangleIcon,
+  MagnifyingGlassIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 
 export const SelectInput = ({
   question,
@@ -22,24 +25,26 @@ export const SelectInput = ({
     error={error}
     options={question.options || []}
   />
-)
+);
 
 interface SelectMultiI {
-  searchInput: string
-  setSearchInput: (str:string) => void
+  searchInput: string;
+  setSearchInput: (str: string) => void;
 }
 export const SelectMultiInput = ({
   question,
   onChange,
   role,
   error,
-  value, searchInput, setSearchInput
+  value,
+  searchInput,
+  setSearchInput,
 }: QuestionRendererProps & SelectMultiI) => {
-  const selectedValues = (value as (string | number)[]) || []
+  const selectedValues = (value as (string | number)[]) || [];
   const filteredOptions =
     question.options?.filter((option) =>
       option.label.toLowerCase().includes(searchInput.toLowerCase()),
-    ) || []
+    ) || [];
 
   return (
     <div>
@@ -48,8 +53,7 @@ export const SelectMultiInput = ({
           "block font-medium mb-2",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
-        )}
-      >
+        )}>
         {question.label}
         {question.validation?.required && "*"}
       </label>
@@ -62,7 +66,7 @@ export const SelectMultiInput = ({
             {selectedValues.map((selectedValue) => {
               const option = question.options?.find(
                 (o) => o.value === selectedValue,
-              )
+              );
               return (
                 <li
                   key={selectedValue}
@@ -71,8 +75,7 @@ export const SelectMultiInput = ({
                     role === RolesEnum.VIGIL
                       ? "bg-orange-50 border-orange-200 text-orange-800"
                       : "bg-blue-50 border-blue-200 text-blue-800",
-                  )}
-                >
+                  )}>
                   {option?.icon && <option.icon className="w-4 h-4" />}
                   <span>{option?.label || selectedValue}</span>
                   <button
@@ -80,15 +83,14 @@ export const SelectMultiInput = ({
                     onClick={() => {
                       onChange(
                         selectedValues.filter((v) => v !== selectedValue),
-                      )
+                      );
                     }}
                     className="text-red-500 hover:text-red-700 ml-1"
-                    aria-label="Remove"
-                  >
+                    aria-label="Remove">
                     <XCircleIcon className="w-4 h-4" />
                   </button>
                 </li>
-              )
+              );
             })}
           </ul>
         </div>
@@ -117,7 +119,7 @@ export const SelectMultiInput = ({
         {filteredOptions.length > 0 ? (
           <ul className="divide-y">
             {filteredOptions.map((option) => {
-              const isChecked = selectedValues.includes(option.value)
+              const isChecked = selectedValues.includes(option.value);
               return (
                 <li
                   key={option.value}
@@ -129,8 +131,7 @@ export const SelectMultiInput = ({
                     isChecked &&
                       role === RolesEnum.CONSUMER &&
                       "bg-consumer-light-blue",
-                  )}
-                >
+                  )}>
                   {/* Icon on the left */}
                   {option.icon && (
                     <option.icon className="w-5 h-5 text-gray-600 mr-2" />
@@ -138,8 +139,7 @@ export const SelectMultiInput = ({
                   {/* Label in the middle */}
                   <label
                     htmlFor={`option-${option.value}`}
-                    className="flex-1 cursor-pointer flex items-center gap-2"
-                  >
+                    className="flex-1 cursor-pointer flex items-center gap-2">
                     <span>{option.label}</span>
                   </label>
                   {/* Checkbox on the right */}
@@ -151,16 +151,16 @@ export const SelectMultiInput = ({
                       if (isChecked) {
                         onChange(
                           selectedValues.filter((v) => v !== option.value),
-                        )
+                        );
                       } else {
-                        onChange([...selectedValues, option.value])
+                        onChange([...selectedValues, option.value]);
                       }
-                      setSearchInput("")
+                      setSearchInput("");
                     }}
                     className="w-4 h-4 cursor-pointer accent-gray-600 ml-2"
                   />
                 </li>
-              )
+              );
             })}
           </ul>
         ) : (
@@ -177,5 +177,5 @@ export const SelectMultiInput = ({
         </p>
       )}
     </div>
-  )
-}
+  );
+};
