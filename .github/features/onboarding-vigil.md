@@ -1,45 +1,125 @@
 # Vigil Onboarding Flow
 
-> **Purpose**: Complete specification for the VIGIL (caregiver) onboarding flow based on actual implementation. This flow collects caregiver profile, qualifications, services offered, and availability.
+> **Purpose**: Complete specification for the VIGIL (caregiver) onboarding flow, from functional requirements to technical implementation. For caregivers offering care services.
 
 ## Quick Reference
 
 **Configuration**: [components/onboarding/multiStep/vigilOnboardingConfig.ts](../../components/onboarding/multiStep/vigilOnboardingConfig.ts)  
 **Wrapper**: [components/onboarding/vigil/VigilMultiStepOnboarding.tsx](../../components/onboarding/vigil/VigilMultiStepOnboarding.tsx)  
 **Page**: [app/vigil/onboard-v2/page.tsx](../../app/vigil/onboard-v2/page.tsx)  
-**Routes**: New flow at `/vigil/onboard-v2`, old flow at `/vigil/onboard`  
-**Total Steps**: 20 steps with 3 conditional branches
+**Routes**: `/vigil/onboard-v2` (new), `/vigil/onboard` (old)  
+**Steps**: 20 steps with 3 conditional branches
 
 ---
 
 ## Table of Contents
-- [Overview](#overview)
-- [Complete Step Sequence](#complete-step-sequence)
-- [Conditional Logic](#conditional-logic)
-- [Data Mapping](#data-mapping)
-- [Testing Guide](#testing-guide)
+- [Requisiti Funzionali](#requisiti-funzionali)
+- [Architettura Implementativa](#architettura-implementativa)
+- [Sequenza Step](#sequenza-step)
+- [Logica Condizionale](#logica-condizionale)
+- [Mappatura Dati](#mappatura-dati)
+- [Testing](#testing)
 
 ---
 
-## Overview
+## Functional Requirements
 
-The vigil onboarding flow collects comprehensive information about caregivers including:
-- Personal info (birthday, gender, address, zones)
-- Transportation and occupation
-- Training and experience
-- Services offered (daily activities, hygiene, outdoor)
-- Past experience and service type
-- Availability and character traits
-- Profile photo
+### Objective
+Collect complete caregiver profile: personal information, qualifications, services offered, experiences, availability and character, to facilitate matching with families.
 
-**3 Conditional Branches**:
-1. Professional occupation (OSA/OSS/NURSE) → documentation acknowledgment
-2. Hygiene services "none" → filters to only "none"
-3. Outdoor services "none" → filters to only "none"
+### User Flow
+1. **Anagrafica**: Data di nascita e genere
+2. **Localizzazione**: Indirizzo di residenza (privato, non visibile alle famiglie)
+3. **Zone Operative**: Aree di Napoli dove si è disponibili a lavorare
+4. **Trasporto**: Mezzo di trasporto disponibile
+5. **Occupazione**: Ruolo professionale (con gestione documentazione per figure sanitarie)
+6. **Formazione**: Corsi e titoli conseguiti
+7. **Esperienza**: Anni nel settore e descrizione competenze
+8. **Servizi Base**: Assistenza vita quotidiana offerta
+9. **Servizi Igiene**: Supporto igiene personale
+10. **Servizi Esterni**: Accompagnamento fuori casa
+11. **Esperienze Specifiche**: Situazioni già gestite (demenza, disabilità, etc.)
+12. **Tipologia Servizio**: Tipo di assistenza offerta
+13. **Impegno Orario**: Ore settimanali desiderate
+14. **Disponibilità**: Calendario settimanale
+15. **Urgenze**: Disponibilità per richieste dell'ultimo minuto
+16. **Carattere**: Tratti personalità (max 3)
+17. **Lingua**: Conferma competenza italiano
+18. **Foto Profilo**: Upload immagine per profilo pubblico
+
+### User Stories
+- **Come caregiver**, voglio creare un profilo completo per essere trovato dalle famiglie giuste
+- **Come caregiver professionale**, devo confermare che fornirò documentazione certificata
+- **Come caregiver**, voglio specificare zone e disponibilità per ricevere proposte compatibili
+- **Come caregiver**, voglio evidenziare le mie competenze specifiche per distinguermi
+
+### Non-Functional Requirements
+- ✅ Flow with conditional branches (based on qualification and services)
+- ✅ Profile photo upload with preview
+- ✅ Multi-level validation (required, maxLength, custom)
+- ✅ Separate file upload handling (storage) vs data (database)
+- ✅ Automatic filters for mutually exclusive selections ("none")
 
 ---
 
-## Complete Step Sequence
+## Implementation Architecture
+
+### Technology Stack
+- **Framework**: Next.js 14 (App Router)
+- **Form Management**: React Hook Form
+- **File Upload**: Supabase Storage
+- **Validation**: Zod schema + custom validators
+- **State Management**: Zustand (user store)
+- **UI Components**: Custom + Heroicons
+- **Type Safety**: Full TypeScript
+
+### Architectural Pattern
+```
+Page Component
+    ↓
+VigilMultiStepOnboarding (wrapper)
+    ↓
+createVigilOnboardingConfig() (config factory)
+    ↓
+MultiStepOnboarding (orchestrator - generic)
+    ↓
+QuestionRenderer (question-specific rendering)
+```
+
+### File Structure
+```
+components/onboarding/
+├── multiStep/
+│   ├── MultiStepOnboarding.tsx        # Generic orchestrator
+│   ├── QuestionRenderer.tsx           # Question renderer
+│   └── vigilOnboardingConfig.ts       # Vigil config
+├── vigil/
+│   └── VigilMultiStepOnboarding.tsx   # Vigil wrapper
+└── @core/
+    └── form/                           # Reusable form components
+
+app/vigil/
+└── onboard-v2/
+    └── page.tsx                        # Entry point
+```
+
+---
+
+## Step Sequence
+
+### Complete Flow (20 Steps with 3 Branches)
+
+**Base Path**:
+1. WELCOME → 2. ADDRESS → 3. ZONES → 4. TRANSPORTATION → 5. OCCUPATION → [6?] → 7. COURSES → 8. YEARS_EXPERIENCE → 9. ABOUT → 10. DAILY_ACTIVITIES → 11. HYGIENE → 12. OUTSIDE → 13. PAST_EXP → 14. SERVICE_TYPE → 15. HOURS → 16. AVAILABILITIES → 17. URGENT → 18. CHARACTER → 19. LANGUAGES → 20. PROPIC → COMPLETE
+
+**Conditional Branches**:
+1. **After OCCUPATION**: If Professional/Nurse → step 6 (PROFESSIONAL_DOCS_INFO), otherwise skip
+2. **After HYGIENE**: If "none" selected → removes other selections
+3. **After OUTSIDE**: If "none" selected → removes other selections
+
+---
+
+## Step Sequence - Implementation Detail
 
 ### Step 1: WELCOME
 
@@ -517,7 +597,7 @@ The vigil onboarding flow collects comprehensive information about caregivers in
 
 ---
 
-## Conditional Logic
+## Conditional Logic - Branch Implementation
 
 ### 1. Occupation → Professional Docs
 
@@ -571,7 +651,7 @@ nextStep: (answers) => {
 
 ---
 
-## Data Mapping
+## Data Mapping - Transformation and Storage
 
 ### Wrapper Transformation
 
@@ -673,7 +753,7 @@ const handleComplete = async (data: Record<string, any>) => {
 20. Upload profile photo → Complete
 21. Verify redirect to completion page
 
-### Conditional Path Tests
+### Conditional Path Test Cases
 
 - [ ] Select "OTHER" occupation → verify skip to courses (no docs step)
 - [ ] Select "PROFESSIONAL" → verify docs acknowledgment shown
@@ -681,7 +761,7 @@ const handleComplete = async (data: Record<string, any>) => {
 - [ ] Check "none" in hygiene → verify other selections removed
 - [ ] Check "none" in outdoor → verify other selections removed
 
-### Validation Tests
+### Validation Test Cases
 
 - [ ] Birthday outside 18-80 range
 - [ ] Try advancing without required selections
@@ -692,7 +772,3 @@ const handleComplete = async (data: Record<string, any>) => {
 - [ ] Try completing without uploading photo
 
 ---
-
-For technical details, see [onboarding-system-reference.md](./onboarding-system-reference.md).  
-For consumer flow, see [onboarding-consumer-flow.md](./onboarding-consumer-flow.md).  
-For development guide, see [onboarding-guide.md](./onboarding-guide.md).

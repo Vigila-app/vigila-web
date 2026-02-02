@@ -1,40 +1,115 @@
 # Consumer Onboarding Flow
 
-> **Purpose**: Complete specification for the CONSUMER onboarding flow based on actual implementation. This flow helps families find caregivers by collecting information about the person needing care and their preferences.
+> **Purpose**: Complete specification for the CONSUMER onboarding flow, from functional requirements to technical implementation. For families seeking care for a loved one.
 
 ## Quick Reference
 
 **Configuration**: [components/onboarding/multiStep/consumerOnboardingConfig.ts](../../components/onboarding/multiStep/consumerOnboardingConfig.ts)  
 **Wrapper**: [components/onboarding/consumer/ConsumerMultiStepOnboarding.tsx](../../components/onboarding/consumer/ConsumerMultiStepOnboarding.tsx)  
 **Page**: [app/(consumer)/onboard-v2/page.tsx](../../app/(consumer)/onboard-v2/page.tsx)  
-**Routes**: New flow at `/onboard-v2`, old flow at `/onboard`  
-**Total Steps**: 11 (linear, no conditional branching)
+**Routes**: `/onboard-v2` (new), `/onboard` (old)  
+**Steps**: 11 linear steps, no conditional branching
 
 ---
 
 ## Table of Contents
-- [Overview](#overview)
-- [Complete Step Sequence](#complete-step-sequence)
-- [Flow Diagram](#flow-diagram)
-- [Data Mapping](#data-mapping)
-- [Testing Guide](#testing-guide)
+- [Requisiti Funzionali](#requisiti-funzionali)
+- [Architettura Implementativa](#architettura-implementativa)
+- [Sequenza Step](#sequenza-step)
+- [Mappatura Dati](#mappatura-dati)
+- [Testing](#testing)
 
 ---
 
-## Overview
+## Functional Requirements
 
-The consumer onboarding flow is a **linear 11-step process** that collects:
-1. Relationship to person needing care
-2. Basic information about the loved one (name, birthday, address)
-3. Care needs and autonomy level
-4. Caregiver preferences (gender, attitude, qualifications, transportation, dementia experience)
-5. Additional free-form information
+### Objective
+Raccogliere informazioni sulla persona che necessita assistenza e le preferenze per il caregiver ideale, per facilitare il matching con i vigil disponibili.
 
-**No conditional branching** - all users go through all 11 steps in the same order.
+### User Flow
+1. **Identificazione**: Chi ha bisogno di assistenza (me stesso, genitore, nonno, etc.)
+2. **Anagrafica**: Nome e data di nascita della persona cara
+3. **Localizzazione**: Indirizzo dove avverrà l'assistenza
+4. **Valutazione Autonomia**: Livello di autosufficienza (completa/parziale/assente)
+5. **Bisogni Primari**: Tipologie di assistenza necessarie (multiple selection)
+6. **Gender Preference**: Preference for caregiver's gender
+7. **Desired Character**: Preferred character traits in caregiver
+8. **Required Qualifications**: Need for OSS or family assistant qualification
+9. **Transportation**: Requirement for caregiver to have transportation
+10. **Specific Experience**: Request for experience with dementia/Alzheimer's
+11. **Additional Notes**: Free text field for extra information
+
+### User Stories
+- **As a family member**, I want to describe who needs care to receive personalized proposals
+- **As a family member**, I want to specify preferences for the caregiver to find the most suitable person
+- **As a family member**, I want to provide situation details to facilitate service organization
+
+### Non-Functional Requirements
+- ✅ Linear flow without branching (simple user experience)
+- ✅ Real-time validation to reduce errors
+- ✅ Ability to go back and modify answers
+- ✅ Data saved once completed (single API call)
+- ✅ Redirect to confirmation page upon completion
 
 ---
 
-## Complete Step Sequence
+## Implementation Architecture
+
+### Technology Stack
+- **Framework**: Next.js 14 (App Router)
+- **Form Management**: React Hook Form
+- **Validation**: Zod schema + custom validators
+- **State Management**: Zustand (user store)
+- **UI Components**: Custom components + Heroicons
+- **Type Safety**: Full TypeScript
+
+### Architectural Pattern
+```
+Page Component
+    ↓
+ConsumerMultiStepOnboarding (wrapper)
+    ↓
+createConsumerOnboardingConfig() (config factory)
+    ↓
+MultiStepOnboarding (orchestrator - generic)
+    ↓
+QuestionRenderer (question-specific rendering)
+```
+
+### File Structure
+```
+components/onboarding/
+├── multiStep/
+│   ├── MultiStepOnboarding.tsx          # Generic orchestrator
+│   ├── QuestionRenderer.tsx             # Question renderer
+│   └── consumerOnboardingConfig.ts      # Consumer config
+├── consumer/
+│   └── ConsumerMultiStepOnboarding.tsx  # Consumer wrapper
+└── @core/
+    └── form/                             # Reusable form components
+
+app/(consumer)/
+└── onboard-v2/
+    └── page.tsx                          # Entry point
+```
+
+---
+
+## Sequenza Step
+
+### Flusso Completo (11 Steps)
+
+1. **RELATIONSHIP** → 2. **NAME-BIRTHDAY** → 3. **ADDRESS** → 4. **AUTONOMY** → 5. **NEEDS** → 6. **GENDER_PREFERENCE** → 7. **ATTITUDE** → 8. **QUALIFICATIONS** → 9. **TRANSPORTATION** → 10. **EXPERIENCE** → 11. **INFO** → **COMPLETE**
+
+**Caratteristiche**:
+- Flusso completamente lineare
+- Nessuna ramificazione condizionale
+- Tutti gli utenti completano gli stessi 11 step
+- Progress bar mostra "Step X di 11"
+
+---
+
+## Implemented Steps Detail
 
 ### Step 1: RELATIONSHIP
 
@@ -413,9 +488,9 @@ const handleComplete = async (data: Record<string, any>) => {
 
 ---
 
-## Testing Guide
+## Testing
 
-### Functional Test Path
+### Piano di Test Funzionale
 
 1. Select "Mamma/Papà" → Next
 2. Enter "Maria Rossi", select birthday (1945-01-01) → Next
@@ -431,7 +506,7 @@ const handleComplete = async (data: Record<string, any>) => {
 12. Verify redirect to completion page
 13. Check database for saved data
 
-### Validation Test Cases
+### Test Cases di Validazione
 
 - [ ] Try empty required fields in each step
 - [ ] Try birthday outside 18-80 range
@@ -442,6 +517,3 @@ const handleComplete = async (data: Record<string, any>) => {
 
 ---
 
-For technical details, see [onboarding-system-reference.md](./onboarding-system-reference.md).  
-For vigil flow, see [onboarding-vigil-flow.md](./onboarding-vigil-flow.md).  
-For development guide, see [onboarding-guide.md](./onboarding-guide.md).
