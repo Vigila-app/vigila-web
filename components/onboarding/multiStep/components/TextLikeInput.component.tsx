@@ -1,5 +1,5 @@
 import { Input, TextArea } from "@/components/form"
-import { getInputType } from "../questionType.utils"
+import { getInputType } from "@/src/utils/questionType.utils"
 import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
 
 export const TextLikeInput = ({

@@ -60,7 +60,7 @@ export const createConsumerOnboardingConfig = (
         {
           id: "lovedOneName",
           type: QuestionType.TEXT,
-          label: "Nome della persona cara",
+          label: "Nome e Cognome della persona cara",
           placeholder: "Es. Giovanni Bianchi",
           validation: {
             required: true,

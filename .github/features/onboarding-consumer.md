@@ -6,8 +6,8 @@
 
 **Configuration**: [components/onboarding/multiStep/consumerOnboardingConfig.ts](../../components/onboarding/multiStep/consumerOnboardingConfig.ts)  
 **Wrapper**: [components/onboarding/consumer/ConsumerMultiStepOnboarding.tsx](../../components/onboarding/consumer/ConsumerMultiStepOnboarding.tsx)  
-**Page**: [app/(consumer)/onboard-v2/page.tsx](../../app/(consumer)/onboard-v2/page.tsx)  
-**Routes**: `/onboard-v2` (new), `/onboard` (old)  
+**Page**: [app/(consumer)/onboard/page.tsx](../../app/(consumer)/onboard/page.tsx)  
+**Routes**: `/onboard`  
 **Steps**: 11 linear steps, no conditional branching
 
 ---
@@ -89,7 +89,7 @@ components/onboarding/
     └── form/                             # Reusable form components
 
 app/(consumer)/
-└── onboard-v2/
+└── onboard/
     └── page.tsx                          # Entry point
 ```
 

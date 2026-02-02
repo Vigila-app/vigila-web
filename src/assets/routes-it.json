@@ -91,7 +91,7 @@
     "roles": []
   },
   "onBoard": {
-    "url": "/onboard-v2",
+    "url": "/onboard",
     "label": "onboard",
     "title": "onboard",
     "menu": {
@@ -106,7 +106,7 @@
     ]
   },
   "onBoardVigil": {
-    "url": "/vigil/onboard-v2",
+    "url": "/vigil/onboard",
     "label": "onboard",
     "title": "onboard",
     "menu": {
@@ -121,7 +121,7 @@
     ]
   },
   "onBoardVigilComplete": {
-    "url": "/vigil/onboard-v2/complete",
+    "url": "/vigil/onboard/complete",
     "label": "Registrazione completata",
     "title": "Registrazione completata",
     "menu": {
@@ -136,7 +136,7 @@
     ]
   },
    "onBoardConsumerComplete": {
-    "url": "/onboard-v2/complete",
+    "url": "/onboard/complete",
     "label": "Registrazione completata",
     "title": "Registrazione completata",
     "menu": {

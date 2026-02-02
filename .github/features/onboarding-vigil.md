@@ -6,8 +6,8 @@
 
 **Configuration**: [components/onboarding/multiStep/vigilOnboardingConfig.ts](../../components/onboarding/multiStep/vigilOnboardingConfig.ts)  
 **Wrapper**: [components/onboarding/vigil/VigilMultiStepOnboarding.tsx](../../components/onboarding/vigil/VigilMultiStepOnboarding.tsx)  
-**Page**: [app/vigil/onboard-v2/page.tsx](../../app/vigil/onboard-v2/page.tsx)  
-**Routes**: `/vigil/onboard-v2` (new), `/vigil/onboard` (old)  
+**Page**: [app/vigil/onboard/page.tsx](../../app/vigil/onboard/page.tsx)  
+**Routes**: `/vigil/onboard`  
 **Steps**: 20 steps with 3 conditional branches
 
 ---
@@ -99,7 +99,7 @@ components/onboarding/
     └── form/                           # Reusable form components
 
 app/vigil/
-└── onboard-v2/
+└── onboard/
     └── page.tsx                        # Entry point
 ```
 

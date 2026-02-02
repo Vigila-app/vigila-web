@@ -47,7 +47,6 @@ Tree-based onboarding system supporting multi-role flows (CONSUMER, VIGIL) throu
 - **Configuration-driven**: Flows defined in config files, not hardcoded
 - **Conditional Routing**: Next step determined by user answers (question-level or step-level)
 - **Single Submission**: All data collected and sent in one API call
-- **Progressive Migration**: New system coexists with old (`/onboard-v2` vs `/onboard`)
 - **Type-safe**: Full TypeScript coverage with comprehensive type definitions
 
 ### Architectural Principles
@@ -665,7 +664,7 @@ vigils.displayName
 
 #### Consumer Onboarding
 ```tsx
-// app/(consumer)/onboard-v2/page.tsx
+// app/(consumer)/onboard/page.tsx
 import ConsumerMultiStepOnboarding from "@/components/onboarding/consumer/ConsumerMultiStepOnboarding";
 
 export default function ConsumerOnboardPage() {
@@ -673,13 +672,11 @@ export default function ConsumerOnboardPage() {
 }
 ```
 
-**Routes**:
-- New flow: `/onboard-v2`
-- Old flow: `/onboard` (still active)
+**Routes**: `/onboard`
 
 #### Vigil Onboarding
 ```tsx
-// app/vigil/onboard-v2/page.tsx
+// app/vigil/onboard/page.tsx
 import VigilMultiStepOnboarding from "@/components/onboarding/vigil/VigilMultiStepOnboarding";
 
 export default function VigilOnboardPage() {
@@ -687,9 +684,7 @@ export default function VigilOnboardPage() {
 }
 ```
 
-**Routes**:
-- New flow: `/vigil/onboard-v2`
-- Old flow: `/vigil/onboard` (still active)
+**Routes**: `/vigil/onboard`
 
 ---
 
@@ -1118,16 +1113,12 @@ describe("MultiStepOnboarding", () => {
 ## Migration Strategy
 
 ### Coexistence Pattern
-New system runs alongside old at different routes:
+New system is now the standard implementation:
 
 ```
-OLD ROUTES (still active):
+STANDARD ROUTES:
 - /onboard (consumer)
 - /vigil/onboard (vigil)
-
-NEW ROUTES (multi-step):
-- /onboard-v2 (consumer)
-- /vigil/onboard-v2 (vigil)
 ```
 
 ### Gradual Migration Steps
@@ -1148,15 +1139,7 @@ NEW ROUTES (multi-step):
 - Redirect old routes to new routes
 - Keep old flow accessible via query param for fallback
 
-```typescript
-// Redirect old to new
-// app/onboard/page.tsx
-import { redirect } from "next/navigation";
 
-export default function OldOnboard() {
-  redirect("/onboard-v2");
-}
-```
 
 #### Phase 4: Deprecation
 - Remove old onboarding components
