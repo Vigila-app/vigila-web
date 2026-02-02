@@ -5,6 +5,7 @@ import { ArrowLeftIcon, CheckIcon, FaceSmileIcon } from "@heroicons/react/24/out
 import { ButtonLink, Logo } from "@/components";
 import { Routes } from "@/src/routes";
 import { Poppins } from "next/font/google"
+import clsx from "clsx";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600"],
@@ -13,7 +14,7 @@ const poppins = Poppins({
 export default function VigilOnboardingCompletePage() {
   return (
     <section
-      className={"min-h-[calc(100vh-4rem)] bg-gray-50 " + poppins.className}
+      className={clsx("min-h-[calc(100vh-4rem)] bg-gray-50", poppins.className)}
     >
       <div className="mx-auto w-full max-w-screen-sm px-4 py-8">
         <div className="flex items-center justify-between">

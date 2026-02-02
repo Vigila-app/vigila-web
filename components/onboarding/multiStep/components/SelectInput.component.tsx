@@ -1,5 +1,5 @@
 import { Input, Select } from "@/components/form"
-import { getInputType } from "../utils"
+import { getInputType } from "../questionType.utils"
 import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
 import clsx from "clsx"
 import { RolesEnum } from "@/src/enums/roles.enums"

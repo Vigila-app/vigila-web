@@ -39,14 +39,3 @@ export enum CurrencyEnum {
   GB_POUND = "£",
 }
 
-// export enum OccupationEnum {
-//   STUDENT = "studente",
-//   UNEMPLOYED = "disoccupato",
-//   OSA = "osa",
-//   OSS = "oss",
-//   NURSE = "infermiere",
-//   EMPLOYEE = "impiegato",
-//   PART_TIME_EMPLOYEE = "impiegato-part-time",
-//   FAMILY_CAREGIVER = "assistente-familiare",
-//   OTHER = "altro",
-// }

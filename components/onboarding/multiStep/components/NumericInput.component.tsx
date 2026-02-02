@@ -1,5 +1,5 @@
 import { Input } from "@/components/form"
-import { getInputType } from "../utils"
+import { getInputType } from "../questionType.utils"
 import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
 
 export const NumericInput = ({
