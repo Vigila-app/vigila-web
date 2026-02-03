@@ -41,8 +41,6 @@ export async function POST(
       });
     }
 
-    const table =
-      role.toUpperCase() === RolesEnum.CONSUMER ? "consumers" : "vigils";
     const _admin = getAdminClient();
 
     if (role.toUpperCase() === RolesEnum.VIGIL) {
@@ -142,12 +140,12 @@ export async function POST(
         ConsumerAnagraficaKeys.has(key),
       ),
     );
-const consumerExtraData = Object.fromEntries(
+    const consumerExtraData = Object.fromEntries(
       Object.entries(onBoardUser).filter(
         ([key]) => !ConsumerAnagraficaKeys.has(key),
       ),
     );
-    console.log("EXTRA DATA ",consumerExtraData);
+    console.log("EXTRA DATA ", consumerExtraData);
     const { data, error } = await _admin
       .from("consumers")
       .update({
@@ -161,7 +159,7 @@ const consumerExtraData = Object.fromEntries(
     if (error || !data)
       throw error || new Error("No data returned from update");
 
-    if( Object.keys(consumerExtraData).length > 0) {
+    if (Object.keys(consumerExtraData).length > 0) {
       const { error: consumerDataError } = await _admin
         .from("consumers_data")
         .upsert(
