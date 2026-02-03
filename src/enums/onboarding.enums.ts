@@ -26,6 +26,7 @@ export enum VigilZoneEnum {
 }
 
 export const VigilZoneLabels: Record<VigilZoneEnum, string> = {
+  //TODO: sostiuire con soluzione piu scalabile
   [VigilZoneEnum.CENTRO_STORICO]: "Centro Storico",
   [VigilZoneEnum.VOMERO]: "Vomero",
   [VigilZoneEnum.CHIAIA]: "Chiaia",
@@ -64,7 +65,7 @@ export enum VigilOccupationEnum {
   NURSE = "infermiere",
   FAMILY_CAREGIVER = "assistente-familiare",
   COMPANY = "compagnia-e-supporto",
-  OTHER="altro",
+  OTHER = "altro",
 }
 
 export const VigilOccupationLabels: Record<VigilOccupationEnum, string> = {
@@ -72,7 +73,8 @@ export const VigilOccupationLabels: Record<VigilOccupationEnum, string> = {
   [VigilOccupationEnum.PROFESSIONAL]: "OSS/OTA/OSA",
   [VigilOccupationEnum.NURSE]: "Infermiere",
   [VigilOccupationEnum.FAMILY_CAREGIVER]: "Assistente familiare a ore",
-  [VigilOccupationEnum.COMPANY]: "Operatore/trice per compagnia e supporto leggero",
+  [VigilOccupationEnum.COMPANY]:
+    "Operatore/trice per compagnia e supporto leggero",
   [VigilOccupationEnum.OTHER]: "Altro",
 }
 
@@ -80,19 +82,18 @@ export enum VigilDocRequirementEnum {
   ACCEPTED = "accepted",
 }
 
-
 export enum VigilExperienceYearsEnum {
-  LT_1 = "lt_1",
-  GTE_1_LT_3 = "1-3_yrs",
-  GTE_3_LT_5 = "3-5_yrs",
-  GTE_5 = "gte_5",
+  LESS_THAN_1_YEAR = "lt_1",
+  ONE_TO_THREE_YEARS = "1-3_yrs",
+  THREE_TO_FIVE_YEARS = "3-5_yrs",
+  FIVE_PLUS_YEARS = "gte_5",
 }
 
 export const VigilExperienceLabels = {
-  [VigilExperienceYearsEnum.LT_1]: "< 1 anno",
-  [VigilExperienceYearsEnum.GTE_1_LT_3]: "1-3 anni",
-  [VigilExperienceYearsEnum.GTE_3_LT_5]: "3-5 anni",
-  [VigilExperienceYearsEnum.GTE_5]: "5+ anni",
+  [VigilExperienceYearsEnum.LESS_THAN_1_YEAR]: "< 1 anno",
+  [VigilExperienceYearsEnum.ONE_TO_THREE_YEARS]: "1-3 anni",
+  [VigilExperienceYearsEnum.THREE_TO_FIVE_YEARS]: "3-5 anni",
+  [VigilExperienceYearsEnum.FIVE_PLUS_YEARS]: "5+ anni",
 }
 
 export enum VigilDailyServiceEnum {
@@ -132,7 +133,10 @@ export enum VigilHygieneServiceEnum {
   NONE = "none",
 }
 
-export const VigilHygieneServiceLabels: Record<VigilHygieneServiceEnum, string> = {
+export const VigilHygieneServiceLabels: Record<
+  VigilHygieneServiceEnum,
+  string
+> = {
   [VigilHygieneServiceEnum.BATHROOM_HELP]: "Aiuto in bagno (lavarsi, vestirsi)",
   [VigilHygieneServiceEnum.BED_HELP]: "Igiene a letto",
   [VigilHygieneServiceEnum.DIAPER_HELP]: "Cambio pannolone",
@@ -149,8 +153,6 @@ export const VigilHygieneServiceIcons: Record<
   [VigilHygieneServiceEnum.NONE]: XCircleIcon,
 }
 
-
-
 export enum VigilOutdoorServiceEnum {
   WALKS = "walks",
   GROCERIES = "groceries",
@@ -159,7 +161,10 @@ export enum VigilOutdoorServiceEnum {
   NONE = "none",
 }
 
-export const VigilOutdoorServiceLabels: Record<VigilOutdoorServiceEnum, string> = {
+export const VigilOutdoorServiceLabels: Record<
+  VigilOutdoorServiceEnum,
+  string
+> = {
   [VigilOutdoorServiceEnum.WALKS]: "Passeggiate",
   [VigilOutdoorServiceEnum.GROCERIES]: "Spesa al supermercato",
   [VigilOutdoorServiceEnum.DOCTOR_APPS]: "Visite mediche / esami",
@@ -189,7 +194,10 @@ export enum VigilPastExperienceEnum {
   NONE = "none",
 }
 
-export const VigilPastExperienceLabels: Record<VigilPastExperienceEnum, string> = {
+export const VigilPastExperienceLabels: Record<
+  VigilPastExperienceEnum,
+  string
+> = {
   [VigilPastExperienceEnum.SELFSUFFICIENT]: "Anziani autosufficienti",
   [VigilPastExperienceEnum.REDUCED_MOBILITY]: "Anziani con mobilità ridotta",
   [VigilPastExperienceEnum.WHEELCHAIR]: "Anziani con carrozzina",
@@ -215,17 +223,20 @@ export const VigilServiceTypeLabels: Record<VigilServiceTypeEnum, string> = {
 }
 
 export enum VigilTimeCommitmentEnum {
-  LTE_10 = "lte_10",
-  GT_10_LT_20 = "gt_10_lt_20",
-  GT_20_LT_30 = "gt_20_lt_30",
-  GT_30 = "gt_30",
+  UP_TO_10_HOURS = "lte_10",
+  TEN_TO_TWENTY_HOURS = "gt_10_lt_20",
+  TWENTY_TO_THIRTY_HOURS = "gt_20_lt_30",
+  THIRTY_PLUS_HOURS = "gt_30",
 }
 
-export const VigilTimeCommitmentLabels: Record<VigilTimeCommitmentEnum, string> = {
-  [VigilTimeCommitmentEnum.LTE_10]: "Fino a 10 ore",
-  [VigilTimeCommitmentEnum.GT_10_LT_20]: "10-20 ore",
-  [VigilTimeCommitmentEnum.GT_20_LT_30]: "20-30 ore",
-  [VigilTimeCommitmentEnum.GT_30]: "30+ ore",
+export const VigilTimeCommitmentLabels: Record<
+  VigilTimeCommitmentEnum,
+  string
+> = {
+  [VigilTimeCommitmentEnum.UP_TO_10_HOURS]: "Fino a 10 ore",
+  [VigilTimeCommitmentEnum.TEN_TO_TWENTY_HOURS]: "10-20 ore",
+  [VigilTimeCommitmentEnum.TWENTY_TO_THIRTY_HOURS]: "20-30 ore",
+  [VigilTimeCommitmentEnum.THIRTY_PLUS_HOURS]: "30+ ore",
 }
 
 
