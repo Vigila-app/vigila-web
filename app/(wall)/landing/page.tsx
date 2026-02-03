@@ -11,6 +11,7 @@ import {
   LandingFAQ,
   LandingImageSlider,
   LandingGetInTouch,
+  LandingCostEstimator,
 } from "@/components/landing";
 // import Footer from "@/components/footer/footer";
 import {
@@ -211,6 +212,21 @@ export default function LandingPage() {
         sectionTitle="Vigila in Numeri"
         sectionSubtitle="La fiducia della nostra community ci guida ogni giorno"
         stats={stats}
+      />
+
+      <LandingCostEstimator
+        sectionTitle="Calcola il Tuo Costo Mensile"
+        sectionSubtitle="Scopri quanto potresti spendere per l'assistenza di cui hai bisogno"
+        minHours={8}
+        maxHours={160}
+        defaultHours={40}
+        hourlyRate={9}
+        benefits={[
+          "Assistenti verificati e qualificati",
+          "Pagamento sicuro tramite piattaforma",
+          "Supporto clienti dedicato 7/7",
+          "Possibilità di modificare le prenotazioni",
+        ]}
       />
 
       <LandingTestimonials

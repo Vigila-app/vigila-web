@@ -176,6 +176,28 @@ Contact form with name, email, phone, and message fields.
 />
 ```
 
+### LandingCostEstimator
+Interactive cost calculator with slider to estimate monthly costs based on hours needed.
+
+```tsx
+<LandingCostEstimator
+  sectionTitle="Calcola il Tuo Costo Mensile"
+  sectionSubtitle="Scopri quanto potresti spendere"
+  minHours={8}
+  maxHours={160}
+  defaultHours={40}
+  hourlyRate={9}
+  benefits={[
+    "Assistenti verificati e qualificati",
+    "Pagamento sicuro tramite piattaforma",
+    "Supporto clienti dedicato",
+    "Possibilità di modificare le prenotazioni"
+  ]}
+  showBenefits={true}
+  bgColor="bg-white"
+/>
+```
+
 ## Styling
 
 All components use:
@@ -198,7 +220,8 @@ import {
   LandingCTA,
   LandingFAQ,
   LandingImageSlider,
-  LandingGetInTouch
+  LandingGetInTouch,
+  LandingCostEstimator
 } from "@/components/landing";
 ```
 
