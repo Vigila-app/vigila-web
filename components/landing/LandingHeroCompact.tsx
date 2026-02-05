@@ -103,7 +103,7 @@ const LandingHeroCompact = ({
           alt={imageAlt}
           width={300}
           height={300}
-          className="object-cover w-full"
+          className="object-cover w-full flex-1"
           priority
         />
       </div>
