@@ -73,7 +73,7 @@ Extension table for consumer onboarding information.
 * `needs` (text[], variable-length multidimensional array)
 * `gender-preference` (text)
 * `attitude` (text[], variable-length multidimensional array)
-* `qualificatios` (text)
+* `qualifications` (text)
 * `transportation` (text)
 * `experience` (text)
 
