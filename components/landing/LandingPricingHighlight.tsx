@@ -12,6 +12,7 @@ export type PricingHighlightItem = {
 };
 
 export type LandingPricingHighlightProps = {
+  label?: string;
   title: string;
   subtitle?: string;
   buttonLabel: string;
@@ -26,7 +27,14 @@ const colorMap: Record<PricingHighlightItem["accentColor"], string> = {
   teal: "bg-[#1abc9c]",
 };
 
+const iconBgMap: Record<PricingHighlightItem["accentColor"], string> = {
+  orange: "bg-[#ffe9df] text-[#f26b4f]",
+  blue: "bg-[#e4f8ff] text-[#00b7df]",
+  teal: "bg-[#e3f7f3] text-[#1abc9c]",
+};
+
 const LandingPricingHighlight = ({
+  label,
   title,
   subtitle,
   buttonLabel,
@@ -41,7 +49,8 @@ const LandingPricingHighlight = ({
         className
       )}>
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="text-lg font-bold sm:text-xl">{title}</h2>
+        {label && <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">{label}</p>}
+        <h2 className="text-xl font-bold sm:text-2xl">{title}</h2>
         {subtitle && <p className="mt-2 text-sm text-white/90">{subtitle}</p>}
         <Link
           href={buttonHref}
@@ -50,17 +59,18 @@ const LandingPricingHighlight = ({
         </Link>
       </div>
 
-      <div className="mx-auto mt-6 grid max-w-3xl gap-3 sm:grid-cols-3">
+      <div className="mx-auto mt-8 flex max-w-3xl flex-col gap-4">
         {highlights.map((item) => (
           <div
             key={item.title}
-            className="flex flex-col gap-2 rounded-2xl bg-white p-4 text-left shadow">
-            <div className="flex items-center justify-between">
+            className="flex flex-col items-center gap-3 rounded-2xl bg-white p-5 text-center shadow"
+          >
+            <div className={clsx("mx-auto flex h-12 w-12 items-center justify-center rounded-full", iconBgMap[item.accentColor])}>
               <span className="text-xl">{item.icon}</span>
-              <span className={clsx("h-2 w-2 rounded-full", colorMap[item.accentColor])} />
             </div>
             <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
             <p className="text-xs leading-relaxed text-gray-600">{item.description}</p>
+            <span className={clsx("mx-auto h-2 w-2 rounded-full", colorMap[item.accentColor])} />
           </div>
         ))}
       </div>

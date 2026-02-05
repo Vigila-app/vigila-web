@@ -23,10 +23,10 @@ const LandingFaqCompact = ({ label, title, subtitle, faqs, className }: LandingF
   return (
     <section className={clsx("px-4 py-12", className)}>
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6 text-left">
+        <div className="mb-6 text-center">
           {label && <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">{label}</p>}
           <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
-          {subtitle && <p className="mt-2 max-w-xl text-sm text-white/90">{subtitle}</p>}
+          {subtitle && <p className="mt-2 text-sm text-white/90">{subtitle}</p>}
         </div>
 
         <div className="space-y-3">

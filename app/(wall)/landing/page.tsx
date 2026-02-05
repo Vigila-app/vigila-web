@@ -2,18 +2,24 @@
 
 import Link from "next/link";
 import {
+  CalendarDaysIcon,
+  CheckBadgeIcon,
+  ArrowPathIcon,
   CurrencyEuroIcon,
+  CreditCardIcon,
+  EyeIcon,
+  DocumentTextIcon,
   HomeIcon,
   PhoneIcon,
+  BoltIcon,
   ShieldCheckIcon,
-  UserIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import {
   LandingAccessGrid,
   LandingFaqCompact,
   LandingFinalCTA,
   LandingFooterAlt,
-  LandingHeaderBar,
   LandingHeroCompact,
   LandingPricingHighlight,
   LandingServiceStack,
@@ -39,17 +45,33 @@ const trustBadges = [
 
 const services = [
   {
-    badge: "A partire da 9€/h",
     title: "Compagnia e supervisione",
-    description:
-      "Supporto emotivo e presenza attiva per garantire benessere e sicurezza quotidiana.",
+    description: "Un Vigil presente per compagnia, ascolto e supervisione quotidiana.",
     image: "/assets/home_banner.png",
   },
   {
-    badge: "A partire da 10€/h",
     title: "Supporto fisico e strutturato",
-    description:
-      "Assistenza pratica per attività quotidiane, mobilità e gestione della routine.",
+    description: "Aiuto nelle attività quotidiane e nella mobilità in sicurezza.",
+    image: "/assets/home_banner.png",
+  },
+  {
+    title: "Cura degli spazi domestici",
+    description: "Piccole attività domestiche per mantenere l'ambiente in ordine e sereno.",
+    image: "/assets/home_banner.png",
+  },
+  {
+    title: "Accompagnamento visite",
+    description: "Supporto negli spostamenti e nelle visite mediche, con aggiornamenti puntuali.",
+    image: "/assets/home_banner.png",
+  },
+  {
+    title: "Monitoraggio e sicurezza",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    image: "/assets/home_banner.png",
+  },
+  {
+    title: "Supporto emotivo dedicato",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     image: "/assets/home_banner.png",
   },
 ];
@@ -58,8 +80,7 @@ const accessFeatures = [
   {
     icon: <span className="text-lg">🎯</span>,
     title: "Assegnazione intelligente",
-    description:
-      "Il sistema ti indica da subito la persona più adatta alle esigenze della persona da assistere.",
+    description: "Il sistema ti indica da subito il Vigil più adatto alle esigenze.",
   },
   {
     icon: <span className="text-lg">✓</span>,
@@ -88,78 +109,85 @@ const pricingHighlights = [
     title: "Flessibile",
     description: "Scegli tu le ore, la frequenza e il Vigil più adatto.",
     accentColor: "orange" as const,
-    icon: <span>🔄</span>,
+    icon: <ArrowPathIcon className="h-5 w-5 text-consumer-blue" />,
   },
   {
     title: "Trasparente",
     description: "Sai sempre quanto spendi, senza sorprese né vincoli.",
     accentColor: "blue" as const,
-    icon: <span>👁️</span>,
+    icon: <EyeIcon className="h-5 w-5 text-vigil-orange" />,
   },
   {
     title: "Immediato",
     description: "Calcolo reale delle ore richieste e del costo.",
     accentColor: "teal" as const,
-    icon: <span>⚡</span>,
+    icon: <BoltIcon className="h-5 w-5 text-consumer-blue" />,
   },
 ];
 
 const steps = [
   {
+    icon: <DocumentTextIcon className="h-5 w-5" />,
+    tone: "blue" as const,
     title: "Compila il questionario",
-    description: "Rispondi a domande pre compilate in 3 minuti.",
+    description: "3 minuti per raccontarci bisogni e orari di assistenza.",
   },
   {
+    icon: <CalendarDaysIcon className="h-5 w-5" />,
+    tone: "blue" as const,
     title: "Programma l'assistenza",
-    description:
-      "Indica giorni, orari e frequenza (settimanale, trisettimanale, quotidiana o H24).",
+    description: "Puoi fare prove: trisettimanale, quotidiana o 24/7, lo scegli tu.",
   },
   {
+    icon: <UsersIcon className="h-5 w-5" />,
+    tone: "blue" as const,
     title: "Scegli i tuoi Vigil",
-    description: "Scegli tra i Vigil proposti dal sistema.",
+    description: "Il sistema ti indica i profili migliori per te, puoi selezionarli.",
   },
   {
+    icon: <CheckBadgeIcon className="h-5 w-5" />,
+    tone: "orange" as const,
     title: "Attendi conferma",
-    description: "Calcolo automatico e assegnazione.",
+    description: "Calcolo automatico del preventivo e assegnazione del Vigil.",
   },
   {
+    icon: <CreditCardIcon className="h-5 w-5" />,
+    tone: "orange" as const,
     title: "Paga in sicurezza",
-    description: "Pagamento sicuro in app o con carta.",
+    description: "Vedi il prezzo subito e paghi solo quando confermi.",
   },
   {
+    icon: <PhoneIcon className="h-5 w-5" />,
+    tone: "orange" as const,
     title: "Inizia con il Vigil",
-    description: "Ti affidi a personale qualificato e verificato.",
+    description: "Match automatizzato e rapido, inizi quando ne hai bisogno.",
   },
 ];
 
 const faqs = [
   {
-    question: "Come vengono scelti i Vigil?",
-    answer:
-      "Sono selezionati tramite questionario, colloquio e verifica delle competenze prima di entrare in servizio.",
+    question: "Cos'è Vigila?",
+    answer: "È la piattaforma digitale per trovare e gestire l'assistenza domiciliare con Vigil verificati.",
   },
   {
-    question: "Come avviene un imprevisto?",
-    answer:
-      "In caso di imprevisto il sistema ti propone subito un sostituto disponibile con le stesse competenze.",
+    question: "Chi sono i Vigil?",
+    answer: "Operatori selezionati, formati e verificati prima di iniziare a lavorare con te.",
   },
   {
-    question: "Posso avere più assistenti?",
-    answer: "Sì, puoi configurare più assistenti per coprire turni o esigenze diverse.",
+    question: "Posso cambiare Vigil se non mi trovo bene?",
+    answer: "Sì, puoi richiedere un cambio direttamente dall'app in qualsiasi momento.",
   },
   {
-    question: "Posso chiedere un cambio Vigil?",
-    answer: "Puoi cambiare Vigil in qualsiasi momento direttamente dall'app.",
+    question: "Come funziona il pagamento?",
+    answer: "Paghi in modo tracciato e sicuro dall'app, senza costi nascosti né vincoli.",
   },
   {
-    question: "Qual è il costo del servizio?",
-    answer:
-      "Il costo parte da 9€/h per la compagnia e 10€/h per il supporto strutturato. Calcola il preventivo personalizzato.",
+    question: "Quanto tempo serve per attivare il servizio?",
+    answer: "Bastano pochi minuti: questionario, scelta dei Vigil e conferma del preventivo.",
   },
   {
-    question: "Voi vi occupate dei pagamenti?",
-    answer:
-      "Sì, i pagamenti sono gestiti e tracciati dalla piattaforma per darti sicurezza e trasparenza.",
+    question: "Posso sospendere il servizio?",
+    answer: "Puoi sospendere o disdire quando vuoi, senza penali.",
   },
 ];
 
@@ -183,25 +211,6 @@ const socialLinks = [
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-white">
-      <LandingHeaderBar
-        logoSrc="/assets/logo.png"
-        badgeLabel="ACCE"
-        actions={[
-          {
-            label: "Accedi",
-            href: "/login",
-            variant: "secondary",
-            icon: <UserIcon className="h-4 w-4" />,
-          },
-          {
-            label: "Richiedi aiuto",
-            href: "/signup",
-            variant: "primary",
-            icon: <PhoneIcon className="h-4 w-4" />,
-          },
-        ]}
-      />
-
       <LandingHeroCompact
         headline={
           <>
@@ -224,18 +233,12 @@ export default function LandingPage() {
           variant: "secondary",
         }}
         trustBadges={trustBadges}
-        appointmentCTA={{
-          label: "Prenota una call",
-          href: "/signup",
-          helper: "Prenota un appuntamento per la tua assistenza",
-          icon: <PhoneIcon className="h-4 w-4" />,
-        }}
         imageSrc="/assets/home_banner.png"
         imageAlt="Famiglia assistita"
         pressLogos={pressLogos}
       />
 
-      <section className="bg-white px-4 pb-12 pt-6">
+      <section className="bg-white px-4 pb-16 pt-10">
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="text-lg font-bold text-gray-900 sm:text-xl">
             I servizi offerti dai
@@ -246,21 +249,23 @@ export default function LandingPage() {
             Fidati dei nostri Vigil. Sono stati formati e selezionati per garantire sempre la serenità.
           </p>
         </div>
-        <LandingServiceStack services={services} cardHeight={320} className="mt-8" />
+        <LandingServiceStack services={services} cardHeight={340} className="mt-12" />
       </section>
 
       <LandingAccessGrid
-        label="Pricing e preventivo"
+        label="Perché scegliere Vigila"
+        labelColor="orange"
         title={`Con Vigila hai <br /> accesso a`}
-        subtitle="Tutto ciò che ti serve per gestire l'utente in modo semplice."
+        subtitle="Tutto ciò che ti serve per gestire l'assistenza in modo semplice."
         features={accessFeatures}
         className="bg-gradient-to-b from-consumer-light-blue/60 to-white"
       />
 
       <LandingPricingHighlight
+        label="Calcola il tuo preventivo"
         title={`Scopri quanto costa il servizio`}
-        subtitle="Calcola il preventivo personalizzato. Scegli il pacchetto che fa per te. Costo trasparente, senza vincoli, senza imprevisti."
-        buttonLabel="Richiedi preventivo"
+        subtitle="Preventivo personalizzato, senza vincoli e con costi trasparenti."
+        buttonLabel="Calcola il preventivo"
         buttonHref="/signup"
         highlights={pricingHighlights}
       />
@@ -268,7 +273,7 @@ export default function LandingPage() {
       <LandingVerticalSteps
         label="Semplice e veloce"
         title="Come funziona Vigila"
-        subtitle="In pochi passaggi ti aiuta a scegliere la soluzione migliore per i tuoi cari."
+        subtitle="In pochi passaggi scegli la soluzione migliore per chi ami."
         steps={steps}
         className="bg-gradient-to-b from-white via-consumer-light-blue/20 to-white"
       />
@@ -278,30 +283,33 @@ export default function LandingPage() {
           href="/signup"
           className="inline-flex items-center justify-center rounded-full bg-vigil-orange px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
         >
-          Richiedi un preventivo
+          Prenota e hai accesso
         </Link>
         <p className="mt-2 text-xs text-gray-500">
-          Hai bisogno di assistenza continuativa? Richiedi un piano assistenziale personalizzato.
+          Hai bisogno di assistenza continuativa? Richiedi un piano personalizzato.
         </p>
       </div>
 
-      <section className="bg-gradient-to-b from-[#f26b4f] via-white to-[#00b7df]">
+      <section className="bg-gradient-to-b from-[#ffe7de] via-white to-[#e6f7ff]">
         <LandingFaqCompact
-          label="Rispondiamo in chat"
+          label="Consultaci ogni volta"
           title="Hai delle domande?"
-          subtitle="Ecco le domande più frequenti sul servizio e come funziona."
+          subtitle="Trovi le risposte più frequenti sul servizio e su come funziona."
           faqs={faqs}
           className="text-white"
         />
         <LandingFinalCTA
           headline={`Con Vigila<br />finalmente non<br />devi risolvere<br />tutto da solo`}
-          description="Con un team di esperti che si occupa di tutte le fasi e grazie all'app assistenziale per gestire da remoto familiari a cui dare supporto."
-          bullets={["A partire da 9€ l'ora", "Disdici quando vuoi"]}
+          description="Con un team di esperti che si occupa di tutte le fasi e l'app assistenziale per gestire da remoto chi ami."
+          bullets={[
+            { text: "A partire da 9€ l'ora", icon: "✓" },
+            { text: "Disdici quando vuoi", icon: "✓" },
+          ]}
           primaryLabel="Avvia la prova"
           primaryHref="/signup"
           secondaryLabel="Diventa un Vigil"
           secondaryHref="/vigil/signup"
-          helper="Prova gratis e subito il servizio"
+          helper="Se non hai bisogno dell'assistenza puoi disdire, avrai report e supporto dedicato."
           className="pt-0"
         />
       </section>

@@ -43,7 +43,6 @@ const LandingHeroCompact = ({
   primaryCTA,
   secondaryCTA,
   trustBadges,
-  appointmentCTA,
   imageSrc,
   imageAlt = "Hero",
   pressLogos,
@@ -78,28 +77,14 @@ const LandingHeroCompact = ({
             {renderCTA(secondaryCTA)}
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600 lg:justify-start">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-700 lg:justify-start">
             {trustBadges.map((badge) => (
-              <span key={badge.label} className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm">
+              <span key={badge.label} className="inline-flex items-center gap-2 font-semibold">
                 {badge.icon}
-                <span className="font-semibold">{badge.label}</span>
+                <span>{badge.label}</span>
               </span>
             ))}
           </div>
-
-          {appointmentCTA && (
-            <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row lg:items-center lg:justify-start">
-              <Link
-                href={appointmentCTA.href}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-consumer-blue px-4 py-2 text-xs font-semibold text-white shadow hover:bg-consumer-light-blue">
-                {appointmentCTA.icon}
-                <span>{appointmentCTA.label}</span>
-              </Link>
-              {appointmentCTA.helper && (
-                <p className="text-[11px] text-gray-600">{appointmentCTA.helper}</p>
-              )}
-            </div>
-          )}
         </div>
 
         <div className="flex flex-1 justify-center lg:justify-end">

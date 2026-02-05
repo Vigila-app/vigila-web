@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import clsx from "clsx";
+import React from "react";
 
 export type LandingFinalCTAProps = {
   headline: string;
   description: string;
-  bullets: string[];
+  bullets: { text: string; icon?: React.ReactNode }[];
   primaryLabel: string;
   primaryHref: string;
   secondaryLabel: string;
@@ -38,9 +39,9 @@ const LandingFinalCTA = ({
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-white/85">
             {bullets.map((bullet) => (
-              <span key={bullet} className="inline-flex items-center gap-1">
-                <span>✓</span>
-                <span>{bullet}</span>
+              <span key={bullet.text} className="inline-flex items-center gap-2">
+                <span>{bullet.icon ?? "✓"}</span>
+                <span>{bullet.text}</span>
               </span>
             ))}
           </div>

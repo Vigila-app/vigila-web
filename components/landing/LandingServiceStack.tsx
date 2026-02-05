@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { useState } from "react";
 
 export type LandingService = {
-  badge: string;
+  badge?: string;
   title: string;
   description: string;
   image: string;
@@ -17,7 +17,7 @@ export type LandingServiceStackProps = {
   cardHeight?: number;
 };
 
-const LandingServiceStack = ({ services, className, cardHeight = 320 }: LandingServiceStackProps) => {
+const LandingServiceStack = ({ services, className, cardHeight = 360 }: LandingServiceStackProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleActivate = (index: number) => setActiveIndex(index);
@@ -49,14 +49,11 @@ const LandingServiceStack = ({ services, className, cardHeight = 320 }: LandingS
                   : `translateY(${(index - activeIndex) * 26 + 20}px) scale(0.94) rotate(3deg)`,
               opacity: index === activeIndex ? 1 : 0.8,
             }}>
-            <div className="relative h-56 w-full overflow-hidden">
+            <div className="relative h-[22rem] w-full overflow-hidden">
               <Image src={service.image} alt={service.title} fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(240,95,67,0.9)] via-[rgba(240,95,67,0.25)] to-transparent" />
-              <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-vigil-orange shadow-sm">
-                {service.badge}
-              </span>
               <div className="absolute bottom-4 left-4 right-4 text-white drop-shadow">
-                <h3 className="text-base font-bold">{service.title}</h3>
+                <h3 className="text-lg font-bold">{service.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-white/90">{service.description}</p>
               </div>
             </div>
