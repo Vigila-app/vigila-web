@@ -19,12 +19,15 @@ export type LandingServiceStackProps = {
 
 const LandingServiceStack = ({ services, className, cardHeight = 360 }: LandingServiceStackProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const containerHeight = cardHeight + 80
+  const baseOffset = 12
+  const spacing = 10
 
-  const handleActivate = (index: number) => setActiveIndex(index);
+  const handleActivate = (index: number) => setActiveIndex(index)
 
   return (
     <div className={clsx("relative mx-auto max-w-sm", className)}>
-      <div className="relative" style={{ height: cardHeight }}>
+      <div className="relative" style={{ height: containerHeight }}>
         {services.map((service, index) => (
           <button
             type="button"
@@ -34,27 +37,38 @@ const LandingServiceStack = ({ services, className, cardHeight = 360 }: LandingS
             onClick={() => handleActivate(index)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                handleActivate(index);
+                event.preventDefault()
+                handleActivate(index)
               }
             }}
             className={clsx(
               "absolute left-0 top-0 w-full cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white text-left shadow-xl transition-all duration-300",
-              index === activeIndex ? "z-20" : "z-10"
+              index === activeIndex ? "z-20" : "z-10",
             )}
             style={{
               transform:
                 index === activeIndex
                   ? "translateY(0) scale(1) rotate(-3deg)"
-                  : `translateY(${(index - activeIndex) * 26 + 20}px) scale(0.94) rotate(3deg)`,
+                  : `translateY(${(index - activeIndex) * spacing + baseOffset}px) scale(0.94) rotate(3deg)`,
               opacity: index === activeIndex ? 1 : 0.8,
-            }}>
-            <div className="relative h-[22rem] w-full overflow-hidden">
-              <Image src={service.image} alt={service.title} fill className="object-cover" />
+            }}
+          >
+            <div
+              className="relative w-full overflow-hidden"
+              style={{ height: cardHeight }}
+            >
+              <Image
+                src={service.image}
+                alt={service.title}
+                fill
+                className="object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(240,95,67,0.9)] via-[rgba(240,95,67,0.25)] to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-white drop-shadow">
                 <h3 className="text-lg font-bold">{service.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-white/90">{service.description}</p>
+                <p className="mt-1 text-sm leading-relaxed text-white/90">
+                  {service.description}
+                </p>
               </div>
             </div>
           </button>
@@ -68,14 +82,14 @@ const LandingServiceStack = ({ services, className, cardHeight = 360 }: LandingS
             onClick={() => setActiveIndex(index)}
             className={clsx(
               "h-2 rounded-full transition-all",
-              index === activeIndex ? "w-6 bg-vigil-orange" : "w-2 bg-gray-300"
+              index === activeIndex ? "w-6 bg-vigil-orange" : "w-2 bg-gray-300",
             )}
             aria-label={`Mostra servizio ${index + 1}`}
           />
         ))}
       </div>
     </div>
-  );
+  )
 };
 
 export default LandingServiceStack;

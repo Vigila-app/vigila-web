@@ -14,6 +14,12 @@ import {
   BoltIcon,
   ShieldCheckIcon,
   UsersIcon,
+  ClockIcon,
+  CalculatorIcon,
+  BellIcon,
+  WalletIcon,
+  PlayIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import {
   LandingAccessGrid,
@@ -78,17 +84,17 @@ const services = [
 
 const accessFeatures = [
   {
-    icon: <span className="text-lg">🎯</span>,
+    icon: <span>🧠</span>,
     title: "Assegnazione intelligente",
-    description: "Il sistema ti indica da subito il Vigil più adatto alle esigenze.",
+    description: "Il sistema assegna automaticamente la persona più adatta alle tue esigenze (zona, competenze, disponibilità)",
   },
   {
-    icon: <span className="text-lg">✓</span>,
+    icon: <span>✓</span>,
     title: "Vigil verificati",
     description: "Operatori formati e verificati prima di iniziare a lavorare.",
   },
   {
-    icon: <span className="text-lg">💳</span>,
+    icon: <span>💳</span>,
     title: "Pagamento tracciato e sicuro",
     description: "Pagamenti tracciati e sicuri sia per te che per il Vigil.",
   },
@@ -107,21 +113,21 @@ const accessFeatures = [
 const pricingHighlights = [
   {
     title: "Flessibile",
-    description: "Scegli tu le ore, la frequenza e il Vigil più adatto.",
+    description: "Scegli tu le ore e i giorni in base alle tue necessità",
     accentColor: "orange" as const,
-    icon: <ArrowPathIcon className="h-5 w-5 text-consumer-blue" />,
+    icon: <ClockIcon className="h-5 w-5" />,
   },
   {
     title: "Trasparente",
-    description: "Sai sempre quanto spendi, senza sorprese né vincoli.",
+    description: "Prezzi chiari, nessun costo nascosto o sorpresa",
     accentColor: "blue" as const,
-    icon: <EyeIcon className="h-5 w-5 text-vigil-orange" />,
+    icon: <CurrencyEuroIcon className="h-5 w-5" />,
   },
   {
     title: "Immediato",
-    description: "Calcolo reale delle ore richieste e del costo.",
-    accentColor: "teal" as const,
-    icon: <BoltIcon className="h-5 w-5 text-consumer-blue" />,
+    description: "Calcola subito il costo senza impegno",
+    accentColor: "orange" as const,
+    icon: <CalculatorIcon className="h-5 w-5" />,
   },
 ];
 
@@ -130,47 +136,47 @@ const steps = [
     icon: <DocumentTextIcon className="h-5 w-5" />,
     tone: "blue" as const,
     title: "Compila il questionario",
-    description: "3 minuti per raccontarci bisogni e orari di assistenza.",
+    description: "Raccontaci le tue esigenze in pochi minuti ",
   },
   {
     icon: <CalendarDaysIcon className="h-5 w-5" />,
     tone: "blue" as const,
     title: "Programma l'assistenza",
-    description: "Puoi fare prove: trisettimanale, quotidiana o 24/7, lo scegli tu.",
+    description: "Scegli i giorni, orari e servizi di cui hai bisogno",
   },
   {
     icon: <UsersIcon className="h-5 w-5" />,
     tone: "blue" as const,
     title: "Scegli i tuoi Vigil",
-    description: "Il sistema ti indica i profili migliori per te, puoi selezionarli.",
+    description: "Seleziona tra gli assistenti disponibili nella tua zona",
   },
   {
-    icon: <CheckBadgeIcon className="h-5 w-5" />,
+    icon: <BellIcon className="h-5 w-5" />,
     tone: "orange" as const,
     title: "Attendi conferma",
-    description: "Calcolo automatico del preventivo e assegnazione del Vigil.",
+    description: "L'assistente confermerà la disponibilità",
   },
   {
-    icon: <CreditCardIcon className="h-5 w-5" />,
+    icon: <WalletIcon className="h-5 w-5" />,
     tone: "orange" as const,
     title: "Paga in sicurezza",
-    description: "Vedi il prezzo subito e paghi solo quando confermi.",
+    description: "Carica il portafoglio digitale e paga in modo tracciato",
   },
   {
-    icon: <PhoneIcon className="h-5 w-5" />,
+    icon: <PlayIcon className="h-5 w-5" />,
     tone: "orange" as const,
-    title: "Inizia con il Vigil",
-    description: "Match automatizzato e rapido, inizi quando ne hai bisogno.",
+    title: "Inizia subito",
+    description: "Contatta l'assistente e inizia il servizio",
   },
 ];
 
 const faqs = [
   {
-    question: "Cos'è Vigila?",
+    question: "Come vengono verificati i Vigil?",
     answer: "È la piattaforma digitale per trovare e gestire l'assistenza domiciliare con Vigil verificati.",
   },
   {
-    question: "Chi sono i Vigil?",
+    question: "Quanto costa il servizio? ",
     answer: "Operatori selezionati, formati e verificati prima di iniziare a lavorare con te.",
   },
   {
@@ -178,15 +184,15 @@ const faqs = [
     answer: "Sì, puoi richiedere un cambio direttamente dall'app in qualsiasi momento.",
   },
   {
-    question: "Come funziona il pagamento?",
+    question: "Cosa succede se l'assistente annulla?",
     answer: "Paghi in modo tracciato e sicuro dall'app, senza costi nascosti né vincoli.",
   },
   {
-    question: "Quanto tempo serve per attivare il servizio?",
+    question: "In quali zone è attivo il servizio?",
     answer: "Bastano pochi minuti: questionario, scelta dei Vigil e conferma del preventivo.",
   },
   {
-    question: "Posso sospendere il servizio?",
+    question: "C'è un impegno minimo?",
     answer: "Puoi sospendere o disdire quando vuoi, senza penali.",
   },
 ];
@@ -214,16 +220,13 @@ export default function LandingPage() {
       <LandingHeroCompact
         headline={
           <>
-            Quando non
-            <br />
-            puoi esserci tu,
-            <br />
-            c'è Vigila
+            Quando non puoi esserci tu, c'è{" "}
+            <span className="text-consumer-blue"> Vigila </span>
           </>
         }
-        description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari con persone verificate nella tua zona."
+        description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari, con persone verificate nella tua zona."
         primaryCTA={{
-          label: "Ti aiuta ad aiutare",
+          label: "Richiedi assistenza",
           href: "/signup",
           variant: "primary",
         }}
@@ -233,30 +236,39 @@ export default function LandingPage() {
           variant: "secondary",
         }}
         trustBadges={trustBadges}
-        imageSrc="/assets/home_banner.png"
+        imageSrc="/assets/home_banner-2.png"
         imageAlt="Famiglia assistita"
         pressLogos={pressLogos}
       />
 
       <section className="bg-white px-4 pb-16 pt-10">
         <div className="mx-auto max-w-5xl text-center">
-          <h2 className="text-lg font-bold text-gray-900 sm:text-xl">
-            I servizi offerti dai
-            <br />
+          <h2 className="text-4xl font-bold text-gray-900 sm:text-xl">
+            I <span className="text-vigil-orange"> servizi offerti </span> dai
             nostri <span className="text-consumer-blue">Vigil</span>
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Fidati dei nostri Vigil. Sono stati formati e selezionati per garantire sempre la serenità.
+            Fidati dei nostri Vigil. Sono stati formati e selezionati per
+            garantire sempre la serenità.
           </p>
         </div>
-        <LandingServiceStack services={services} cardHeight={340} className="mt-12" />
+        <LandingServiceStack
+          services={services}
+          cardHeight={340}
+          className="my-12 px-10"
+        />
       </section>
 
       <LandingAccessGrid
         label="Perché scegliere Vigila"
         labelColor="orange"
-        title={`Con Vigila hai <br /> accesso a`}
-        subtitle="Tutto ciò che ti serve per gestire l'assistenza in modo semplice."
+        title={
+          <>
+            Con <span className="text-consumer-blue"> Vigila </span> hai accesso
+            a
+          </>
+        }
+        subtitle="Tutto ciò di cui hai bisogno per gestire l'assistenza in modo semplice e sicuro."
         features={accessFeatures}
         className="bg-gradient-to-b from-consumer-light-blue/60 to-white"
       />
@@ -264,7 +276,7 @@ export default function LandingPage() {
       <LandingPricingHighlight
         label="Calcola il tuo preventivo"
         title={`Scopri quanto costa il servizio`}
-        subtitle="Preventivo personalizzato, senza vincoli e con costi trasparenti."
+        subtitle="Calcola in pochi secondi un preventivo approssimativo per l'assistenza di cui hai bisogno. Nessun impegno, nessuna email richiesta."
         buttonLabel="Calcola il preventivo"
         buttonHref="/signup"
         highlights={pricingHighlights}
@@ -273,7 +285,7 @@ export default function LandingPage() {
       <LandingVerticalSteps
         label="Semplice e veloce"
         title="Come funziona Vigila"
-        subtitle="In pochi passaggi scegli la soluzione migliore per chi ami."
+        subtitle="Sei passi per trovare l'assistenza perfetta per i tuoi cari"
         steps={steps}
         className="bg-gradient-to-b from-white via-consumer-light-blue/20 to-white"
       />
@@ -281,25 +293,29 @@ export default function LandingPage() {
       <div className="px-4 pb-10 text-center">
         <Link
           href="/signup"
-          className="inline-flex items-center justify-center rounded-full bg-vigil-orange px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
+          className="inline-flex gap-3 items-center justify-center rounded-full bg-vigil-orange px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
         >
-          Prenota e hai accesso
+          Rispondi al questionario <ArrowRightIcon className="w-4" />
         </Link>
-        <p className="mt-2 text-xs text-gray-500">
-          Hai bisogno di assistenza continuativa? Richiedi un piano personalizzato.
+        <p className="mt-2 text-sm text-consumer-blue font-semibold">
+          Hai urgenza? Assistenza prioritaria
         </p>
       </div>
 
       <section className="bg-gradient-to-b from-[#ffe7de] via-white to-[#e6f7ff]">
         <LandingFaqCompact
-          label="Consultaci ogni volta"
+          label="Domande frequenti"
           title="Hai delle domande?"
           subtitle="Trovi le risposte più frequenti sul servizio e su come funziona."
           faqs={faqs}
           className="text-white"
         />
         <LandingFinalCTA
-          headline={`Con Vigila<br />finalmente non<br />devi risolvere<br />tutto da solo`}
+          headline={
+            <>
+              Con Vigila finalmente non devi risolvere tutto da solo
+            </>
+          }
           description="Con un team di esperti che si occupa di tutte le fasi e l'app assistenziale per gestire da remoto chi ami."
           bullets={[
             { text: "A partire da 9€ l'ora", icon: "✓" },
@@ -321,5 +337,5 @@ export default function LandingPage() {
         socialLinks={socialLinks}
       />
     </main>
-  );
+  )
 }
