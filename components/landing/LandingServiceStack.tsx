@@ -63,7 +63,14 @@ const LandingServiceStack = ({ services, className, cardHeight = 360 }: LandingS
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(240,95,67,0.9)] via-[rgba(240,95,67,0.25)] to-transparent" />
+              <div
+                className={clsx(
+                  "absolute inset-0 bg-gradient-to-t to-transparent",
+                  index % 2 == 0
+                    ? "from-[rgba(240,95,67,0.9)]"
+                    : "from-[rgba(0,158,218,0.9)]",
+                )}
+              />
               <div className="absolute bottom-4 left-4 right-4 text-white drop-shadow">
                 <h3 className="text-lg font-bold">{service.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-white/90">

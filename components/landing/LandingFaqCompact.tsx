@@ -37,7 +37,7 @@ const LandingFaqCompact = ({ label, title, subtitle, faqs, className }: LandingF
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   className="flex w-full items-center justify-between px-5 py-4 text-left">
-                  <span className="text-sm font-semibold text-gray-900">{faq.question}</span>
+                  <span className="text-md font-semibold text-gray-900">{faq.question}</span>
                   <ChevronDownIcon
                     className={clsx(
                       "h-5 w-5 text-vigil-orange transition-transform",
@@ -46,7 +46,7 @@ const LandingFaqCompact = ({ label, title, subtitle, faqs, className }: LandingF
                   />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-gray-100 px-5 pb-5 pt-3 text-xs leading-relaxed text-gray-600">
+                  <div className="border-t border-gray-100 px-5 pb-5 pt-3 text-sm leading-relaxed text-gray-600">
                     {faq.answer}
                   </div>
                 )}

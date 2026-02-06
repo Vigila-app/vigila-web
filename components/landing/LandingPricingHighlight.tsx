@@ -79,7 +79,7 @@ const LandingPricingHighlight = ({
             <h3 className="text-md font-semibold text-gray-900">
               {item.title}
             </h3>
-            <p className="text-xs leading-relaxed text-gray-600">
+            <p className="text-sm leading-relaxed text-gray-600">
               {item.description}
             </p>
           </div>

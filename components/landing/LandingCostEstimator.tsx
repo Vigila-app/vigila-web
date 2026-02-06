@@ -12,6 +12,7 @@ export type LandingCostEstimatorProps = {
   hourlyRate?: number;
   bgColor?: string;
   className?: string;
+  id?: string;
   showBenefits?: boolean;
   benefits?: string[];
 };
@@ -25,6 +26,7 @@ const LandingCostEstimator = ({
   hourlyRate = 9, // Default to cheapest service rate
   bgColor = "bg-white",
   className,
+  id,
   showBenefits = true,
   benefits = [
     "Assistenti verificati e qualificati",
@@ -45,7 +47,7 @@ const LandingCostEstimator = ({
   };
 
   return (
-    <section className={clsx("py-16 px-4", bgColor, className)}>
+    <section id={id} className={clsx("py-16 px-4", bgColor, className)}>
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -146,7 +148,7 @@ const LandingCostEstimator = ({
               servizio scelto e dalle tue esigenze specifiche.
             </p>
             <a
-              href="/signup"
+              href="/auth/registraion"
               className="inline-flex justify-center items-center rounded-full border px-8 py-3 text-base font-semibold shadow border-consumer-blue bg-consumer-blue text-white hover:bg-consumer-blue/90 transition">
               Richiedi un Preventivo Gratuito
             </a>

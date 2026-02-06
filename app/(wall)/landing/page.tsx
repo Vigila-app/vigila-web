@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import Link from "next/link";
+import Link from "next/link"
 import {
   CalendarDaysIcon,
   CheckBadgeIcon,
@@ -20,9 +20,13 @@ import {
   WalletIcon,
   PlayIcon,
   ArrowRightIcon,
-} from "@heroicons/react/24/outline";
+  UserPlusIcon,
+  CalendarIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline"
 import {
   LandingAccessGrid,
+  LandingCostEstimator,
   LandingFaqCompact,
   LandingFinalCTA,
   LandingFooterAlt,
@@ -30,9 +34,9 @@ import {
   LandingPricingHighlight,
   LandingServiceStack,
   LandingVerticalSteps,
-} from "@/components/landing";
+} from "@/components/landing"
 
-const pressLogos = ["IL MATTINO", "Linkiesta", "StartupItalia"];
+const pressLogos = ["IL MATTINO", "Linkiesta", "StartupItalia"]
 
 const trustBadges = [
   {
@@ -47,68 +51,59 @@ const trustBadges = [
     icon: <CurrencyEuroIcon className="h-5 w-5 text-consumer-blue" />,
     label: "Pagamenti sicuri",
   },
-];
+]
 
 const services = [
   {
     title: "Compagnia e supervisione",
-    description: "Un Vigil presente per compagnia, ascolto e supervisione quotidiana.",
-    image: "/assets/home_banner.png",
+    description: "Presenza, conversazione e monitoraggio leggere",
+    image: "/assets/service_card_1.png",
   },
   {
-    title: "Supporto fisico e strutturato",
-    description: "Aiuto nelle attività quotidiane e nella mobilità in sicurezza.",
-    image: "/assets/home_banner.png",
+    title: "Spesa e commissioni",
+    description: "Farmacia, supermercato e piccole commissioni",
+    image: "/assets/service_card_2.png",
   },
-  {
-    title: "Cura degli spazi domestici",
-    description: "Piccole attività domestiche per mantenere l'ambiente in ordine e sereno.",
-    image: "/assets/home_banner.png",
-  },
-  {
-    title: "Accompagnamento visite",
-    description: "Supporto negli spostamenti e nelle visite mediche, con aggiornamenti puntuali.",
-    image: "/assets/home_banner.png",
-  },
-  {
-    title: "Monitoraggio e sicurezza",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    image: "/assets/home_banner.png",
-  },
-  {
-    title: "Supporto emotivo dedicato",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    image: "/assets/home_banner.png",
-  },
-];
+]
 
 const accessFeatures = [
   {
-    icon: <span>🧠</span>,
+    icon: <SparklesIcon />, //TODO add brain icon
     title: "Assegnazione intelligente",
-    description: "Il sistema assegna automaticamente la persona più adatta alle tue esigenze (zona, competenze, disponibilità)",
+    description:
+      "Il sistema assegna automaticamente la persona più adatta alle tue esigenze (zona, competenze, disponibilità)",
   },
   {
-    icon: <span>✓</span>,
+    icon: <ShieldCheckIcon />,
     title: "Vigil verificati",
-    description: "Operatori formati e verificati prima di iniziare a lavorare.",
+    description:
+      "+100 assistenti verificati in piattaforma con documenti, profilo, foto e recensioni",
   },
   {
-    icon: <span>💳</span>,
-    title: "Pagamento tracciato e sicuro",
-    description: "Pagamenti tracciati e sicuri sia per te che per il Vigil.",
+    icon: <CalendarIcon />,
+    title: "Calendario integrato",
+    description:
+      "Programma l'assistenza in app e tieni tutto sotto controllo grazie al calendario.",
   },
   {
-    icon: <span className="text-lg">↔️</span>,
-    title: "Cambio Vigil dall'app",
-    description: "Hai sempre un piano B e puoi richiedere un cambio in app.",
+    icon: <ArrowPathIcon />,
+    title: "Sostituzioni automatiche",
+    description:
+      "L'algoritmo inizia subito la ricerca di un sostituto se l'assistente annulla la visita.",
   },
   {
-    icon: <span className="text-lg">📱</span>,
-    title: "Gestione digitale",
-    description: "Tutto è gestibile in app per avere accesso in qualsiasi momento e dispositivo.",
+    icon: <WalletIcon />,
+    title: "Pagamenti tracciati",
+    description:
+      "Prezzi chiari, nessun costo aggiuntivo. Traccia tutti i movimenti con il portafoglio digitale",
   },
-];
+  {
+    icon: <UserPlusIcon />,
+    title: "Cambio assistente facile",
+    description:
+      "Recensisci l'assistente e richiedi il cambio se non ti trovi bene",
+  },
+]
 
 const pricingHighlights = [
   {
@@ -129,7 +124,7 @@ const pricingHighlights = [
     accentColor: "orange" as const,
     icon: <CalculatorIcon className="h-5 w-5" />,
   },
-];
+]
 
 const steps = [
   {
@@ -168,51 +163,56 @@ const steps = [
     title: "Inizia subito",
     description: "Contatta l'assistente e inizia il servizio",
   },
-];
+]
 
 const faqs = [
   {
     question: "Come vengono verificati i Vigil?",
-    answer: "È la piattaforma digitale per trovare e gestire l'assistenza domiciliare con Vigil verificati.",
+    answer:
+      "È la piattaforma digitale per trovare e gestire l'assistenza domiciliare con Vigil verificati.",
   },
   {
     question: "Quanto costa il servizio? ",
-    answer: "Operatori selezionati, formati e verificati prima di iniziare a lavorare con te.",
+    answer:
+      "Operatori selezionati, formati e verificati prima di iniziare a lavorare con te.",
   },
   {
     question: "Posso cambiare Vigil se non mi trovo bene?",
-    answer: "Sì, puoi richiedere un cambio direttamente dall'app in qualsiasi momento.",
+    answer:
+      "Sì, puoi richiedere un cambio direttamente dall'app in qualsiasi momento.",
   },
   {
     question: "Cosa succede se l'assistente annulla?",
-    answer: "Paghi in modo tracciato e sicuro dall'app, senza costi nascosti né vincoli.",
+    answer:
+      "Paghi in modo tracciato e sicuro dall'app, senza costi nascosti né vincoli.",
   },
   {
     question: "In quali zone è attivo il servizio?",
-    answer: "Bastano pochi minuti: questionario, scelta dei Vigil e conferma del preventivo.",
+    answer:
+      "Bastano pochi minuti: questionario, scelta dei Vigil e conferma del preventivo.",
   },
   {
     question: "C'è un impegno minimo?",
     answer: "Puoi sospendere o disdire quando vuoi, senza penali.",
   },
-];
+]
 
 const primaryLinks = [
   { label: "Aggiungi la password", href: "/login" },
-  { label: "Nuova prenotazione Vigil", href: "/signup" },
+  { label: "Nuova prenotazione Vigil", href: "/auth/registration" },
   { label: "Profilo Vigil", href: "/vigil" },
-];
+]
 
 const infoLinks = [
   { label: "Chi siamo", href: "/" },
   { label: "Privacy policy", href: "/privacy-policy" },
   { label: "Cookie policy", href: "/cookie-policy" },
-];
+]
 
 const socialLinks = [
   { label: "LinkedIn", href: "https://www.linkedin.com" },
   { label: "Instagram", href: "https://www.instagram.com" },
-];
+]
 
 export default function LandingPage() {
   return (
@@ -227,12 +227,12 @@ export default function LandingPage() {
         description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari, con persone verificate nella tua zona."
         primaryCTA={{
           label: "Richiedi assistenza",
-          href: "/signup",
+          href: "/auth/registration",
           variant: "primary",
         }}
         secondaryCTA={{
           label: "Diventa un Vigil",
-          href: "/vigil/signup",
+          href: "auth/registration",
           variant: "secondary",
         }}
         trustBadges={trustBadges}
@@ -278,8 +278,19 @@ export default function LandingPage() {
         title={`Scopri quanto costa il servizio`}
         subtitle="Calcola in pochi secondi un preventivo approssimativo per l'assistenza di cui hai bisogno. Nessun impegno, nessuna email richiesta."
         buttonLabel="Calcola il preventivo"
-        buttonHref="/signup"
+        buttonHref="#cost-estimator"
         highlights={pricingHighlights}
+      />
+
+      <LandingCostEstimator
+        id="cost-estimator"
+        sectionTitle="Calcola il tuo preventivo"
+        sectionSubtitle="Stima subito un costo mensile indicativo in base alle ore di assistenza di cui hai bisogno."
+        hourlyRate={9}
+        minHours={8}
+        maxHours={200}
+        defaultHours={40}
+        bgColor="bg-gradient-to-b from-white via-consumer-light-blue/20 to-white"
       />
 
       <LandingVerticalSteps
@@ -292,7 +303,7 @@ export default function LandingPage() {
 
       <div className="px-4 pb-10 text-center">
         <Link
-          href="/signup"
+          href="/auth/registration"
           className="inline-flex gap-3 items-center justify-center rounded-full bg-vigil-orange px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
         >
           Rispondi al questionario <ArrowRightIcon className="w-4" />
@@ -311,21 +322,20 @@ export default function LandingPage() {
           className="text-white"
         />
         <LandingFinalCTA
-          headline={
-            <>
-              Con Vigila finalmente non devi risolvere tutto da solo
-            </>
-          }
-          description="Con un team di esperti che si occupa di tutte le fasi e l'app assistenziale per gestire da remoto chi ami."
+          headline={<>Con Vigila finalmente non devi risolvere tutto da solo</>}
+          description="Parti con 1-2 settimane di prova. È il modo più semplice per capire se Vigila ti fa davvero stare più tranquillo."
           bullets={[
-            { text: "A partire da 9€ l'ora", icon: "✓" },
-            { text: "Disdici quando vuoi", icon: "✓" },
+            {
+              text: "Nessun impegno mensile all'avvio",
+              icon: <ShieldCheckIcon />,
+            },
+            { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
           ]}
           primaryLabel="Avvia la prova"
-          primaryHref="/signup"
+          primaryHref="/auth/registration"
           secondaryLabel="Diventa un Vigil"
-          secondaryHref="/vigil/signup"
-          helper="Se non hai bisogno dell'assistenza puoi disdire, avrai report e supporto dedicato."
+          secondaryHref="/auth/registration"
+          helper="Compiti il questionario e vedi subito le disponibilità compatibili della tua zona"
           className="pt-0"
         />
       </section>

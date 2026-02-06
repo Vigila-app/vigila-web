@@ -25,6 +25,7 @@ const labelColorMap = {
 }
 
 const gapSize = 12
+const cardTargetWidth = 400
 
 const LandingAccessGrid = ({
   label,
@@ -36,20 +37,39 @@ const LandingAccessGrid = ({
 }: LandingAccessGridProps) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [cardWidth, setCardWidth] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)")
+    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(event.matches)
+    }
+
+    handleChange(media)
+    media.addEventListener("change", handleChange)
+
+    return () => media.removeEventListener("change", handleChange)
+  }, [])
+
+  useEffect(() => {
+    if (!isMobile) return
+
     const updateWidth = () => {
       if (scrollRef.current) {
-        setCardWidth(scrollRef.current.clientWidth)
+        setCardWidth(
+          Math.min(scrollRef.current.clientWidth, cardTargetWidth),
+        )
       }
     }
     updateWidth()
     window.addEventListener("resize", updateWidth)
     return () => window.removeEventListener("resize", updateWidth)
-  }, [])
+  }, [isMobile])
 
   const handleDotClick = (index: number) => {
+    if (!isMobile) return
+
     setActiveIndex(index)
     const container = scrollRef.current
     if (container) {
@@ -62,6 +82,8 @@ const LandingAccessGrid = ({
   }
 
   const handleScroll = () => {
+    if (!isMobile) return
+
     const container = scrollRef.current
     const width = cardWidth || container?.clientWidth || 0
     if (!container || width === 0) return
@@ -101,21 +123,35 @@ const LandingAccessGrid = ({
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="no-scrollbar mx-auto flex max-w-4xl gap-3 overflow-x-auto pb-2 text-left snap-x snap-mandatory"
+            className="no-scrollbar mx-auto flex max-w-4xl gap-3 overflow-x-auto pb-2 text-left snap-x snap-mandatory lg:grid lg:max-w-5xl lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:pb-0 lg:snap-none"
+            role={isMobile ? "list" : undefined}
           >
-            {features.map((feature) => (
+            {features.map((feature, index) => (
               <div
                 key={feature.title}
-                style={{ width: cardWidth ? `${cardWidth}px` : "100%" }}
-                className="flex-shrink-0 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm snap-start text-center"
+                style={
+                  isMobile
+                    ? { width: cardWidth ? `${cardWidth}px` : "100%" }
+                    : undefined
+                }
+                className={clsx(
+                  "flex-shrink-0 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center",
+                  "aspect-[4/3]",
+                  "snap-start",
+                  "lg:w-full lg:max-w-[400px] lg:flex-shrink",
+                  "flex flex-col justify-around"
+                )}
               >
-                <div className="mb-2 flex h-12 w-12 items-center text-2xl justify-center rounded-lg bg-vigil-light-orange text-consumer-blue mx-auto">
+                <div className={clsx(
+                  "mb-2 flex h-15 w-15 items-center p-3 justify-center rounded-lg mx-auto",
+                    index % 2 == 0 ? "bg-vigil-light-orange text-vigil-orange" : "bg-consumer-light-blue text-consumer-blue"
+                  )}>
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-xl font-semibold text-gray-900">
                   {feature.title}
                 </h3>
-                <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                <p className="mt-1 text-md leading-relaxed text-gray-600">
                   {feature.description}
                 </p>
               </div>
@@ -126,13 +162,13 @@ const LandingAccessGrid = ({
             type="button"
             aria-label="Vai alla card successiva"
             onClick={() => handleDotClick(activeIndex + 1 >= features.length ? 0 : activeIndex + 1)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-consumer-blue text-white shadow-lg transition hover:bg-consumer-light-blue"
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-consumer-blue text-white shadow-lg transition hover:bg-consumer-light-blue lg:hidden"
           >
             <ChevronRightIcon className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="mt-4 flex justify-center gap-2 lg:hidden">
           {features.map((feature, index) => (
             <button
               key={feature.title}

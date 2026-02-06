@@ -28,9 +28,9 @@ const LandingFinalCTA = ({
   className,
 }: LandingFinalCTAProps) => {
   return (
-    <section className={clsx("px-4 pb-16", className)}>
+    <section className={clsx("px-4 pb-16 w-full", className)}>
       <div className="mx-auto max-w-5xl">
-        <div className="relative mx-auto max-w-xl overflow-hidden rounded-3xl bg-gradient-to-br from-[#05b6d7] via-consumer-blue to-[#e95d3c] p-8 text-center text-white shadow-xl">
+        <div className="relative mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-[#05b6d7] via-consumer-blue to-[#e95d3c] p-8 text-center text-white shadow-xl">
           <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
           <div className="pointer-events-none absolute -left-14 -bottom-14 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
 
