@@ -1,14 +1,16 @@
-import dynamic from "next/dynamic";
+"use client"
 
-const ConsumerOnboardComponent = dynamic(
-  () => import("@/components/onboarding/consumer/onboardComponent_Consumer"),
-  { ssr: !!false }
-);
+import dynamic from "next/dynamic"
 
-export default function Profile() {
+const ConsumerMultiStepOnboarding = dynamic(
+  () => import("@/components/onboarding/consumer/ConsumerMultiStepOnboarding"),
+  { ssr: false }
+)
+
+export default function ConsumerOnboardPage() {
   return (
-    <section id="user-profile">
-      <ConsumerOnboardComponent />
+    <section id="consumer-onboard-multi-step">
+      <ConsumerMultiStepOnboarding />
     </section>
-  );
+  )
 }
