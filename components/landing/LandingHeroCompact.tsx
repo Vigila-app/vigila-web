@@ -50,7 +50,7 @@ const LandingHeroCompact = ({
 }: LandingHeroCompactProps) => {
   const renderCTA = (cta: HeroCTA) => {
     const base =
-      "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition w-full"
+      "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold transition w-full"
     const variantClass =
       cta.variant === "primary"
         ? "bg-vigil-orange text-white hover:bg-vigil-light-orange"

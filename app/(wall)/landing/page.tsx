@@ -241,23 +241,11 @@ export default function LandingPage() {
         pressLogos={pressLogos}
       />
 
-      <section className="bg-white px-4 pb-16 pt-10">
-        <div className="mx-auto max-w-5xl text-center">
-          <h2 className="text-4xl font-bold text-gray-900 sm:text-xl">
-            I <span className="text-vigil-orange"> servizi offerti </span> dai
-            nostri <span className="text-consumer-blue">Vigil</span>
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Fidati dei nostri Vigil. Sono stati formati e selezionati per
-            garantire sempre la serenità.
-          </p>
-        </div>
         <LandingServiceStack
           services={services}
           cardHeight={340}
           className="my-12 px-10"
         />
-      </section>
 
       <LandingAccessGrid
         label="Perché scegliere Vigila"
@@ -270,7 +258,7 @@ export default function LandingPage() {
         }
         subtitle="Tutto ciò di cui hai bisogno per gestire l'assistenza in modo semplice e sicuro."
         features={accessFeatures}
-        className="bg-gradient-to-b from-consumer-light-blue/60 to-white"
+        className=""
       />
 
       <LandingPricingHighlight
@@ -290,7 +278,6 @@ export default function LandingPage() {
         minHours={8}
         maxHours={200}
         defaultHours={40}
-        bgColor="bg-gradient-to-b from-white via-consumer-light-blue/20 to-white"
       />
 
       <LandingVerticalSteps
@@ -301,44 +288,30 @@ export default function LandingPage() {
         className="bg-gradient-to-b from-white via-consumer-light-blue/20 to-white"
       />
 
-      <div className="px-4 pb-10 text-center">
-        <Link
-          href="/auth/registration"
-          className="inline-flex gap-3 items-center justify-center rounded-full bg-vigil-orange px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
-        >
-          Rispondi al questionario <ArrowRightIcon className="w-4" />
-        </Link>
-        <p className="mt-2 text-sm text-consumer-blue font-semibold">
-          Hai urgenza? Assistenza prioritaria
-        </p>
-      </div>
-
-      <section className="bg-gradient-to-b from-[#ffe7de] via-white to-[#e6f7ff]">
-        <LandingFaqCompact
-          label="Domande frequenti"
-          title="Hai delle domande?"
-          subtitle="Trovi le risposte più frequenti sul servizio e su come funziona."
-          faqs={faqs}
-          className="text-white"
-        />
-        <LandingFinalCTA
-          headline={<>Con Vigila finalmente non devi risolvere tutto da solo</>}
-          description="Parti con 1-2 settimane di prova. È il modo più semplice per capire se Vigila ti fa davvero stare più tranquillo."
-          bullets={[
-            {
-              text: "Nessun impegno mensile all'avvio",
-              icon: <ShieldCheckIcon />,
-            },
-            { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
-          ]}
-          primaryLabel="Avvia la prova"
-          primaryHref="/auth/registration"
-          secondaryLabel="Diventa un Vigil"
-          secondaryHref="/auth/registration"
-          helper="Compiti il questionario e vedi subito le disponibilità compatibili della tua zona"
-          className="pt-0"
-        />
-      </section>
+      <LandingFaqCompact
+        label="Domande frequenti"
+        title="Hai delle domande?"
+        subtitle="Trovi le risposte più frequenti sul servizio e su come funziona."
+        faqs={faqs}
+        className="text-white"
+      />
+      <LandingFinalCTA
+        headline={<>Con Vigila finalmente non devi risolvere tutto da solo</>}
+        description="Parti con 1-2 settimane di prova. È il modo più semplice per capire se Vigila ti fa davvero stare più tranquillo."
+        bullets={[
+          {
+            text: "Nessun impegno mensile all'avvio",
+            icon: <ShieldCheckIcon />,
+          },
+          { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
+        ]}
+        primaryLabel="Avvia la prova"
+        primaryHref="/auth/registration"
+        secondaryLabel="Diventa un Vigil"
+        secondaryHref="/auth/registration"
+        helper="Compiti il questionario e vedi subito le disponibilità compatibili della tua zona"
+        className="pt-0"
+      />
 
       <LandingFooterAlt
         primaryLinks={primaryLinks}
