@@ -42,11 +42,12 @@ const LandingAccessGrid = ({
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 1023px)")
-    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(event.matches)
+    const applyMatch = (list: MediaQueryList | MediaQueryListEvent) => {
+      setIsMobile("matches" in list ? list.matches : media.matches)
     }
 
-    handleChange(media)
+    applyMatch(media)
+    const handleChange = (event: MediaQueryListEvent) => applyMatch(event)
     media.addEventListener("change", handleChange)
 
     return () => media.removeEventListener("change", handleChange)
