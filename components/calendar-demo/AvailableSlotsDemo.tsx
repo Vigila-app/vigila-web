@@ -204,7 +204,7 @@ export const AvailableSlotsDemo = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                       {slots.map((slot, index) => (
                         <div
-                          key={`${slot.date}-${slot.start_hour}-${index}`}
+                          key={`${slot.date}-${slot.start_time}-${index}`}
                           className={`p-2 rounded text-center text-sm ${
                             slot.available
                               ? "bg-green-100 text-green-800 border border-green-300"
@@ -212,7 +212,7 @@ export const AvailableSlotsDemo = () => {
                           }`}
                         >
                           <div className="font-medium">
-                            {formatTimeRange(slot.start_hour, slot.end_hour)}
+                            {formatTimeRange(slot.start_time, slot.end_time)}
                           </div>
                           {slot.duration_hours > 1 && (
                             <div className="text-xs">({slot.duration_hours}h)</div>

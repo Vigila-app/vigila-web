@@ -256,8 +256,8 @@ Stores weekly recurring availability patterns for Vigils.
 * `updated_at` (timestamptz)
 * `vigil_id` (uuid, FK)
 * `weekday` (smallint, 0-6, where 0=Sunday)
-* `start_hour` (smallint, 0-23)
-* `end_hour` (smallint, 1-24)
+* `start_time` (smallint, 0-23)
+* `end_time` (smallint, 1-24)
 * `valid_from` (date)
 * `valid_to` (date, nullable)
 
@@ -268,9 +268,9 @@ Stores weekly recurring availability patterns for Vigils.
 **Constraints**:
 
 * `weekday` must be between 0 and 6
-* `start_hour` must be between 0 and 23
-* `end_hour` must be between 1 and 24
-* `end_hour` must be greater than `start_hour`
+* `start_time` must be between 0 and 23
+* `end_time` must be between 1 and 24
+* `end_time` must be greater than `start_time`
 * If `valid_to` is set, it must be >= `valid_from`
 
 ---

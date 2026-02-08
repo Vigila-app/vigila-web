@@ -26,14 +26,14 @@ export const AvailabilityRulesDemo = () => {
   // Form state
   const [formData, setFormData] = useState<Partial<VigilAvailabilityRuleFormI>>({
     weekday: WeekdayEnum.MONDAY,
-    start_hour: 9,
-    end_hour: 17,
+    start_time: 9,
+    end_time: 17,
     valid_from: formatDateToISO(new Date()),
     valid_to: null,
   });
 
   const weekdays = getWeekdaysArray();
-  const hours = getHoursArray();
+  const times = getHoursArray();
 
   useEffect(() => {
     loadRules();
@@ -58,9 +58,9 @@ export const AvailabilityRulesDemo = () => {
     setLoading(true);
     setError(null);
     try {
-      // Validate hour range
-      if (formData.end_hour! <= formData.start_hour!) {
-        setError("End hour must be greater than start hour");
+      // Validate time range
+      if (formData.end_time! <= formData.start_time!) {
+        setError("End time must be greater than start time");
         setLoading(false);
         return;
       }
@@ -76,8 +76,8 @@ export const AvailabilityRulesDemo = () => {
       const ruleData: VigilAvailabilityRuleFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
         weekday: formData.weekday!,
-        start_hour: formData.start_hour!,
-        end_hour: formData.end_hour!,
+        start_time: formData.start_time!,
+        end_time: formData.end_time!,
         valid_from: formData.valid_from!,
         valid_to: formData.valid_to || null,
       };
@@ -88,8 +88,8 @@ export const AvailabilityRulesDemo = () => {
       // Reset form
       setFormData({
         weekday: WeekdayEnum.MONDAY,
-        start_hour: 9,
-        end_hour: 17,
+        start_time: 9,
+        end_time: 17,
         valid_from: formatDateToISO(new Date()),
         valid_to: null,
       });
@@ -160,15 +160,15 @@ export const AvailabilityRulesDemo = () => {
                 Start Hour
               </label>
               <select
-                value={formData.start_hour}
+                value={formData.start_time}
                 onChange={(e) =>
-                  setFormData({ ...formData, start_hour: Number(e.target.value) })
+                  setFormData({ ...formData, start_time: Number(e.target.value) })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {hours.slice(0, 23).map((hour) => (
-                  <option key={hour} value={hour}>
-                    {hour}:00
+                {times.slice(0, 23).map((time) => (
+                  <option key={time} value={time}>
+                    {time}:00
                   </option>
                 ))}
               </select>
@@ -179,15 +179,15 @@ export const AvailabilityRulesDemo = () => {
                 End Hour
               </label>
               <select
-                value={formData.end_hour}
+                value={formData.end_time}
                 onChange={(e) =>
-                  setFormData({ ...formData, end_hour: Number(e.target.value) })
+                  setFormData({ ...formData, end_time: Number(e.target.value) })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {hours.slice(1).map((hour) => (
-                  <option key={hour} value={hour}>
-                    {hour}:00
+                {times.slice(1).map((time) => (
+                  <option key={time} value={time}>
+                    {time}:00
                   </option>
                 ))}
               </select>
@@ -255,7 +255,7 @@ export const AvailabilityRulesDemo = () => {
                 >
                   <div>
                     <p className="font-medium">
-                      {getWeekdayNameIT(rule.weekday)} - {formatTimeRange(rule.start_hour, rule.end_hour)}
+                      {getWeekdayNameIT(rule.weekday)} - {formatTimeRange(rule.start_time, rule.end_time)}
                     </p>
                     <p className="text-sm text-gray-600">
                       Valid from {rule.valid_from}

@@ -18,15 +18,17 @@ CREATE TABLE IF NOT EXISTS vigil_availability_rules (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     vigil_id UUID NOT NULL REFERENCES vigils(id) ON DELETE CASCADE,
     weekday SMALLINT NOT NULL CHECK (weekday >= 0 AND weekday <= 6), -- 0=Sunday, 6=Saturday
-    start_hour SMALLINT NOT NULL CHECK (start_hour >= 0 AND start_hour <= 23),
-    end_hour SMALLINT NOT NULL CHECK (end_hour >= 1 AND end_hour <= 24),
+    start_time SMALLINT NOT NULL CHECK (start_time >= 0 AND start_time <= 23),
+    end_time SMALLINT NOT NULL CHECK (end_time >= 1 AND end_time <= 24),
     valid_from DATE NOT NULL DEFAULT CURRENT_DATE,
     valid_to DATE, -- NULL means indefinite
-    CONSTRAINT valid_hour_range CHECK (end_hour > start_hour),
+    CONSTRAINT valid_time_range CHECK (end_time > start_time),
     CONSTRAINT valid_date_range CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 
 -- Index for efficient queries by vigil
+
+--TODO vedere tutti gli index creati e capire se serve il gist per le sorapposizioni temporali .
 CREATE INDEX idx_vigil_availability_rules_vigil_id ON vigil_availability_rules(vigil_id);
 -- Composite index for date range queries
 CREATE INDEX idx_vigil_availability_rules_dates ON vigil_availability_rules(vigil_id, valid_from, valid_to);
@@ -165,7 +167,7 @@ CREATE POLICY "Consumers can view unavailabilities for booking"
 -- Function: Get available slots for a vigil in a date range
 -- This is a database function that can be called from the API
 -- Returns slots that are available considering rules, bookings, and unavailabilities
-
+--TODO eliminare le funzioni e tutto quello che non è stato più aggiunto nella query usata su supabase
 CREATE OR REPLACE FUNCTION get_available_slots(
     p_vigil_id UUID,
     p_start_date DATE,
@@ -174,8 +176,8 @@ CREATE OR REPLACE FUNCTION get_available_slots(
 )
 RETURNS TABLE (
     slot_date DATE,
-    slot_start_hour INTEGER,
-    slot_end_hour INTEGER,
+    slot_start_time INTEGER,
+    slot_end_time INTEGER,
     available BOOLEAN
 ) AS $$
 BEGIN
@@ -196,11 +198,11 @@ COMMENT ON TABLE vigil_availability_rules IS
 COMMENT ON COLUMN vigil_availability_rules.weekday IS 
 'Day of week: 0=Sunday, 1=Monday, ..., 6=Saturday. Follows ISO standard.';
 
-COMMENT ON COLUMN vigil_availability_rules.start_hour IS 
-'Start hour in 24h format (0-23). Inclusive.';
+COMMENT ON COLUMN vigil_availability_rules.start_time IS 
+'Start time in 24h format (0-23). Inclusive.';
 
-COMMENT ON COLUMN vigil_availability_rules.end_hour IS 
-'End hour in 24h format (1-24). Exclusive. Value 24 means end of day.';
+COMMENT ON COLUMN vigil_availability_rules.end_time IS 
+'End time in 24h format (1-24). Exclusive. Value 24 means end of day.';
 
 COMMENT ON COLUMN vigil_availability_rules.valid_from IS 
 'Start date for this rule. Rule applies from this date forward.';

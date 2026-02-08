@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       .select("*")
       .eq("vigil_id", userObject.id)
       .order("weekday", { ascending: true })
-      .order("start_hour", { ascending: true });
+      .order("start_time", { ascending: true });
 
     if (error) throw error;
 
@@ -98,15 +98,15 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (
       body.weekday === undefined ||
-      body.start_hour === undefined ||
-      body.end_hour === undefined ||
+      body.start_time === undefined ||
+      body.end_time === undefined ||
       !body.valid_from
     ) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
         success: false,
         message:
-          "Missing required fields: weekday, start_hour, end_hour, valid_from",
+          "Missing required fields: weekday, start_time, end_time, valid_from",
       } as any);
     }
 
@@ -119,26 +119,26 @@ export async function POST(req: NextRequest) {
       } as any);
     }
 
-    // Validate hour range
+    // Validate time range
     if (
-      body.start_hour < 0 ||
-      body.start_hour > 23 ||
-      body.end_hour < 1 ||
-      body.end_hour > 24
+      body.start_time < 0 ||
+      body.start_time > 23 ||
+      body.end_time < 1 ||
+      body.end_time > 24
     ) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
         success: false,
-        message: "start_hour must be 0-23, end_hour must be 1-24",
+        message: "start_time must be 0-23, end_time must be 1-24",
       } as any);
     }
 
-    // Validate hour range logic
-    if (body.end_hour <= body.start_hour) {
+    // Validate time range logic
+    if (body.end_time <= body.start_time) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
         success: false,
-        message: "end_hour must be greater than start_hour",
+        message: "end_time must be greater than start_time",
       } as any);
     }
 
@@ -148,8 +148,8 @@ export async function POST(req: NextRequest) {
     const newRule = {
       vigil_id: userObject.id, // Always use authenticated user's ID
       weekday: body.weekday,
-      start_hour: body.start_hour,
-      end_hour: body.end_hour,
+      start_time: body.start_time,
+      end_time: body.end_time,
       valid_from: body.valid_from,
       valid_to: body.valid_to || null,
     };
