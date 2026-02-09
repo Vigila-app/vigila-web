@@ -1,8 +1,7 @@
 "use client"
 
 import clsx from "clsx"
-import { ChevronRightIcon } from "@heroicons/react/24/outline"
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { Section } from "./Section"
 
 export type AccessFeature = {
@@ -18,11 +17,6 @@ export type LandingAccessGridProps = {
   subtitle?: string
   features: AccessFeature[]
   className?: string
-}
-
-const labelColorMap = {
-  blue: "text-consumer-blue",
-  orange: "text-vigil-orange",
 }
 
 const gapSize = 12
@@ -59,9 +53,7 @@ const LandingAccessGrid = ({
 
     const updateWidth = () => {
       if (scrollRef.current) {
-        setCardWidth(
-          Math.min(scrollRef.current.clientWidth, cardTargetWidth),
-        )
+        setCardWidth(Math.min(scrollRef.current.clientWidth, cardTargetWidth))
       }
     }
     updateWidth()
@@ -69,19 +61,44 @@ const LandingAccessGrid = ({
     return () => window.removeEventListener("resize", updateWidth)
   }, [isMobile])
 
-  const handleDotClick = (index: number) => {
-    if (!isMobile) return
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (!isMobile) return
 
-    setActiveIndex(index)
-    const container = scrollRef.current
-    if (container) {
+      const container = scrollRef.current
+      if (!container) return
+
       const width = cardWidth || container.clientWidth
+      if (!width) return
+
       container.scrollTo({
         left: index * (width + gapSize),
         behavior: "smooth",
       })
-    }
+    },
+    [cardWidth, isMobile],
+  )
+
+  const handleDotClick = (index: number) => {
+    if (!isMobile) return
+
+    setActiveIndex(index)
+    scrollToIndex(index)
   }
+
+  useEffect(() => {
+    if (!isMobile || features.length <= 1) return
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((current) => {
+        const nextIndex = (current + 1) % features.length
+        scrollToIndex(nextIndex)
+        return nextIndex
+      })
+    }, 4500)
+
+    return () => window.clearInterval(intervalId)
+  }, [isMobile, features.length, cardWidth, scrollToIndex])
 
   const handleScroll = () => {
     if (!isMobile) return
@@ -100,16 +117,9 @@ const LandingAccessGrid = ({
   }
 
   return (
-    <Section
-      title={title}
-      label={label}
-      subtitle={subtitle}
-      variant="white"
-    >
+    <Section title={title} label={label} subtitle={subtitle} variant="white">
       <section className={clsx("px-4 py-12", className)}>
         <div className="mx-auto max-w-5xl text-center">
-          
-
           <div className="relative">
             <div
               ref={scrollRef}
@@ -127,6 +137,7 @@ const LandingAccessGrid = ({
                   }
                   className={clsx(
                     "flex-shrink-0 h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center",
+                    "lg-aspect-[1/1]",
                     "aspect-[4/3]",
                     "snap-start",
                     "lg:w-full lg:max-w-[400px] lg:flex-shrink",
@@ -146,25 +157,12 @@ const LandingAccessGrid = ({
                   <h3 className="text-xl font-semibold text-gray-900">
                     {feature.title}
                   </h3>
-                  <p className="mt-1 text-md leading-relaxed text-gray-600">
+                  <p className="mt-1 text-sm leading-relaxed text-gray-600">
                     {feature.description}
                   </p>
                 </div>
               ))}
             </div>
-
-            <button
-              type="button"
-              aria-label="Vai alla card successiva"
-              onClick={() =>
-                handleDotClick(
-                  activeIndex + 1 >= features.length ? 0 : activeIndex + 1,
-                )
-              }
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-consumer-blue text-white shadow-lg transition hover:bg-consumer-light-blue lg:hidden"
-            >
-              <ChevronRightIcon className="h-5 w-5" />
-            </button>
           </div>
 
           <div className="mt-4 flex justify-center gap-2 lg:hidden">

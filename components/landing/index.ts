@@ -30,11 +30,12 @@ export type { LandingGetInTouchProps } from "./LandingGetInTouch";
 export type { LandingCostEstimatorProps } from "./LandingCostEstimator";
 export type { LandingHeaderBarProps, LandingHeaderAction } from "./LandingHeaderBar";
 export type {
-	LandingHeroCompactProps,
-	HeroCTA,
-	TrustBadge,
-	AppointmentCTA,
-} from "./LandingHeroCompact";
+  LandingHeroCompactProps,
+  HeroCTA,
+  TrustBadge,
+  AppointmentCTA,
+  PressMention,
+} from "./LandingHeroCompact"
 export type { LandingServiceStackProps, LandingService } from "./LandingServiceStack";
 export type { LandingAccessGridProps, AccessFeature } from "./LandingAccessGrid";
 export type {

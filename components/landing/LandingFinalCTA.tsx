@@ -13,7 +13,7 @@ export type LandingFinalCTAProps = {
   primaryHref: string
   secondaryLabel: string
   secondaryHref: string
-  helper?: string
+  helper?: ReactNode
   className?: string
 }
 

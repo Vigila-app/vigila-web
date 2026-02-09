@@ -1,17 +1,10 @@
 "use client"
-
-import Link from "next/link"
 import {
   CalendarDaysIcon,
-  CheckBadgeIcon,
   ArrowPathIcon,
   CurrencyEuroIcon,
-  CreditCardIcon,
-  EyeIcon,
   DocumentTextIcon,
   HomeIcon,
-  PhoneIcon,
-  BoltIcon,
   ShieldCheckIcon,
   UsersIcon,
   ClockIcon,
@@ -19,7 +12,6 @@ import {
   BellIcon,
   WalletIcon,
   PlayIcon,
-  ArrowRightIcon,
   UserPlusIcon,
   CalendarIcon,
   SparklesIcon,
@@ -29,14 +21,23 @@ import {
   LandingCostEstimator,
   LandingFaqCompact,
   LandingFinalCTA,
-  LandingFooterAlt,
   LandingHeroCompact,
   LandingPricingHighlight,
   LandingServiceStack,
   LandingVerticalSteps,
 } from "@/components/landing"
+import { AppConstants } from "@/src/constants"
+import { Routes } from "@/src/routes"
 
-const pressLogos = ["IL MATTINO", "Linkiesta", "StartupItalia"]
+const pressMentions = [
+  { name: "Arena Digitale", logoSrc: "/assets/arena%20digitale.png" },
+  {
+    name: "Il Mattino",
+    href: "https://www.ilmattino.it/",
+    logoSrc: "/assets/il%20mattino.png",
+  },
+  { name: "Festival", logoSrc: "/assets/festival.png" },
+]
 
 const trustBadges = [
   {
@@ -197,23 +198,6 @@ const faqs = [
   },
 ]
 
-const primaryLinks = [
-  { label: "Aggiungi la password", href: "/login" },
-  { label: "Nuova prenotazione Vigil", href: "/auth/registration" },
-  { label: "Profilo Vigil", href: "/vigil" },
-]
-
-const infoLinks = [
-  { label: "Chi siamo", href: "/" },
-  { label: "Privacy policy", href: "/privacy-policy" },
-  { label: "Cookie policy", href: "/cookie-policy" },
-]
-
-const socialLinks = [
-  { label: "LinkedIn", href: "https://www.linkedin.com" },
-  { label: "Instagram", href: "https://www.instagram.com" },
-]
-
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-white">
@@ -227,25 +211,25 @@ export default function LandingPage() {
         description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari, con persone verificate nella tua zona."
         primaryCTA={{
           label: "Richiedi assistenza",
-          href: "/auth/registration",
+          href: Routes.registrationConsumer.url,
           variant: "primary",
         }}
         secondaryCTA={{
           label: "Diventa un Vigil",
-          href: "auth/registration",
+          href: Routes.registrationVigil.url,
           variant: "secondary",
         }}
         trustBadges={trustBadges}
         imageSrc="/assets/home_banner-2.png"
         imageAlt="Famiglia assistita"
-        pressLogos={pressLogos}
+        pressMentions={pressMentions}
       />
 
-        <LandingServiceStack
-          services={services}
-          cardHeight={340}
-          className="my-12 px-10"
-        />
+      <LandingServiceStack
+        services={services}
+        cardHeight={340}
+        className="my-12 px-10"
+      />
 
       <LandingAccessGrid
         label="Perché scegliere Vigila"
@@ -306,18 +290,23 @@ export default function LandingPage() {
           { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
         ]}
         primaryLabel="Avvia la prova"
-        primaryHref="/auth/registration"
+        primaryHref={AppConstants.whatsappUrl}
         secondaryLabel="Diventa un Vigil"
-        secondaryHref="/auth/registration"
-        helper="Compiti il questionario e vedi subito le disponibilità compatibili della tua zona"
+        secondaryHref={Routes.registrationVigil.url}
+        helper={
+          <span>
+            Compila il questionario e, se hai dubbi, scrivi a Luigi su
+            <a
+              className="ml-1 underline"
+              href={AppConstants.whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              WhatsApp
+            </a>
+          </span>
+        }
         className="pt-0"
-      />
-
-      <LandingFooterAlt
-        primaryLinks={primaryLinks}
-        infoLinks={infoLinks}
-        contactEmail="ciao@vigila.app"
-        socialLinks={socialLinks}
       />
     </main>
   )

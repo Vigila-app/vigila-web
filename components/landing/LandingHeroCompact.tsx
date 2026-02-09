@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import clsx from "clsx"
-import { ReactNode } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 
 export type HeroCTA = {
   label: string
@@ -24,6 +24,12 @@ export type AppointmentCTA = {
   icon?: ReactNode
 }
 
+export type PressMention = {
+  name: string
+  href?: string
+  logoSrc?: string
+}
+
 export type LandingHeroCompactProps = {
   headline: ReactNode
   description: string
@@ -33,7 +39,7 @@ export type LandingHeroCompactProps = {
   appointmentCTA?: AppointmentCTA
   imageSrc: string
   imageAlt?: string
-  pressLogos?: string[]
+  pressMentions?: PressMention[]
   className?: string
 }
 
@@ -45,9 +51,24 @@ const LandingHeroCompact = ({
   trustBadges,
   imageSrc,
   imageAlt = "Hero",
-  pressLogos,
+  pressMentions,
   className,
 }: LandingHeroCompactProps) => {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 700px)")
+    const apply = (event: MediaQueryList | MediaQueryListEvent) => {
+      setIsMobile("matches" in event ? event.matches : media.matches)
+    }
+
+    apply(media)
+    media.addEventListener("change", apply)
+    return () => media.removeEventListener("change", apply)
+  }, [])
+
+  // Pure CSS marquee for mobile: duplicate items and translate the track
+
   const renderCTA = (cta: HeroCTA) => {
     const base =
       "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold transition w-full"
@@ -108,24 +129,116 @@ const LandingHeroCompact = ({
         />
       </div>
 
-      {pressLogos && pressLogos.length > 0 && (
-        <div className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-6 text-[11px] font-semibold text-gray-400">
-          {pressLogos.map((logo) => {
-            let logoClass = "tracking-wide"
-            if (logo === "Linkiesta") {
-              logoClass = "italic"
-            } else if (logo === "StartupItalia") {
-              logoClass = "text-vigil-orange"
-            }
+      {pressMentions && pressMentions.length > 0 && (
+        <div className="mx-auto mt-8 max-w-6xl">
+          <div className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">
+            Parlano di noi
+          </div>
+          {isMobile ? (
+            <div className="overflow-hidden px-2">
+              <div className="press-marquee-track flex items-center gap-6 w-max">
+                {[...pressMentions, ...pressMentions].map((press, index) => {
+                  const logo = press.logoSrc ? (
+                    <Image
+                      src={press.logoSrc}
+                      alt={press.name}
+                      width={150}
+                      height={80}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold uppercase text-gray-700">
+                      {press.name.slice(0, 2)}
+                    </div>
+                  )
 
-            return (
-              <span key={logo} className={logoClass}>
-                {logo}
-              </span>
-            )
-          })}
+                  const content = (
+                    <div className="flex items-center gap-3">{logo}</div>
+                  )
+
+                  const wrapperClass =
+                    "flex items-center shrink-0 min-w-[150px]"
+
+                  if (press.href) {
+                    return (
+                      <Link
+                        key={`${press.name}-${index}`}
+                        href={press.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className={wrapperClass}
+                      >
+                        {content}
+                      </Link>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={`${press.name}-${index}`}
+                      className={wrapperClass}
+                    >
+                      {content}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-around flex-wrap gap-6 max-w-[80vh] mx-auto">
+              {pressMentions.map((press) => {
+                const logo = press.logoSrc ? (
+                  <Image
+                    src={press.logoSrc}
+                    alt={press.name}
+                    width={150}
+                    height={80}
+                    className="object-contain"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold uppercase text-gray-700">
+                    {press.name.slice(0, 2)}
+                  </div>
+                )
+
+                return press.href ? (
+                  <Link
+                    key={press.name}
+                    href={press.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="flex items-center"
+                  >
+                    {logo}
+                  </Link>
+                ) : (
+                  <div key={press.name} className="flex items-center">
+                    {logo}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
+
+      <style jsx global>{`
+        @media (max-width: 1023px) {
+          @keyframes press-marquee {
+            from {
+              transform: translateX(0);
+            }
+            to {
+              transform: translateX(-50%);
+            }
+          }
+
+          .press-marquee-track {
+            animation: press-marquee 24s linear infinite;
+            will-change: transform;
+          }
+        }
+      `}</style>
     </section>
   )
 }
