@@ -308,8 +308,7 @@ export default function LandingPage() {
         primaryLabel="Avvia la prova"
         primaryHref={AppConstants.whatsappUrl}
         secondaryLabel="Contatta il team"
-        secondaryHref={Routes.registrationVigil.url}
-        
+        secondaryHref={AppConstants.whatsappUrl}
         className="pt-0"
       />
     </main>
