@@ -3,6 +3,7 @@
 import Image from "next/image"
 import clsx from "clsx"
 import { useState } from "react"
+import { ChevronRightIcon } from "@heroicons/react/24/outline"
 import { Section } from "./Section"
 
 export type LandingService = {
@@ -27,6 +28,10 @@ const LandingServiceStack = ({
   const containerHeight = cardHeight + 80
   const baseOffset = 12
   const spacing = 10
+
+  const handleNext = () => {
+    setActiveIndex((current) => (current + 1) % services.length)
+  }
 
   const handleActivate = (index: number) => setActiveIndex(index)
 
@@ -97,6 +102,14 @@ const LandingServiceStack = ({
               </div>
             </button>
           ))}
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Vai al servizio successivo"
+            className="absolute right-[-14px] top-1/2 -translate-y-1/2 z-30 inline-flex h-10 w-10 items-center justify-center rounded-full bg-vigil-orange text-white shadow-lg hover:bg-vigil-light-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-vigil-orange"
+          >
+            <ChevronRightIcon className="h-5 w-5" />
+          </button>
         </div>
 
         <div className="mt-4 flex justify-center gap-2">
