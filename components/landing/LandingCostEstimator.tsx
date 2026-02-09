@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Section } from "./Section"
+import { AppConstants } from "@/src/constants"
 
 export type LandingCostEstimatorProps = {
   sectionTitle?: string
@@ -136,7 +137,7 @@ const LandingCostEstimator = ({
             servizio scelto e dalle tue esigenze specifiche.
           </p>
           <a
-            href="/auth/registration"
+            href={AppConstants.whatsappUrl}
             className="inline-flex justify-center items-center rounded-full border px-8 py-3 text-base font-semibold shadow border-consumer-blue bg-consumer-blue text-white hover:bg-consumer-blue/90 transition"
           >
             Richiedi un Preventivo Gratuito

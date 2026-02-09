@@ -60,7 +60,7 @@ const LandingVerticalSteps = ({
       </div>
       <div className="px-4 pb-10 text-center mt-20">
         <Link
-          href="/auth/registration"
+          href="/auth/registration/consumer"
           className="inline-flex gap-3 items-center justify-center rounded-full bg-vigil-orange px-6 py-3 font-semibold text-white shadow-md transition hover:bg-vigil-orange/90"
         >
           Rispondi al questionario <ArrowRightIcon className="w-4" />
