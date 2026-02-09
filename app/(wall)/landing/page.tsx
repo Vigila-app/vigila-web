@@ -65,6 +65,21 @@ const services = [
     description: "Farmacia, supermercato e piccole commissioni",
     image: "/assets/service_card_2.png",
   },
+  {
+    title: "Igiene",
+    description: "",
+    image: "/assets/service_card_1.png",
+  },
+  {
+    title: "Accompagnamento in auto",
+    description: "Visite mediche, terapie, disbrigo pratiche",
+    image: "/assets/service_card_1.png",
+  },
+  {
+    title: "Assistenza leggera in casa",
+    description: "Pasti, mobilità, vestizione, rassetto, farmaci",
+    image: "/assets/service_card_2.png",
+  },
 ]
 
 const accessFeatures = [
@@ -170,31 +185,32 @@ const faqs = [
   {
     question: "Come vengono verificati i Vigil?",
     answer:
-      "È la piattaforma digitale per trovare e gestire l'assistenza domiciliare con Vigil verificati.",
+      "Ogni Vigil passa attraverso un processo di verifica completo che include controllo documenti, colloquio conoscitivo, verifica referenze e formazione iniziale. Solo dopo aver superato tutti i controlli possono accedere alla piattaforma.",
   },
   {
     question: "Quanto costa il servizio? ",
     answer:
-      "Operatori selezionati, formati e verificati prima di iniziare a lavorare con te.",
+      "I prezzi variano in base al tipo di servizio e alla durata. Puoi vedere i costi chiari prima di prenotare, senza costi nascosti. Paghi solo per le visite effettuate tramite il portafoglio digitale.",
   },
   {
     question: "Posso cambiare Vigil se non mi trovo bene?",
     answer:
-      "Sì, puoi richiedere un cambio direttamente dall'app in qualsiasi momento.",
+      "Assolutamente sì. Puoi lasciare una recensione e richiedere un cambio assistente in qualsiasi momento. Il nostro algoritmo troverà subito un sostituto compatibile con le tue esigenze.",
   },
   {
     question: "Cosa succede se l'assistente annulla?",
     answer:
-      "Paghi in modo tracciato e sicuro dall'app, senza costi nascosti né vincoli.",
+      "In caso di cancellazione da parte dell'assistente, il nostro algoritmo inizia immediatamente la ricerca di un sostituto. Verrai avvisato tempestivamente e potrai approvare il nuovo Vigil proposto.",
   },
   {
     question: "In quali zone è attivo il servizio?",
     answer:
-      "Bastano pochi minuti: questionario, scelta dei Vigil e conferma del preventivo.",
+      "Vigila è attivo in diverse città italiane e stiamo espandendo continuamente la nostra copertura. Compila il questionario per verificare la disponibilità nella tua zona.",
   },
   {
     question: "C'è un impegno minimo?",
-    answer: "Puoi sospendere o disdire quando vuoi, senza penali.",
+    answer:
+      "No, non c'è nessun impegno mensile obbligatorio. Carichi il portafoglio digitale e prenoti solo le visite che ti servono, quando ne hai bisogno.",
   },
 ]
 
@@ -228,7 +244,7 @@ export default function LandingPage() {
       <LandingServiceStack
         services={services}
         cardHeight={340}
-        className="my-12 px-10"
+        className="px-10"
       />
 
       <LandingAccessGrid
@@ -291,21 +307,9 @@ export default function LandingPage() {
         ]}
         primaryLabel="Avvia la prova"
         primaryHref={AppConstants.whatsappUrl}
-        secondaryLabel="Diventa un Vigil"
+        secondaryLabel="Contatta il team"
         secondaryHref={Routes.registrationVigil.url}
-        helper={
-          <span>
-            Compila il questionario e, se hai dubbi, scrivi a Luigi su
-            <a
-              className="ml-1 underline"
-              href={AppConstants.whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              WhatsApp
-            </a>
-          </span>
-        }
+        
         className="pt-0"
       />
     </main>

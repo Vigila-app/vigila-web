@@ -27,9 +27,11 @@ const LandingCostEstimator = ({
   showBenefits = true,
   benefits = [
     "Assistenti verificati e qualificati",
-    "Pagamento sicuro tramite piattaforma",
-    "Supporto clienti dedicato",
-    "Possibilità di modificare le prenotazioni",
+    "Assegnazione intelligente",
+    "Accesso alla rete per le sostituzioni",
+    "Cambio assistente gratuito",
+    "Pagamenti sicuri e tracciati",
+    "Supporto dedicato",
   ],
 }: LandingCostEstimatorProps) => {
   const [hours, setHours] = useState(defaultHours)

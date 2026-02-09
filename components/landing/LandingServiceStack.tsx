@@ -46,7 +46,7 @@ const LandingServiceStack = ({
       subtitle="Fidati dei nostri Vigil. Sono stati formati e selezionati per
           garantire sempre la serenità."
       variant="white"
-      className={clsx("px-4 pb-16 pt-10", className)}
+      className={clsx("px-4 pb-16", className)}
     >
       <div className={clsx("relative mx-auto max-w-sm w-[300px]")}>
         <div className="relative" style={{ height: containerHeight }}>

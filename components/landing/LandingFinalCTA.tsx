@@ -13,7 +13,6 @@ export type LandingFinalCTAProps = {
   primaryHref: string
   secondaryLabel: string
   secondaryHref: string
-  helper?: ReactNode
   className?: string
 }
 
@@ -25,7 +24,6 @@ const LandingFinalCTA = ({
   primaryHref,
   secondaryLabel,
   secondaryHref,
-  helper,
   className,
 }: LandingFinalCTAProps) => {
   return (
@@ -64,7 +62,6 @@ const LandingFinalCTA = ({
             </Link>
           </div>
 
-          {helper && <p className="mt-4 text-xs text-white/85">{helper}</p>}
         </div>
     </Section>
   )

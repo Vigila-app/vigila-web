@@ -118,15 +118,16 @@ const LandingHeroCompact = ({
             ))}
           </div>
         </div>
-
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          width={300}
-          height={300}
-          className="object-cover w-full flex-1"
-          priority
-        />
+        <div className="flex justify-center w-full flex-1">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={600}
+            height={600}
+            className="object-cover sm-max-w-[50vw]"
+            priority
+          />
+        </div>
       </div>
 
       {pressMentions && pressMentions.length > 0 && (
