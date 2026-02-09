@@ -92,8 +92,7 @@ const LandingAccessGrid = ({
                     key={`${feature.title}-${index}`}
                     className={clsx(
                       "h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center",
-                      "lg-aspect-[1/1]",
-                      "aspect-[4/3]",
+                      // "aspect-[4/3]",
                       "flex flex-col justify-around",
                     )}
                   >
