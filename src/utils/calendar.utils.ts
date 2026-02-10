@@ -427,6 +427,16 @@ export const slotsOverlap = (
     compareTimeStrings(start1, end2) < 0 && compareTimeStrings(start2, end1) < 0
   );
 };
+export const dateRangesOverlap = (
+  from1: string, to1: string | null | undefined,
+  from2: string, to2: string | null | undefined
+): boolean => {
+  const end1 = to1 || "9999-12-31"; 
+  const end2 = to2 || "9999-12-31";
+  
+  return from1 <= end2 && from2 <= end1;
+};
+
 
 /**
  * Calculate duration in hours between two ISO datetime strings

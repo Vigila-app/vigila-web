@@ -14,6 +14,7 @@ import {
   isValidAvailabilityRuleDateRange,
   calculateDurationMinutes,
   slotsOverlap,
+  dateRangesOverlap,
 } from "@/src/utils/calendar.utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -177,14 +178,21 @@ export async function POST(req: NextRequest) {
 
     // Check if new rule overlaps with any existing rule for the same weekday
     if (existingRules && existingRules.length > 0) {
-      const hasOverlap = existingRules.some((rule: any) =>
-        slotsOverlap(
+      const hasOverlap = existingRules.some((rule: any) => {
+        const timeOverlap = slotsOverlap(
           body.start_time,
           body.end_time,
           rule.start_time,
           rule.end_time,
-        ),
-      );
+        );
+        const dateOverlap = dateRangesOverlap(
+          body.valid_from,
+          body.valid_to,
+          rule.valid_from,
+          rule.valid_to,
+        );
+        return timeOverlap && dateOverlap;
+      });
 
       if (hasOverlap) {
         return jsonErrorResponse(400, {

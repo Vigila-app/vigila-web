@@ -11,7 +11,7 @@ import {
   getWeekdayNameIT,
   formatTimeRange,
   getWeekdaysArray,
-  getHoursArray,
+  getTimeSlots,
   formatDateToISO,
 } from "@/src/utils/calendar.utils";
 
@@ -23,23 +23,23 @@ export const AvailabilityRulesDemo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state (internal representation uses numbers for hours)
+  // Form state (internal representation uses HH:MM format)
   const [formData, setFormData] = useState<{
     weekday: WeekdayEnum;
-    start_time: number;
-    end_time: number;
+    start_time: string;
+    end_time: string;
     valid_from: string;
     valid_to: string | null;
   }>({
     weekday: WeekdayEnum.MONDAY,
-    start_time: 9,
-    end_time: 17,
+    start_time: "09:00",
+    end_time: "17:00",
     valid_from: formatDateToISO(new Date()),
     valid_to: null,
   });
 
   const weekdays = getWeekdaysArray();
-  const times = getHoursArray();
+  const times = getTimeSlots(15); // 15-minute intervals
 
   useEffect(() => {
     loadRules();
@@ -60,10 +60,10 @@ export const AvailabilityRulesDemo = () => {
   };
 
   /**
-   * Convert hour number (0-23) to TIME format string (HH:00:00)
+   * Convert HH:MM to TIME format string (HH:MM:00)
    */
-  const convertHourToTimeFormat = (hour: number): string => {
-    return `${String(hour).padStart(2, "0")}:00:00`;
+  const convertTimeToTimeFormat = (time: string): string => {
+    return `${time}:00`;
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -89,8 +89,8 @@ export const AvailabilityRulesDemo = () => {
       const ruleData: VigilAvailabilityRuleFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
         weekday: formData.weekday!,
-        start_time: convertHourToTimeFormat(formData.start_time!),
-        end_time: convertHourToTimeFormat(formData.end_time!),
+        start_time: convertTimeToTimeFormat(formData.start_time!),
+        end_time: convertTimeToTimeFormat(formData.end_time!),
         valid_from: formData.valid_from!,
         valid_to: formData.valid_to || null,
       };
@@ -101,8 +101,8 @@ export const AvailabilityRulesDemo = () => {
       // Reset form
       setFormData({
         weekday: WeekdayEnum.MONDAY,
-        start_time: 9,
-        end_time: 17,
+        start_time: "09:00",
+        end_time: "17:00",
         valid_from: formatDateToISO(new Date()),
         valid_to: null,
       });
@@ -170,18 +170,18 @@ export const AvailabilityRulesDemo = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Hour
+                Start Time
               </label>
               <select
                 value={formData.start_time}
                 onChange={(e) =>
-                  setFormData({ ...formData, start_time: Number(e.target.value) })
+                  setFormData({ ...formData, start_time: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {times.slice(0, 23).map((time) => (
+                {times.map((time) => (
                   <option key={time} value={time}>
-                    {time}:00
+                    {time}
                   </option>
                 ))}
               </select>
@@ -189,18 +189,18 @@ export const AvailabilityRulesDemo = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Hour
+                End Time
               </label>
               <select
                 value={formData.end_time}
                 onChange={(e) =>
-                  setFormData({ ...formData, end_time: Number(e.target.value) })
+                  setFormData({ ...formData, end_time: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {times.slice(1).map((time) => (
+                {times.map((time) => (
                   <option key={time} value={time}>
-                    {time}:00
+                    {time}
                   </option>
                 ))}
               </select>
