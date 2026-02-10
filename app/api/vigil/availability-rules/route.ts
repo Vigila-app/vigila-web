@@ -9,11 +9,17 @@ import {
   VigilAvailabilityRuleI,
   VigilAvailabilityRuleFormI,
 } from "@/src/types/calendar.types";
+import {
+  isValidTimeRange,
+  isValidAvailabilityRuleDateRange,
+  calculateDurationMinutes,
+  slotsOverlap,
+} from "@/src/utils/calendar.utils";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/vigil/availability-rules
- * 
+ *
  * Returns all availability rules for the authenticated vigil
  */
 export async function GET(req: NextRequest) {
@@ -55,7 +61,7 @@ export async function GET(req: NextRequest) {
         data: rules || [],
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Get availability rules error:", error);
@@ -69,7 +75,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/vigil/availability-rules
- * 
+ *
  * Creates a new availability rule for the authenticated vigil
  */
 export async function POST(req: NextRequest) {
@@ -95,7 +101,7 @@ export async function POST(req: NextRequest) {
 
     const body: VigilAvailabilityRuleFormI = await req.json();
 
-    // Validate required fields
+    // 1. Validate required fields
     if (
       body.weekday === undefined ||
       body.start_time === undefined ||
@@ -110,7 +116,7 @@ export async function POST(req: NextRequest) {
       } as any);
     }
 
-    // Validate weekday range
+    // 2. Validate weekday range
     if (body.weekday < 0 || body.weekday > 6) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
@@ -119,30 +125,75 @@ export async function POST(req: NextRequest) {
       } as any);
     }
 
-    // Validate time range
-    if (
-      body.start_time < 0 ||
-      body.start_time > 23 ||
-      body.end_time < 1 ||
-      body.end_time > 24
-    ) {
+    // 3. Validate time range (start_time < end_time with full HH:MM support)
+    const timeRangeValidation = isValidTimeRange(
+      body.start_time,
+      body.end_time,
+    );
+    if (!timeRangeValidation.valid) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
         success: false,
-        message: "start_time must be 0-23, end_time must be 1-24",
+        message: timeRangeValidation.error,
       } as any);
     }
 
-    // Validate time range logic
-    if (body.end_time <= body.start_time) {
+    // 4. Validate minimum 1 hour duration
+    const durationMinutes = calculateDurationMinutes(
+      body.start_time,
+      body.end_time,
+    );
+    if (durationMinutes < 60) {
       return jsonErrorResponse(400, {
         code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
         success: false,
-        message: "end_time must be greater than start_time",
+        message: "Minimum duration must be at least 1 hour (60 minutes)",
+      } as any);
+    }
+
+    // 5. Validate valid_from and valid_to date range
+    const dateRangeValidation = isValidAvailabilityRuleDateRange(
+      body.valid_from,
+      body.valid_to,
+    );
+    if (!dateRangeValidation.valid) {
+      return jsonErrorResponse(400, {
+        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        success: false,
+        message: dateRangeValidation.error,
       } as any);
     }
 
     const _admin = getAdminClient();
+
+    // 6. Check for overlapping time slots on the same weekday
+    const { data: existingRules, error: fetchError } = await _admin
+      .from("vigil_availability_rules")
+      .select("*")
+      .eq("vigil_id", userObject.id)
+      .eq("weekday", body.weekday);
+
+    if (fetchError) throw fetchError;
+
+    // Check if new rule overlaps with any existing rule for the same weekday
+    if (existingRules && existingRules.length > 0) {
+      const hasOverlap = existingRules.some((rule: any) =>
+        slotsOverlap(
+          body.start_time,
+          body.end_time,
+          rule.start_time,
+          rule.end_time,
+        ),
+      );
+
+      if (hasOverlap) {
+        return jsonErrorResponse(400, {
+          code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+          success: false,
+          message: `Time slot overlaps with an existing availability rule for ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][body.weekday]}`,
+        } as any);
+      }
+    }
 
     // Create the rule (vigil_id is set from authenticated user)
     const newRule = {
@@ -168,7 +219,7 @@ export async function POST(req: NextRequest) {
         data: rule,
         success: true,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Create availability rule error:", error);

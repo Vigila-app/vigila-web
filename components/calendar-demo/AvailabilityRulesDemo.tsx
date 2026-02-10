@@ -23,8 +23,14 @@ export const AvailabilityRulesDemo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
-  const [formData, setFormData] = useState<Partial<VigilAvailabilityRuleFormI>>({
+  // Form state (internal representation uses numbers for hours)
+  const [formData, setFormData] = useState<{
+    weekday: WeekdayEnum;
+    start_time: number;
+    end_time: number;
+    valid_from: string;
+    valid_to: string | null;
+  }>({
     weekday: WeekdayEnum.MONDAY,
     start_time: 9,
     end_time: 17,
@@ -53,6 +59,13 @@ export const AvailabilityRulesDemo = () => {
     }
   };
 
+  /**
+   * Convert hour number (0-23) to TIME format string (HH:00:00)
+   */
+  const convertHourToTimeFormat = (hour: number): string => {
+    return `${String(hour).padStart(2, "0")}:00:00`;
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -76,8 +89,8 @@ export const AvailabilityRulesDemo = () => {
       const ruleData: VigilAvailabilityRuleFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
         weekday: formData.weekday!,
-        start_time: formData.start_time!,
-        end_time: formData.end_time!,
+        start_time: convertHourToTimeFormat(formData.start_time!),
+        end_time: convertHourToTimeFormat(formData.end_time!),
         valid_from: formData.valid_from!,
         valid_to: formData.valid_to || null,
       };

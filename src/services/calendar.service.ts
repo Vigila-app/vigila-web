@@ -42,6 +42,14 @@ import {
  */
 export class AvailabilityEngine {
   /**
+   * Helper: Parse TIME format string (HH:MM:SS) to hour number (0-23)
+   */
+  private static parseTimeToHour(timeStr: string): number {
+    const hours = parseInt(timeStr.split(':')[0], 10);
+    return hours;
+  }
+
+  /**
    * Generate available slots for a vigil in a date range
    */
   static generateAvailableSlots(params: {
@@ -118,7 +126,11 @@ export class AvailabilityEngine {
 
       // Generate hourly slots for each applicable rule
       for (const rule of applicableRules) {
-        for (let time = rule.start_time; time < rule.end_time; time++) {
+        // Parse TIME format strings (HH:MM:SS) to hour numbers
+        const startHour = this.parseTimeToHour(rule.start_time);
+        const endHour = this.parseTimeToHour(rule.end_time);
+
+        for (let time = startHour; time < endHour; time++) {
           slots.push({
             date: dateStr,
             start_time: time,
