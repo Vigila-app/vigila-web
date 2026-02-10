@@ -437,6 +437,30 @@ export const dateRangesOverlap = (
   return from1 <= end2 && from2 <= end1;
 };
 
+/**
+ * Check if two datetime ranges overlap
+ * Handles ISO datetime format strings
+ * Example: unavailabilitiesOverlap("2024-01-15T10:00:00Z", "2024-01-15T14:00:00Z", "2024-01-15T12:00:00Z", "2024-01-15T16:00:00Z") returns true
+ * @param start1 - Start datetime of first range (ISO format)
+ * @param end1 - End datetime of first range (ISO format)
+ * @param start2 - Start datetime of second range (ISO format)
+ * @param end2 - End datetime of second range (ISO format)
+ * @returns true if ranges overlap, false otherwise
+ */
+export const unavailabilitiesOverlap = (
+  start1: string,
+  end1: string,
+  start2: string,
+  end2: string,
+): boolean => {
+  const date1Start = new Date(start1);
+  const date1End = new Date(end1);
+  const date2Start = new Date(start2);
+  const date2End = new Date(end2);
+
+  // Two ranges overlap if: start1 < end2 AND start2 < end1
+  return date1Start < date2End && date2Start < date1End;
+};
 
 /**
  * Calculate duration in hours between two ISO datetime strings

@@ -15,7 +15,9 @@ import { dateDisplay } from "@/src/utils/date.utils";
  * Demo component for Unavailabilities CRUD operations
  */
 export const UnavailabilitiesDemo = () => {
-  const [unavailabilities, setUnavailabilities] = useState<VigilUnavailabilityI[]>([]);
+  const [unavailabilities, setUnavailabilities] = useState<
+    VigilUnavailabilityI[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,28 +51,18 @@ export const UnavailabilitiesDemo = () => {
     setLoading(true);
     setError(null);
     try {
-      // Validate datetime range
-      if (formData.end_at && formData.start_at && formData.end_at <= formData.start_at) {
-        setError("End date/time must be after start date/time");
-        setLoading(false);
-        return;
-      }
-
-      // Convert datetime-local format to ISO datetime
-      const startAtISO = new Date(formData.start_at!).toISOString();
-      const endAtISO = new Date(formData.end_at!).toISOString();
 
       // Note: In a real scenario, vigil_id would come from authenticated user
       const unavailabilityData: VigilUnavailabilityFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
-        start_at: startAtISO,
-        end_at: endAtISO,
+        start_at: formData.start_at!,
+        end_at: formData.end_at!,
         reason: formData.reason || undefined,
       };
 
       await CalendarService.createVigilUnavailability(unavailabilityData);
       await loadUnavailabilities();
-      
+
       // Reset form
       setFormData({
         start_at: "",
@@ -78,7 +70,10 @@ export const UnavailabilitiesDemo = () => {
         reason: "",
       });
     } catch (err: any) {
-      setError(err.message || "Failed to create unavailability");
+  
+      setError(
+        err.message || "Failed to create unavailability",
+      );
       console.error("Error creating unavailability:", err);
     } finally {
       setLoading(false);
@@ -100,9 +95,11 @@ export const UnavailabilitiesDemo = () => {
         )}
 
         {/* Create Form */}
-        <form onSubmit={handleCreate} className="space-y-4 mb-6 p-4 bg-gray-50 rounded">
+        <form
+          onSubmit={handleCreate}
+          className="space-y-4 mb-6 p-4 bg-gray-50 rounded">
           <h3 className="text-lg font-semibold">Create New Unavailability</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -153,8 +150,7 @@ export const UnavailabilitiesDemo = () => {
           <button
             type="submit"
             disabled={loading || !formData.start_at || !formData.end_at}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
             {loading ? "Creating..." : "Create Unavailability"}
           </button>
         </form>
@@ -166,8 +162,7 @@ export const UnavailabilitiesDemo = () => {
             <button
               onClick={loadUnavailabilities}
               disabled={loading}
-              className="bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 disabled:opacity-50"
-            >
+              className="bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 disabled:opacity-50">
               {loading ? "Loading..." : "Refresh"}
             </button>
           </div>
@@ -181,20 +176,20 @@ export const UnavailabilitiesDemo = () => {
               {unavailabilities.map((unavailability) => {
                 const duration = calculateDurationHours(
                   unavailability.start_at,
-                  unavailability.end_at
+                  unavailability.end_at,
                 );
                 return (
                   <div
                     key={unavailability.id}
-                    className="p-3 bg-gray-50 border border-gray-200 rounded"
-                  >
+                    className="p-3 bg-gray-50 border border-gray-200 rounded">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="font-medium text-lg">
                           {unavailability.reason || "No reason specified"}
                         </p>
                         <p className="text-sm text-gray-600">
-                          From: {dateDisplay(unavailability.start_at, "dateTime")}
+                          From:{" "}
+                          {dateDisplay(unavailability.start_at, "dateTime")}
                         </p>
                         <p className="text-sm text-gray-600">
                           To: {dateDisplay(unavailability.end_at, "dateTime")}

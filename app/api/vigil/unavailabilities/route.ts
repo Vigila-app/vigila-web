@@ -9,11 +9,15 @@ import {
   VigilUnavailabilityI,
   VigilUnavailabilityFormI,
 } from "@/src/types/calendar.types";
+import {
+  isValidUnavailabilityDateRange,
+  unavailabilitiesOverlap,
+} from "@/src/utils/calendar.utils";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/vigil/unavailabilities
- * 
+ *
  * Returns all unavailabilities for the authenticated vigil
  */
 export async function GET(req: NextRequest) {
@@ -54,7 +58,7 @@ export async function GET(req: NextRequest) {
         data: unavailabilities || [],
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Get unavailabilities error:", error);
@@ -68,7 +72,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/vigil/unavailabilities
- * 
+ *
  * Creates a new unavailability for the authenticated vigil
  */
 export async function POST(req: NextRequest) {
@@ -91,7 +95,7 @@ export async function POST(req: NextRequest) {
         message: "Only vigils can create unavailabilities",
       } as any);
     }
-
+    // dati passati dal front end
     const body: VigilUnavailabilityFormI = await req.json();
 
     // Validate required fields
@@ -102,8 +106,19 @@ export async function POST(req: NextRequest) {
         message: "Missing required fields: start_at, end_at",
       } as any);
     }
-
-    // Validate time range
+    // Validate datetime range using utility function
+    const dateRangeValidation = isValidUnavailabilityDateRange(
+      body.start_at,
+      body.end_at,
+    );
+    if (!dateRangeValidation.valid) {
+      return jsonErrorResponse(400, {
+        code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
+        success: false,
+        message: dateRangeValidation.error,
+      } as any);
+    }
+    //crezione oggetto date
     const startDate = new Date(body.start_at);
     const endDate = new Date(body.end_at);
 
@@ -111,26 +126,47 @@ export async function POST(req: NextRequest) {
       return jsonErrorResponse(400, {
         code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
         success: false,
-        message: "Invalid date format for start_at or end_at",
+        message: "Invalid start_at or end_at date format",
       } as any);
     }
-
-    if (endDate <= startDate) {
-      return jsonErrorResponse(400, {
-        code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
-        success: false,
-        message: "end_at must be after start_at",
-      } as any);
-    }
-
+    //normalizzazione iso
+    const startISO = startDate.toISOString();
+    const endISO = endDate.toISOString();
     const _admin = getAdminClient();
+
+    // Check for overlapping unavailabilities
+    const { data: existingUnavailabilities, error: fetchError } = await _admin
+      .from("vigil_unavailabilities")
+      .select("*")
+      .eq("vigil_id", userObject.id);
+
+    if (fetchError) throw fetchError;
+
+    if (existingUnavailabilities && existingUnavailabilities.length > 0) {
+      const hasOverlap = existingUnavailabilities.some((unavail: any) =>
+        unavailabilitiesOverlap(
+          startISO,
+          endISO,
+          unavail.start_at,
+          unavail.end_at,
+        ),
+      );
+
+      if (hasOverlap) {
+        return jsonErrorResponse(409, {
+          code: "UNAVAILABILITIES_CREATE_OVERLAP",
+          success: false,
+          message: "This unavailability overlaps with an existing one",
+        } as any);
+      }
+    }
 
     // Create the unavailability (vigil_id is set from authenticated user)
     const newUnavailability = {
       vigil_id: userObject.id, // Always use authenticated user's ID
-      start_at: body.start_at,
-      end_at: body.end_at,
-      reason: body.reason || null,
+      start_at: startISO,
+      end_at: endISO,
+      reason: body.reason?.trim() || null,
     };
 
     const { data: unavailability, error } = await _admin
@@ -147,7 +183,7 @@ export async function POST(req: NextRequest) {
         data: unavailability,
         success: true,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Create unavailability error:", error);
