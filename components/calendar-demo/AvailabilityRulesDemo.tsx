@@ -59,13 +59,6 @@ export const AvailabilityRulesDemo = () => {
     }
   };
 
-  /**
-   * Convert HH:MM to TIME format string (HH:MM:00)
-   */
-  const convertTimeToTimeFormat = (time: string): string => {
-    return `${time}:00`;
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -89,15 +82,15 @@ export const AvailabilityRulesDemo = () => {
       const ruleData: VigilAvailabilityRuleFormI = {
         vigil_id: "demo-vigil-id", // This would be from auth context
         weekday: formData.weekday!,
-        start_time: convertTimeToTimeFormat(formData.start_time!),
-        end_time: convertTimeToTimeFormat(formData.end_time!),
+        start_time: formData.start_time!,
+        end_time: formData.end_time!,
         valid_from: formData.valid_from!,
         valid_to: formData.valid_to || null,
       };
 
       await CalendarService.createVigilAvailabilityRule(ruleData);
       await loadRules();
-      
+
       // Reset form
       setFormData({
         weekday: WeekdayEnum.MONDAY,
@@ -135,7 +128,8 @@ export const AvailabilityRulesDemo = () => {
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-2xl font-bold mb-4">Availability Rules Demo</h2>
         <p className="text-gray-600 mb-4">
-          Test CRUD operations for Vigil availability rules (weekly recurring patterns)
+          Test CRUD operations for Vigil availability rules (weekly recurring
+          patterns)
         </p>
 
         {error && (
@@ -145,9 +139,11 @@ export const AvailabilityRulesDemo = () => {
         )}
 
         {/* Create Form */}
-        <form onSubmit={handleCreate} className="space-y-4 mb-6 p-4 bg-gray-50 rounded">
+        <form
+          onSubmit={handleCreate}
+          className="space-y-4 mb-6 p-4 bg-gray-50 rounded">
           <h3 className="text-lg font-semibold">Create New Rule</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -156,10 +152,12 @@ export const AvailabilityRulesDemo = () => {
               <select
                 value={formData.weekday}
                 onChange={(e) =>
-                  setFormData({ ...formData, weekday: Number(e.target.value) as WeekdayEnum })
+                  setFormData({
+                    ...formData,
+                    weekday: Number(e.target.value) as WeekdayEnum,
+                  })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 {weekdays.map((day) => (
                   <option key={day.value} value={day.value}>
                     {day.labelIT} ({day.label})
@@ -177,8 +175,7 @@ export const AvailabilityRulesDemo = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, start_time: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 {times.map((time) => (
                   <option key={time} value={time}>
                     {time}
@@ -196,8 +193,7 @@ export const AvailabilityRulesDemo = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, end_time: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 {times.map((time) => (
                   <option key={time} value={time}>
                     {time}
@@ -238,8 +234,7 @@ export const AvailabilityRulesDemo = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
             {loading ? "Creating..." : "Create Rule"}
           </button>
         </form>
@@ -251,24 +246,25 @@ export const AvailabilityRulesDemo = () => {
             <button
               onClick={loadRules}
               disabled={loading}
-              className="bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 disabled:opacity-50"
-            >
+              className="bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 disabled:opacity-50">
               {loading ? "Loading..." : "Refresh"}
             </button>
           </div>
 
           {rules.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No rules found. Create one above!</p>
+            <p className="text-gray-500 text-center py-4">
+              No rules found. Create one above!
+            </p>
           ) : (
             <div className="space-y-2">
               {rules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded"
-                >
+                  className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded">
                   <div>
                     <p className="font-medium">
-                      {getWeekdayNameIT(rule.weekday)} - {formatTimeRange(rule.start_time, rule.end_time)}
+                      {getWeekdayNameIT(rule.weekday)} -{" "}
+                      {formatTimeRange(rule.start_time, rule.end_time)}
                     </p>
                     <p className="text-sm text-gray-600">
                       Valid from {rule.valid_from}
@@ -278,8 +274,7 @@ export const AvailabilityRulesDemo = () => {
                   <button
                     onClick={() => handleDelete(rule.id)}
                     disabled={loading}
-                    className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 disabled:opacity-50"
-                  >
+                    className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 disabled:opacity-50">
                     Delete
                   </button>
                 </div>

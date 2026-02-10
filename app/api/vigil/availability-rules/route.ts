@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     );
     if (durationMinutes < 60) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        code: "AVAILABILITY_RULES_MIN_DURATION_ERROR",
         success: false,
         message: "Minimum duration must be at least 1 hour (60 minutes)",
       } as any);
@@ -195,8 +195,8 @@ export async function POST(req: NextRequest) {
       });
 
       if (hasOverlap) {
-        return jsonErrorResponse(400, {
-          code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        return jsonErrorResponse(409, {
+          code: "AVAILABILITY_RULES_OVERLAP_ERROR",
           success: false,
           message: `Time slot overlaps with an existing availability rule for ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][body.weekday]}`,
         } as any);
