@@ -12,7 +12,7 @@ The Calendar & Availability System is a comprehensive feature that enables **Vig
 - Vigils define their regular working hours on a weekly basis
 - Example: "Every Monday from 9:00 to 17:00"
 - Weekday values: 0=Sunday, 1=Monday, ..., 6=Saturday
-- Hour range: start_hour (0-23), end_hour (1-24)
+- Hour range: start_time (0-23), end_time (1-24)
 - Rules can have validity periods (valid_from, valid_to)
 
 ### 2. Unavailabilities (Specific Blocks)
@@ -137,8 +137,8 @@ Create a new availability rule.
 ```json
 {
   "weekday": 1,
-  "start_hour": 9,
-  "end_hour": 17,
+  "start_time": 9,
+  "end_time": 17,
   "valid_from": "2024-01-01",
   "valid_to": "2024-12-31"
 }
@@ -146,9 +146,9 @@ Create a new availability rule.
 
 **Validations**:
 - weekday: 0-6
-- start_hour: 0-23
-- end_hour: 1-24
-- end_hour > start_hour
+- start_time: 0-23
+- end_time: 1-24
+- end_time > start_time
 - valid_to >= valid_from (if provided)
 
 #### DELETE /api/vigil/availability-rules/:ruleId
@@ -214,8 +214,8 @@ Get available time slots for a vigil and service.
     "slots": [
       {
         "date": "2024-01-15",
-        "start_hour": 9,
-        "end_hour": 11,
+        "start_time": 9,
+        "end_time": 11,
         "available": true,
         "duration_hours": 2
       }
@@ -244,7 +244,7 @@ Get available time slots for a vigil and service.
 - Remove slots that have any overlap
 
 ### Step 4: Aggregate Consecutive Slots
-- For services requiring multiple hours (e.g., 3-hour service)
+- For services requiring multiple times (e.g., 3-time service)
 - Find sequences of N consecutive available slots
 - Only include slots where the full duration is available
 

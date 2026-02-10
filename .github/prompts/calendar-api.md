@@ -49,8 +49,8 @@ Disponibilità ricorrenti settimanali
 - id
 - vigil_id
 - weekday (0–6, domenica = 0)
-- start_hour (0–23)
-- end_hour (1–24)
+- start_time (0–23)
+- end_time (1–24)
 - valid_from (date)
 - valid_to (date | null)
 

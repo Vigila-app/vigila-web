@@ -42,6 +42,14 @@ import {
  */
 export class AvailabilityEngine {
   /**
+   * Helper: Parse TIME format string (HH:MM:SS) to hour number (0-23)
+   */
+  private static parseTimeToHour(timeStr: string): number {
+    const hours = parseInt(timeStr.split(':')[0], 10);
+    return hours;
+  }
+
+  /**
    * Generate available slots for a vigil in a date range
    */
   static generateAvailableSlots(params: {
@@ -118,11 +126,15 @@ export class AvailabilityEngine {
 
       // Generate hourly slots for each applicable rule
       for (const rule of applicableRules) {
-        for (let hour = rule.start_hour; hour < rule.end_hour; hour++) {
+        // Parse TIME format strings (HH:MM:SS) to hour numbers
+        const startHour = this.parseTimeToHour(rule.start_time);
+        const endHour = this.parseTimeToHour(rule.end_time);
+
+        for (let time = startHour; time < endHour; time++) {
           slots.push({
             date: dateStr,
-            start_hour: hour,
-            end_hour: hour + 1,
+            start_time: time,
+            end_time: time + 1,
             available: true,
             duration_hours: 1,
           });
@@ -182,8 +194,8 @@ export class AvailabilityEngine {
     conflicts: SlotConflictI[]
   ): TimeSlotI[] {
     return slots.filter((slot) => {
-      const slotStart = this.slotToDateTime(slot, slot.start_hour);
-      const slotEnd = this.slotToDateTime(slot, slot.end_hour);
+      const slotStart = this.slotToDateTime(slot, slot.start_time);
+      const slotEnd = this.slotToDateTime(slot, slot.end_time);
 
       // Check if slot conflicts with any booking or unavailability
       for (const conflict of conflicts) {
@@ -221,8 +233,8 @@ export class AvailabilityEngine {
 
     // For each date, find consecutive slot sequences
     for (const [date, dateSlots] of Array.from(slotsByDate)) {
-      // Sort by start_hour
-      dateSlots.sort((a, b) => a.start_hour - b.start_hour);
+      // Sort by start_time
+      dateSlots.sort((a, b) => a.start_time - b.start_time);
 
       // Find consecutive sequences of required length
       for (let i = 0; i <= dateSlots.length - serviceDurationHours; i++) {
@@ -230,7 +242,7 @@ export class AvailabilityEngine {
 
         // Check if next N slots are consecutive
         for (let j = 0; j < serviceDurationHours - 1; j++) {
-          if (dateSlots[i + j].end_hour !== dateSlots[i + j + 1].start_hour) {
+          if (dateSlots[i + j].end_time !== dateSlots[i + j + 1].start_time) {
             isConsecutive = false;
             break;
           }
@@ -240,8 +252,8 @@ export class AvailabilityEngine {
           // Create aggregated slot
           aggregated.push({
             date,
-            start_hour: dateSlots[i].start_hour,
-            end_hour: dateSlots[i + serviceDurationHours - 1].end_hour,
+            start_time: dateSlots[i].start_time,
+            end_time: dateSlots[i + serviceDurationHours - 1].end_time,
             available: true,
             duration_hours: serviceDurationHours,
           });
@@ -267,9 +279,9 @@ export class AvailabilityEngine {
   /**
    * Convert a slot and hour to a Date object
    */
-  private static slotToDateTime(slot: TimeSlotI, hour: number): Date {
+  private static slotToDateTime(slot: TimeSlotI, time: number): Date {
     const date = new Date(slot.date);
-    date.setHours(hour, 0, 0, 0);
+    date.setHours(time, 0, 0, 0);
     return date;
   }
 

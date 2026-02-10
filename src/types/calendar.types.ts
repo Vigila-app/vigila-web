@@ -30,8 +30,8 @@ export interface VigilAvailabilityRuleI {
   updated_at: string;
   vigil_id: string;
   weekday: WeekdayEnum; // 0-6 (Sunday-Saturday)
-  start_hour: number; // 0-23
-  end_hour: number; // 1-24
+  start_time: string; // TIME format (HH:MM:SS), e.g., "09:00:00"
+  end_time: string; // TIME format (HH:MM:SS), e.g., "17:00:00"
   valid_from: string; // ISO date format (YYYY-MM-DD)
   valid_to: string | null; // ISO date format or null for indefinite
 }
@@ -42,8 +42,8 @@ export interface VigilAvailabilityRuleI {
 export interface VigilAvailabilityRuleFormI {
   vigil_id: string;
   weekday: WeekdayEnum;
-  start_hour: number;
-  end_hour: number;
+  start_time: string; // TIME format (HH:MM:SS), e.g., "09:00:00"
+  end_time: string; // TIME format (HH:MM:SS), e.g., "17:00:00"
   valid_from: string;
   valid_to?: string | null;
 }
@@ -79,8 +79,8 @@ export interface VigilUnavailabilityFormI {
  */
 export interface TimeSlotI {
   date: string; // ISO date format (YYYY-MM-DD)
-  start_hour: number; // 0-23
-  end_hour: number; // 1-24
+  start_time: number; // 0-23
+  end_time: number; // 1-24
   available: boolean;
   duration_hours: number;
 }

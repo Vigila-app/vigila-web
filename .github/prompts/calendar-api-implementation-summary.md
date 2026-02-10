@@ -41,8 +41,8 @@ Stores weekly recurring availability patterns (e.g., "Every Monday 9-17").
 - `id` (uuid, PK)
 - `vigil_id` (uuid, FK → vigils)
 - `weekday` (0-6, Sunday-Saturday)
-- `start_hour` (0-23)
-- `end_hour` (1-24)
+- `start_time` (0-23)
+- `end_time` (1-24)
 - `valid_from` (date)
 - `valid_to` (date, nullable)
 - `created_at`, `updated_at`
@@ -180,8 +180,8 @@ Create new availability rule.
 ```json
 {
   "weekday": 1,
-  "start_hour": 9,
-  "end_hour": 17,
+  "start_time": 9,
+  "end_time": 17,
   "valid_from": "2024-01-01",
   "valid_to": "2024-12-31"
 }
@@ -189,9 +189,9 @@ Create new availability rule.
 
 **Validations**:
 - weekday: 0-6
-- start_hour: 0-23
-- end_hour: 1-24
-- end_hour > start_hour
+- start_time: 0-23
+- end_time: 1-24
+- end_time > start_time
 
 #### `DELETE /api/vigil/availability-rules/:ruleId`
 Delete availability rule.
@@ -248,8 +248,8 @@ Calculate available time slots for booking.
   "slots": [
     {
       "date": "2024-01-15",
-      "start_hour": 9,
-      "end_hour": 11,
+      "start_time": 9,
+      "end_time": 11,
       "available": true,
       "duration_hours": 2
     }
