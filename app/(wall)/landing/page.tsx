@@ -66,19 +66,19 @@ const services = [
     image: "/assets/service_card_2.png",
   },
   {
-    title: "Igiene",
-    description: "",
-    image: "/assets/service_card_1.png",
+    title: "Igiene personale",
+    description: "Doccia, igiene a letto e cura personale",
+    image: "/assets/service_card_3.png",
   },
   {
     title: "Accompagnamento in auto",
     description: "Visite mediche, terapie, disbrigo pratiche",
-    image: "/assets/service_card_1.png",
+    image: "/assets/service_card_4.png",
   },
   {
     title: "Assistenza leggera in casa",
     description: "Pasti, mobilità, vestizione, rassetto, farmaci",
-    image: "/assets/service_card_2.png",
+    image: "/assets/service_card_5.png",
   },
 ]
 
