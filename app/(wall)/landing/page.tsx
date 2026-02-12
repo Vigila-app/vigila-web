@@ -56,6 +56,16 @@ const trustBadges = [
 
 const services = [
   {
+    title: "Accompagnamento in auto",
+    description: "Visite mediche, terapie, disbrigo pratiche",
+    image: "/assets/service_card_4.png",
+  },
+  {
+    title: "Igiene personale",
+    description: "Doccia, igiene a letto e cura personale",
+    image: "/assets/service_card_3.png",
+  },
+  {
     title: "Compagnia e supervisione",
     description: "Presenza, conversazione e monitoraggio leggere",
     image: "/assets/service_card_1.png",
@@ -64,16 +74,6 @@ const services = [
     title: "Spesa e commissioni",
     description: "Farmacia, supermercato e piccole commissioni",
     image: "/assets/service_card_2.png",
-  },
-  {
-    title: "Igiene personale",
-    description: "Doccia, igiene a letto e cura personale",
-    image: "/assets/service_card_3.png",
-  },
-  {
-    title: "Accompagnamento in auto",
-    description: "Visite mediche, terapie, disbrigo pratiche",
-    image: "/assets/service_card_4.png",
   },
   {
     title: "Assistenza leggera in casa",
