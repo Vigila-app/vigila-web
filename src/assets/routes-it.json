@@ -11,6 +11,7 @@
     "private": false,
     "roles": []
   },
+  
   "homeConsumer": {
     "url": "/home",
     "label": "Home",
