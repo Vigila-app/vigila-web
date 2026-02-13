@@ -214,7 +214,7 @@ const faqs = [
   },
 ]
 
-export default function LandingPage() {
+export default function LandingComponent() {
   return (
     <main className="min-h-screen bg-white">
       <LandingHeroCompact
