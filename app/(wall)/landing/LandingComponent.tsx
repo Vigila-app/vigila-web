@@ -227,7 +227,7 @@ export default function LandingComponent() {
         description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari, con persone verificate nella tua zona."
         primaryCTA={{
           label: "Richiedi assistenza",
-          href: Routes.registrationConsumer.url,
+          href: "https://app.youform.com/forms/zktn92x0",
           variant: "primary",
         }}
         secondaryCTA={{
@@ -306,7 +306,7 @@ export default function LandingComponent() {
           { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
         ]}
         primaryLabel="Avvia la prova"
-        primaryHref={AppConstants.whatsappUrl}
+        primaryHref={"https://app.youform.com/forms/zktn92x0"}
         secondaryLabel="Contatta il team"
         secondaryHref={AppConstants.whatsappUrl}
         className="pt-0"

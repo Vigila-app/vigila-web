@@ -78,7 +78,7 @@ const LandingHeroCompact = ({
         : "bg-consumer-blue text-white hover:bg-consumer-light-blue"
 
     return (
-      <Link href={cta.href} className={clsx(base, variantClass)}>
+      <Link href={cta.href} target="_blank" className={clsx(base, variantClass)}>
         {cta.icon}
         <span>{cta.label}</span>
       </Link>
