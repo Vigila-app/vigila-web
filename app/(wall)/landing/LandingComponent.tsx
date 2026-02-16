@@ -306,7 +306,7 @@ export default function LandingComponent() {
           { text: "Ci vogliono solo 3 minuti", icon: <ClockIcon /> },
         ]}
         primaryLabel="Avvia la prova"
-        primaryHref={"https://app.youform.com/forms/zktn92x0"}
+        primaryHref={AppConstants.whatsappUrl}
         secondaryLabel="Contatta il team"
         secondaryHref={AppConstants.whatsappUrl}
         className="pt-0"
