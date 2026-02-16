@@ -15,10 +15,10 @@ export default function VigilRedirectHandler() {
       switch (user?.user_metadata?.status) {
         case UserStatusEnum.ACTIVE:
         default:
-          break;
+          break
         case UserStatusEnum.PENDING:
-          router.replace(Routes.onBoardVigil.url);
-          break;
+          router.replace(Routes.onBoardVigil.url) //TODO: fix on json file and bring back to onboarding
+          break
       }
     }
   }, [user, router]);

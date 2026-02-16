@@ -58,7 +58,7 @@ const HomeComponent = (props: HomeComponentI) => {
             <div className="grid gap-4">
               <div className="p-4 border-2 border-consumer-blue rounded-3xl flex flex-col items-center text-center bg-consumer-light-blue">
                 <div className="w-8 h-8  mb-2">
-                  <Cuore />
+                  <Cuore className="text-consumer-blue" />
                 </div>
                 <h3 className="font-semibold text-lg text-consumer-blue">
                   Hai bisogno di aiuto?
@@ -72,14 +72,15 @@ const HomeComponent = (props: HomeComponentI) => {
                 role={RolesEnum.CONSUMER}
                 full
                 href={primaryAction?.url}
-                type="button">
+                type="button"
+              >
                 {primaryAction?.label || "Trova un vigil vicino a te"}
               </ButtonLink>
 
               {/* Vuoi lavorare? */}
               <div className="p-4 mt-4 border-2 border-vigil-orange rounded-3xl flex flex-col items-center text-center bg-vigil-light-orange">
                 <div className="w-8 h-8  mb-2">
-                  <Smile />
+                  <Smile className="text-vigil-orange" />
                 </div>
                 <h3 className="font-semibold text-lg text-vigil-orange">
                   Vuoi lavorare?
@@ -93,7 +94,8 @@ const HomeComponent = (props: HomeComponentI) => {
                 full
                 href={secondaryAction?.url}
                 type="button"
-                role={RolesEnum.VIGIL}>
+                role={RolesEnum.VIGIL}
+              >
                 {secondaryAction?.label || "Diventa un Vigil"}
               </ButtonLink>
             </div>
@@ -104,19 +106,19 @@ const HomeComponent = (props: HomeComponentI) => {
           <div className="flex justify-between items-center py-4 ">
             <div className="flex items-center font-medium gap-1 text-[12px]">
               <div className="w-6 h-6 text-primary mb-1 flex items-center ">
-                <Scudo />
+                <Scudo className="text-consumer-blue" />
               </div>
               <span>Vigil verificati</span>
             </div>
             <div className="flex items-center font-medium gap-1 text-[12px]">
               <div className="w-6 h-6 text-primary mb-1 flex items-center ">
-                <Casa />
+                <Casa className="text-vigil-orange" />
               </div>
               <span>Nella tua zona</span>
             </div>
             <div className="flex items-center font-medium gap-1 text-[12px]">
               <div className="w-6 h-6 text-primary mb-1 flex items-center ">
-                <Euro />
+                <Euro className="text-consumer-blue" />
               </div>
               <span>Pagamenti sicuri</span>
             </div>
@@ -134,7 +136,7 @@ const HomeComponent = (props: HomeComponentI) => {
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
-                  <Stetoscopio />
+                  <Stetoscopio className="text-consumer-blue" />
                 </div>
                 <h3 className="font-semibold text-lg">Hai bisogno di aiuto?</h3>
                 <p className="text-[12px] font-normal mt-1">
@@ -147,7 +149,7 @@ const HomeComponent = (props: HomeComponentI) => {
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
-                  <CarrelloSpesa />
+                  <CarrelloSpesa className="text-vigil-orange" />
                 </div>
                 <h3 className="font-semibold text-lg">Spesa insieme</h3>
                 <p className="text-[12px]  font-normal mt-1">
@@ -160,7 +162,7 @@ const HomeComponent = (props: HomeComponentI) => {
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-vigil-light-orange mb-2">
-                  <Automobile />
+                  <Automobile className="text-vigil-orange" />
                 </div>
                 <h3 className="font-semibold text-lg">Viaggi condivisi</h3>
                 <p className="text-[12px] font-normal mt-1">
@@ -173,7 +175,7 @@ const HomeComponent = (props: HomeComponentI) => {
             <Card className="p-4 rounded-lg shadow-sm bg-pureWhite flex flex-col items-center justify-center text-center">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-consumer-light-blue mb-2">
-                  <Cuore />
+                  <Cuore className="text-consumer-blue" />
                 </div>
                 <h3 className="font-semibold text-lg">Compagnia sincera</h3>
                 <p className="text-[12px] font-normal mt-1">
@@ -251,7 +253,7 @@ const HomeComponent = (props: HomeComponentI) => {
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-20 h-20 rounded-full border-2 border-consumer-blue flex items-center justify-center bg-consumer-light-blue">
                   <div className="w-10 h-10 flex justify-center items-center">
-                    <Cuore />
+                    <Cuore className="text-consumer-blue" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-consumer-blue">
@@ -283,7 +285,8 @@ const HomeComponent = (props: HomeComponentI) => {
                     Scegli chi ti ispira fiducia
                   </p>
                   <p className="text-[12px] ">
-                    Leggi recensioni e seleziona l&apos;Assistente Vigil più adatto
+                    Leggi recensioni e seleziona l&apos;Assistente Vigil più
+                    adatto
                   </p>
                 </div>
                 {/* Step 3 Famiglie */}
@@ -353,7 +356,7 @@ const HomeComponent = (props: HomeComponentI) => {
         </section>
       </div>
     </>
-  );
+  )
 };
 
 export default HomeComponent;

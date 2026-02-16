@@ -139,7 +139,9 @@ const MenuMobile = () => {
                     ? Routes.profileConsumer
                     : user.user_metadata?.role === RolesEnum.VIGIL
                       ? Routes.profileVigil
-                      : Routes.admin,
+                      : user.user_metadata?.role === RolesEnum.ADMIN
+                        ? Routes.profileAdmin
+                        : Routes.home,
                   UserIcon
                 )}
               </li>

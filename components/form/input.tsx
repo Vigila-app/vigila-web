@@ -71,7 +71,7 @@ const Input = (props: InputI) => {
           {...{ ...props, type, error: undefined, icon: undefined }}
           id={id || name || label}
           className={clsx(
-            "relative appearance-none w-full flex-1 border-none bg-transparent rounded-4xl pl-0.5 focus:placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0",
+            "relative appearance-none w-full flex-1 border-none bg-transparent rounded-4xl pl-1.5 focus:placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0",
             disabled && "cursor-not-allowed",
             "scroll-m-12"
           )}

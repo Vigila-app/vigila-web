@@ -11,37 +11,40 @@ import {
   UnavailabilitiesDemo,
   AvailableSlotsDemo,
 } from "@/components/calendar-demo";
+import AvailabilityFlow from "@/components/calendar/AvailabilityRules/AvailabilityFlow"
 
 const PlaygroundComponent = (props: { data?: any }) => {
-  const { data = "{}" } = props;
-  const { currentLocation } = useCurrentLocation({ onRender: true });
+  const { data = "{}" } = props
+  const { currentLocation } = useCurrentLocation({ onRender: true })
   const [mapPosition, setMapPosition] = useState<LatLngExpression | null>(
     currentLocation
       ? [currentLocation.latitude, currentLocation.longitude]
-      : null
-  );
-  const [activeTab, setActiveTab] = useState<"maps" | "calendar">("calendar");
+      : null,
+  )
+  const [activeTab, setActiveTab] = useState<
+    "maps" | "calendar" | "availabilityFlow"
+  >("calendar")
 
   const test = async () => {
     try {
-      const user = await UserService.getUser();
-      console.log("PlaygroundComponent test", user);
+      const user = await UserService.getUser()
+      console.log("PlaygroundComponent test", user)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (currentLocation) {
-      setMapPosition([currentLocation.latitude, currentLocation.longitude]);
+      setMapPosition([currentLocation.latitude, currentLocation.longitude])
     }
-  }, [currentLocation]);
+  }, [currentLocation])
 
   useEffect(() => {
-    test();
-  }, []);
+    test()
+  }, [])
 
-  console.log("data", JSON.parse(data));
+  console.log("data", JSON.parse(data))
 
   return (
     <div className="space-y-6">
@@ -76,6 +79,16 @@ const PlaygroundComponent = (props: { data?: any }) => {
             >
               Maps Integration
             </button>
+            <button
+              onClick={() => setActiveTab("availabilityFlow")}
+              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === "availabilityFlow"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Availability Flow
+            </button>
           </nav>
         </div>
 
@@ -83,11 +96,14 @@ const PlaygroundComponent = (props: { data?: any }) => {
           {activeTab === "calendar" && (
             <div className="space-y-8">
               <div className="prose max-w-none">
-                <h2 className="text-2xl font-bold">Calendar & Availability System</h2>
+                <h2 className="text-2xl font-bold">
+                  Calendar & Availability System
+                </h2>
                 <p className="text-gray-600">
-                  This section demonstrates the calendar and availability system APIs.
-                  Test CRUD operations for availability rules, unavailabilities, and
-                  the availability engine that calculates bookable time slots.
+                  This section demonstrates the calendar and availability system
+                  APIs. Test CRUD operations for availability rules,
+                  unavailabilities, and the availability engine that calculates
+                  bookable time slots.
                 </p>
               </div>
 
@@ -107,7 +123,8 @@ const PlaygroundComponent = (props: { data?: any }) => {
               <div className="prose max-w-none">
                 <h2 className="text-2xl font-bold">Maps Integration</h2>
                 <p className="text-gray-600">
-                  Test the maps integration with address search and location display.
+                  Test the maps integration with address search and location
+                  display.
                 </p>
               </div>
 
@@ -116,9 +133,9 @@ const PlaygroundComponent = (props: { data?: any }) => {
                 <SearchAddress
                   location
                   onSubmit={(address) => {
-                    console.log("Address selected:", address);
+                    console.log("Address selected:", address)
                     if (address?.lat && address?.lon)
-                      setMapPosition([Number(address.lat), Number(address.lon)]);
+                      setMapPosition([Number(address.lat), Number(address.lon)])
                   }}
                 />
                 {mapPosition ? (
@@ -129,9 +146,30 @@ const PlaygroundComponent = (props: { data?: any }) => {
               </div>
             </div>
           )}
+
+          {activeTab === "availabilityFlow" && (
+            <div className="space-y-8">
+              <div className="prose max-w-none">
+                <h2 className="text-2xl font-bold">Availability Flow</h2>
+                <p className="text-gray-600">
+                  Test the multi-step availability flow using the
+                  AvailabilityFlow component.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h4 className="text-lg font-semibold mb-4">
+                  Availability Flow Demo
+                </h4>
+                <AvailabilityFlow
+                  onComplete={() => console.log("Availability Flow completed")}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 export default PlaygroundComponent;
