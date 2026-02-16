@@ -42,7 +42,7 @@ const TextArea = (props: TextAreaI) => {
       <label
         htmlFor={name || label}
         className={clsx(
-          "relative block p-3 rounded-md border border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          "relative block p-3 rounded-2xl border border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           role === RolesEnum.CONSUMER &&
             "text-gray-700 placeholder:text-consumer-orange  border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue ",
           role === RolesEnum.VIGIL &&
@@ -61,7 +61,7 @@ const TextArea = (props: TextAreaI) => {
           }}
           id={id || name || label}
           className={clsx(
-            "w-full whitespace-pre-wrap  border-none bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
+            "w-full whitespace-pre-wrap  border-none rounded bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
             disabled && "cursor-not-allowed",
             role === RolesEnum.CONSUMER && " border-consumer-blue",
             role === RolesEnum.VIGIL && " border-vigil-orange"

@@ -120,6 +120,36 @@
       "VIGIL"
     ]
   },
+  "onBoardVigilComplete": {
+    "url": "/vigil/onboard/complete",
+    "label": "Registrazione completata",
+    "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "VIGIL"
+    ]
+  },
+   "onBoardConsumerComplete": {
+    "url": "/onboard/complete",
+    "label": "Registrazione completata",
+    "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },
   "resetPassword": {
     "url": "/auth/reset-password",
     "label": "Reset password",
@@ -364,10 +394,39 @@
       "ADMIN"
     ]
   },
+  "inizializationBooking": {
+    "url": "/booking/inizialization",
+    "label": "Prima Prenotazione",
+    "title": "Prima Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },
   "createBooking": {
     "url": "/booking/create",
     "label": "Nuova Prenotazione",
     "title": "Nuova Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },"recurrenceBooking": {
+    "url": "/recurrence",
+    "label": "Prenotazione Ricorrente",
+    "title": "Prenotazione Ricorrente",
     "menu": {
       "mobile": false,
       "desktop": false,

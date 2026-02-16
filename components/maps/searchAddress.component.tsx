@@ -136,8 +136,10 @@ const SearchAddress = (props: {
     try {
       if (debouncedSearchTerm?.length >= minLength) {
         setIsLoading(true);
-        const results =
-          await MapsService.autocompleteAddress(debouncedSearchTerm, addressTypes);
+        const results = await MapsService.autocompleteAddress(
+          debouncedSearchTerm,
+          addressTypes
+        );
         setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
@@ -232,9 +234,9 @@ const SearchAddress = (props: {
             {autocompleteResults.map((result, index) => (
               <li
                 key={index}
-                className="bg-transparent hover:bg-gray-100 transition rounded"
-              >
+                className="bg-transparent hover:bg-gray-100 transition rounded">
                 <button
+                  type="button"
                   onClick={() => {
                     const displayName =
                       result.display_name || result.name || "";
@@ -243,8 +245,7 @@ const SearchAddress = (props: {
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-consumer-blue border-b-1 text-sm px-1 w-full"
-                >
+                  className="text-consumer-blue border-b-1 text-sm px-1 w-full">
                   {result.address
                     ? [
                         result.address.road,
