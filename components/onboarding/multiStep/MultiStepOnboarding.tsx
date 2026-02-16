@@ -1,19 +1,20 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Button, ProgressBar } from "@/components";
-import Card from "@/components/card/card";
+import { useCallback, useMemo, useState } from "react"
+import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
+import { useForm, Controller } from "react-hook-form"
+import { Button, ProgressBar } from "@/components"
+import Card from "@/components/card/card"
 import {
   MultiStepOnboardingProps,
   OnboardingFlowState,
   OnboardingStep,
   OnboardingQuestion,
-} from "@/src/types/multiStepOnboard.types";
-import QuestionRenderer from "./QuestionRenderer";
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
-import { RolesEnum } from "@/src/enums/roles.enums";
+} from "@/src/types/multiStepOnboard.types"
+import QuestionRenderer from "./QuestionRenderer"
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline"
+import clsx from "clsx"
+import { RolesEnum } from "@/src/enums/roles.enums"
 
 /**
  * Main component that manages the multi-step onboarding flow
@@ -22,18 +23,16 @@ const MultiStepOnboarding = ({
   config,
   onCancel,
 }: MultiStepOnboardingProps) => {
-  const { role, steps, initialStepId, onComplete } = config;
+  const { role, steps, initialStepId, onComplete } = config
 
-  const [state, setState] = useState<OnboardingFlowState>({
-    currentStepId: initialStepId,
-    currentStepIndex: 0,
-    answers: {},
-    visitedSteps: [initialStepId],
-    isLoading: false,
-  });
+  const { state, currentStep, isLastStep, next, back, progress } =
+    useMultiStepFlow({ role, steps, initialStepId, onComplete } as any)
+
+  const [error, setError] = useState<string | null>(null)
 
   const {
     control,
+    register,
     handleSubmit,
     formState: { errors },
     trigger,
@@ -41,132 +40,38 @@ const MultiStepOnboarding = ({
   } = useForm({
     mode: "onChange",
     defaultValues: state.answers,
-  });
+  })
 
-  // Get current step
-  const currentStep = useMemo(() => {
-    return steps.find((step) => step.id === state.currentStepId);
-  }, [steps, state.currentStepId]);
-
-  // Check if this is the last step
-  const isLastStep = useMemo(() => {
-    if (!currentStep) return false;
-
-    // If the step has no nextStep defined, it's the last step
-    if (!currentStep.nextStep) return true;
-
-    // If nextStep is a function, we need to evaluate it
-    if (typeof currentStep.nextStep === "function") {
-      const nextId = currentStep.nextStep(state.answers);
-      return !nextId;
-    }
-
-    return false;
-  }, [currentStep, state.answers]);
-  console.log(state.answers); //TODO
-  // Determine the next step based on current answers
-  const getNextStepId = useCallback(
-    (currentStepData: OnboardingStep, stepAnswers: Record<string, any>) => {
-      // Check if any question has a conditional nextStep
-      for (const question of currentStepData.questions) {
-        const answer = stepAnswers[question.id];
-        if (question.nextStep) {
-          if (typeof question.nextStep === "function") {
-            const nextId = question.nextStep(answer, stepAnswers);
-            if (nextId) return nextId;
-          } else {
-            return question.nextStep;
-          }
-        }
-      }
-
-      // Use step-level nextStep
-      if (currentStepData.nextStep) {
-        if (typeof currentStepData.nextStep === "function") {
-          return currentStepData.nextStep(stepAnswers);
-        }
-        return currentStepData.nextStep;
-      }
-
-      return null;
-    },
-    [],
-  );
-
-  // Handle moving to next step
-  const handleNext = useCallback(async () => {
-    if (!currentStep) return;
-
-    // Validate current step questions
-    const questionIds = currentStep.questions.map((q) => q.id);
-    const isValid = await trigger(questionIds);
-
-    if (!isValid) return;
-
-    const currentValues = getValues();
-    const updatedAnswers = { ...state.answers, ...currentValues };
-
-    // Check if this is the last step
-    const nextStepId = getNextStepId(currentStep, updatedAnswers);
-
-    if (!nextStepId) {
-      // Complete the onboarding
-      setState((prev) => ({ ...prev, isLoading: true }));
+  // Helper for custom step components to advance with validated answers
+  const onNext = useCallback(
+    async (validatedAnswers: Record<string, any>) => {
+      if (!currentStep) return
       try {
-        await onComplete(updatedAnswers);
-      } catch (error) {
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: error instanceof Error ? error.message : "An error occurred",
-        }));
+        await next(currentStep, validatedAnswers)
+      } catch (err: any) {
+        setError(err?.message || "An error occurred")
       }
-      return;
+    },
+    [currentStep, next],
+  )
+
+  const handleNext = useCallback(async () => {
+    if (!currentStep) return
+
+    const questionIds = currentStep.questions?.map((q) => q.id)
+    const isValid = await trigger(questionIds)
+    if (!isValid) return
+
+    const currentValues = getValues()
+    try {
+      await next(currentStep, currentValues)
+    } catch (err: any) {
+      setError(err?.message || "An error occurred")
     }
-
-    // Move to next step
-    setState((prev) => ({
-      ...prev,
-      currentStepId: nextStepId,
-      currentStepIndex: prev.currentStepIndex + 1,
-      answers: updatedAnswers,
-      visitedSteps: [...prev.visitedSteps, nextStepId],
-    }));
-  }, [
-    currentStep,
-    getNextStepId,
-    getValues,
-    onComplete,
-    state.answers,
-    trigger,
-  ]);
-
-  // Handle moving to previous step
-  const handleBack = useCallback(() => {
-    if (state.visitedSteps.length <= 1) return;
-
-    const newVisitedSteps = [...state.visitedSteps];
-    newVisitedSteps.pop(); // Remove current step
-    const previousStepId = newVisitedSteps[newVisitedSteps.length - 1];
-
-    setState((prev) => ({
-      ...prev,
-      currentStepId: previousStepId,
-      currentStepIndex: Math.max(0, prev.currentStepIndex - 1),
-      visitedSteps: newVisitedSteps,
-    }));
-  }, [state.visitedSteps.length]);
-
-  // Progress calculation
-  const progress = useMemo(() => {
-    const totalSteps = steps.length - 1;
-    return Math.round(((state.currentStepIndex + 1) / totalSteps) * 100);
-  }, [steps.length, state.currentStepIndex]);
+  }, [currentStep, trigger, getValues, next])
 
   if (!currentStep) {
-    return (
-      <div className="text-center text-red-500">Error: Step not found</div>
-    );
+    return <div className="text-center text-red-500">Error: Step not found</div>
   }
 
   return (
@@ -177,8 +82,6 @@ const MultiStepOnboarding = ({
       </div>
       <Card>
         <div className="p-4 ">
-       
-
           {/* Step header */}
           {currentStep.title && (
             <section className="flex flex-col items-center gap-2 mb-8">
@@ -194,49 +97,67 @@ const MultiStepOnboarding = ({
           )}
 
           {/* Error message */}
-          {state.error && (
+          {error && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-              {state.error}
+              {error}
             </div>
           )}
 
           {/* Questions form */}
           <form
             onSubmit={handleSubmit(handleNext)}
-            className="max-w-lg mx-auto space-y-6">
-            {currentStep.questions.map((question: OnboardingQuestion) => (
-              <Controller
-                key={question.id}
-                name={question.id}
-                control={control}
-                defaultValue={state.answers[question.id]}
-                rules={{
-                  required: question.validation?.required,
-                  minLength: question.validation?.minLength,
-                  maxLength: question.validation?.maxLength,
-                  min: question.validation?.min,
-                  max: question.validation?.max,
-                  pattern: question.validation?.pattern,
-                  validate: question.validation?.validate,
-                }}
-                render={({ field }) => (
-                  <QuestionRenderer
-                    question={question}
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors[question.id] as any}
-                    role={role}
+            className="max-w-lg mx-auto space-y-6"
+          >
+            {currentStep.component
+              ? // Render custom step component (backwards-compatible)
+                (() => {
+                  const StepComponent = currentStep.component as any
+                  return (
+                    <StepComponent
+                      control={control}
+                      register={register}
+                      errors={errors}
+                      role={role}
+                      step={currentStep}
+                      answers={state.answers}
+                      onNext={onNext}
+                      onBack={back}
+                    />
+                  )
+                })()
+              : currentStep.questions?.map((question: OnboardingQuestion) => (
+                  <Controller
+                    key={question.id}
+                    name={question.id}
+                    control={control}
+                    defaultValue={state.answers[question.id]}
+                    rules={{
+                      required: question.validation?.required,
+                      minLength: question.validation?.minLength,
+                      maxLength: question.validation?.maxLength,
+                      min: question.validation?.min,
+                      max: question.validation?.max,
+                      pattern: question.validation?.pattern,
+                      validate: question.validation?.validate,
+                    }}
+                    render={({ field }) => (
+                      <QuestionRenderer
+                        question={question}
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors[question.id] as any}
+                        role={role}
+                      />
+                    )}
                   />
-                )}
-              />
-            ))}
+                ))}
             <hr />
             {/* Navigation buttons */}
             <div className="flex justify-between items-center pt-4">
               {state.visitedSteps.length > 1 ? (
                 <Button
                   type="button"
-                  action={handleBack}
+                  action={back}
                   role={role}
                   label="Indietro"
                   icon={<ArrowLeftIcon className="size-5" />}
@@ -269,7 +190,7 @@ const MultiStepOnboarding = ({
         </div>
       </Card>
     </div>
-  );
-};
+  )
+}
 
 export default MultiStepOnboarding;

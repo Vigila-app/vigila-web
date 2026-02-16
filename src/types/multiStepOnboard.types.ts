@@ -78,11 +78,21 @@ export interface OnboardingQuestion {
  * Represents a step in the onboarding flow
  */
 export interface OnboardingStep {
-  id: string;
-  title?: string;
-  description?: string;
-  questions: OnboardingQuestion[];
-  nextStep?: string | ((answers: Record<string, any>) => string | null);
+  id: string
+  title?: string
+  description?: string
+  questions?: OnboardingQuestion[]
+  /**
+   * Optional custom component to render for this step. If provided, the
+   * `MultiStepOnboarding` will render this component instead of the
+   * default question rendering. The component will receive helpful props
+   * such as `control`, `register`, `errors`, `role`, `step`, and `answers`.
+   * Use `react-hook-form`'s `control` or `register` inside the component
+   * for form integration, then let the parent handle submission validation
+   * and navigation (or call the provided callbacks).
+   */
+  component?: any
+  nextStep?: string | ((answers: Record<string, any>) => string | null)
 }
 
 /**
