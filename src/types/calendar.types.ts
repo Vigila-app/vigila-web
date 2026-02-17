@@ -144,3 +144,10 @@ export interface SlotConflictI {
   end: Date;
   id: string;
 }
+export interface CalendarDay {
+  dateObj: Date;       // L'oggetto Date nativo
+  dateISO: string;     // La stringa formattata "YYYY-MM-DD" (fondamentale per i confronti)
+  dayNumber: number;   // Il numero del giorno (es: 16)
+  weekdayLabel: string;// L'abbreviazione del giorno (es: "LUN")
+  isToday: boolean;    // Vero se il giorno è oggi
+}

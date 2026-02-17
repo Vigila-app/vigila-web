@@ -511,6 +511,21 @@
       "CONSUMER"
     ]
   },
+  "calendar": {
+    "url": "/calendar",
+    "label": "Calendario",
+    "title": "Calendario",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": true,
+      "footer": true
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },
   "notifications": {
     "url": "/notifications",
     "label": "Notifiche",

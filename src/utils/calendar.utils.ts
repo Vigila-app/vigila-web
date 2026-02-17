@@ -5,7 +5,7 @@
  * availability rules, and time slots.
  */
 
-import { WeekdayEnum } from "@/src/types/calendar.types";
+import { CalendarDay, WeekdayEnum } from "@/src/types/calendar.types";
 
 /**
  * Get weekday name from enum value
@@ -428,12 +428,14 @@ export const slotsOverlap = (
   );
 };
 export const dateRangesOverlap = (
-  from1: string, to1: string | null | undefined,
-  from2: string, to2: string | null | undefined
+  from1: string,
+  to1: string | null | undefined,
+  from2: string,
+  to2: string | null | undefined,
 ): boolean => {
-  const end1 = to1 || "9999-12-31"; 
+  const end1 = to1 || "9999-12-31";
   const end2 = to2 || "9999-12-31";
-  
+
   return from1 <= end2 && from2 <= end1;
 };
 
@@ -474,4 +476,58 @@ export const calculateDurationHours = (
   const end = parseISODate(endAt);
   const diffMs = end.getTime() - start.getTime();
   return Math.round(diffMs / (1000 * 60 * 60));
+};
+
+// Funzione helper per generare i giorni del mese
+export const generateDaysInMonth = (pivotDate: Date) => {
+  const year = pivotDate.getFullYear();
+  const month = pivotDate.getMonth();
+
+  // Quanti giorni ha questo mese?
+  // Il giorno 0 del mese successivo ci dà l'ultimo di quello attuale.
+  const daysCount = new Date(year, month + 1, 0).getDate();
+
+  const days = [];
+  for (let i = 1; i <= daysCount; i++) {
+    const date = new Date(year, month, i);
+    days.push({
+      dayNumber: i,
+      dayName: date
+        .toLocaleDateString("it-IT", { weekday: "short" })
+        .toUpperCase()
+        .substring(0, 3),
+      fullDate: date.toISOString().split("T")[0], // Formato YYYY-MM-DD per i confronti
+      isToday: new Date().toDateString() === date.toDateString(),
+    });
+  }
+  return days;
+};
+export const generateTwoWeeksDays = (pivotMonday: Date): CalendarDay[] => {
+  const days: CalendarDay[] = [];
+
+  for (let i = 0; i < 14; i++) {
+    const date = new Date(pivotMonday);
+    date.setDate(pivotMonday.getDate() + i);
+
+    days.push({
+      dateObj: date,
+      dateISO: formatDateToISO(date),
+      dayNumber: date.getDate(),
+      weekdayLabel: getWeekdayNameIT(date.getDay() as WeekdayEnum)
+        .substring(0, 3)
+        .toUpperCase(),
+      isToday: formatDateToISO(new Date()) === formatDateToISO(date),
+    });
+  }
+  return days;
+};
+
+export const getMonday = (date: Date): Date => {
+  const d = new Date(date);
+  const day = d.getDay();
+  // In JS: Dom=0, Lun=1, ..., Sab=6
+  // Se è Domenica (0), dobbiamo tornare indietro di 6 giorni.
+  // Altrimenti torniamo indietro di (day - 1) giorni.
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
 };
