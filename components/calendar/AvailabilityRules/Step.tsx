@@ -1,8 +1,12 @@
+import { useState } from "react"
 import { QuestionRenderer } from "@/components/onboarding/multiStep"
 import { OnboardingFlowConfig, OnboardingFlowState, OnboardingStep, QuestionType } from "@/src/types/multiStepOnboard.types"
 import { CalendarIcon, MapIcon, MapPinIcon } from "@heroicons/react/24/outline"
 
 export const Step = ({currentStep, state, config}: {currentStep: OnboardingStep, state: OnboardingFlowState, config: OnboardingFlowConfig}) => {
+  // local tick forces this component to re-render when answers are mutated in-place
+  const [, setTick] = useState(0)
+
   return (
     <>
       {" "}
@@ -28,7 +32,9 @@ export const Step = ({currentStep, state, config}: {currentStep: OnboardingStep,
               question={{ ...q, label: "", description: "" }}
               value={state.answers[q.id]}
               onChange={(value) => {
+                // persist answer and trigger a local re-render so controlled inputs update
                 state.answers[q.id] = value
+                setTick((t) => t + 1)
               }}
               error={undefined} // Adjusted to match the expected prop
               role={config.role} // Added role prop as required by QuestionRenderer
