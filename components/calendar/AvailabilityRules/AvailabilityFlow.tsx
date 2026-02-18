@@ -8,6 +8,8 @@ import {
 import { RolesEnum } from "@/src/enums/roles.enums"
 import { AvailabilityRulesDemo } from "@/components/calendar-demo"
 import QuestionRenderer from "@/components/onboarding/multiStep/QuestionRenderer"
+import { Step } from "./Step"
+import { InformationCircleIcon } from "@heroicons/react/24/outline"
 
 export default function AvailabilityFlow({
   onComplete,
@@ -36,7 +38,7 @@ export default function AvailabilityFlow({
             id: "address",
             type: QuestionType.ADDRESS,
             label: "Indirizzo",
-            placeholder: "",
+            placeholder: "Via Napoli 123",
             description: "Dove si svolgerà l'assistenza",
             validation: {
               required: true,
@@ -44,7 +46,11 @@ export default function AvailabilityFlow({
           },
         ],
         component: AvailabilityRulesDemo,
+        note: "Potrai modificare la ricorrenza in qualsiasi momento: cambiare i giorni, aggiungere o cancellare singole visite e gestire eccezioni",
         nextStep: "",
+      },
+      {
+        // PLACEHOLDER
       },
     ],
     initialStepId: "availabilities",
@@ -71,21 +77,11 @@ export default function AvailabilityFlow({
   return (
     <div className="mx-auto w-full max-w-md">
       <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
-          {currentStep.component && <currentStep.component />}
-        {currentStep.questions?.map((q) => (
-          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-            <QuestionRenderer
-              key={q.id}
-              question={q}
-              value={state.answers[q.id]}
-              onChange={(value) => {
-                state.answers[q.id] = value
-              }}
-              error={undefined} // Adjusted to match the expected prop
-              role={config.role} // Added role prop as required by QuestionRenderer
-            />
-          </div>
-        ))}
+        <Step currentStep={currentStep} state={state} config={config} />
+        <div className="text-zinc-500  text-sm flex items-start gap-3">
+          <InformationCircleIcon className="text-zinc-500 h-6 w-10" />
+          {currentStep.note}
+        </div>
         <div>
           <button type="button" onClick={back}>
             Back

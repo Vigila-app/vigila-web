@@ -92,6 +92,7 @@ export interface OnboardingStep {
    * and navigation (or call the provided callbacks).
    */
   component?: any
+  note?: string
   nextStep?: string | ((answers: Record<string, any>) => string | null)
 }
 
