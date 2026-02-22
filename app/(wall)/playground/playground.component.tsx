@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import { MapsComponent } from "@/components/maps";
-import SearchAddress from "@/components/maps/searchAddress.component";
-import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
-import { UserService } from "@/src/services";
-import { LatLngExpression } from "leaflet";
-import { useEffect, useState } from "react";
+import { MapsComponent } from "@/components/maps"
+import SearchAddress from "@/components/maps/searchAddress.component"
+import { useCurrentLocation } from "@/src/hooks/useCurrentLocation"
+import { UserService } from "@/src/services"
+import { LatLngExpression } from "leaflet"
+import { useEffect, useState } from "react"
 import {
   AvailabilityRulesDemo,
   UnavailabilitiesDemo,
   AvailableSlotsDemo,
-} from "@/components/calendar-demo";
+} from "@/components/calendar-demo"
 import AvailabilityFlow from "@/components/calendar/AvailabilityRules/AvailabilityFlow"
 
 const PlaygroundComponent = (props: { data?: any }) => {
@@ -172,4 +172,4 @@ const PlaygroundComponent = (props: { data?: any }) => {
     </div>
   )
 }
-export default PlaygroundComponent;
+export default PlaygroundComponent

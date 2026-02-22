@@ -1,5 +1,3 @@
-// Save edited rule (for edit mode)
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
@@ -15,7 +13,6 @@ import {
   getTimeSlots,
   formatDateToISO,
 } from "@/src/utils/calendar.utils"
-import SingleRule from "@/components/calendar/AvailabilityRules/SingleRule"
 
 /**
  * Demo component for Availability Rules CRUD operations
@@ -28,7 +25,6 @@ export const AvailabilityRulesDemo = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Allow multiple draft slots per day
   const [activeDays, setActiveDays] = useState<Record<number, boolean>>(() => {
     const initial: Record<number, boolean> = {}
     weekdays.forEach((day) => {
@@ -36,126 +32,16 @@ export const AvailabilityRulesDemo = () => {
     })
     return initial
   })
-  async function saveEditedRule({
-    rule,
-    editState,
-    setEditRules,
-    setLoading,
-    setError,
-    loadRules,
-    getMinutesFromTime,
-    toTimeString,
-    convertTimeToTimeFormat,
-  }: {
-    rule: VigilAvailabilityRuleI
-    editState: {
-      start: string
-      durationHours: number
-      error?: string
-      editing: boolean
-    }
-    setEditRules: React.Dispatch<
-      React.SetStateAction<
-        Record<
-          string,
-          {
-            start: string
-            durationHours: number
-            error?: string
-            editing: boolean
-          }
-        >
-      >
-    >
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>
-    setError: React.Dispatch<React.SetStateAction<string | null>>
-    loadRules: () => Promise<void>
-    getMinutesFromTime: (time: string) => number
-    toTimeString: (totalMinutes: number) => string
-    convertTimeToTimeFormat: (time: string) => string
-  }) {
-    const startMinutes = getMinutesFromTime(editState.start)
-    const endMinutes = startMinutes + editState.durationHours * 60
-    if (endMinutes > 24 * 60) {
-      setEditRules((prev) => ({
-        ...prev,
-        [rule.id]: {
-          ...prev[rule.id],
-          error: "La durata supera il limite giornaliero",
-        },
-      }))
-      return
-    }
-    if (endMinutes <= startMinutes) {
-      setEditRules((prev) => ({
-        ...prev,
-        [rule.id]: {
-          ...prev[rule.id],
-          error: "Orario di fine non valido",
-        },
-      }))
-      return
-    }
-    setLoading(true)
-    setError(null)
-    try {
-      const endTime = toTimeString(endMinutes)
-      const ruleData: VigilAvailabilityRuleFormI = {
-        vigil_id: rule.vigil_id,
-        weekday: rule.weekday,
-        start_time: convertTimeToTimeFormat(editState.start),
-        end_time: convertTimeToTimeFormat(endTime),
-        valid_from: rule.valid_from,
-        valid_to: rule.valid_to,
-      }
-      await CalendarService.updateVigilAvailabilityRule(rule.id, ruleData)
-      await loadRules()
-      setEditRules((prev) => {
-        const next = { ...prev }
-        delete next[rule.id]
-        return next
-      })
-    } catch (err: any) {
-      if (err?.status === 400 || err?.response?.status === 400) {
-        setEditRules((prev) => ({
-          ...prev,
-          [rule.id]: {
-            ...prev[rule.id],
-            error: err.message || "Errore di validazione",
-          },
-        }))
-      } else {
-        setError(err.message || "Failed to update rule")
-      }
-      console.error("Error updating rule:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
-  // Multiple drafts per day, auto-save on change
+
   const [draftSlots, setDraftSlots] = useState<
-    Record<number, Array<{ start: string; durationHours: number }>>
+    Record<number, { start: string; durationHours: number }>
   >(() => {
-    const initial: Record<
-      number,
-      Array<{ start: string; durationHours: number }>
-    > = {}
+    const initial: Record<number, { start: string; durationHours: number }> = {}
     weekdays.forEach((day) => {
-      initial[day.value] = [{ start: "12:00", durationHours: 3 }]
+      initial[day.value] = { start: "12:00", durationHours: 3 }
     })
     return initial
   })
-
-  // Track error per draft per day (array of string)
-  const [draftErrors, setDraftErrors] = useState<Record<number, string[]>>(
-    () => {
-      const initial: Record<number, string[]> = {}
-      weekdays.forEach((day) => {
-        initial[day.value] = [""]
-      })
-      return initial
-    },
-  )
 
   useEffect(() => {
     loadRules()
@@ -230,114 +116,39 @@ export const AvailabilityRulesDemo = () => {
     return grouped
   }, [rules, weekdays])
 
-  // Edit state for rules: { [ruleId]: { start, durationHours, error, editing } }
-  const [editRules, setEditRules] = useState<
-    Record<
-      string,
-      {
-        start: string
-        durationHours: number
-        error?: string
-        editing: boolean
-      }
-    >
-  >({})
-
-  // Track which draft input is focused for orange bg
-  const [focusedDraft, setFocusedDraft] = useState<{
-    day: number
-    idx: number
-  } | null>(null)
-
-  // Only validate on change, do not save until user clicks add
-  const handleDraftChange = (
-    weekday: WeekdayEnum,
-    draftIdx: number,
-    field: "start" | "durationHours",
-    value: string | number,
-  ) => {
-    setDraftSlots((prev) => {
-      const next = { ...prev }
-      next[weekday] = next[weekday].map((slot, i) =>
-        i === draftIdx ? { ...slot, [field]: value } : slot,
-      )
-      return next
-    })
-    setDraftErrors((prev) => {
-      const next = { ...prev }
-      next[weekday][draftIdx] = ""
-      return next
-    })
-
-    // Validate
-    const draft = {
-      ...draftSlots[weekday][draftIdx],
-      [field]: value,
-    }
-    const startMinutes = getMinutesFromTime(draft.start)
-    const endMinutes = startMinutes + draft.durationHours * 60
-    if (endMinutes > 24 * 60) {
-      setDraftErrors((prev) => {
-        const next = { ...prev }
-        next[weekday][draftIdx] = "La durata supera il limite giornaliero"
-        return next
-      })
-      return
-    }
-    if (endMinutes <= startMinutes) {
-      setDraftErrors((prev) => {
-        const next = { ...prev }
-        next[weekday][draftIdx] = "Orario di fine non valido"
-        return next
-      })
-      return
-    }
-  }
-
-  // Save draft as rule when clicking add button
-  const handleAddDraft = async (weekday: WeekdayEnum, draftIdx: number) => {
-    const draft = draftSlots[weekday][draftIdx]
-    const startMinutes = getMinutesFromTime(draft.start)
-    const endMinutes = startMinutes + draft.durationHours * 60
-    if (endMinutes > 24 * 60 || endMinutes <= startMinutes) return
-    const endTime = toTimeString(endMinutes)
+  const handleCreate = async (weekday: WeekdayEnum) => {
     setLoading(true)
     setError(null)
     try {
+      const draft = draftSlots[weekday]
+      const startMinutes = getMinutesFromTime(draft.start)
+      const endMinutes = startMinutes + draft.durationHours * 60
+      if (endMinutes > 24 * 60) {
+        setError("La durata supera il limite giornaliero")
+        setLoading(false)
+        return
+      }
+      if (endMinutes <= startMinutes) {
+        setError("Orario di fine non valido")
+        setLoading(false)
+        return
+      }
+      const endTime = toTimeString(endMinutes)
+
+      // Note: In a real scenario, vigil_id would come from authenticated user
       const ruleData: VigilAvailabilityRuleFormI = {
-        vigil_id: "demo-vigil-id",
+        vigil_id: "demo-vigil-id", // This would be from auth context
         weekday,
         start_time: convertTimeToTimeFormat(draft.start),
         end_time: convertTimeToTimeFormat(endTime),
         valid_from: formatDateToISO(new Date()),
         valid_to: null,
       }
+
       await CalendarService.createVigilAvailabilityRule(ruleData)
       await loadRules()
-      // Remove the draft after successful save
-      setDraftSlots((prev) => {
-        const next = { ...prev }
-        next[weekday] = next[weekday].filter((_, i) => i !== draftIdx)
-        if (next[weekday].length === 0)
-          next[weekday] = [{ start: "12:00", durationHours: 3 }]
-        return next
-      })
-      setDraftErrors((prev) => {
-        const next = { ...prev }
-        next[weekday] = next[weekday].filter((_, i) => i !== draftIdx)
-        if (next[weekday].length === 0) next[weekday] = [""]
-        return next
-      })
     } catch (err: any) {
-      if (err?.status === 400 || err?.response?.status === 400) {
-        setDraftErrors((prev) => {
-          const next = { ...prev }
-          next[weekday][draftIdx] = err.message || "Errore di validazione"
-          return next
-        })
-      } else {
-        setError(err.message || "Failed to create availability rule")
-      }
+      setError(err.message || "Failed to create availability rule")
       console.error("Error creating rule:", err)
     } finally {
       setLoading(false)
@@ -413,216 +224,149 @@ export const AvailabilityRulesDemo = () => {
             const draft = draftSlots[day.value]
             return (
               <div key={day.value} className="py-4">
-                <div className="flex items-center gap-3">
-                  <label className="relative flex h-6 w-11 cursor-pointer items-center">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={isActive}
-                      onChange={() =>
-                        setActiveDays((prev) => ({
-                          ...prev,
-                          [day.value]: !prev[day.value],
-                        }))
-                      }
-                    />
-                    <span className="h-5 w-9 rounded-full bg-slate-200 transition peer-checked:bg-rose-500" />
-                    <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
-                  </label>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {day.labelIT}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                      <input
+                        type="checkbox"
+                        className="peer sr-only"
+                        checked={isActive}
+                        onChange={() =>
+                          setActiveDays((prev) => ({
+                            ...prev,
+                            [day.value]: !prev[day.value],
+                          }))
+                        }
+                      />
+                      <span className="h-5 w-9 rounded-full bg-slate-200 transition peer-checked:bg-rose-500" />
+                      <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+                    </label>
+                    <span className="text-sm font-semibold text-slate-900">
+                      {day.labelIT}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleCreate(day.value as WeekdayEnum)}
+                    disabled={loading || !isActive}
+                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-40"
+                  >
+                    + Aggiungi fascia
+                  </button>
                 </div>
 
                 {isActive && (
                   <div className="mt-4 space-y-4">
                     {dayRules.length === 0 ? (
                       <div className="rounded-2xl border border-rose-200 bg-rose-50/40 px-4 py-3 text-sm text-slate-500">
-                        Nessuna fascia attiva. Imposta una nuova fascia qui
-                        sotto.
+                        Nessuna fascia attiva. Aggiungine una qui sotto.
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {dayRules.map((rule, index) => (
-                          <SingleRule
-                            key={rule.id}
-                            rule={rule}
-                            index={index}
-                            editState={editRules[rule.id]}
-                            editRules={editRules}
-                            helpers={{
-                              times,
-                              durationOptions,
-                              formatDuration,
-                              formatTimeRange,
-                              getMinutesFromTime,
-                              toTimeString,
-                              convertTimeToTimeFormat,
-                            }}
-                            actions={{
-                              setEditRules,
-                              onDelete: handleDelete,
-                              saveEditedRule,
-                              setLoading,
-                              setError,
-                              loadRules,
-                            }}
-                            loading={loading}
-                          />
-                        ))}
+                        {dayRules.map((rule, index) => {
+                          const start = rule.start_time.slice(0, 5)
+                          const end = rule.end_time.slice(0, 5)
+                          return (
+                            <div
+                              key={rule.id}
+                              className="rounded-2xl border border-rose-200 bg-white px-4 py-3 shadow-sm"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-slate-500">
+                                  Fascia {index + 1}
+                                </span>
+                                <button
+                                  onClick={() => handleDelete(rule.id)}
+                                  disabled={loading}
+                                  className="rounded-full border border-rose-200 px-2 py-0.5 text-xs text-rose-600 hover:border-rose-300 hover:text-rose-700 disabled:opacity-40"
+                                >
+                                  Elimina
+                                </button>
+                              </div>
+                              <div className="mt-3 grid grid-cols-2 gap-3">
+                                <div>
+                                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                    Ora inizio
+                                  </p>
+                                  <div className="mt-1 rounded-full border border-rose-200 px-3 py-2 text-sm font-semibold text-slate-800">
+                                    {start}
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                    Durata
+                                  </p>
+                                  <div className="mt-1 rounded-full border border-rose-200 px-3 py-2 text-sm font-semibold text-slate-800">
+                                    {formatDuration(start, end)}
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="mt-3 text-xs text-slate-400">
+                                {formatTimeRange(
+                                  rule.start_time,
+                                  rule.end_time,
+                                )}
+                              </p>
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
 
-                    {/* Multiple draft inputs per day, auto-save on change */}
-                    {draftSlots[day.value].map((draft, draftIdx) => {
-                      const isFocused =
-                        focusedDraft &&
-                        focusedDraft.day === day.value &&
-                        focusedDraft.idx === draftIdx
-                      return (
-                        <div
-                          key={draftIdx}
-                          className={`rounded-2xl border border-rose-200 px-4 py-4 mt-2 transition-colors ${isFocused ? "bg-orange-50" : "bg-rose-50/60"}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-slate-500">
-                              Fascia {dayRules.length + draftIdx + 1}
-                            </span>
-                            <button
-                              type="button"
-                              className="ml-2 text-xs text-slate-400 hover:text-rose-500"
-                              onClick={() => {
-                                setDraftSlots((prev) => {
-                                  const next = { ...prev }
-                                  next[day.value] = next[day.value].filter(
-                                    (_, i) => i !== draftIdx,
-                                  )
-                                  if (next[day.value].length === 0)
-                                    next[day.value] = [
-                                      { start: "12:00", durationHours: 3 },
-                                    ]
-                                  return next
-                                })
-                                setDraftErrors((prev) => {
-                                  const next = { ...prev }
-                                  next[day.value] = next[day.value].filter(
-                                    (_, i) => i !== draftIdx,
-                                  )
-                                  if (next[day.value].length === 0)
-                                    next[day.value] = [""]
-                                  return next
-                                })
-                              }}
-                              title="Rimuovi questa fascia"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                          <div className="mt-3 grid grid-cols-2 gap-3">
-                            <div>
-                              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                                Ora inizio
-                              </p>
-                              <select
-                                value={draft.start}
-                                onChange={(e) =>
-                                  handleDraftChange(
-                                    day.value as WeekdayEnum,
-                                    draftIdx,
-                                    "start",
-                                    e.target.value,
-                                  )
-                                }
-                                onFocus={() =>
-                                  setFocusedDraft({
-                                    day: day.value,
-                                    idx: draftIdx,
-                                  })
-                                }
-                                onBlur={() => setFocusedDraft(null)}
-                                className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-orange-300 focus:outline-none"
-                              >
-                                {times.map((time) => (
-                                  <option key={time} value={time}>
-                                    {time}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div>
-                              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                                Durata
-                              </p>
-                              <select
-                                value={draft.durationHours}
-                                onChange={(e) =>
-                                  handleDraftChange(
-                                    day.value as WeekdayEnum,
-                                    draftIdx,
-                                    "durationHours",
-                                    Number(e.target.value),
-                                  )
-                                }
-                                onFocus={() =>
-                                  setFocusedDraft({
-                                    day: day.value,
-                                    idx: draftIdx,
-                                  })
-                                }
-                                onBlur={() => setFocusedDraft(null)}
-                                className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-orange-300 focus:outline-none"
-                              >
-                                {durationOptions.map((hours) => (
-                                  <option key={hours} value={hours}>
-                                    {hours} ore
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                          {draftErrors[day.value] &&
-                            draftErrors[day.value][draftIdx] && (
-                              <div className="mt-2 text-xs text-rose-600">
-                                {draftErrors[day.value][draftIdx]}
-                              </div>
-                            )}
-                          <button
-                            type="button"
-                            className="mt-4 w-full rounded-full bg-rose-500 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-600 disabled:opacity-40"
-                            disabled={
-                              loading || !!draftErrors[day.value][draftIdx]
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50/60 px-4 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">
+                        Nuova fascia
+                      </p>
+                      <div className="mt-3 grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Ora inizio
+                          </p>
+                          <select
+                            value={draft.start}
+                            onChange={(e) =>
+                              setDraftSlots((prev) => ({
+                                ...prev,
+                                [day.value]: {
+                                  ...prev[day.value],
+                                  start: e.target.value,
+                                },
+                              }))
                             }
-                            onClick={() =>
-                              handleAddDraft(day.value as WeekdayEnum, draftIdx)
-                            }
+                            className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-rose-300 focus:outline-none"
                           >
-                            Salva fascia
-                          </button>
+                            {times.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      )
-                    })}
-                    <button
-                      type="button"
-                      className="mt-4 w-full rounded-full bg-rose-500 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-600 disabled:opacity-40"
-                      onClick={() => {
-                        setDraftSlots((prev) => {
-                          const next = { ...prev }
-                          next[day.value] = [
-                            ...next[day.value],
-                            { start: "12:00", durationHours: 3 },
-                          ]
-                          return next
-                        })
-                        setDraftErrors((prev) => {
-                          const next = { ...prev }
-                          next[day.value] = [...(next[day.value] || []), ""]
-                          return next
-                        })
-                      }}
-                      disabled={loading}
-                    >
-                      + Aggiungi un'altra fascia
-                    </button>
+                        <div>
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                            Durata
+                          </p>
+                          <select
+                            value={draft.durationHours}
+                            onChange={(e) =>
+                              setDraftSlots((prev) => ({
+                                ...prev,
+                                [day.value]: {
+                                  ...prev[day.value],
+                                  durationHours: Number(e.target.value),
+                                },
+                              }))
+                            }
+                            className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-rose-300 focus:outline-none"
+                          >
+                            {durationOptions.map((hours) => (
+                              <option key={hours} value={hours}>
+                                {hours} ore
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
