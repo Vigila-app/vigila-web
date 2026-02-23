@@ -84,18 +84,34 @@ export const Services = ({
     setCurrentDayIdx(0)
   }, [selectedDays.length])
 
+  // per-day local selections
+  const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [selectedMansioni, setSelectedMansioni] = useState<string[]>([])
+  const [car, setCar] = useState(false)
+  const [notes, setNotes] = useState("")
+
+  // load per-day values when current day changes
+  useEffect(() => {
+    const day = selectedDays[currentDayIdx]
+    const saved = answers?.services?.[day]
+    if (saved) {
+      setSelectedServices(Array.isArray(saved.services) ? saved.services : [])
+      setSelectedMansioni(Array.isArray(saved.mansioni) ? saved.mansioni : [])
+      setCar(!!saved.car)
+      setNotes(saved.notes || "")
+    } else {
+      setSelectedServices([])
+      setSelectedMansioni([])
+      setCar(false)
+      setNotes("")
+    }
+  }, [currentDayIdx, selectedDays.join("-")])
+
   if (loading)
     return (
       <div className="text-zinc-500 text-sm">Caricamento disponibilità…</div>
     )
   if (error) return <div className="text-red-500 text-sm">{error}</div>
-
-  // Group rules by weekday
-  // const rulesByDay: Record<number, any[]> = {}
-  // rules.forEach((rule) => {
-  //   if (!rulesByDay[rule.weekday]) rulesByDay[rule.weekday] = []
-  //   rulesByDay[rule.weekday].push(rule)
-  // })
 
   return (
     <div className="bg-zinc-200 p-4">
@@ -126,22 +142,41 @@ export const Services = ({
 
       {/* Service checkboxes with icons */}
       <div className="bg-white p-4 rounded-2xl">
-        <h2>{dayNames[Number(currentDayIdx)]}</h2>
-        <span className="ml-2 text-zinc-600 text-sm">
-          {(answers?.availabilities || [])
-            .filter((r: any) => Number(r.weekday) === Number(currentDayIdx))
-            .map(
-              (r: any) =>
-                `${r.start_time.slice(0, 5)} - ${r.end_time.slice(0, 5)}`,
-            )
-            .join(", ")}
-          {/* TODO: add how mmany hours is each slot in this format (2h) */}
-        </span>
+        {selectedDays.length === 0 ? (
+          <div className="text-sm text-zinc-500">Nessun giorno selezionato</div>
+        ) : (
+          <>
+            <h2>{dayNames[Number(selectedDays[currentDayIdx])]}</h2>
+            <span className="ml-2 text-zinc-600 text-sm">
+              {(answers?.availabilities || [])
+                .filter(
+                  (r: any) =>
+                    Number(r.weekday) === Number(selectedDays[currentDayIdx]),
+                )
+                .map(
+                  (r: any) =>
+                    `${r.start_time.slice(0, 5)} - ${r.end_time.slice(0, 5)}`,
+                )
+                .join(", ")}
+            </span>
+          </>
+        )}
+        {/* TODO: add how many hours is each slot in this format (2h) */}
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
           <div className="grid grid-cols-2 gap-3">
             {SERVICES.map((srv) => (
-              <SingleService {...srv} />
+              <SingleService
+                key={srv.name}
+                {...srv}
+                checked={selectedServices.includes(srv.name)}
+                onChange={(next: boolean) => {
+                  setSelectedServices((prev) => {
+                    if (next) return Array.from(new Set([...prev, srv.name]))
+                    return prev.filter((s) => s !== srv.name)
+                  })
+                }}
+              />
             ))}
           </div>
         </div>
@@ -150,30 +185,51 @@ export const Services = ({
         <div className="mb-4">
           <div className="font-semibold mb-2">Mansioni</div>
           <div className="flex flex-col gap-2">
-            {MANSIONI_LABELS.map((label, i) => (
-              <label
-                key={label}
-                className="cursor-pointer w-full py-3 text-center rounded-full checked:border-vigil-orange border-1"
-              >
-                <input
-                  type="checkbox"
-                  checked={false}
-                  onChange={() => {}}
-                  className="hidden"
-                />
-                <span>{label}</span>
-              </label>
-            ))}
+            {MANSIONI_LABELS.map((label) => {
+              const isChecked = selectedMansioni.includes(label)
+              return (
+                <label
+                  key={label}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    setSelectedMansioni((prev) =>
+                      prev.includes(label)
+                        ? prev.filter((p) => p !== label)
+                        : [...prev, label],
+                    )
+                  }}
+                  className={`cursor-pointer w-full py-3 text-center rounded-full border ${
+                    isChecked
+                      ? "border-vigil-orange bg-vigil-light-orange"
+                      : "border-zinc-200 bg-white"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    readOnly
+                    className="hidden"
+                  />
+                  <span>{label}</span>
+                </label>
+              )
+            })}
           </div>
         </div>
 
         {/* Accompagnamento in auto */}
         <div className="mb-4">
-          <label className="block cursor-pointer w-full p-3 rounded-2xl checked:border-vigil-orange border-1">
+          <label
+            className={`block cursor-pointer w-full p-3 rounded-2xl border ${
+              car
+                ? "border-vigil-orange bg-vigil-light-orange"
+                : "border-zinc-200 bg-white"
+            }`}
+          >
             <input
               type="checkbox"
-              checked={false}
-              onChange={() => {}}
+              checked={car}
+              onChange={() => setCar((v) => !v)}
               className="hidden"
             />
             <h3 className="flex items-center gap-2 w-full font-bold text-lg">
@@ -195,8 +251,8 @@ export const Services = ({
           <textarea
             className="w-full border rounded-md p-2"
             rows={2}
-            value={""}
-            onChange={(e) => {}}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
             placeholder="Aggiungi note opzionali..."
           />
         </div>
@@ -214,14 +270,20 @@ export const Services = ({
                   setAnswers((prev: Record<string, any>) => {
                     const next = { ...(prev || {}) }
                     next.services = { ...(next.services || {}) }
-                    // Placeholder: collect values from UI components and save per day
-                    // For now we mark the day as saved (you can replace with real selections)
-                    next.services[day] = next.services[day] || { saved: true }
+                    // Save actual selections for the day
+                    next.services[day] = {
+                      weekday: Number(day),
+                      services: selectedServices,
+                      mansioni: selectedMansioni,
+                      car: !!car,
+                      notes: notes || "",
+                    }
                     return next
                   })
 
                   // TODO: POST to API to save services for this day
-                  // await ApiService.post(`/api/vigil/availability-rules/${ruleId}/services`, payload)
+                  // const payload = { services: selectedServices, mansioni: selectedMansioni, car, notes }
+                  // await ApiService.post(`/api/vigil/availability-rules/${day}/services`, payload)
                 }
 
                 // move to next day or finalize
