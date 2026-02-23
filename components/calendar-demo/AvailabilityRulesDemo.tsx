@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { CalendarService } from "@/src/services"
 import {
   VigilAvailabilityRuleI,
@@ -17,7 +17,11 @@ import {
 /**
  * Demo component for Availability Rules CRUD operations
  */
-export const AvailabilityRulesDemo = () => {
+export const AvailabilityRulesDemo = ({
+  setAnswers,
+}: {
+  setAnswers: (updater: (prev: Record<string, any>) => Record<string, any>) => void
+}) => {
   const weekdays = getWeekdaysArray()
   const times = getTimeSlots(15) // 15-minute intervals
 
@@ -47,12 +51,18 @@ export const AvailabilityRulesDemo = () => {
     loadRules()
   }, [])
 
-  const loadRules = async () => {
+  const loadRules = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const data = await CalendarService.getVigilAvailabilityRules()
       setRules(data)
+      setAnswers((prev) => {
+        if (JSON.stringify(prev?.availabilities) !== JSON.stringify(data)) {
+          return { ...prev, availabilities: data }
+        }
+        return prev
+      })
       setActiveDays((prev) => {
         const next = { ...prev }
         data.forEach((rule) => {
@@ -66,7 +76,7 @@ export const AvailabilityRulesDemo = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [setAnswers])
 
   /**
    * Convert HH:MM to TIME format string (HH:MM:00)

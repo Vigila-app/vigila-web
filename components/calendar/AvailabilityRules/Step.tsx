@@ -1,16 +1,38 @@
 import { useState } from "react"
 import { QuestionRenderer } from "@/components/onboarding/multiStep"
-import { OnboardingFlowConfig, OnboardingFlowState, OnboardingStep, QuestionType } from "@/src/types/multiStepOnboard.types"
-import { CalendarIcon, MapIcon, MapPinIcon } from "@heroicons/react/24/outline"
+import {
+  OnboardingFlowConfig,
+  OnboardingFlowState,
+  OnboardingStep,
+  QuestionType,
+} from "@/src/types/multiStepOnboard.types"
+import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline"
 
-export const Step = ({currentStep, state, config}: {currentStep: OnboardingStep, state: OnboardingFlowState, config: OnboardingFlowConfig}) => {
+export const Step = ({
+  currentStep,
+  state,
+  config,
+  setAnswers,
+}: {
+  currentStep: OnboardingStep
+  state: OnboardingFlowState
+  config: OnboardingFlowConfig
+  setAnswers?: (
+    updater:
+      | Record<string, any>
+      | ((prev: Record<string, any>) => Record<string, any>),
+  ) => void
+}) => {
   // local tick forces this component to re-render when answers are mutated in-place
   const [, setTick] = useState(0)
-
   return (
     <>
-      {" "}
-      {currentStep.component && <currentStep.component />}
+      {currentStep.component && (
+        <currentStep.component
+          answers={state.answers}
+          setAnswers={setAnswers}
+        />
+      )}
       {currentStep.questions?.map((q) => (
         <div
           key={q.id}
@@ -23,9 +45,8 @@ export const Step = ({currentStep, state, config}: {currentStep: OnboardingStep,
                 {q.type == QuestionType.ADDRESS && <MapPinIcon />}
               </div>
               <div>
-
-              <h3 className="fw-bold">{q.label}</h3>
-              <div className="text-sm text-zinc-600">{q.description}</div>
+                <h3 className="fw-bold">{q.label}</h3>
+                <div className="text-sm text-zinc-600">{q.description}</div>
               </div>
             </div>
             <QuestionRenderer
