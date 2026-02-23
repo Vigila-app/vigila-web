@@ -108,6 +108,22 @@ export function useMultiStepFlow(config: MultiStepOnboardingProps["config"]) {
     return Math.round(((state.currentStepIndex + 1) / Math.max(1, totalSteps)) * 100)
   }, [steps.length, state.currentStepIndex])
 
+  // Allow updating answers from child components
+  // Accepts either a new answers object or a functional updater
+  const setAnswers = useCallback(
+    (
+      updater: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>),
+    ) => {
+      setState((prev) => {
+        const nextAnswers = typeof updater === "function" ? updater(prev.answers) : updater
+        // Avoid updating state if answers didn't actually change (prevents unnecessary re-renders)
+        if (nextAnswers === prev.answers) return prev
+        return { ...prev, answers: nextAnswers }
+      })
+    },
+    [],
+  )
+
   return {
     state,
     currentStep,
@@ -116,6 +132,7 @@ export function useMultiStepFlow(config: MultiStepOnboardingProps["config"]) {
     next,
     back,
     progress,
+    setAnswers,
   }
 }
 
