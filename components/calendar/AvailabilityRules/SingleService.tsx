@@ -16,7 +16,7 @@ export const SingleService = ({
   return (
     <label
       className={clsx(
-        "flex flex-col items-center gap-2 border-3 p-3 rounded-3xl cursor-pointer transition-all",
+        "flex flex-col items-center justify-between gap-2 border-3 p-3 rounded-3xl cursor-pointer transition-all",
         selected ? "border-vigil-orange border-2 bg-vigil-light-orange" : "border-zinc-400 bg-white"
       )}
     >

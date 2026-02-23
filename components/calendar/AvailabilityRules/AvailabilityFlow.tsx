@@ -64,7 +64,11 @@ export default function AvailabilityFlow({
         questions: [],
         // Pass answers as prop to Services
         component: (props: any) => (
-          <Services answers={state.answers} {...props} />
+          <Services
+            answers={state.answers}
+            setAnswers={setAnswers}
+            {...props}
+          />
         ),
         note: "Seleziona i servizi e mansioni per ogni giorno scelto.",
         nextStep: "",
