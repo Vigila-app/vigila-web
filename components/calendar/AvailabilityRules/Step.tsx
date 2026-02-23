@@ -12,16 +12,27 @@ export const Step = ({
   currentStep,
   state,
   config,
+  setAnswers,
 }: {
   currentStep: OnboardingStep
   state: OnboardingFlowState
   config: OnboardingFlowConfig
+  setAnswers?: (
+    updater:
+      | Record<string, any>
+      | ((prev: Record<string, any>) => Record<string, any>),
+  ) => void
 }) => {
   // local tick forces this component to re-render when answers are mutated in-place
   const [, setTick] = useState(0)
-
-  return <>
-      {currentStep.component && <currentStep.component />}
+  return (
+    <>
+      {currentStep.component && (
+        <currentStep.component
+          answers={state.answers}
+          setAnswers={setAnswers}
+        />
+      )}
       {currentStep.questions?.map((q) => (
         <div
           key={q.id}
@@ -53,5 +64,5 @@ export const Step = ({
         </div>
       ))}
     </>
-  
+  )
 }

@@ -288,7 +288,23 @@ export const Services = ({
 
                 // move to next day or finalize
                 if (currentDayIdx < selectedDays.length - 1) {
-                  setCurrentDayIdx((idx) => idx + 1)
+                  const nextIdx = currentDayIdx + 1
+                  const nextDay = selectedDays[nextIdx]
+                  // load saved values for next day (if any) so UI reflects them immediately
+                  const savedNext = answers?.services?.[nextDay]
+                  setSelectedServices(
+                    Array.isArray(savedNext?.services)
+                      ? savedNext.services
+                      : [],
+                  )
+                  setSelectedMansioni(
+                    Array.isArray(savedNext?.mansioni)
+                      ? savedNext.mansioni
+                      : [],
+                  )
+                  setCar(!!savedNext?.car)
+                  setNotes(savedNext?.notes || "")
+                  setCurrentDayIdx(nextIdx)
                 } else {
                   // last day: finalize / salva ricorrenza
                   // TODO: trigger final save/API call for whole recurrence

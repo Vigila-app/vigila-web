@@ -53,7 +53,7 @@ export default function AvailabilityFlow({
             },
           },
         ],
-        component: () => <AvailabilityRulesDemo setAnswers={setAnswers} />,
+        component: AvailabilityRulesDemo,
         note: "Potrai modificare la ricorrenza in qualsiasi momento: cambiare i giorni, aggiungere o cancellare singole visite e gestire eccezioni",
         nextStep: "services",
       },
@@ -63,13 +63,7 @@ export default function AvailabilityFlow({
         description: "",
         questions: [],
         // Pass answers as prop to Services
-        component: (props: any) => (
-          <Services
-            answers={state.answers}
-            setAnswers={setAnswers}
-            {...props}
-          />
-        ),
+        component: Services,
         note: "Seleziona i servizi e mansioni per ogni giorno scelto.",
         nextStep: "",
       },
@@ -97,7 +91,12 @@ export default function AvailabilityFlow({
   return (
     <div className="mx-auto w-full max-w-md">
       <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
-        <Step currentStep={currentStep} state={state} config={config} />
+        <Step
+          currentStep={currentStep}
+          state={state}
+          config={config}
+          setAnswers={setAnswers}
+        />
         <div className="text-zinc-500  text-sm flex items-start gap-3">
           <InformationCircleIcon className="text-zinc-500 h-6 w-10" />
           {currentStep.note}
