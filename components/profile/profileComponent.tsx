@@ -34,10 +34,11 @@ import ServiziTab from "@/app/vigil/tabs/servizi";
 import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import WalletTab from "@/app/(consumer)/tabs/walletTab";
+import CalendarioTab from "@/app/vigil/tabs/calendario";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
-  
+
   const [tab, setTab] = useQueryState("tab", { defaultValue: "panoramica" });
   const currentTabId = tab || "panoramica";
 
@@ -64,7 +65,7 @@ const ProfileComponent = () => {
           className={clsx(
             "size-6",
             pendingBookings.length > 0 && "text-red-500",
-            isVigil && pendingBookings.length > 0 && "animate-bounce"
+            isVigil && pendingBookings.length > 0 && "animate-bounce",
           )}
         />
       ),
@@ -75,6 +76,10 @@ const ProfileComponent = () => {
           {
             label: <BriefcaseIcon className="size-6" />,
             id: "servizi",
+          },
+          {
+            label: <StarIcon className="size-6" />,
+            id: "calendario",
           },
         ]
       : [
@@ -101,7 +106,7 @@ const ProfileComponent = () => {
 
   const uploadProfilePic = async (
     file: string | ArrayBuffer | File,
-    metadata?: { contentType?: string; name?: string }
+    metadata?: { contentType?: string; name?: string },
   ) => {
     try {
       if (file && user?.id) {
@@ -160,7 +165,7 @@ const ProfileComponent = () => {
                           <span className="capitalize">
                             {dateDisplay(
                               consumer.created_at,
-                              "monthYearLiteral"
+                              "monthYearLiteral",
                             )}
                           </span>
                         </span>
@@ -169,18 +174,20 @@ const ProfileComponent = () => {
                   </section>
                 </div>
               </div>
-              
+
               {/* --- TAB GROUP E CONTENUTI CONSUMER --- */}
               <div className="mt-2 w-full">
                 <TabGroup
                   variant="icons"
                   tabs={tabs}
                   selectedId={currentTabId}
-                  onChange={(id:string) => setTab(id)}
+                  onChange={(id: string) => setTab(id)}
                 />
-                
+
                 {currentTabId === "panoramica" && <PanoramicaConsumerTab />}
-                {currentTabId === "prenotazioni" && <PrenotazioniConsumerTabs />}
+                {currentTabId === "prenotazioni" && (
+                  <PrenotazioniConsumerTabs />
+                )}
                 {currentTabId === "famiglia" && <FamigliaTab />}
                 {currentTabId === "recensioni" && <RecensioniTab />}
                 {currentTabId === "informazioni" && <InformazioniConsumerTab />}
@@ -246,17 +253,18 @@ const ProfileComponent = () => {
                 </section>
               </div>
             </div>
-            
+
             <div className="mt-2 w-full">
               <TabGroup
                 variant="icons"
                 tabs={tabs}
                 selectedId={currentTabId}
-                onChange={(id:string) => setTab(id)}
+                onChange={(id: string) => setTab(id)}
               />
 
               {/* Contenuto Condizionale VIGIL */}
               {currentTabId === "panoramica" && <PanoramicaTab />}
+              {currentTabId === "calendario" && <CalendarioTab />}
               {currentTabId === "prenotazioni" && <PrenotationTabs />}
               {currentTabId === "servizi" && <ServiziTab />}
               {currentTabId === "recensioni" && <RecensioniTab />}

@@ -5,7 +5,7 @@
  * availability rules, and time slots.
  */
 
-import { CalendarDay, WeekdayEnum } from "@/src/types/calendar.types";
+import { AgendaWeekGroup, CalendarDay, CalendarEventI, WeekdayEnum } from "@/src/types/calendar.types";
 
 /**
  * Get weekday name from enum value
@@ -530,4 +530,53 @@ export const getMonday = (date: Date): Date => {
   // Altrimenti torniamo indietro di (day - 1) giorni.
   const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   return new Date(d.setDate(diff));
+};
+
+export const getGroupedAgenda = (
+  bookings: CalendarEventI[], 
+  unavailabilities: CalendarEventI[], 
+  pivotMonday: Date
+): AgendaWeekGroup[] => {
+  
+  // 1. Uniamo i due array in uno solo
+  const allEvents = [...bookings, ...unavailabilities];
+
+  // 2. Ordiniamo per data e ora (start)
+  allEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+  // 3. Definiamo il punto di distacco (7 giorni dopo il pivotMonday)
+  const week2Start = new Date(pivotMonday);
+  week2Start.setDate(pivotMonday.getDate() + 7);
+
+  // 4. Filtriamo gli eventi per le due settimane
+  const week1Events = allEvents.filter(e => {
+    const d = new Date(e.start);
+    return d >= pivotMonday && d < week2Start;
+  });
+
+  const week2Events = allEvents.filter(e => {
+    const d = new Date(e.start);
+    return d >= week2Start;
+  });
+
+  // Helper per label range (es. "16 Feb - 22 Feb")
+  const getRangeLabel = (start: Date) => {
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    return `${start.toLocaleDateString('it-IT', options)} - ${end.toLocaleDateString('it-IT', options)}`;
+  };
+
+  return [
+    {
+      title: "Questa settimana",
+      rangeLabel: getRangeLabel(pivotMonday),
+      events: week1Events
+    },
+    {
+      title: "Prossima settimana",
+      rangeLabel: getRangeLabel(week2Start),
+      events: week2Events
+    }
+  ];
 };

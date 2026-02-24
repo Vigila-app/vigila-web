@@ -414,10 +414,18 @@ export const CalendarService = {
   /**
    * Get vigil calendar (bookings + unavailabilities)
    */
-  getVigilCalendar: async (): Promise<VigilCalendarResponseI> => {
+  getVigilCalendar: async (
+    startDate: Date,
+    endDate: Date,
+  ): Promise<VigilCalendarResponseI> => {
     try {
+      const query = new URLSearchParams({
+      from: startDate.toISOString().split('T')[0],
+      to: endDate.toISOString().split('T')[0],
+    }).toString();
+      
       const response = (await ApiService.get(
-        "/api/calendar/vigil/bookings",
+        `/api/v1/calendar/vigil/bookings?${query}`,
       )) as any
       return response.data
     } catch (error) {

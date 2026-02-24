@@ -1,6 +1,6 @@
 /**
  * Calendar & Availability System Type Definitions
- * 
+ *
  * These types define the structure for calendar, availability rules,
  * and unavailabilities in the Vigila platform.
  */
@@ -110,7 +110,7 @@ export interface AvailableSlotsResponseI {
  */
 export interface CalendarEventI {
   id: string;
-  type: 'booking' | 'unavailability' | 'availability';
+  type: "booking" | "unavailability" | "availability";
   title: string;
   start: string; // ISO datetime
   end: string; // ISO datetime
@@ -139,15 +139,20 @@ export interface VigilCalendarResponseI {
  * Represents a time range that blocks a slot
  */
 export interface SlotConflictI {
-  type: 'booking' | 'unavailability';
+  type: "booking" | "unavailability";
   start: Date;
   end: Date;
   id: string;
 }
 export interface CalendarDay {
-  dateObj: Date;       // L'oggetto Date nativo
-  dateISO: string;     // La stringa formattata "YYYY-MM-DD" (fondamentale per i confronti)
-  dayNumber: number;   // Il numero del giorno (es: 16)
-  weekdayLabel: string;// L'abbreviazione del giorno (es: "LUN")
-  isToday: boolean;    // Vero se il giorno è oggi
+  dateObj: Date; // L'oggetto Date nativo
+  dateISO: string; // La stringa formattata "YYYY-MM-DD" (fondamentale per i confronti)
+  dayNumber: number; // Il numero del giorno (es: 16)
+  weekdayLabel: string; // L'abbreviazione del giorno (es: "LUN")
+  isToday: boolean; // Vero se il giorno è oggi
+}
+export interface AgendaWeekGroup {
+  title: string;
+  rangeLabel: string;
+  events: CalendarEventI[];
 }
