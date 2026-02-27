@@ -6,13 +6,13 @@ import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import Badge from "@/components/badge/badge.component";
 import { ChevronRightIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { BookingUtils } from "@/src/utils/booking.utils";
-// import { Clock, ChevronRight } from 'lucide-react'; // Icone per pulizia
 
 interface AgendaItemProps {
   event: CalendarEventI;
+  selectedDate?: string;
 }
 
-export const AgendaItem = ({ event }: AgendaItemProps) => {
+export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
   const isBooking = event.type === "booking";
 
   const dateObj = new Date(event.start || "");
@@ -21,6 +21,7 @@ export const AgendaItem = ({ event }: AgendaItemProps) => {
     .toUpperCase();
   const dayNumber = dateObj.getDate();
 
+  const isHighlighted = selectedDate === event.start.split("T")[0];
   const startTime = event.start
     ? new Date(event.start).toLocaleTimeString("it-IT", {
         hour: "2-digit",
@@ -39,13 +40,19 @@ export const AgendaItem = ({ event }: AgendaItemProps) => {
     isBooking && status in bookingStatusBadge
       ? bookingStatusBadge[status]
       : null;
-      
+
   const cardContent = (
     <div className="flex items-stretch gap-0 mb-4 bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
       {/* 1. BLOCCO DATA A SINISTRA */}
       <div
-        className={`flex flex-col items-center justify-center min-w-16 py-3 text-white ${
-          isBooking ? "bg-vigil-orange" : "bg-gray-400"
+        className={`flex flex-col items-center justify-center min-w-16 py-3 text-vigil-orange transition-colors ${
+          isHighlighted
+            ? isBooking
+              && "bg-vigil-orange text-white "
+             
+            : isBooking
+              && "bg-vigil-light-orange "
+              
         }`}>
         <span className="text-xs font-bold opacity-80 uppercase leading-none mb-1">
           {dayName}
@@ -59,7 +66,7 @@ export const AgendaItem = ({ event }: AgendaItemProps) => {
           {/* Orario e Info Servizio */}
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-gray-400 text-xs font-semibold">
-              <ClockIcon  className="text-gray-400 w-3 h-3" />
+              <ClockIcon className="text-gray-400 w-3 h-3" />
               <span>
                 {startTime} - {endTime}
               </span>
@@ -70,7 +77,7 @@ export const AgendaItem = ({ event }: AgendaItemProps) => {
             </h3>
 
             <p className="text-sm text-gray-400 font-medium truncate md:max-w-2xl max-w-48">
-              {event.description }
+              {event.description}
             </p>
           </div>
 

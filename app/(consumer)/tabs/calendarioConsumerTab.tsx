@@ -93,7 +93,7 @@ export default function CalendarioTab() {
       <CalendarStrip
         days={daysToShow}
         selectedDate={selectedDate}
-        eventsDates={activeEventDates} // <-- Usiamo i dati reali qui
+        eventsDates={activeEventDates} 
         onDateClick={setSelectedDate}
         onNextWeek={handleNextWeek}
         onPrevWeek={handlePrevWeek}
@@ -113,7 +113,7 @@ export default function CalendarioTab() {
             <div className="divide-y divide-gray-200">
               {week.events.length > 0 ? (
                 week.events.map((event) => (
-                  <AgendaItem key={event.id} event={event} />
+                  <AgendaItem key={event.id} event={event} selectedDate={selectedDate} />
                 ))
               ) : (
                 <p className="p-4 text-center text-gray-400 text-sm italic">
