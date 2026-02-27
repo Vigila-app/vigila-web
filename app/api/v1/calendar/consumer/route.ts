@@ -5,15 +5,22 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ConsumerCalendarResponseI, CalendarEventI } from "@/src/types/calendar.types";
+import {
+  ConsumerCalendarResponseI,
+  CalendarEventI,
+} from "@/src/types/calendar.types";
 import { NextRequest, NextResponse } from "next/server";
 import { BookingI } from "@/src/types/booking.types";
 
 /**
  * GET /api/calendar/consumer
- * 
- * Returns the consumer's calendar with all their bookings
- * 
+ *
+ * Returns the consumer's calendar with their bookings for a given period
+ *
+ * Query Parameters:
+ * @param from - Start date (ISO format, optional)
+ * @param to - End date (ISO format, optional)
+ *
  * @returns ConsumerCalendarResponseI
  */
 export async function GET(req: NextRequest) {
@@ -38,19 +45,29 @@ export async function GET(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
+    const { searchParams } = new URL(req.url);
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
 
-    // Get all bookings for this consumer
-    const { data: bookings, error: bookingsError } = await _admin
+    // Build query for bookings with optional date filters
+    let bookingsQuery = _admin
       .from("bookings")
       .select(
         `
         *,
         vigil:vigils(displayName),
-        service:services(name)
-      `
+        service:services(name,description)
+      `,
       )
-      .eq("consumer_id", userObject.id)
-      .order("startDate", { ascending: true });
+      .eq("consumer_id", userObject.id);
+
+    if (from) bookingsQuery = bookingsQuery.gte("startDate", from);
+    if (to) bookingsQuery = bookingsQuery.lte("startDate", to);
+
+    const { data: bookings, error: bookingsError } = await bookingsQuery.order(
+      "startDate",
+      { ascending: true },
+    );
 
     if (bookingsError) throw bookingsError;
 
@@ -60,6 +77,7 @@ export async function GET(req: NextRequest) {
         id: booking.id,
         type: "booking" as const,
         title: `${booking.service?.name || "Service"} - ${booking.vigil?.displayName || "Vigil"}`,
+        description: booking.service?.description || "",
         start: booking.startDate,
         end: booking.endDate,
         status: booking.status,
@@ -70,7 +88,7 @@ export async function GET(req: NextRequest) {
           payment_status: booking.payment_status,
           price: booking.price,
         },
-      })
+      }),
     );
 
     const response: ConsumerCalendarResponseI = {
@@ -83,7 +101,7 @@ export async function GET(req: NextRequest) {
         data: response,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Consumer calendar error:", error);

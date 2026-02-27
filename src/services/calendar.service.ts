@@ -309,11 +309,23 @@ export const CalendarService = {
   // ============================================
 
   /**
-   * Get consumer calendar (bookings)
+   * Get consumer calendar (bookings) for a given period
+   * @param startDate - Start date for the calendar range
+   * @param endDate - End date for the calendar range
    */
-  getConsumerCalendar: async (): Promise<ConsumerCalendarResponseI> => {
+  getConsumerCalendar: async (
+    startDate: Date,
+    endDate: Date,
+  ): Promise<ConsumerCalendarResponseI> => {
     try {
-      const response = (await ApiService.get("/api/calendar/consumer")) as any
+      const query = new URLSearchParams({
+        from: startDate.toISOString().split('T')[0],
+        to: endDate.toISOString().split('T')[0],
+      }).toString();
+
+      const response = (await ApiService.get(
+        `/api/v1/calendar/consumer?${query}`,
+      )) as any
       return response.data
     } catch (error) {
       console.error("CalendarService.getConsumerCalendar error", error)
