@@ -78,7 +78,7 @@ const ProfileComponent = () => {
             id: "servizi",
           },
           {
-            label: <StarIcon className="size-6" />,
+            label: <CalendarDaysIcon className="size-6" />,
             id: "calendario",
           },
         ]

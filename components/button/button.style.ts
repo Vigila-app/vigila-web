@@ -1,5 +1,5 @@
 const baseBtnStyle =
-  "inline-flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition";
+  "flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition active:scale-95";
 const primaryBtnStyle =
   "shadow border-primary-600 bg-primary-600 text-white hover:bg-white hover:text-primary-600";
 const secondaryBtnStyle =
@@ -11,7 +11,7 @@ const dangerBtnStyle =
 
 const disabledBtnStyle = "opacity-50";
 const loadingBtnStyle = "cursor-wait";
-const fullBtnStyle = "w-full justify-center";
+const fullBtnStyle = "w-full";
 const tabBtnStyle = "bg-white text-black";
 const smallBtnStyle = "w-15 h-8 flex items-center justify-center text-xs";
 
