@@ -28,6 +28,22 @@ export default function AvailabilityFlow({
     role: RolesEnum.VIGIL,
     steps: [
       {
+        id: "welcome",
+        title: "Prenota l'assistenza domiciliare",
+        description: "",
+        nextStep: "availabilities",
+        questions: [
+          {
+            id: "booking-type",
+            type: QuestionType.RADIO,
+          description: "Scegli se la prenotazione è una tantum o ricorrente",
+            label: "Tipo di prenotazione",
+            options: [
+              { label: "Una volta", value: "one-time" },
+              { label: "Ricorrente", value: "recurring" }]
+          }]
+      },
+      {
         id: "availabilities",
         title: "",
         description: "",
@@ -68,7 +84,7 @@ export default function AvailabilityFlow({
         nextStep: "",
       },
     ],
-    initialStepId: "availabilities",
+    initialStepId: "welcome",
     onComplete: async () => {
       console.log("Availability flow completed")
       onComplete()
@@ -101,11 +117,11 @@ export default function AvailabilityFlow({
           <InformationCircleIcon className="text-zinc-500 h-6 w-10" />
           {currentStep.note}
         </div>
-        <div>
-          <button type="button" onClick={back}>
+        <div className="flex gap-2 flex-wrap">
+          <button className="border-2 border-vigil-orange flex-1 py-3 rounded-full" type="button" onClick={back}>
             Back
           </button>
-          <button type="submit">Next</button>
+          <button className="bg-vigil-orange flex-1 py-3 rounded-full" type="submit">Next</button>
         </div>
       </form>
     </div>
