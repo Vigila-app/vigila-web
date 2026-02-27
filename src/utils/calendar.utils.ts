@@ -532,23 +532,30 @@ export const getMonday = (date: Date): Date => {
   return new Date(d.setDate(diff));
 };
 
+/**
+ * Group calendar events into two weeks with labels
+ * Works for both vigil (bookings + unavailabilities) and consumer (bookings only)
+ * @param bookings - Array of booking events
+ * @param pivotMonday - Starting Monday date for the two-week view
+ * @param unavailabilities - Array of unavailability events (optional, defaults to empty)
+ */
 export const getGroupedAgenda = (
   bookings: CalendarEventI[], 
-  unavailabilities: CalendarEventI[], 
-  pivotMonday: Date
+  pivotMonday: Date,
+  unavailabilities: CalendarEventI[] = []
 ): AgendaWeekGroup[] => {
   
-  // 1. Uniamo i due array in uno solo
+  // Combine events - consumers will only pass bookings
   const allEvents = [...bookings, ...unavailabilities];
 
-  // 2. Ordiniamo per data e ora (start)
+  // Sort by start date/time
   allEvents.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
-  // 3. Definiamo il punto di distacco (7 giorni dopo il pivotMonday)
+  // Define week boundary (7 days after pivotMonday)
   const week2Start = new Date(pivotMonday);
   week2Start.setDate(pivotMonday.getDate() + 7);
 
-  // 4. Filtriamo gli eventi per le due settimane
+  // Filter events into two weeks
   const week1Events = allEvents.filter(e => {
     const d = new Date(e.start);
     return d >= pivotMonday && d < week2Start;
@@ -559,7 +566,7 @@ export const getGroupedAgenda = (
     return d >= week2Start;
   });
 
-  // Helper per label range (es. "16 Feb - 22 Feb")
+  // Helper for range label (e.g., "16 Feb - 22 Feb")
   const getRangeLabel = (start: Date) => {
     const end = new Date(start);
     end.setDate(start.getDate() + 6);

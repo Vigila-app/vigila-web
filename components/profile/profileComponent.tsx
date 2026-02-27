@@ -35,6 +35,7 @@ import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import WalletTab from "@/app/(consumer)/tabs/walletTab";
 import CalendarioTab from "@/app/vigil/tabs/calendario";
+import CalendarioConsumerTab from "@/app/(consumer)/tabs/calendarioConsumerTab";
 
 const ProfileComponent = () => {
   const { user, forceUpdate: forceUserUpdate } = useUserStore();
@@ -71,16 +72,17 @@ const ProfileComponent = () => {
       ),
       id: "prenotazioni",
     },
+    {
+            label: <CalendarDaysIcon className="size-6" />,
+            id: "calendario",
+          },
     ...(isVigil
       ? [
           {
             label: <BriefcaseIcon className="size-6" />,
             id: "servizi",
           },
-          {
-            label: <CalendarDaysIcon className="size-6" />,
-            id: "calendario",
-          },
+          
         ]
       : [
           {
@@ -188,6 +190,7 @@ const ProfileComponent = () => {
                 {currentTabId === "prenotazioni" && (
                   <PrenotazioniConsumerTabs />
                 )}
+                {currentTabId === "calendario" && <CalendarioConsumerTab />}
                 {currentTabId === "famiglia" && <FamigliaTab />}
                 {currentTabId === "recensioni" && <RecensioniTab />}
                 {currentTabId === "informazioni" && <InformazioniConsumerTab />}

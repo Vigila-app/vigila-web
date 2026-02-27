@@ -2,7 +2,7 @@
 
 import { AgendaItem } from "@/components/calendar-demo/AgendaItem";
 import { CalendarStrip } from "@/components/calendar-demo/CalendarStrip";
-import { VigilCalendarResponseI } from "@/src/types/calendar.types";
+import { ConsumerCalendarResponseI, } from "@/src/types/calendar.types";
 import {
   getMonday,
   generateTwoWeeksDays,
@@ -14,10 +14,9 @@ import { useEffect, useMemo, useState } from "react";
 
 export default function CalendarioTab() {
   const [pivotMonday, setPivotMonday] = useState(getMonday(new Date()));
-  const [calendarData, setCalendarData] = useState<VigilCalendarResponseI>({
+  const [calendarData, setCalendarData] = useState<ConsumerCalendarResponseI>({
     bookings: [],
-    unavailabilities: [],
-    availability_rules: [],
+   
   });
   const [selectedDate, setSelectedDate] = useState(formatDateToISO(new Date()));
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +56,7 @@ export default function CalendarioTab() {
       toDate.setDate(pivotMonday.getDate() + 13);
 
       try {
-        const data = await CalendarService.getVigilCalendar(
+        const data = await CalendarService.getConsumerCalendar(
           pivotMonday,
           toDate,
         );
@@ -80,7 +79,6 @@ export default function CalendarioTab() {
     return getGroupedAgenda(
       calendarData.bookings,
       pivotMonday,
-      calendarData.unavailabilities,
     );
   }, [calendarData, pivotMonday]);
 
