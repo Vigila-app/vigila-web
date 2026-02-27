@@ -87,11 +87,9 @@ export default function CalendarioTab() {
   // 2. Calcoliamo i pallini dinamicamente in base alle prenotazioni
   const activeEventDates = useMemo(() => {
     return calendarData.bookings.map((booking) => {
-      // Assumendo che booking.start sia una stringa ISO tipo "2026-02-16T10:00:00Z"
       return booking.start.split("T")[0];
     });
   }, [calendarData.bookings]);
-
   return (
     <>
       <CalendarStrip

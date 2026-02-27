@@ -1,5 +1,11 @@
-import React from 'react';
-import { CalendarEventI } from '@/src/types/calendar.types';
+import React from "react";
+import Link from "next/link";
+import { CalendarEventI } from "@/src/types/calendar.types";
+import { bookingStatusBadge } from "@/src/types/booking.types";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
+import Badge from "@/components/badge/badge.component";
+import { ChevronRightIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { BookingUtils } from "@/src/utils/booking.utils";
 // import { Clock, ChevronRight } from 'lucide-react'; // Icone per pulizia
 
 interface AgendaItemProps {
@@ -7,28 +13,44 @@ interface AgendaItemProps {
 }
 
 export const AgendaItem = ({ event }: AgendaItemProps) => {
-  const isBooking = event.type === 'booking';
-  
-  const dateObj = new Date(event.start || '');
-  const dayName = dateObj.toLocaleDateString('it-IT', { weekday: 'short' }).toUpperCase();
-  const dayNumber = dateObj.getDate();
-  
-  const startTime = event.start ? new Date(event.start).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
-  const endTime = event.end ? new Date(event.end).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+  const isBooking = event.type === "booking";
 
-  return (
-    <div className="flex items-stretch gap-0 mb-4 bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+  const dateObj = new Date(event.start || "");
+  const dayName = dateObj
+    .toLocaleDateString("it-IT", { weekday: "short" })
+    .toUpperCase();
+  const dayNumber = dateObj.getDate();
+
+  const startTime = event.start
+    ? new Date(event.start).toLocaleTimeString("it-IT", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "--:--";
+  const endTime = event.end
+    ? new Date(event.end).toLocaleTimeString("it-IT", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "--:--";
+
+  const status = event.status as BookingStatusEnum;
+  const badgeConfig =
+    isBooking && status in bookingStatusBadge
+      ? bookingStatusBadge[status]
+      : null;
       
+  const cardContent = (
+    <div className="flex items-stretch gap-0 mb-4 bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
       {/* 1. BLOCCO DATA A SINISTRA */}
-      <div className={`flex flex-col items-center justify-center min-w-[70px] py-3 text-white ${
-        isBooking ? 'bg-[#E14D2A]' : 'bg-gray-400' 
-      }`}>
-        <span className="text-[10px] font-bold opacity-80 uppercase leading-none mb-1">
+      <div
+        className={`flex flex-col items-center justify-center min-w-16 py-3 text-white ${
+          isBooking ? "bg-vigil-orange" : "bg-gray-400"
+        }`}>
+        <span className="text-xs font-bold opacity-80 uppercase leading-none mb-1">
           {dayName}
         </span>
-        <span className="text-2xl font-black leading-none">
-          {dayNumber}
-        </span>
+        <span className="text-2xl font-black leading-none">{dayNumber}</span>
       </div>
 
       {/* 2. CONTENUTO DETTAGLIATO */}
@@ -36,40 +58,47 @@ export const AgendaItem = ({ event }: AgendaItemProps) => {
         <div className="flex justify-between items-start mb-1">
           {/* Orario e Info Servizio */}
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-gray-400 text-[11px] font-semibold">
-              {/* <Clock size={12} className="text-gray-300" /> */}
-              <span>{startTime} - {endTime}</span>
+            <div className="flex items-center gap-1.5 text-gray-400 text-xs font-semibold">
+              <ClockIcon  className="text-gray-400 w-3 h-3" />
+              <span>
+                {startTime} - {endTime}
+              </span>
             </div>
-            
-            <h3 className="text-sm font-bold text-gray-800 leading-tight">
+
+            <h3 className="text-sm font-bold truncate md:max-w-2xl max-w-48 ">
               {event.title}
             </h3>
-            
-            <p className="text-[11px] text-gray-400 font-medium">
-              {event.metadata?.description || 'Alut mobility, Somministraz...'}
+
+            <p className="text-sm text-gray-400 font-medium truncate md:max-w-2xl max-w-48">
+              {event.description }
             </p>
           </div>
 
           {/* Badge Stato (Angolo Alto Destra) */}
-          {isBooking && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold border ${
-              event.status === 'confirmed' 
-                ? 'bg-green-50 text-green-500 border-green-100' 
-                : 'bg-blue-50 text-blue-500 border-blue-100'
-            }`}>
-              <div className={`w-1 h-1 rounded-full ${event.status === 'confirmed' ? 'bg-green-500' : 'bg-blue-500'}`} />
-              {event.status === 'confirmed' ? 'Confermata' : 'In corso'}
-            </div>
+          {isBooking && badgeConfig && (
+            <Badge color={badgeConfig.color} label={badgeConfig.label} />
           )}
         </div>
 
         {/* Footer Card: Dettagli */}
         <div className="flex justify-end mt-2">
-          <button className="flex items-center text-[10px] font-bold text-[#E14D2A] hover:opacity-70 transition-opacity">
-            {/* Dettagli <ChevronRight size={12} /> */}
+          <button className="flex items-center text-xs font-bold text-vigil-orange hover:opacity-70 transition-opacity">
+            Dettagli <ChevronRightIcon className="w-4 h-4" />
           </button>
         </div>
       </div>
     </div>
   );
+
+  if (isBooking) {
+    return (
+      <Link
+        href={BookingUtils.getBookingDetailsUrl(event.id)}
+        className="no-underline">
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 };

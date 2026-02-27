@@ -112,6 +112,7 @@ export interface CalendarEventI {
   id: string;
   type: "booking" | "unavailability" | "availability";
   title: string;
+  description?: string;
   start: string; // ISO datetime
   end: string; // ISO datetime
   status?: string;

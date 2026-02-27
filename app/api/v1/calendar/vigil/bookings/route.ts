@@ -14,22 +14,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/calendar/vigil/bookings
- * 
+ *
  * Returns the vigil's calendar with bookings, unavailabilities, and availability rules
- * 
+ *
  * @returns VigilCalendarResponseI
  */
 export async function GET(req: NextRequest) {
   try {
-
-    const { nextUrl, url } = req;
     // Authenticate user
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
         success: false,
-        message: "Unauthorized zzzzertrarcbeveoapsersad sd",
+        message: "Unauthorized ",
       } as any);
     }
 
@@ -43,33 +41,40 @@ export async function GET(req: NextRequest) {
     }
 
     const _admin = getAdminClient();
+    const { searchParams } = new URL(req.url);
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
 
-    // Get all bookings for this vigil
-    const { data: bookings, error: bookingsError } = await _admin
+    let bookingsQuery = _admin
       .from("bookings")
       .select(
-        `
-        *,
-        consumer:consumers(displayName),
-        service:services(name)
-      `
+        `*, consumer:consumers(displayName), service:services(name, description) `,
       )
-      .eq("vigil_id", userObject.id)
-      .order("startDate", { ascending: true });
+      .eq("vigil_id", userObject.id);
+
+    if (from) bookingsQuery = bookingsQuery.gte("startDate", from);
+    if (to) bookingsQuery = bookingsQuery.lte("startDate", to);
+
+    const { data: bookings, error: bookingsError } = await bookingsQuery.order(
+      "startDate",
+      { ascending: true },
+    );
 
     if (bookingsError) throw bookingsError;
 
-    // Get all unavailabilities for this vigil
+    let unavailQuery = _admin
+      .from("vigil_unavailabilities")
+      .select("*")
+      .eq("vigil_id", userObject.id);
+
+    if (from) unavailQuery = unavailQuery.gte("start_at", from);
+    if (to) unavailQuery = unavailQuery.lte("start_at", to);
+
     const { data: unavailabilities, error: unavailabilitiesError } =
-      await _admin
-        .from("vigil_unavailabilities")
-        .select("*")
-        .eq("vigil_id", userObject.id)
-        .order("start_at", { ascending: true });
+      await unavailQuery.order("start_at");
 
     if (unavailabilitiesError) throw unavailabilitiesError;
 
-    // Get all availability rules for this vigil
     const { data: availabilityRules, error: rulesError } = await _admin
       .from("vigil_availability_rules")
       .select("*")
@@ -84,6 +89,7 @@ export async function GET(req: NextRequest) {
         id: booking.id,
         type: "booking" as const,
         title: `${booking.service?.name || "Service"} - ${booking.consumer?.displayName || "Consumer"}`,
+        description: booking.service?.description || "",
         start: booking.startDate,
         end: booking.endDate,
         status: booking.status,
@@ -94,36 +100,36 @@ export async function GET(req: NextRequest) {
           payment_status: booking.payment_status,
           price: booking.price,
         },
-      })
+      }),
     );
 
     // Transform unavailabilities into calendar events
-    const unavailabilityEvents: CalendarEventI[] = (
-      unavailabilities || []
-    ).map((unavailability: any) => ({
-      id: unavailability.id,
-      type: "unavailability" as const,
-      title: unavailability.reason || "Unavailable",
-      start: unavailability.start_at,
-      end: unavailability.end_at,
-      metadata: {
-        reason: unavailability.reason,
-      },
-    }));
+    const unavailabilityEvents: CalendarEventI[] = (unavailabilities || []).map(
+      (unavailability: any) => ({
+        id: unavailability.id,
+        type: "unavailability" as const,
+        title: unavailability.reason || "Unavailable",
+        start: unavailability.start_at,
+        end: unavailability.end_at,
+        metadata: {
+          reason: unavailability.reason,
+        },
+      }),
+    );
 
     const response: VigilCalendarResponseI = {
       bookings: bookingEvents,
       unavailabilities: unavailabilityEvents,
       availability_rules: (availabilityRules || []) as VigilAvailabilityRuleI[],
     };
-
+    console.log("Vigil Calendar Response:", response);
     return NextResponse.json(
       {
         code: "VIGIL_CALENDAR_SUCCESS",
         data: response,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Vigil calendar error:", error);
