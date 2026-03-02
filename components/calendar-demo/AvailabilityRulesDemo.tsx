@@ -20,8 +20,8 @@ import {
 export const AvailabilityRulesDemo = ({
   setAnswers,
 }: {
-  setAnswers: (updater: (prev: Record<string, any>) => Record<string, any>) => void
-}) => {
+  setAnswers?: (updater: (prev: Record<string, any>) => Record<string, any>) => void
+} = {}) => {
   const weekdays = getWeekdaysArray()
   const times = getTimeSlots(15) // 15-minute intervals
 
@@ -57,7 +57,7 @@ export const AvailabilityRulesDemo = ({
     try {
       const data = await CalendarService.getVigilAvailabilityRules()
       setRules(data)
-      setAnswers((prev) => {
+      setAnswers?.((prev) => {
         if (JSON.stringify(prev?.availabilities) !== JSON.stringify(data)) {
           return { ...prev, availabilities: data }
         }
