@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITIES_LIST_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITIES_LIST_FORBIDDEN.code,
         success: false,
         message: "Only vigils can access this endpoint",
       } as any);
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        code: "UNAVAILABILITIES_LIST_SUCCESS",
+        code: ResponseCodesConstants.UNAVAILABILITIES_LIST_SUCCESS.code,
         data: unavailabilities || [],
         success: true,
       },
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Get unavailabilities error:", error);
     return jsonErrorResponse(500, {
-      code: "UNAVAILABILITIES_LIST_ERROR",
+      code: ResponseCodesConstants.UNAVAILABILITIES_LIST_ERROR.code,
       success: false,
       error,
     } as any);
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_FORBIDDEN.code,
         success: false,
         message: "Only vigils can create unavailabilities",
       } as any);
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (!body.start_at || !body.end_at) {
       return jsonErrorResponse(400, {
-        code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_BAD_REQUEST.code,
         success: false,
         message: "Missing required fields: start_at, end_at",
       } as any);
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     );
     if (!dateRangeValidation.valid) {
       return jsonErrorResponse(400, {
-        code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_BAD_REQUEST.code,
         success: false,
         message: dateRangeValidation.error,
       } as any);
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return jsonErrorResponse(400, {
-        code: "UNAVAILABILITIES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_BAD_REQUEST.code,
         success: false,
         message: "Invalid start_at or end_at date format",
       } as any);
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
 
       if (hasOverlap) {
         return jsonErrorResponse(409, {
-          code: "UNAVAILABILITIES_CREATE_OVERLAP",
+          code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_OVERLAP.code,
           success: false,
           message: "This unavailability overlaps with an existing one",
         } as any);
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        code: "UNAVAILABILITIES_CREATE_SUCCESS",
+        code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_SUCCESS.code,
         data: unavailability,
         success: true,
       },
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Create unavailability error:", error);
     return jsonErrorResponse(500, {
-      code: "UNAVAILABILITIES_CREATE_ERROR",
+      code: ResponseCodesConstants.UNAVAILABILITIES_CREATE_ERROR.code,
       success: false,
       error,
     } as any);

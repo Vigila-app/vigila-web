@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.VIGIL_CALENDAR_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized ",
       } as any);
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.VIGIL_CALENDAR_FORBIDDEN.code,
         success: false,
         message: "Only vigils can access this endpoint",
       } as any);
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Vigil calendar error:", error);
     return jsonErrorResponse(500, {
-      code: "VIGIL_CALENDAR_ERROR",
+      code: ResponseCodesConstants.VIGIL_CALENDAR_ERROR.code,
       success: false,
       error,
     } as any);

@@ -31,7 +31,7 @@ export async function PUT(
     const userObject = await authenticateUser(req)
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any)
@@ -40,7 +40,7 @@ export async function PUT(
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_FORBIDDEN.code,
         success: false,
         message: "Only vigils can update availability rules",
       } as any)
@@ -48,7 +48,7 @@ export async function PUT(
 
     if (!ruleId) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
         success: false,
         message: "Rule ID is required",
       } as any)
@@ -58,7 +58,7 @@ export async function PUT(
     const { start_time, end_time, valid_from, valid_to } = body
     if (!start_time || !end_time) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
         success: false,
         message: "start_time and end_time are required",
       } as any)
@@ -68,7 +68,7 @@ export async function PUT(
     const timeRangeValidation = isValidTimeRange(start_time, end_time)
     if (!timeRangeValidation.valid) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
         success: false,
         message: timeRangeValidation.error,
       } as any)
@@ -78,7 +78,7 @@ export async function PUT(
     const durationMinutes = calculateDurationMinutes(start_time, end_time)
     if (durationMinutes < 60) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
         success: false,
         message: "Minimum duration must be at least 1 hour (60 minutes)",
       } as any)
@@ -91,7 +91,7 @@ export async function PUT(
     )
     if (!dateRangeValidation.valid) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
         success: false,
         message: dateRangeValidation.error,
       } as any)
@@ -109,7 +109,7 @@ export async function PUT(
     if (fetchRuleError) throw fetchRuleError
     if (!existingRule) {
       return jsonErrorResponse(404, {
-        code: "AVAILABILITY_RULES_UPDATE_NOT_FOUND",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_NOT_FOUND.code,
         success: false,
         message: "Availability rule not found",
       } as any)
@@ -144,7 +144,7 @@ export async function PUT(
 
       if (hasOverlap) {
         return jsonErrorResponse(400, {
-          code: "AVAILABILITY_RULES_UPDATE_BAD_REQUEST",
+          code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_BAD_REQUEST.code,
           success: false,
           message: `Time slot overlaps with an existing availability rule for ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][existingRule.weekday]}`,
         } as any)
@@ -167,7 +167,7 @@ export async function PUT(
 
     return NextResponse.json(
       {
-        code: "AVAILABILITY_RULES_UPDATE_SUCCESS",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_SUCCESS.code,
         success: true,
         message: "Availability rule updated successfully",
       },
@@ -176,7 +176,7 @@ export async function PUT(
   } catch (error) {
     console.error("Update availability rule error:", error)
     return jsonErrorResponse(500, {
-      code: "AVAILABILITY_RULES_UPDATE_ERROR",
+      code: ResponseCodesConstants.AVAILABILITY_RULES_UPDATE_ERROR.code,
       success: false,
       error,
     } as any)
@@ -199,7 +199,7 @@ export async function DELETE(
     const userObject = await authenticateUser(req)
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_DELETE_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any)
@@ -208,7 +208,7 @@ export async function DELETE(
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_DELETE_FORBIDDEN.code,
         success: false,
         message: "Only vigils can delete availability rules",
       } as any)
@@ -216,7 +216,7 @@ export async function DELETE(
 
     if (!ruleId) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_DELETE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_DELETE_BAD_REQUEST.code,
         success: false,
         message: "Rule ID is required",
       } as any)
@@ -235,7 +235,7 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        code: "AVAILABILITY_RULES_DELETE_SUCCESS",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_DELETE_SUCCESS.code,
         success: true,
         message: "Availability rule deleted successfully",
       },
@@ -244,7 +244,7 @@ export async function DELETE(
   } catch (error) {
     console.error("Delete availability rule error:", error)
     return jsonErrorResponse(500, {
-      code: "AVAILABILITY_RULES_DELETE_ERROR",
+      code: ResponseCodesConstants.AVAILABILITY_RULES_DELETE_ERROR.code,
       success: false,
       error,
     } as any)

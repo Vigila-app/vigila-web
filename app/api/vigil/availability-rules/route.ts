@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_LIST_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_LIST_FORBIDDEN.code,
         success: false,
         message: "Only vigils can access this endpoint",
       } as any);
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        code: "AVAILABILITY_RULES_LIST_SUCCESS",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_LIST_SUCCESS.code,
         data: rules || [],
         success: true,
       },
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Get availability rules error:", error);
     return jsonErrorResponse(500, {
-      code: "AVAILABILITY_RULES_LIST_ERROR",
+      code: ResponseCodesConstants.AVAILABILITY_RULES_LIST_ERROR.code,
       success: false,
       error,
     } as any);
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_FORBIDDEN.code,
         success: false,
         message: "Only vigils can create availability rules",
       } as any);
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       !body.valid_from
     ) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_BAD_REQUEST.code,
         success: false,
         message:
           "Missing required fields: weekday, start_time, end_time, valid_from",
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     // 2. Validate weekday range
     if (body.weekday < 0 || body.weekday > 6) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_BAD_REQUEST.code,
         success: false,
         message: "Weekday must be between 0 (Sunday) and 6 (Saturday)",
       } as any);
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
     );
     if (!timeRangeValidation.valid) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_BAD_REQUEST.code,
         success: false,
         message: timeRangeValidation.error,
       } as any);
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     );
     if (durationMinutes < 60) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_MIN_DURATION_ERROR",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_MIN_DURATION_ERROR.code,
         success: false,
         message: "Minimum duration must be at least 1 hour (60 minutes)",
       } as any);
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
     );
     if (!dateRangeValidation.valid) {
       return jsonErrorResponse(400, {
-        code: "AVAILABILITY_RULES_CREATE_BAD_REQUEST",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_BAD_REQUEST.code,
         success: false,
         message: dateRangeValidation.error,
       } as any);
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
 
       if (hasOverlap) {
         return jsonErrorResponse(409, {
-          code: "AVAILABILITY_RULES_OVERLAP_ERROR",
+          code: ResponseCodesConstants.AVAILABILITY_RULES_OVERLAP_ERROR.code,
           success: false,
           message: `Time slot overlaps with an existing availability rule for ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][body.weekday]}`,
         } as any);
@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        code: "AVAILABILITY_RULES_CREATE_SUCCESS",
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_SUCCESS.code,
         data: rule,
         success: true,
       },
@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Create availability rule error:", error);
     return jsonErrorResponse(500, {
-      code: "AVAILABILITY_RULES_CREATE_ERROR",
+      code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_ERROR.code,
       success: false,
       error,
     } as any);

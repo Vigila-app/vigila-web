@@ -23,7 +23,7 @@ export async function DELETE(
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITY_DELETE_FORBIDDEN.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -32,7 +32,7 @@ export async function DELETE(
     // Verify user is a vigil
     if (userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.UNAVAILABILITY_DELETE_FORBIDDEN.code,
         success: false,
         message: "Only vigils can delete unavailabilities",
       } as any);
@@ -40,7 +40,7 @@ export async function DELETE(
 
     if (!ruleId) {
       return jsonErrorResponse(400, {
-        code: "UNAVAILABILITY_DELETE_BAD_REQUEST",
+        code: ResponseCodesConstants.UNAVAILABILITY_DELETE_BAD_REQUEST.code,
         success: false,
         message: "Unavailability ID is required",
       } as any);
@@ -59,7 +59,7 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        code: "UNAVAILABILITY_DELETE_SUCCESS",
+        code: ResponseCodesConstants.UNAVAILABILITY_DELETE_SUCCESS.code,
         success: true,
         message: "Unavailability deleted successfully",
       },
@@ -68,7 +68,7 @@ export async function DELETE(
   } catch (error) {
     console.error("Delete unavailability error:", error);
     return jsonErrorResponse(500, {
-      code: "UNAVAILABILITY_DELETE_ERROR",
+      code: ResponseCodesConstants.UNAVAILABILITY_DELETE_ERROR.code,
       success: false,
       error,
     } as any);

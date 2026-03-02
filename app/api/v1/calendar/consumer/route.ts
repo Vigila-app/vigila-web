@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.CONSUMER_CALENDAR_UNAUTHORIZED.code,
         success: false,
         message: "Unauthorized",
       } as any);
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     // Verify user is a consumer
     if (userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
       return jsonErrorResponse(403, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.CONSUMER_CALENDAR_FORBIDDEN.code,
         success: false,
         message: "Only consumers can access this endpoint",
       } as any);
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        code: "CONSUMER_CALENDAR_SUCCESS",
+        code: ResponseCodesConstants.CONSUMER_CALENDAR_SUCCESS.code,
         data: response,
         success: true,
       },
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Consumer calendar error:", error);
     return jsonErrorResponse(500, {
-      code: "CONSUMER_CALENDAR_ERROR",
+      code: ResponseCodesConstants.CONSUMER_CALENDAR_ERROR.code,
       success: false,
       error,
     } as any);
