@@ -122,7 +122,6 @@ export async function GET(req: NextRequest) {
       unavailabilities: unavailabilityEvents,
       availability_rules: (availabilityRules || []) as VigilAvailabilityRuleI[],
     };
-    console.log("Vigil Calendar Response:", response);
     return NextResponse.json(
       {
         code: "VIGIL_CALENDAR_SUCCESS",

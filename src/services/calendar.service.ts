@@ -419,6 +419,18 @@ export const CalendarService = {
     }
   },
 
+  /**
+   * Delete vigil unavailability
+   */
+  deleteVigilUnavailability: async (unavailabilityId: string): Promise<void> => {
+    try {
+      await ApiService.delete(`/api/vigil/unavailabilities/${unavailabilityId}`)
+    } catch (error) {
+      console.error("CalendarService.deleteVigilUnavailability error", error)
+      throw error
+    }
+  },
+
   // ============================================
   // VIGIL APIS - Calendar
   // ============================================

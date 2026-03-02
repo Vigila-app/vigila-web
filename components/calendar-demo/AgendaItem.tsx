@@ -1,18 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { CalendarEventI } from "@/src/types/calendar.types";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import Badge from "@/components/badge/badge.component";
-import { ChevronRightIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, ClockIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { BookingUtils } from "@/src/utils/booking.utils";
+import { CalendarService } from "@/src/services/calendar.service";
 
 interface AgendaItemProps {
   event: CalendarEventI;
   selectedDate?: string;
+  onDelete?: (id: string) => void;
 }
 
-export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
+export const AgendaItem = ({ event, selectedDate, onDelete }: AgendaItemProps) => {
   const isBooking = event.type === "booking";
+  const isUnavailability = event.type === "unavailability";
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await CalendarService.deleteVigilUnavailability(event.id);
+      onDelete?.(event.id);
+    } catch (err) {
+      console.error("Delete unavailability error:", err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const dateObj = new Date(event.start || "");
   const dayName = dateObj
@@ -47,11 +66,13 @@ export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
     <div className="flex items-stretch gap-0 mb-4 bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
       {/* 1. BLOCCO DATA A SINISTRA */}
       <div
-        className={`flex flex-col items-center justify-center min-w-16 py-3 text-vigil-orange transition-colors ${
-          isHighlighted
-            ? isBooking && "bg-vigil-orange text-white "
-            : isBooking && "bg-vigil-light-orange "
-        }`}>
+        className={`flex flex-col items-center justify-center min-w-16 py-3 transition-colors ${
+          isUnavailability
+            ? "bg-gray-300 text-gray-700"
+            : isHighlighted
+              ? isBooking && "bg-vigil-orange text-white"
+              : isBooking && "bg-vigil-light-orange text-vigil-orange"
+        } ${!isUnavailability && isBooking && "text-vigil-orange"}`}>
         <span className="text-xs font-bold opacity-80 uppercase leading-none mb-1">
           {dayName}
         </span>
@@ -83,9 +104,19 @@ export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
               <Badge color={badgeConfig.color} label={badgeConfig.label} />
             )}
 
-            <button className="flex items-center justify-center text-xs font-bold text-vigil-orange hover:opacity-70 transition-opacity">
-              Dettagli <ChevronRightIcon className="w-4 h-4" />
-            </button>
+            {isUnavailability ? (
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="flex items-center justify-center text-xs font-bold gap-0.5 text-vigil-orange hover:opacity-70 transition-opacity disabled:opacity-40">
+                {isDeleting ? "..." : "Elimina"}
+                <TrashIcon className="w-4 h-4" />
+              </button>
+            ) : (
+              <button className="flex items-center justify-center text-xs font-bold text-vigil-orange hover:opacity-70 transition-opacity">
+                Dettagli <ChevronRightIcon className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
