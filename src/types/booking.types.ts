@@ -44,33 +44,13 @@ export type BookingStoreType = {
   getBookings: (force?: boolean) => void;
   getBookingDetails: (
     bookingId: BookingI["id"],
-    force?: boolean
+    force?: boolean,
   ) => Promise<BookingI>;
   createBooking: (booking: BookingFormI) => Promise<BookingI>;
   updateBookingStatus: (
     bookingId: BookingI["id"],
-    status: BookingStatusEnum
+    status: BookingStatusEnum,
   ) => Promise<BookingI>;
   cancelBooking: (bookingId: BookingI["id"]) => Promise<boolean>;
   resetLastUpdate: () => void;
-};
-
-type BadgeConfig = { color: string; label: string };
-
-export const bookingStatusBadge: Record<BookingStatusEnum, BadgeConfig> = {
-  [BookingStatusEnum.PENDING]:          { color: 'yellow', label: 'In attesa' },
-  [BookingStatusEnum.CONFIRMED]:        { color: 'green',  label: 'Confermata' },
-  [BookingStatusEnum.IN_PROGRESS]:      { color: 'blue',   label: 'In corso' },
-  [BookingStatusEnum.COMPLETED]:        { color: 'gray',   label: 'Completata' },
-  [BookingStatusEnum.CANCELLED_USER]:   { color: 'red',    label: 'Annullata' },
-  [BookingStatusEnum.CANCELLED_VIGIL]:  { color: 'red',    label: 'Annullata da Vigil' },
-  [BookingStatusEnum.REJECTED]:         { color: 'red',    label: 'Rifiutata' },
-  [BookingStatusEnum.REFUNDED]:         { color: 'purple', label: 'Rimborsata' },
-};
-
-export const paymentStatusBadge: Record<PaymentStatusEnum, BadgeConfig> = {
-  [PaymentStatusEnum.PENDING]:  { color: 'yellow', label: 'Pagamento in attesa' },
-  [PaymentStatusEnum.PAID]:     { color: 'green',  label: 'Pagato' },
-  [PaymentStatusEnum.FAILED]:   { color: 'red',    label: 'Pagamento fallito' },
-  [PaymentStatusEnum.REFUNDED]: { color: 'purple', label: 'Rimborsato' },
 };

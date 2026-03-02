@@ -10,7 +10,7 @@ export const CalendarStrip = ({
   currentMonthLabel,
 }: any) => {
   return (
-    <div className="bg-vigil-orange text-white p-5  shadow-xl">
+    <div className="bg-vigil-orange text-white p-5 border rounded-2xl shadow-xl">
       {/* Header Navigazione */}
       <div className="flex justify-between items-center mb-6">
         <button

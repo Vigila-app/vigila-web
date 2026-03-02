@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { CalendarEventI } from "@/src/types/calendar.types";
-import { bookingStatusBadge } from "@/src/types/booking.types";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import Badge from "@/components/badge/badge.component";
 import { ChevronRightIcon, ClockIcon } from "@heroicons/react/24/outline";
@@ -37,8 +36,11 @@ export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
 
   const status = event.status as BookingStatusEnum;
   const badgeConfig =
-    isBooking && status in bookingStatusBadge
-      ? bookingStatusBadge[status]
+    isBooking && status
+      ? {
+          color: BookingUtils.getStatusColor(status),
+          label: BookingUtils.getStatusText(status),
+        }
       : null;
 
   const cardContent = (
@@ -47,12 +49,8 @@ export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
       <div
         className={`flex flex-col items-center justify-center min-w-16 py-3 text-vigil-orange transition-colors ${
           isHighlighted
-            ? isBooking
-              && "bg-vigil-orange text-white "
-             
-            : isBooking
-              && "bg-vigil-light-orange "
-              
+            ? isBooking && "bg-vigil-orange text-white "
+            : isBooking && "bg-vigil-light-orange "
         }`}>
         <span className="text-xs font-bold opacity-80 uppercase leading-none mb-1">
           {dayName}
@@ -80,18 +78,15 @@ export const AgendaItem = ({ event, selectedDate }: AgendaItemProps) => {
               {event.description}
             </p>
           </div>
+          <div className="flex flex-col justify-between items-end h-full">
+            {isBooking && badgeConfig && (
+              <Badge color={badgeConfig.color} label={badgeConfig.label} />
+            )}
 
-          {/* Badge Stato (Angolo Alto Destra) */}
-          {isBooking && badgeConfig && (
-            <Badge color={badgeConfig.color} label={badgeConfig.label} />
-          )}
-        </div>
-
-        {/* Footer Card: Dettagli */}
-        <div className="flex justify-end mt-2">
-          <button className="flex items-center text-xs font-bold text-vigil-orange hover:opacity-70 transition-opacity">
-            Dettagli <ChevronRightIcon className="w-4 h-4" />
-          </button>
+            <button className="flex items-center justify-center text-xs font-bold text-vigil-orange hover:opacity-70 transition-opacity">
+              Dettagli <ChevronRightIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

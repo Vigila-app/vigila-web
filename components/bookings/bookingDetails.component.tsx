@@ -3,18 +3,17 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { Button, Badge, Avatar } from "@/components";
-import { ReviewButtonComponent } from "@/components/reviews"; // REINTEGRATO
+import { ReviewButtonComponent } from "@/components/reviews";
 import {
   MapPinIcon,
   HeartIcon,
   DocumentTextIcon,
-  PhoneIcon,
   ExclamationTriangleIcon,
   PencilSquareIcon,
   XMarkIcon,
   CheckIcon,
   BanknotesIcon,
-  PlusCircleIcon, // NUOVA ICONA PER GLI EXTRA
+  PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import {
   BookingStatusEnum,
@@ -36,8 +35,6 @@ import { BookingUtils } from "@/src/utils/booking.utils";
 import { CurrencyEnum } from "@/src/enums/common.enums";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation"; // CORRETTO (era next/router)
-
-// REINTEGRATI PER GLI EXTRA
 import { ServiceCatalogItem } from "@/src/types/services.types";
 import { ServicesService } from "@/src/services";
 
@@ -80,7 +77,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   const vigil = useMemo(() => booking?.vigil, [booking]);
   const consumer = useMemo(() => booking?.consumer, [booking]);
 
-  // REINTEGRATO: Recupero Catalogo Servizi per gli Extra
   const serviceCatalog: ServiceCatalogItem | undefined = useMemo(
     () =>
       service?.info?.catalog_id
@@ -89,7 +85,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     [service],
   );
 
-  // REINTEGRATO: Logica di controllo cancellazione
   const checkCancellation = useCallback(async () => {
     if (!booking) {
       setCanCancel(false);
@@ -111,7 +106,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     if (bookingId) getBookingDetails(bookingId);
   }, [bookingId, getBookingDetails]);
 
-  // REINTEGRATO: Esecuzione del controllo cancellazione
   useEffect(() => {
     checkCancellation();
   }, [checkCancellation]);
@@ -336,7 +330,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {/* AZIONI DINAMICHE IN BASE AL RUOLO */}
         <div className="space-y-3 pt-4 border-t">
-          {/* LOGICA VIGIL: Accetta/Rifiuta */}
           {isVigil && booking.status === BookingStatusEnum.PENDING && (
             <div className="grid grid-cols-2 gap-4">
               <Button
@@ -356,7 +349,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             </div>
           )}
 
-          {/* LOGICA VIGIL: Completamento */}
           {isVigil &&
             booking.status === BookingStatusEnum.CONFIRMED &&
             dateDiff(booking.endDate, currentDate) < 0 && (
@@ -368,7 +360,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               />
             )}
 
-          {/* LOGICA CONSUMER: Paga */}
           {isConsumer &&
             booking.payment_status === PaymentStatusEnum.PENDING && (
               <Button
@@ -382,7 +373,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               />
             )}
 
-          {/* REINTEGRATO: Logica e Tasto di Annullamento */}
           {canCancel && dateDiff(booking.endDate, currentDate) > 0 && (
             <Button
               full
@@ -411,9 +401,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           />
         </div>
 
-        {/* REINTEGRATO: Review Section */}
         {booking.status === BookingStatusEnum.COMPLETED && (
-          <div className="mt-6 pt-6 border-t border-gray-100">
+          <div className="mt-6 pt-6 border-t items-center border-gray-100">
             <ReviewButtonComponent
               booking={booking}
               vigilName={vigil?.displayName}
