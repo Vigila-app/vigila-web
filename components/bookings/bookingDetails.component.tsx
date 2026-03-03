@@ -14,6 +14,8 @@ import {
   CheckIcon,
   BanknotesIcon,
   PlusCircleIcon,
+  ShieldCheckIcon,
+  PhoneIcon,
 } from "@heroicons/react/24/outline";
 import {
   BookingStatusEnum,
@@ -139,9 +141,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     return <div className="p-10 text-center">Caricamento...</div>;
 
   return (
-    <div className="bg-white min-h-screen pb-10">
+    <div className=" pb-10">
       {/* HEADER: Data e Stato */}
-      <div className="p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+      <div className="py-5  ">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-black  leading-tight">
@@ -152,13 +154,13 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               {dateDisplay(booking.endDate, "HH:mm")} ({booking.quantity} ore)
             </p>
           </div>
-          {isModal && (
+          {/* {isModal && (
             <button
               onClick={closeModal}
               className="p-2 bg-gray-50 rounded-full text-gray-400">
               <XMarkIcon className="w-6 h-6" />
             </button>
-          )}
+          )} */}
         </div>
 
         <div className="mt-4 flex items-center gap-2">
@@ -176,7 +178,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         </div>
       </div>
 
-      <div className="p-5 space-y-8">
+      <div className="p-y5 space-y-8">
         {/* INFO PRINCIPALI */}
         <div className="space-y-6">
           {/* Indirizzo */}
@@ -291,12 +293,13 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
         <div
           className={`rounded-3xl p-5 border ${isConsumer ? "bg-blue-50 border-blue-100" : "bg-purple-50 border-purple-100"}`}>
           <p
-            className={`font-bold text-xs uppercase tracking-wider mb-4 ${isConsumer ? "text-blue-500" : "text-purple-500"}`}>
+            className={`font-bold text-xs uppercase tracking-wider mb-4 ${isConsumer ? "text-consumer-blue" : "text-purple-500"}`}>
             {isConsumer ? "Operatore assegnato" : "Cliente da assistere"}
           </p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Avatar
+              size="standard"
                 userId={isConsumer ? vigil?.id : consumer?.id}
                 value={isConsumer ? vigil?.displayName : consumer?.displayName}
               />
@@ -308,22 +311,29 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 </p>
                 <div className="flex items-center gap-1 text-green-600 text-xs font-black uppercase">
                   <span className="p-0.5 bg-green-600 rounded-full text-white">
-                    <CheckIcon className="w-2 h-2" />
+                    <ShieldCheckIcon className="w-2 h-2" />
                   </span>
                   Profilo Verificato
                 </div>
               </div>
             </div>
           </div>
+                <div className="mt-2 text-sm text-gray-600">
+                  <p>
+                    L'operatore confermerà la disponibilità dopo la tua
+                    richiesta. Ti avviseremo non appena sarà confermata.
+                  </p>
+                </div>
         </div>
 
         {/* POLICY CANCELLAZIONE */}
         {isConsumer && (
           <div className="bg-yellow-50 rounded-2xl p-4 border border-yellow-100 flex gap-3">
             <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 flex-shrink-0" />
-            <p className="text-xs text-yellow-800 leading-relaxed font-medium">
+            <p className="text-xs text-yellow-800 leading-relaxed font-normal">
               <span className="font-bold">Policy:</span> Cancellazione gratuita
-              entro 24h. Dopo tale termine verrà applicata una penale del 50%.
+              entro 24 ore prima. Dopo tale termine verrà applicata una penale
+              del 50% a conpenso dell'operatore. Hai sempre il controllo!
             </p>
           </div>
         )}
@@ -398,6 +408,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             action={() => {
               router.push(`${Routes.customerCare.url}`);
             }}
+            icon={<PhoneIcon className="w-5 h-5" />}
+            
           />
         </div>
 

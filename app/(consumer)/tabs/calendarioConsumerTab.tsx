@@ -11,6 +11,9 @@ import {
 } from "@/src/utils/calendar.utils";
 import { CalendarService } from "@/src/services";
 import { useEffect, useMemo, useState } from "react";
+import { useModalStore } from "@/src/store/modal/modal.store";
+import ModalBase from "@/components/@core/modal/modalBase.component";
+import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
 
 export default function CalendarioTab() {
   const [pivotMonday, setPivotMonday] = useState(getMonday(new Date()));
@@ -20,6 +23,10 @@ export default function CalendarioTab() {
   });
   const [selectedDate, setSelectedDate] = useState(formatDateToISO(new Date()));
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const { openModal } = useModalStore();
+
+  const BOOKING_MODAL_ID = "consumer-booking-details-modal";
 
   const daysToShow = useMemo(
     () => generateTwoWeeksDays(pivotMonday),
@@ -75,6 +82,11 @@ export default function CalendarioTab() {
     fetchCalendarData();
   }, [pivotMonday]); // Ora dipende solo da pivotMonday, pulitissimo.
 
+  const handleBookingClick = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    openModal(BOOKING_MODAL_ID);
+  };
+
   const groupedWeeks = useMemo(() => {
     return getGroupedAgenda(
       calendarData.bookings,
@@ -113,7 +125,12 @@ export default function CalendarioTab() {
             <div className="divide-y divide-gray-200">
               {week.events.length > 0 ? (
                 week.events.map((event) => (
-                  <AgendaItem key={event.id} event={event} selectedDate={selectedDate} />
+                  <AgendaItem
+                    key={event.id}
+                    event={event}
+                    selectedDate={selectedDate}
+                    onBookingClick={handleBookingClick}
+                  />
                 ))
               ) : (
                 <p className="p-4 text-center text-gray-400 text-sm italic">
@@ -124,6 +141,12 @@ export default function CalendarioTab() {
           </div>
         ))}
       </div>
+
+      {selectedBookingId && (
+        <ModalBase modalId={BOOKING_MODAL_ID} closable title="Dettagli Prenotazione">
+          <BookingDetailsComponent bookingId={selectedBookingId} isModal={true} />
+        </ModalBase>
+      )}
     </>
   );
 }

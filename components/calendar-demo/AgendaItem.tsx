@@ -11,9 +11,10 @@ interface AgendaItemProps {
   event: CalendarEventI;
   selectedDate?: string;
   onDelete?: (id: string) => void;
+  onBookingClick?: (bookingId: string) => void;
 }
 
-export const AgendaItem = ({ event, selectedDate, onDelete }: AgendaItemProps) => {
+export const AgendaItem = ({ event, selectedDate, onDelete, onBookingClick }: AgendaItemProps) => {
   const isBooking = event.type === "booking";
   const isUnavailability = event.type === "unavailability";
   const [isDeleting, setIsDeleting] = useState(false);
@@ -124,6 +125,15 @@ export const AgendaItem = ({ event, selectedDate, onDelete }: AgendaItemProps) =
   );
 
   if (isBooking) {
+    if (onBookingClick) {
+      return (
+        <button
+          onClick={() => onBookingClick(event.id)}
+          className="no-underline block w-full text-left">
+          {cardContent}
+        </button>
+      );
+    }
     return (
       <Link
         href={BookingUtils.getBookingDetailsUrl(event.id)}
