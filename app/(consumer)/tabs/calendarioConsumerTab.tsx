@@ -2,104 +2,42 @@
 
 import { AgendaItem } from "@/components/calendar-demo/AgendaItem";
 import { CalendarStrip } from "@/components/calendar-demo/CalendarStrip";
-import { ConsumerCalendarResponseI, } from "@/src/types/calendar.types";
-import {
-  getMonday,
-  generateTwoWeeksDays,
-  formatDateToISO,
-  getGroupedAgenda,
-} from "@/src/utils/calendar.utils";
+import { ConsumerCalendarResponseI } from "@/src/types/calendar.types";
 import { CalendarService } from "@/src/services";
-import { useEffect, useMemo, useState } from "react";
-import { useModalStore } from "@/src/store/modal/modal.store";
+import { useCallback } from "react";
 import ModalBase from "@/components/@core/modal/modalBase.component";
 import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
+import { useCalendar } from "@/src/hooks/useCalendar";
+import { CalendarActionButtons } from "@/components/calendar-demo/CalendarActionButtons";
+
+const INITIAL_DATA: ConsumerCalendarResponseI = {
+  bookings: [],
+};
 
 export default function CalendarioTab() {
-  const [pivotMonday, setPivotMonday] = useState(getMonday(new Date()));
-  const [calendarData, setCalendarData] = useState<ConsumerCalendarResponseI>({
-    bookings: [],
-   
-  });
-  const [selectedDate, setSelectedDate] = useState(formatDateToISO(new Date()));
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const { openModal } = useModalStore();
-
-  const BOOKING_MODAL_ID = "consumer-booking-details-modal";
-
-  const daysToShow = useMemo(
-    () => generateTwoWeeksDays(pivotMonday),
-    [pivotMonday],
+  const fetchData = useCallback(
+    (from: Date, to: Date) => CalendarService.getConsumerCalendar(from, to),
+    [],
   );
 
-  const handleNextWeek = () => {
-    setPivotMonday((prev) => {
-      const next = new Date(prev);
-      next.setDate(prev.getDate() + 7);
-      return next;
-    });
-  };
-
-  const handlePrevWeek = () => {
-    setPivotMonday((prev) => {
-      const next = new Date(prev);
-      next.setDate(prev.getDate() - 7);
-      return next;
-    });
-  };
-
-  const currentMonthLabel = pivotMonday.toLocaleDateString("it-IT", {
-    month: "long",
-    year: "numeric",
+  const {
+    daysToShow,
+    selectedDate,
+    setSelectedDate,
+    isLoading,
+    handleNextWeek,
+    handlePrevWeek,
+    currentMonthLabel,
+    handleBookingClick,
+    groupedWeeks,
+    activeEventDates,
+    selectedBookingId,
+    modalId,
+  } = useCalendar<ConsumerCalendarResponseI>({
+    fetchData,
+    modalId: "consumer-booking-details-modal",
+    initialData: INITIAL_DATA,
   });
-
-  // 1. Spostiamo la fetch DENTRO useEffect per evitare warning di dipendenze
-  useEffect(() => {
-    const fetchCalendarData = async () => {
-      setIsLoading(true);
-
-      const toDate = new Date(pivotMonday);
-      toDate.setDate(pivotMonday.getDate() + 13);
-
-      try {
-        const data = await CalendarService.getConsumerCalendar(
-          pivotMonday,
-          toDate,
-        );
-        setCalendarData(data);
-
-        // if (result?.success || result?.data) {
-        //   setCalendarData(result?.data || result);
-        // }
-      } catch (error) {
-        console.error("Failed to fetch calendar data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCalendarData();
-  }, [pivotMonday]); // Ora dipende solo da pivotMonday, pulitissimo.
-
-  const handleBookingClick = (bookingId: string) => {
-    setSelectedBookingId(bookingId);
-    openModal(BOOKING_MODAL_ID);
-  };
-
-  const groupedWeeks = useMemo(() => {
-    return getGroupedAgenda(
-      calendarData.bookings,
-      pivotMonday,
-    );
-  }, [calendarData, pivotMonday]);
-
-  // 2. Calcoliamo i pallini dinamicamente in base alle prenotazioni
-  const activeEventDates = useMemo(() => {
-    return calendarData.bookings.map((booking) => {
-      return booking.start.split("T")[0];
-    });
-  }, [calendarData.bookings]);
   return (
     <>
       <CalendarStrip
@@ -140,10 +78,14 @@ export default function CalendarioTab() {
             </div>
           </div>
         ))}
+        <CalendarActionButtons
+          onAddVisit={() => {}}
+          onEditRecurrence={() => {}}
+        />
       </div>
 
       {selectedBookingId && (
-        <ModalBase modalId={BOOKING_MODAL_ID} closable title="Dettagli Prenotazione">
+        <ModalBase modalId={modalId} closable title="Dettagli Prenotazione">
           <BookingDetailsComponent bookingId={selectedBookingId} isModal={true} />
         </ModalBase>
       )}

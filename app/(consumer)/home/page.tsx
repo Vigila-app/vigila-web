@@ -19,15 +19,22 @@ import { EurConverter } from "@/src/utils/common.utils";
 import { formatDateToISO } from "@/src/utils/calendar.utils";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
 import { useUserStore } from "@/src/store/user/user.store";
+import { useModalStore } from "@/src/store/modal/modal.store";
 import { CalendarService } from "@/src/services/calendar.service";
 import { CalendarEventI } from "@/src/types/calendar.types";
+import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
+import ModalBase from "@/components/@core/modal/modalBase.component";
 
 export default function HomeConsumer() {
   const { user } = useUserStore();
   const { balance: storeBalance, getTransactions } = useTransactionsStore();
+  const { openModal } = useModalStore();
 
   const [todayEvents, setTodayEvents] = useState<CalendarEventI[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+
+  const BOOKING_MODAL_ID = "home-booking-details-modal";
 
   const balance = useMemo(() => EurConverter(storeBalance), [storeBalance]);
 
@@ -57,6 +64,11 @@ export default function HomeConsumer() {
 
     fetchTodayEvents();
   }, []);
+
+  const handleBookingClick = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    openModal(BOOKING_MODAL_ID);
+  };
 
   return (
     <div className="my-6 md:max-w-3xl mx-auto w-full px-4">
@@ -141,6 +153,7 @@ export default function HomeConsumer() {
                 key={event.id}
                 event={event}
                 selectedDate={todayISO}
+                onBookingClick={handleBookingClick}
               />
             ))}
           </div>
@@ -157,6 +170,12 @@ export default function HomeConsumer() {
           </div>
         )}
       </section>
+
+      {selectedBookingId && (
+        <ModalBase modalId={BOOKING_MODAL_ID} closable title="Dettagli Prenotazione">
+          <BookingDetailsComponent bookingId={selectedBookingId} isModal={true} />
+        </ModalBase>
+      )}
     </div>
   );
 }

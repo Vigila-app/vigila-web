@@ -21,6 +21,7 @@ import {
 } from "@/src/types/calendar.types"
 import { BookingI } from "@/src/types/booking.types"
 import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums"
+import { formatDateToISO } from "@/src/utils/calendar.utils"
 
 /**
  * Availability Engine Algorithm
@@ -319,8 +320,8 @@ export const CalendarService = {
   ): Promise<ConsumerCalendarResponseI> => {
     try {
       const query = new URLSearchParams({
-        from: startDate.toISOString().split('T')[0],
-        to: endDate.toISOString().split('T')[0],
+        from: formatDateToISO(startDate),
+        to: formatDateToISO(endDate),
       }).toString();
 
       const response = (await ApiService.get(
@@ -444,9 +445,9 @@ export const CalendarService = {
   ): Promise<VigilCalendarResponseI> => {
     try {
       const query = new URLSearchParams({
-      from: startDate.toISOString().split('T')[0],
-      to: endDate.toISOString().split('T')[0],
-    }).toString();
+        from: formatDateToISO(startDate),
+        to: formatDateToISO(endDate),
+      }).toString();
       
       const response = (await ApiService.get(
         `/api/v1/calendar/vigil/bookings?${query}`,

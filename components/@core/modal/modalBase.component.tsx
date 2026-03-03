@@ -68,7 +68,7 @@ const ModalBase = (props: ModalBaseI) => {
           className={clsx(
             "modal-body px-2 pt-1 overflow-y-auto",
             "max-h-[calc(100vh-6rem)]",
-            "md:max-h-[calc(100vh-8rem)]"
+            "md:max-h-[calc(100vh-12rem)]"
           )}
         >
           {children}

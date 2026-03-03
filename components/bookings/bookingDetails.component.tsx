@@ -277,13 +277,13 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               <div className="mt-1 p-2.5 rounded-xl">
                 <PencilSquareIcon className="w-6 h-6 text-gray-400" />
               </div>
-              <div>
+              <div className="flex-1  ">
                 <p className="text-xs font-black text-gray-400 uppercase ">
                   Note importanti
                 </p>
-                <p className="text-sm font-medium rounded-xl mt-1">
+                <div className="flex flex-wrap text-xs mt-2 ">
                   {booking.note}
-                </p>
+                </div>
               </div>
             </div>
           )}
