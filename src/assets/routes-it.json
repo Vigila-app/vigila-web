@@ -231,6 +231,23 @@
       "VIGIL"
     ]
   },
+    "bookingRecurring": {
+    "url": "/booking/recurrence",
+    "label": "Prenotazione ricorrente",
+    "title": "Prenotazione ricorrente",
+    "matchingUrl": "/booking/",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER",
+      "VIGIL"
+    ]
+  },
   "wallet": {
     "url": "/wallet",
     "label": "wallet",

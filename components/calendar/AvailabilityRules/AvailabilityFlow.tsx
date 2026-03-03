@@ -13,6 +13,7 @@ import QuestionRenderer from "@/components/onboarding/multiStep/QuestionRenderer
 import { Step } from "./Step"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { Services } from "./Services"
+import { BookingTypeEnum } from "@/src/enums/booking.enums"
 
 export default function AvailabilityFlow({
   onComplete,
@@ -39,8 +40,8 @@ export default function AvailabilityFlow({
           description: "Scegli se la prenotazione è una tantum o ricorrente",
             label: "Tipo di prenotazione",
             options: [
-              { label: "Una volta", value: "one-time" },
-              { label: "Ricorrente", value: "recurring" }]
+              { label: "Una volta", value: BookingTypeEnum.OCCASIONAL },
+              { label: "Ricorrente", value: BookingTypeEnum.RECURRING }]
           }]
       },
       {
