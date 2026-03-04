@@ -52,7 +52,7 @@ export interface NoticeBoardProposalEmailDataI {
   serviceLabel: string;
   zone: string;
   registrationUrl: string;
-  appUrl?: string;
+  loginUrl: string;
 }
 
 export interface EmailResponseI {

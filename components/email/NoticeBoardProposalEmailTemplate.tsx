@@ -1,7 +1,6 @@
 import * as React from "react";
 import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
-import { AppConstants } from "@/src/constants";
 
 interface NoticeBoardProposalEmailProps {
   recipientName: string;
@@ -9,7 +8,7 @@ interface NoticeBoardProposalEmailProps {
   serviceLabel: string;
   zone: string;
   registrationUrl: string;
-  appUrl?: string;
+  loginUrl: string;
 }
 
 export function NoticeBoardProposalEmailTemplate({
@@ -18,7 +17,7 @@ export function NoticeBoardProposalEmailTemplate({
   serviceLabel,
   zone,
   registrationUrl,
-  appUrl = AppConstants.hostUrl,
+  loginUrl,
 }: NoticeBoardProposalEmailProps) {
   return (
     <div style={{ fontFamily: "Arial, sans-serif", margin: "0 auto" }}>
@@ -97,7 +96,7 @@ export function NoticeBoardProposalEmailTemplate({
 
         <p style={{ color: "#888", fontSize: "14px", lineHeight: "1.6" }}>
           Hai già un account?{" "}
-          <a href={appUrl} style={{ color: "#E87722" }}>
+          <a href={loginUrl} style={{ color: "#E87722" }}>
             Accedi direttamente
           </a>{" "}
           per visualizzare la proposta.

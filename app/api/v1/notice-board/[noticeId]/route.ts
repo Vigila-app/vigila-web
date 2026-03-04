@@ -7,6 +7,7 @@ import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { AppConstants } from "@/src/constants";
+import { Routes } from "@/src/routes";
 import { EmailService } from "@/server/email.service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -93,7 +94,9 @@ export async function POST(
     const serviceLabel =
       SERVICE_TYPE_LABELS[notice.service_type] || notice.service_type;
     const zone = notice.city || notice.postal_code;
-    const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer`;
+    const redirectUserTo = encodeURIComponent(Routes.homeConsumer.url);
+    const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer?redirectUserTo=${redirectUserTo}`;
+    const loginUrl = `${AppConstants.hostUrl}/auth/login?redirectUserTo=${redirectUserTo}`;
 
     // Send email notification to the notice creator using the dedicated template
     try {
@@ -104,7 +107,7 @@ export async function POST(
         serviceLabel,
         zone,
         registrationUrl,
-        appUrl: AppConstants.hostUrl,
+        loginUrl,
       });
     } catch (emailError) {
       // Log but don't fail the request if email sending fails

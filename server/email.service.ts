@@ -259,7 +259,7 @@ export const EmailService = {
             serviceLabel: data.serviceLabel,
             zone: data.zone,
             registrationUrl: data.registrationUrl,
-            appUrl: data.appUrl,
+            loginUrl: data.loginUrl,
           }),
         });
         resolve(result);

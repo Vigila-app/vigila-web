@@ -213,6 +213,7 @@ const NotFoundSection = ({
     phone: "",
     message: "",
     service_type: null as ServiceCatalogTypeEnum | null,
+    consent: false,
   });
   const noticeBoardAltchaRef = useRef<{ value: string | null }>(null);
   const { challenge: noticeCaptcha, onStateChange: onNoticeAltchaChange } =
@@ -230,7 +231,7 @@ const NotFoundSection = ({
     e.preventDefault();
     const usedCaptcha =
       noticeBoardAltchaRef.current?.value || noticeCaptcha || captcha;
-    if (!usedCaptcha || !form.name || !form.email || !form.service_type || !postalCode)
+    if (!usedCaptcha || !form.name || !form.email || !form.service_type || !postalCode || !form.consent)
       return;
     try {
       setIsLoading(true);
@@ -390,6 +391,25 @@ const NotFoundSection = ({
               rows={3}
               placeholder="Descrivi il servizio di cui hai bisogno… (opzionale)"
             />
+          </div>
+          <div className="flex items-start gap-2">
+            <input
+              id="notice-consent"
+              type="checkbox"
+              required
+              checked={form.consent}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, consent: e.target.checked }))
+              }
+              className="mt-0.5 h-4 w-4 shrink-0 accent-vigil-orange cursor-pointer"
+            />
+            <label
+              htmlFor="notice-consent"
+              className="text-xs text-gray-500 leading-tight cursor-pointer"
+            >
+              Autorizzo Vigila a utilizzare i miei contatti per mettermi in
+              relazione con un assistente disponibile nella mia zona. *
+            </label>
           </div>
           <div className="flex justify-center">
             <Altcha
