@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   CalendarDaysIcon,
   ArrowPathIcon,
@@ -15,7 +15,7 @@ import {
   UserPlusIcon,
   CalendarIcon,
   SparklesIcon,
-} from "@heroicons/react/24/outline"
+} from "@heroicons/react/24/outline";
 import {
   LandingAccessGrid,
   LandingCostEstimator,
@@ -26,9 +26,9 @@ import {
   LandingSearchSection,
   LandingServiceStack,
   LandingVerticalSteps,
-} from "@/components/landing"
-import { AppConstants } from "@/src/constants"
-import { Routes } from "@/src/routes"
+} from "@/components/landing";
+import { AppConstants } from "@/src/constants";
+import { Routes } from "@/src/routes";
 
 const pressMentions = [
   { name: "Arena Digitale", logoSrc: "/assets/arena%20digitale.png" },
@@ -38,7 +38,7 @@ const pressMentions = [
     logoSrc: "/assets/il%20mattino.png",
   },
   { name: "Festival", logoSrc: "/assets/festival.png" },
-]
+];
 
 const trustBadges = [
   {
@@ -53,7 +53,7 @@ const trustBadges = [
     icon: <CurrencyEuroIcon className="h-5 w-5 text-consumer-blue" />,
     label: "Pagamenti sicuri",
   },
-]
+];
 
 const services = [
   {
@@ -81,7 +81,7 @@ const services = [
     description: "Pasti, mobilità, vestizione, rassetto, farmaci",
     image: "/assets/service_card_5.png",
   },
-]
+];
 
 const accessFeatures = [
   {
@@ -120,7 +120,7 @@ const accessFeatures = [
     description:
       "Recensisci l'assistente e richiedi il cambio se non ti trovi bene",
   },
-]
+];
 
 const pricingHighlights = [
   {
@@ -141,7 +141,7 @@ const pricingHighlights = [
     accentColor: "orange" as const,
     icon: <CalculatorIcon className="h-5 w-5" />,
   },
-]
+];
 
 const steps = [
   {
@@ -180,7 +180,7 @@ const steps = [
     title: "Inizia subito",
     description: "Contatta l'assistente e inizia il servizio",
   },
-]
+];
 
 const faqs = [
   {
@@ -213,7 +213,7 @@ const faqs = [
     answer:
       "No, non c'è nessun impegno mensile obbligatorio. Carichi il portafoglio digitale e prenoti solo le visite che ti servono, quando ne hai bisogno.",
   },
-]
+];
 
 export default function LandingComponent() {
   return (
@@ -221,8 +221,8 @@ export default function LandingComponent() {
       <LandingHeroCompact
         headline={
           <>
-            Quando non puoi esserci tu, c'è{" "}
-            <span className="text-consumer-blue"> Vigila </span>
+            Quando non puoi esserci tu, c&apos;è&nbsp;
+            <span className="text-consumer-blue">Vigila</span>
           </>
         }
         description="Il servizio digitale che ti aiuta a trovare e gestire l'assistenza per i tuoi cari, con persone verificate nella tua zona."
@@ -255,8 +255,8 @@ export default function LandingComponent() {
         labelColor="orange"
         title={
           <>
-            Con <span className="text-consumer-blue"> Vigila </span> hai accesso
-            a
+            Con&nbsp;<span className="text-consumer-blue">Vigila</span>&nbsp;hai
+            accesso a
           </>
         }
         subtitle="Tutto ciò di cui hai bisogno per gestire l'assistenza in modo semplice e sicuro."
@@ -266,7 +266,7 @@ export default function LandingComponent() {
 
       <LandingPricingHighlight
         label="Calcola il tuo preventivo"
-        title={`Scopri quanto costa il servizio`}
+        title="Scopri quanto costa il servizio"
         subtitle="Calcola in pochi secondi un preventivo approssimativo per l'assistenza di cui hai bisogno. Nessun impegno, nessuna email richiesta."
         buttonLabel="Calcola il preventivo"
         buttonHref="#cost-estimator"
@@ -315,5 +315,5 @@ export default function LandingComponent() {
         className="pt-0"
       />
     </main>
-  )
+  );
 }
