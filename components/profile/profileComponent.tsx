@@ -24,6 +24,7 @@ import {
   CalendarDaysIcon,
   DocumentIcon,
   MapPinIcon,
+  MegaphoneIcon,
   StarIcon,
   UserGroupIcon,
   UserIcon,
@@ -31,6 +32,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import ServiziTab from "@/app/vigil/tabs/servizi";
+import NoticeBoardVigil from "@/components/notice-board/NoticeBoardVigil";
 import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import WalletTab from "@/app/(consumer)/tabs/walletTab";
@@ -75,6 +77,10 @@ const ProfileComponent = () => {
           {
             label: <BriefcaseIcon className="size-6" />,
             id: "servizi",
+          },
+          {
+            label: <MegaphoneIcon className="size-6" />,
+            id: "bacheca",
           },
         ]
       : [
@@ -259,6 +265,7 @@ const ProfileComponent = () => {
               {currentTabId === "panoramica" && <PanoramicaTab />}
               {currentTabId === "prenotazioni" && <PrenotationTabs />}
               {currentTabId === "servizi" && <ServiziTab />}
+              {currentTabId === "bacheca" && <NoticeBoardVigil />}
               {currentTabId === "recensioni" && <RecensioniTab />}
               {currentTabId === "informazioni" && <InformazioniTab />}
             </div>

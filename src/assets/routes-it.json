@@ -428,6 +428,15 @@
       "VIGIL"
     ]
   },
+  "noticeBoardVigil": {
+    "url": "/vigil/user/bacheca",
+    "label": "Bacheca annunci",
+    "title": "Bacheca annunci",
+    "private": true,
+    "roles": [
+      "VIGIL"
+    ]
+  },
   "vigilDetails": {
     "url": "/vigil/:vigilId/profile",
     "label": "Dettagli Vigil",

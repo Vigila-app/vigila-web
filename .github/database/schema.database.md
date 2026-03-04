@@ -238,6 +238,55 @@ Represents money movements within wallets.
 
 ---
 
+### 8. `notice_board`
+
+Collects service requests from users in areas not yet covered by existing services. Visible to VIGIL users.
+
+**Primary Key**: `id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `name` (text, required)
+* `email` (text)
+* `phone` (text)
+* `message` (text, required)
+* `postal_code` (text, required)
+* `city` (text)
+* `service_type` (text)
+* `status` (text, default: `active`) — can be `active` or `closed`
+
+**Access**:
+
+* **Write (public)**: Anyone (protected by Altcha captcha)
+* **Read (authenticated)**: VIGIL role only
+
+---
+
+### 9. `search_analytics`
+
+Tracks public homepage search requests for statistical analysis of service demand by area.
+
+**Primary Key**: `id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `postal_code` (text)
+* `city` (text)
+* `lat` (numeric)
+* `lon` (numeric)
+
+**Access**:
+
+* **Write (public)**: Recorded automatically on each search (no auth required)
+* **Read**: Admin only
+
+---
+
 ## Key Relationships Summary
 
 * **Consumer → Booking**: one-to-many

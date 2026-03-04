@@ -23,6 +23,7 @@ import {
   LandingFinalCTA,
   LandingHeroCompact,
   LandingPricingHighlight,
+  LandingSearchSection,
   LandingServiceStack,
   LandingVerticalSteps,
 } from "@/components/landing"
@@ -246,6 +247,8 @@ export default function LandingComponent() {
         cardHeight={340}
         className="px-10"
       />
+
+      <LandingSearchSection />
 
       <LandingAccessGrid
         label="Perché scegliere Vigila"

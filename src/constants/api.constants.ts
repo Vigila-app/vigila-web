@@ -136,6 +136,13 @@ const apiControllers = {
   // region EMAIL
   EMAIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/email`,
   // endregion EMAIL
+
+  // region PUBLIC
+  PUBLIC_SEARCH: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/public/search`,
+  NOTICE_BOARD: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/notice-board`,
+  // endregion PUBLIC
 };
 
 export const apiUser = {
@@ -271,4 +278,15 @@ export const apiReviews = {
 
 export const apiEmail = {
   SEND: (isMock?: boolean): string => apiControllers.EMAIL(isMock),
+};
+
+export const apiPublicSearch = {
+  SEARCH: (isMock?: boolean): string => apiControllers.PUBLIC_SEARCH(isMock),
+};
+
+export const apiNoticeBoard = {
+  CREATE: (isMock?: boolean): string => apiControllers.NOTICE_BOARD(isMock),
+  LIST: (isMock?: boolean): string => apiControllers.NOTICE_BOARD(isMock),
+  DETAILS: (id: string, isMock?: boolean): string =>
+    `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : id}`,
 };
