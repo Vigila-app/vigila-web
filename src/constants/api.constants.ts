@@ -136,6 +136,10 @@ const apiControllers = {
   // region EMAIL
   EMAIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/email`,
   // endregion EMAIL
+
+  // region CALENDAR
+  CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
+  // endregion CALENDAR
 };
 
 export const apiUser = {
@@ -272,3 +276,30 @@ export const apiReviews = {
 export const apiEmail = {
   SEND: (isMock?: boolean): string => apiControllers.EMAIL(isMock),
 };
+
+export const apiCalendar = {
+  // Consumer APIs
+  CONSUMER: (isMock?: boolean): string => 
+    `${apiControllers.CALENDAR(isMock)}/consumer`,
+  
+  // Vigil Calendar APIs
+  VIGIL_BOOKINGS: (isMock?: boolean): string => 
+    `${apiControllers.CALENDAR(isMock)}/vigil/bookings`,
+  
+  // Availability Rules APIs
+  AVAILABILITY_RULES: (isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/availability-rules`,
+  AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
+  
+  // Unavailabilities APIs
+  UNAVAILABILITIES: (isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/unavailabilities`,
+  UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
+  
+  // Available Slots API
+  AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
+};
+

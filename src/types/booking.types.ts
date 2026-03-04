@@ -44,12 +44,12 @@ export type BookingStoreType = {
   getBookings: (force?: boolean) => void;
   getBookingDetails: (
     bookingId: BookingI["id"],
-    force?: boolean
+    force?: boolean,
   ) => Promise<BookingI>;
   createBooking: (booking: BookingFormI) => Promise<BookingI>;
   updateBookingStatus: (
     bookingId: BookingI["id"],
-    status: BookingStatusEnum
+    status: BookingStatusEnum,
   ) => Promise<BookingI>;
   cancelBooking: (bookingId: BookingI["id"]) => Promise<boolean>;
   resetLastUpdate: () => void;

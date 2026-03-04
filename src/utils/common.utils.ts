@@ -192,13 +192,16 @@ export const timestampToDate = (timestamp: any) => {
 export const formatBookingDate = (dateString: string): string => {
   const date = new Date(dateString);
 
-  return new Intl.DateTimeFormat("it-IT", {
-    year: "numeric",
-    month: "long",
+  const formatted = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
     day: "numeric",
+    month: "long",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+  
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 export const capitalize = (text: string) =>

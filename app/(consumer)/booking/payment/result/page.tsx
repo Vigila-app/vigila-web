@@ -6,10 +6,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { redirect } from "next/navigation";
 import { BookingsService, PaymentService } from "@/src/services";
-import {
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from "@/src/enums/booking.enums";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { useEffect, useState, Suspense } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
@@ -46,7 +43,6 @@ function BookingPaymentResultContent() {
         throw new Error("Il pagamento non è stato completato con successo");
       }
 
-      
       if (paymentData.bookingId !== bookingId) {
         throw new Error("Errore nella corrispondenza dei dati di pagamento");
       }
@@ -56,7 +52,7 @@ function BookingPaymentResultContent() {
         {
           payment_id: payment_intent,
           payment_status: PaymentStatusEnum.PAID,
-        }
+        },
       );
 
       setPaymentVerified(true);
@@ -64,12 +60,12 @@ function BookingPaymentResultContent() {
     } catch (error) {
       console.error(
         "Failed to verify and update booking payment status:",
-        error
+        error,
       );
       setError(
         error instanceof Error
           ? error.message
-          : "Errore durante la verifica del pagamento"
+          : "Errore durante la verifica del pagamento",
       );
       throw error;
     } finally {
@@ -137,7 +133,7 @@ function BookingPaymentResultContent() {
                 role={RolesEnum.VIGIL}
                 full
                 label="Contatta il supporto"
-                href={Routes.home.url}
+                href={Routes.customerCare.url}
               />
             </div>
           </>

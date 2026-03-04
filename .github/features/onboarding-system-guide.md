@@ -5,6 +5,7 @@
 ## Quick Reference
 
 **Core Orchestrator**: [MultiStepOnboarding.tsx](../../components/onboarding/multiStep/MultiStepOnboarding.tsx) (286 lines)  
+**Flow Hook**: [useMultiStepFlow.ts](../../src/hooks/useMultiStepFlow.ts) (new)
 **Question Renderer**: [QuestionRenderer.tsx](../../components/onboarding/multiStep/QuestionRenderer.tsx) (240 lines)  
 **Type System**: [onboarding.types.ts](../../src/types/onboarding.types.ts)  
 **Consumer Config**: [consumerOnboardingConfig.ts](../../components/onboarding/multiStep/consumerOnboardingConfig.ts) (427 lines)  
@@ -86,6 +87,8 @@ User Input → Validation → Next Step → ... → Complete → API Call
 - Tracks progress and displays progress bar
 - Collects all answers and invokes `onComplete` callback
 - Handles loading and error states
+- Handles loading and error states
+- Uses `useMultiStepFlow` hook internally to centralize navigation logic and make the flow reusable across the app (the component remains backwards-compatible).
 
 **Key Methods**:
 ```typescript
@@ -210,6 +213,65 @@ const ConsumerMultiStepOnboarding = () => {
 
   return <MultiStepOnboarding config={config} onComplete={handleComplete} />;
 };
+```
+
+---
+
+### New: `useMultiStepFlow` (Hook)
+
+**Location**: `src/hooks/useMultiStepFlow.ts`
+
+**Purpose**: A reusable hook that centralizes multi-step flow state and navigation (current step, visited steps, answers, `next`, `back`, and `progress`). It's deliberately decoupled from form libraries so you can reuse routing logic anywhere you need a step-based flow.
+
+**Key API**:
+- `state`: the `OnboardingFlowState` object
+- `currentStep`: the active `OnboardingStep`
+- `isLastStep`: boolean
+- `next(currentStep, validatedAnswers)`: advance to next step or complete (accepts already-validated answers)
+- `back()`: go to previous visited step
+- `progress`: percentage number
+
+**Notes**:
+- `MultiStepOnboarding` uses this hook internally — the component remains fully backwards-compatible. Existing wrappers and configs work without changes.
+- Use the hook when you want to implement custom wizards or reuse the same routing logic outside of the onboarding component.
+
+### Example: Using `useMultiStepFlow` in a custom wizard
+
+This example shows a minimal custom wizard that uses `react-hook-form` for validation and `useMultiStepFlow` for routing. Validate inputs with your form library, then pass validated answers to `next`.
+
+```tsx
+import React from "react"
+import { useForm } from "react-hook-form"
+import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
+
+function MyCustomWizard({ config, onComplete }) {
+  const { state, currentStep, next, back, progress } = useMultiStepFlow({ role: config.role, steps: config.steps, initialStepId: config.initialStepId, onComplete } as any)
+  const { register, handleSubmit } = useForm({ defaultValues: state.answers })
+
+  if (!currentStep) return null
+
+  const onNext = async (values) => {
+    // values are validated by react-hook-form
+    await next(currentStep, values)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onNext)}>
+      {currentStep.questions.map(q => (
+        <div key={q.id}>
+          <label>{q.label}</label>
+          <input {...register(q.id, { required: q.validation?.required })} />
+        </div>
+      ))}
+
+      <div>
+        <button type="button" onClick={back}>Back</button>
+        <button type="submit">Next</button>
+      </div>
+    </form>
+  )
+}
+
 ```
 
 ---
