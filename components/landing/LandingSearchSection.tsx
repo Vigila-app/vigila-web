@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
@@ -40,16 +40,14 @@ const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [foundServices, setFoundServices] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressI | null>(null);
-  const { challenge, isVerified, onStateChange } = useAltcha();
-  const altchaRef = useRef<{ value: string | null }>(null);
+  const { challenge, onStateChange } = useAltcha();
 
   const handleAddressSelect = async (address: AddressI) => {
     setSelectedAddress(address);
-    const captcha = altchaRef.current?.value || challenge;
-    if (!captcha) {
+    if (!challenge) {
       return;
     }
-    await doSearch(address, captcha);
+    await doSearch(address, challenge);
   };
 
   const doSearch = async (address: AddressI, captcha: string) => {
@@ -126,12 +124,6 @@ const LandingSearchSection = () => {
                 resetOnSubmit={false}
               />
             </div>
-            <div className="flex justify-center">
-              <Altcha
-                ref={altchaRef}
-                onStateChange={handleAltchaStateChange}
-              />
-            </div>
             {searchState === "loading" && (
               <div className="flex items-center justify-center gap-2 text-consumer-blue text-sm py-2">
                 <MagnifyingGlassIcon className="size-5 animate-pulse" />
@@ -191,6 +183,8 @@ const LandingSearchSection = () => {
           />
         ) : null}
       </div>
+      {/* Invisible floating challenge — auto-solves in the background, aligned with login/signup */}
+      <Altcha floating onStateChange={handleAltchaStateChange} />
     </Section>
   );
 };
@@ -215,9 +209,6 @@ const NotFoundSection = ({
     service_type: "" as string,
     consent: false,
   });
-  const noticeBoardAltchaRef = useRef<{ value: string | null }>(null);
-  const { challenge: noticeCaptcha, onStateChange: onNoticeAltchaChange } =
-    useAltcha();
 
   const postalCode = address?.address?.postcode || address?.q || "";
   const city =
@@ -229,10 +220,8 @@ const NotFoundSection = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const usedCaptcha =
-      noticeBoardAltchaRef.current?.value || noticeCaptcha || captcha;
     if (
-      !usedCaptcha ||
+      !captcha ||
       !form.name ||
       !form.email ||
       !form.service_type ||
@@ -246,7 +235,7 @@ const NotFoundSection = ({
         "@/src/services/notice-board.service"
       );
       await NoticeBoardService.createNotice({
-        captcha: usedCaptcha,
+        captcha,
         name: form.name,
         email: form.email,
         phone: form.phone || undefined,
@@ -376,12 +365,6 @@ const NotFoundSection = ({
             onChange={(checked) => setForm((f) => ({ ...f, consent: checked as boolean }))}
             role={RolesEnum.CONSUMER}
           />
-          <div className="flex justify-center">
-            <Altcha
-              ref={noticeBoardAltchaRef}
-              onStateChange={onNoticeAltchaChange}
-            />
-          </div>
           <div className="flex gap-3">
             <Button
               type="submit"
