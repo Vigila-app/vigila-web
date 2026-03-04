@@ -5,11 +5,13 @@ import {
   BookingCreationEmailTemplate,
   BookingConfirmationEmailTemplate,
   NotificationEmailTemplate,
+  NoticeBoardProposalEmailTemplate,
 } from "@/components/email";
 import {
   WelcomeEmailDataI,
   BookingConfirmationEmailDataI,
   EmailNotificationDataI,
+  NoticeBoardProposalEmailDataI,
   EmailResponseI,
   EmailI,
 } from "@/src/types/email.types";
@@ -238,6 +240,31 @@ export const EmailService = {
         resolve(result);
       } catch (error) {
         console.error("EmailService sendNotificationEmail error:", error);
+        reject(error);
+      }
+    }),
+
+  sendNoticeBoardProposalEmail: async (data: NoticeBoardProposalEmailDataI) =>
+    new Promise<EmailResponseI>(async (resolve, reject) => {
+      try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
+        const result = await ResendService.sendEmailWithTemplate({
+          to: data.to,
+          subject: `${EmailConstants.subjectPrefixes.notification} Un Vigil è disponibile per la tua richiesta in ${data.zone}`,
+          react: NoticeBoardProposalEmailTemplate({
+            recipientName: data.recipientName,
+            vigilName: data.vigilName,
+            serviceLabel: data.serviceLabel,
+            zone: data.zone,
+            registrationUrl: data.registrationUrl,
+            appUrl: data.appUrl,
+          }),
+        });
+        resolve(result);
+      } catch (error) {
+        console.error("EmailService sendNoticeBoardProposalEmail error:", error);
         reject(error);
       }
     }),

@@ -45,6 +45,16 @@ export interface EmailNotificationDataI {
   content: string;
 }
 
+export interface NoticeBoardProposalEmailDataI {
+  to: string;
+  recipientName: string;
+  vigilName: string;
+  serviceLabel: string;
+  zone: string;
+  registrationUrl: string;
+  appUrl?: string;
+}
+
 export interface EmailResponseI {
   success: boolean;
   data: { id?: string } | null;

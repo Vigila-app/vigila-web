@@ -60,18 +60,31 @@ export async function GET(req: NextRequest) {
       ? vigilProfile.cap
       : [];
 
-    let db_query = _admin
+    // If the VIGIL has no covered postal codes, return an empty result immediately
+    if (vigilCaps.length === 0) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.NOTICE_BOARD_SUCCESS.code,
+          success: true,
+          data: [],
+          pagination: {
+            page,
+            pages: 0,
+            itemPerPage,
+            count: 0,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
+    const { data, error, count } = await _admin
       .from("notice_board")
       .select("*", { count: "exact" })
       .eq("status", "active")
-      .order("created_at", { ascending: false });
-
-    // Filter notices to only those in the VIGIL's covered zones
-    if (vigilCaps.length > 0) {
-      db_query = db_query.in("postal_code", vigilCaps);
-    }
-
-    const { data, error, count } = await db_query.range(from, to);
+      .in("postal_code", vigilCaps)
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) throw error;
 

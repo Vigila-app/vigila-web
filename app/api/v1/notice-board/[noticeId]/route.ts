@@ -92,35 +92,22 @@ export async function POST(
 
     const serviceLabel =
       SERVICE_TYPE_LABELS[notice.service_type] || notice.service_type;
-
-    // Send email notification to the notice creator
+    const zone = notice.city || notice.postal_code;
     const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer`;
-    const emailContent = `
-Ciao ${notice.name},
 
-Buone notizie! <strong>${vigilName}</strong> è disponibile ad aiutarti per il servizio <strong>${serviceLabel}</strong> nella tua zona (${notice.city || notice.postal_code}).
-
-Per completare la prenotazione, registrati gratuitamente su Vigila e poi conferma il servizio direttamente in app.
-
-Una volta registrato, potrai:
-- Rivedere i dettagli del servizio
-- Scegliere data e orario
-- Pagare in modo sicuro tramite il portafoglio digitale Vigila
-
-Clicca qui per registrarti: ${registrationUrl}
-
-A presto,
-Il team Vigila
-    `.trim();
-
+    // Send email notification to the notice creator using the dedicated template
     try {
-      await EmailService.sendNotificationEmail({
+      await EmailService.sendNoticeBoardProposalEmail({
         to: notice.email,
-        subject: `Un Vigil è disponibile per la tua richiesta in ${notice.city || notice.postal_code}`,
-        content: emailContent,
+        recipientName: notice.name,
+        vigilName,
+        serviceLabel,
+        zone,
+        registrationUrl,
+        appUrl: AppConstants.hostUrl,
       });
     } catch (emailError) {
-      // Log but don't fail the request if email fails
+      // Log but don't fail the request if email sending fails
       console.error("Failed to send proposal notification email:", emailError);
     }
 
