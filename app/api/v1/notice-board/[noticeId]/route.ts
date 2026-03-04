@@ -88,9 +88,7 @@ export async function POST(
     if (updateError) throw updateError;
 
     // Look up label and catalog metadata from the central ServiceCatalog
-    const catalogItem = ServicesService.getServicesCatalog().find(
-      (s) => s.type === notice.service_type
-    );
+    const catalogItem = ServicesService.getServicesByType(notice.service_type);
     const serviceLabel = catalogItem?.name || notice.service_type;
     const zone = notice.city || notice.postal_code;
 

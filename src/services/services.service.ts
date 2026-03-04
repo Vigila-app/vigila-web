@@ -90,8 +90,8 @@ export const ServicesService = {
     return servicesCatalogData.find((service) => service.id === id);
   },
 
-  getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem[] => {
-    return servicesCatalogData.filter((service) => service.type === type);
+  getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem | undefined => {
+    return servicesCatalogData.find((service) => service.type === type);
   },
 
   searchServicesByTag: (tag: string): ServiceCatalogItem[] => {
