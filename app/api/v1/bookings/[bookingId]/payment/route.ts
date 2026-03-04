@@ -108,16 +108,18 @@ export async function PUT(
     }
 
     // Validate allowed status transitions
+    const pendingTransitions = [
+      BookingStatusEnum.CONFIRMED,
+      BookingStatusEnum.CANCELLED_USER,
+      BookingStatusEnum.CANCELLED_VIGIL,
+      BookingStatusEnum.REJECTED,
+    ];
     const allowedStatusTransitions: Record<
       BookingStatusEnum,
       BookingStatusEnum[]
     > = {
-      [BookingStatusEnum.PENDING]: [
-        BookingStatusEnum.CONFIRMED,
-        BookingStatusEnum.CANCELLED_USER,
-        BookingStatusEnum.CANCELLED_VIGIL,
-        BookingStatusEnum.REJECTED,
-      ],
+      [BookingStatusEnum.PENDING]: pendingTransitions,
+      [BookingStatusEnum.PENDING_NOTICE_PROPOSAL]: pendingTransitions,
       [BookingStatusEnum.CONFIRMED]: [
         BookingStatusEnum.COMPLETED,
         BookingStatusEnum.CANCELLED_USER,

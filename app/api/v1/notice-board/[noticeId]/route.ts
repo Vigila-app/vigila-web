@@ -13,7 +13,7 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { replaceDynamicUrl } from "@/src/utils/common.utils";
-import servicesCatalogJson from "@/mock/cms/services-catalog.json";
+import { ServicesService } from "@/src/services/services.service";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -88,7 +88,7 @@ export async function POST(
     if (updateError) throw updateError;
 
     // Look up label and catalog metadata from the central ServiceCatalog
-    const catalogItem = servicesCatalogJson.services_catalog.find(
+    const catalogItem = ServicesService.getServicesCatalog().find(
       (s) => s.type === notice.service_type
     );
     const serviceLabel = catalogItem?.name || notice.service_type;
@@ -122,7 +122,7 @@ export async function POST(
             quantity,
             price: (vigilService.unit_price + catalogItem.fee) * quantity,
             fee: catalogItem.fee * quantity,
-            status: BookingStatusEnum.PENDING,
+            status: BookingStatusEnum.PENDING_NOTICE_PROPOSAL,
             payment_status: PaymentStatusEnum.PENDING,
             note: `notice_board:${noticeId}`,
           })

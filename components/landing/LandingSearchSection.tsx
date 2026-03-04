@@ -11,13 +11,13 @@ import {
 import { AddressI } from "@/src/types/maps.types";
 import { PublicSearchService } from "@/src/services/notice-board.service";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { ServicesService } from "@/src/services/services.service";
 import { Routes } from "@/src/routes";
 import useAltcha from "@/src/hooks/useAltcha";
 import { Section } from "./Section";
 import { Input, Select, TextArea, Checkbox } from "@/components/form";
 import Button from "@/components/button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -30,11 +30,11 @@ const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
 
 type SearchState = "idle" | "loading" | "found" | "not_found" | "error";
 
-// Derive service options from the central ServiceCatalog (filtered to valid enum values)
-const VALID_SERVICE_TYPES = Object.values(ServiceCatalogTypeEnum) as string[];
-const serviceOptions = servicesCatalogJson.services_catalog
-  .filter((s) => VALID_SERVICE_TYPES.includes(s.type))
-  .map((s) => ({ label: s.name, value: s.type }));
+// Derive service options from the central ServiceCatalog via ServicesService
+const serviceOptions = ServicesService.getServicesCatalog().map((s) => ({
+  label: s.name,
+  value: s.type,
+}));
 
 const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");

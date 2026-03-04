@@ -44,9 +44,10 @@ const verifyBookingAccess = async (
 
   // Check access based on role
   if (userRole === RolesEnum.CONSUMER && data.consumer_id !== userId) {
-    // Allow consumers to view PENDING bookings with no consumer yet (notice board proposals)
+    // Allow consumers to view notice-board proposal bookings with no consumer yet
     const isNoticeProposal =
-      data.consumer_id === null && data.status === BookingStatusEnum.PENDING;
+      data.consumer_id === null &&
+      data.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL;
     if (!isNoticeProposal) {
       throw jsonErrorResponse(403, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,

@@ -1,5 +1,6 @@
 export enum BookingStatusEnum {
   PENDING = "pending",
+  PENDING_NOTICE_PROPOSAL = "pending_notice_proposal",
   CONFIRMED = "confirmed",
   IN_PROGRESS = "in_progress",
   COMPLETED = "completed",
