@@ -3,10 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   MapPinIcon,
-  EnvelopeIcon,
-  PhoneIcon,
   ClockIcon,
   MegaphoneIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { NoticeBoardService } from "@/src/services/notice-board.service";
 import { NoticeBoardI } from "@/src/types/notice-board.types";
@@ -17,11 +16,12 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDisplay } from "@/src/utils/date.utils";
 
 const NoticeBoardVigil = () => {
-  const { showToast, showLoader, hideLoader } = useAppStore();
+  const { showToast } = useAppStore();
   const [notices, setNotices] = useState<NoticeBoardI[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [proposedIds, setProposedIds] = useState<Set<string>>(new Set());
 
   const loadNotices = useCallback(
     async (pageNum = 1) => {
@@ -53,17 +53,18 @@ const NoticeBoardVigil = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  const handleContact = (notice: NoticeBoardI) => {
-    if (notice.email) {
-      window.open(
-        `mailto:${notice.email}?subject=Risposta al tuo annuncio Vigila&body=Ciao ${notice.name}, ho visto il tuo annuncio su Vigila e sono disponibile ad aiutarti nella tua zona.`,
-        "_blank"
-      );
-    } else if (notice.phone) {
-      window.open(`tel:${notice.phone}`, "_blank");
-    } else {
+  const handlePropose = async (notice: NoticeBoardI) => {
+    try {
+      await NoticeBoardService.proposeForNotice(notice.id);
+      setProposedIds((prev) => new Set(prev).add(notice.id));
       showToast({
-        message: "Nessun contatto disponibile per questo annuncio",
+        message:
+          "Proposta inviata! L'utente riceverà una notifica per completare la prenotazione.",
+        type: ToastStatusEnum.SUCCESS,
+      });
+    } catch {
+      showToast({
+        message: "Errore nell'invio della proposta. Riprova.",
         type: ToastStatusEnum.ERROR,
       });
     }
@@ -74,9 +75,7 @@ const NoticeBoardVigil = () => {
       <div className="flex items-center gap-3">
         <MegaphoneIcon className="size-7 text-vigil-orange" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Bacheca annunci
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800">Bacheca annunci</h1>
           <p className="text-sm text-gray-500">
             Annunci attivi di utenti che cercano assistenza nella tua zona
           </p>
@@ -95,7 +94,8 @@ const NoticeBoardVigil = () => {
               Nessun annuncio attivo al momento
             </p>
             <p className="text-sm text-gray-400">
-              Gli annunci pubblicati dagli utenti nella tua zona appariranno qui.
+              Gli annunci pubblicati dagli utenti nella tua zona appariranno
+              qui.
             </p>
           </div>
         </Card>
@@ -105,7 +105,8 @@ const NoticeBoardVigil = () => {
             <NoticeCard
               key={notice.id}
               notice={notice}
-              onContact={() => handleContact(notice)}
+              proposed={proposedIds.has(notice.id)}
+              onPropose={() => handlePropose(notice)}
             />
           ))}
 
@@ -138,11 +139,21 @@ const NoticeBoardVigil = () => {
 
 const NoticeCard = ({
   notice,
-  onContact,
+  proposed,
+  onPropose,
 }: {
   notice: NoticeBoardI;
-  onContact: () => void;
+  proposed: boolean;
+  onPropose: () => void;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async () => {
+    setIsLoading(true);
+    await onPropose();
+    setIsLoading(false);
+  };
+
   return (
     <Card role={RolesEnum.VIGIL} hoverable>
       <div className="space-y-3">
@@ -161,7 +172,9 @@ const NoticeCard = ({
           </span>
         </div>
 
-        <p className="text-sm text-gray-600">{notice.message}</p>
+        {notice.message && (
+          <p className="text-sm text-gray-600">{notice.message}</p>
+        )}
 
         <div className="flex flex-wrap gap-3 text-xs text-gray-500">
           <span className="flex items-center gap-1">
@@ -170,26 +183,23 @@ const NoticeCard = ({
               ? `${notice.city} (${notice.postal_code})`
               : notice.postal_code}
           </span>
-          {notice.email && (
-            <span className="flex items-center gap-1">
-              <EnvelopeIcon className="size-3.5" />
-              {notice.email}
-            </span>
-          )}
-          {notice.phone && (
-            <span className="flex items-center gap-1">
-              <PhoneIcon className="size-3.5" />
-              {notice.phone}
-            </span>
-          )}
         </div>
 
-        <button
-          onClick={onContact}
-          className="w-full bg-vigil-orange hover:bg-vigil-orange/90 text-white text-sm font-semibold py-2 px-4 rounded-xl transition"
-        >
-          Proposti per questo servizio
-        </button>
+        {proposed ? (
+          <div className="flex items-center gap-2 text-green-600 text-sm font-medium py-2">
+            <CheckCircleIcon className="size-5" />
+            Proposta inviata — l&apos;utente riceverà una email per completare
+            la prenotazione
+          </div>
+        ) : (
+          <button
+            onClick={handleClick}
+            disabled={isLoading}
+            className="w-full bg-vigil-orange hover:bg-vigil-orange/90 text-white text-sm font-semibold py-2 px-4 rounded-xl transition disabled:opacity-60"
+          >
+            {isLoading ? "Invio in corso…" : "Proposti per questo servizio"}
+          </button>
+        )}
       </div>
     </Card>
   );

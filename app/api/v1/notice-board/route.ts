@@ -6,25 +6,29 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { NextRequest, NextResponse } from "next/server";
 import altcha from "altcha-lib";
 
 export type NoticeBoardI = {
   id: string;
   name: string;
-  email?: string;
+  email: string;
   phone?: string;
-  message: string;
+  message?: string;
   postal_code: string;
   city?: string;
-  service_type?: string;
-  status: "active" | "closed";
+  service_type: string;
+  status: "active" | "proposed" | "closed";
+  vigil_id?: string;
   created_at: Date;
   updated_at?: Date;
 };
 
+const VALID_SERVICE_TYPES = Object.values(ServiceCatalogTypeEnum) as string[];
+
 // POST /api/v1/notice-board - Public: create a new notice (protected by Altcha)
-// GET  /api/v1/notice-board - Authenticated VIGILs: list active notices
+// GET  /api/v1/notice-board - Authenticated VIGILs: list active notices in their covered zones
 
 export async function GET(req: NextRequest) {
   try {
@@ -45,12 +49,29 @@ export async function GET(req: NextRequest) {
 
     const _admin = getAdminClient();
 
-    const { data, error, count } = await _admin
+    // Fetch VIGIL's covered postal codes from their profile
+    const { data: vigilProfile } = await _admin
+      .from("vigils")
+      .select("cap")
+      .eq("id", userObject.id)
+      .maybeSingle();
+
+    const vigilCaps: string[] = Array.isArray(vigilProfile?.cap)
+      ? vigilProfile.cap
+      : [];
+
+    let db_query = _admin
       .from("notice_board")
       .select("*", { count: "exact" })
       .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      .order("created_at", { ascending: false });
+
+    // Filter notices to only those in the VIGIL's covered zones
+    if (vigilCaps.length > 0) {
+      db_query = db_query.in("postal_code", vigilCaps);
+    }
+
+    const { data, error, count } = await db_query.range(from, to);
 
     if (error) throw error;
 
@@ -82,17 +103,18 @@ export async function POST(req: NextRequest) {
     const body: {
       captcha: string;
       name: string;
-      email?: string;
+      email: string;
       phone?: string;
-      message: string;
+      message?: string;
       postal_code: string;
       city?: string;
-      service_type?: string;
+      service_type: string;
     } = await req.json();
 
     console.log(`API POST notice-board`, {
       postal_code: body.postal_code,
       city: body.city,
+      service_type: body.service_type,
     });
 
     if (!body?.captcha) {
@@ -103,11 +125,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (!body?.name || !body?.postal_code || !body?.message) {
+    if (!body?.name || !body?.email || !body?.postal_code) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
         success: false,
-        message: "Nome, CAP e messaggio sono obbligatori",
+        message: "Nome, email e CAP sono obbligatori",
+      });
+    }
+
+    if (!body?.service_type || !VALID_SERVICE_TYPES.includes(body.service_type)) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
+        success: false,
+        message: "Tipo di servizio non valido",
       });
     }
 
@@ -131,12 +161,12 @@ export async function POST(req: NextRequest) {
       .from("notice_board")
       .insert({
         name: body.name,
-        email: body.email || null,
+        email: body.email,
         phone: body.phone || null,
-        message: body.message,
+        message: body.message || null,
         postal_code: body.postal_code,
         city: body.city || null,
-        service_type: body.service_type || null,
+        service_type: body.service_type,
         status: "active",
       })
       .select()

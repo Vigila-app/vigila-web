@@ -26,4 +26,7 @@ export const NoticeBoardService = {
     }`;
     return ApiService.get(url);
   },
+
+  proposeForNotice: async (noticeId: string) =>
+    ApiService.post(apiNoticeBoard.PROPOSE(noticeId), {}),
 };

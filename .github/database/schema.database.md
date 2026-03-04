@@ -240,7 +240,7 @@ Represents money movements within wallets.
 
 ### 8. `notice_board`
 
-Collects service requests from users in areas not yet covered by existing services. Visible to VIGIL users.
+Collects service requests from users in areas not yet covered by existing services. Visible to VIGIL users (filtered to their covered postal codes).
 
 **Primary Key**: `id`
 
@@ -250,18 +250,21 @@ Collects service requests from users in areas not yet covered by existing servic
 * `created_at` (timestamptz)
 * `updated_at` (timestamptz)
 * `name` (text, required)
-* `email` (text)
+* `email` (text, **required** — used to notify the user when a VIGIL proposes)
 * `phone` (text)
-* `message` (text, required)
+* `message` (text, optional)
 * `postal_code` (text, required)
 * `city` (text)
-* `service_type` (text)
-* `status` (text, default: `active`) — can be `active` or `closed`
+* `service_type` (text, **required** — must be one of `ServiceCatalogTypeEnum` values: `companionship`, `light_assistance`, `medical_assistance`, `house_keeping`, `transportation`, `specialized_care`)
+* `status` (text, default: `active`) — can be `active`, `proposed`, or `closed`
+* `vigil_id` (uuid) — set when a VIGIL proposes for this notice
 
 **Access**:
 
 * **Write (public)**: Anyone (protected by Altcha captcha)
-* **Read (authenticated)**: VIGIL role only
+* **Read (authenticated)**: VIGIL role only, filtered to notices whose `postal_code` is in the VIGIL's `cap` array
+
+**Propose flow**: When a VIGIL proposes via `POST /api/v1/notice-board/[noticeId]`, the notice `status` is updated to `proposed`, `vigil_id` is set, and an email is sent to `notice.email` inviting the user to register and complete the booking on the platform.
 
 ---
 

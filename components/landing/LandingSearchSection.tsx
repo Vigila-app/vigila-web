@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { AddressI } from "@/src/types/maps.types";
 import { PublicSearchService } from "@/src/services/notice-board.service";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { Routes } from "@/src/routes";
 import useAltcha from "@/src/hooks/useAltcha";
 import { Section } from "./Section";
@@ -25,6 +26,16 @@ const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
 
 type SearchState = "idle" | "loading" | "found" | "not_found" | "error";
 
+// Human-readable labels for service catalog types
+const SERVICE_TYPE_LABELS: Record<ServiceCatalogTypeEnum, string> = {
+  [ServiceCatalogTypeEnum.COMPANIONSHIP]: "Compagnia e conversazione",
+  [ServiceCatalogTypeEnum.LIGHT_ASSISTANCE]: "Assistenza leggera",
+  [ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE]: "Assistenza medica",
+  [ServiceCatalogTypeEnum.HOUSE_KEEPING]: "Lavori domestici",
+  [ServiceCatalogTypeEnum.TRANSPORTATION]: "Accompagnamento in auto",
+  [ServiceCatalogTypeEnum.SPECIALIZED_CARE]: "Cura specializzata",
+};
+
 const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [foundServices, setFoundServices] = useState<string[]>([]);
@@ -36,7 +47,6 @@ const LandingSearchSection = () => {
     setSelectedAddress(address);
     const captcha = altchaRef.current?.value || challenge;
     if (!captcha) {
-      // Wait for user to complete altcha
       return;
     }
     await doSearch(address, captcha);
@@ -45,8 +55,7 @@ const LandingSearchSection = () => {
   const doSearch = async (address: AddressI, captcha: string) => {
     try {
       setSearchState("loading");
-      const postalCode =
-        address.address?.postcode || address.q || "";
+      const postalCode = address.address?.postcode || address.q || "";
       const city =
         address.address?.town ||
         address.address?.county ||
@@ -75,7 +84,6 @@ const LandingSearchSection = () => {
     }
   };
 
-  // When altcha completes and we have an address selected, auto-search
   const handleAltchaStateChange = (evt: CustomEvent) => {
     onStateChange(evt);
     if (evt.detail?.state === "verified" && selectedAddress) {
@@ -133,9 +141,7 @@ const LandingSearchSection = () => {
             {searchState === "error" && (
               <div className="flex items-center gap-2 text-red-500 text-sm py-2">
                 <ExclamationCircleIcon className="size-5" />
-                <span>
-                  Si è verificato un errore. Riprova.
-                </span>
+                <span>Si è verificato un errore. Riprova.</span>
               </div>
             )}
           </div>
@@ -201,12 +207,18 @@ const NotFoundSection = ({
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+    service_type: null as ServiceCatalogTypeEnum | null,
+  });
   const noticeBoardAltchaRef = useRef<{ value: string | null }>(null);
-  const { challenge: noticeCaptcha, onStateChange: onNoticeAltchaChange } = useAltcha();
+  const { challenge: noticeCaptcha, onStateChange: onNoticeAltchaChange } =
+    useAltcha();
 
-  const postalCode =
-    address?.address?.postcode || address?.q || "";
+  const postalCode = address?.address?.postcode || address?.q || "";
   const city =
     address?.address?.town ||
     address?.address?.county ||
@@ -216,8 +228,10 @@ const NotFoundSection = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const usedCaptcha = noticeBoardAltchaRef.current?.value || noticeCaptcha || captcha;
-    if (!usedCaptcha || !form.name || !postalCode) return;
+    const usedCaptcha =
+      noticeBoardAltchaRef.current?.value || noticeCaptcha || captcha;
+    if (!usedCaptcha || !form.name || !form.email || !form.service_type || !postalCode)
+      return;
     try {
       setIsLoading(true);
       const { NoticeBoardService } = await import(
@@ -226,16 +240,16 @@ const NotFoundSection = ({
       await NoticeBoardService.createNotice({
         captcha: usedCaptcha,
         name: form.name,
-        email: form.email || undefined,
+        email: form.email,
         phone: form.phone || undefined,
-        message: form.message || `Richiesta di servizio per la zona: ${city || postalCode}`,
+        message: form.message || undefined,
         postal_code: postalCode,
         city: city || undefined,
+        service_type: form.service_type,
       });
       setSubmitted(true);
     } catch {
       setIsLoading(false);
-      // Show error to user
       alert("Si è verificato un errore nell'invio dell'annuncio. Riprova.");
     } finally {
       setIsLoading(false);
@@ -252,8 +266,8 @@ const NotFoundSection = ({
               Annuncio pubblicato con successo!
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              Un Vigil della tua zona potrà contattarti non appena sarà
-              disponibile per offrirti il servizio.
+              Un Vigil della tua zona ti contatterà non appena disponibile per
+              offrirti il servizio.
             </p>
           </div>
         </div>
@@ -261,7 +275,7 @@ const NotFoundSection = ({
           onClick={onReset}
           className="text-consumer-blue text-sm underline underline-offset-2"
         >
-          Fai un'altra ricerca
+          Fai un&apos;altra ricerca
         </button>
       </div>
     );
@@ -300,6 +314,29 @@ const NotFoundSection = ({
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
+              Tipo di servizio *
+            </label>
+            <select
+              required
+              value={form.service_type ?? ""}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  service_type: (e.target.value as ServiceCatalogTypeEnum) || null,
+                }))
+              }
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30 bg-white"
+            >
+              <option value="">Seleziona il servizio…</option>
+              {Object.entries(SERVICE_TYPE_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
               Nome *
             </label>
             <input
@@ -313,10 +350,11 @@ const NotFoundSection = ({
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
-              Email
+              Email *
             </label>
             <input
               type="email"
+              required
               value={form.email}
               onChange={(e) =>
                 setForm((f) => ({ ...f, email: e.target.value }))
@@ -336,7 +374,7 @@ const NotFoundSection = ({
                 setForm((f) => ({ ...f, phone: e.target.value }))
               }
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30"
-              placeholder="Il tuo numero di telefono"
+              placeholder="Il tuo numero di telefono (opzionale)"
             />
           </div>
           <div>
@@ -350,7 +388,7 @@ const NotFoundSection = ({
               }
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30 resize-none"
               rows={3}
-              placeholder="Descrivi il servizio di cui hai bisogno…"
+              placeholder="Descrivi il servizio di cui hai bisogno… (opzionale)"
             />
           </div>
           <div className="flex justify-center">

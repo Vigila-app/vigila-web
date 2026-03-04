@@ -289,4 +289,6 @@ export const apiNoticeBoard = {
   LIST: (isMock?: boolean): string => apiControllers.NOTICE_BOARD(isMock),
   DETAILS: (id: string, isMock?: boolean): string =>
     `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : id}`,
+  PROPOSE: (noticeId: string, isMock?: boolean): string =>
+    `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : noticeId}`,
 };
