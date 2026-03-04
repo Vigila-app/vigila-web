@@ -39,6 +39,14 @@ export interface BookingConfirmationEmailDataI {
   unitType?: string;
 }
 
+export interface WalletTopUpEmailDataI {
+  to: string;
+  firstName: string;
+  amount: string;
+  currency?: string;
+  appUrl?: string;
+}
+
 export interface EmailNotificationDataI {
   to: string | string[];
   subject: string;
@@ -60,5 +68,6 @@ export interface EmailConfigI {
     welcome: string;
     reset: string;
     verification: string;
+    wallet: string;
   };
 }
