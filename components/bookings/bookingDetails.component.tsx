@@ -299,7 +299,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Avatar
-              size="standard"
+                size="standard"
                 userId={isConsumer ? vigil?.id : consumer?.id}
                 value={isConsumer ? vigil?.displayName : consumer?.displayName}
               />
@@ -310,20 +310,22 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                     : consumer?.displayName}
                 </p>
                 <div className="flex items-center gap-1 text-green-600 text-xs font-black uppercase">
-                  <span className="p-0.5 bg-green-600 rounded-full text-white">
-                    <ShieldCheckIcon className="w-2 h-2" />
+                  <span className="text-green-600">
+                    <ShieldCheckIcon className="w-3 h-3" />
                   </span>
                   Profilo Verificato
                 </div>
               </div>
             </div>
           </div>
-                <div className="mt-2 text-sm text-gray-600">
-                  <p>
-                    L'operatore confermerà la disponibilità dopo la tua
-                    richiesta. Ti avviseremo non appena sarà confermata.
-                  </p>
-                </div>
+          {isConsumer && (
+            <div className="mt-2 text-sm text-gray-600">
+              <p>
+                L'operatore confermerà la disponibilità dopo la tua richiesta.
+                Ti avviseremo non appena sarà confermata.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* POLICY CANCELLAZIONE */}
@@ -409,7 +411,6 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               router.push(`${Routes.customerCare.url}`);
             }}
             icon={<PhoneIcon className="w-5 h-5" />}
-            
           />
         </div>
 
