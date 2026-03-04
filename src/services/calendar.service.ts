@@ -22,6 +22,7 @@ import {
 import { BookingI } from "@/src/types/booking.types"
 import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums"
 import { formatDateToISO } from "@/src/utils/calendar.utils"
+import { apiCalendar } from "@/src/constants/api.constants"
 
 /**
  * Availability Engine Algorithm
@@ -325,7 +326,7 @@ export const CalendarService = {
       }).toString();
 
       const response = (await ApiService.get(
-        `/api/v1/calendar/consumer?${query}`,
+        `${apiCalendar.CONSUMER()}?${query}`,
       )) as any
       return response.data
     } catch (error) {
@@ -344,7 +345,7 @@ export const CalendarService = {
   getVigilAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
     try {
       const response = (await ApiService.get(
-        "/api/vigil/availability-rules",
+        apiCalendar.AVAILABILITY_RULES(),
       )) as any
       return response.data
     } catch (error) {
@@ -361,7 +362,7 @@ export const CalendarService = {
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.post(
-        "/api/vigil/availability-rules",
+        apiCalendar.AVAILABILITY_RULES(),
         rule,
       )) as any
       return response.data
@@ -376,7 +377,7 @@ export const CalendarService = {
    */
   deleteVigilAvailabilityRule: async (ruleId: string): Promise<void> => {
     try {
-      await ApiService.delete(`/api/vigil/availability-rules/${ruleId}`)
+      await ApiService.delete(apiCalendar.AVAILABILITY_RULE(ruleId))
     } catch (error) {
       console.error("CalendarService.deleteVigilAvailabilityRule error", error)
       throw error
@@ -393,7 +394,7 @@ export const CalendarService = {
   getVigilUnavailabilities: async (): Promise<VigilUnavailabilityI[]> => {
     try {
       const response = (await ApiService.get(
-        "/api/vigil/unavailabilities",
+        apiCalendar.UNAVAILABILITIES(),
       )) as any
       return response.data
     } catch (error) {
@@ -410,7 +411,7 @@ export const CalendarService = {
   ): Promise<VigilUnavailabilityI> => {
     try {
       const response = (await ApiService.post(
-        "/api/vigil/unavailabilities",
+        apiCalendar.UNAVAILABILITIES(),
         unavailability,
       )) as any
       return response.data
@@ -425,7 +426,7 @@ export const CalendarService = {
    */
   deleteVigilUnavailability: async (unavailabilityId: string): Promise<void> => {
     try {
-      await ApiService.delete(`/api/vigil/unavailabilities/${unavailabilityId}`)
+      await ApiService.delete(apiCalendar.UNAVAILABILITY(unavailabilityId))
     } catch (error) {
       console.error("CalendarService.deleteVigilUnavailability error", error)
       throw error
@@ -450,7 +451,7 @@ export const CalendarService = {
       }).toString();
       
       const response = (await ApiService.get(
-        `/api/v1/calendar/vigil/bookings?${query}`,
+        `${apiCalendar.VIGIL_BOOKINGS()}?${query}`,
       )) as any
       return response.data
     } catch (error) {
@@ -473,7 +474,7 @@ export const CalendarService = {
       const { vigil_id, ...queryParams } = params
       const query = new URLSearchParams(queryParams as any).toString()
       const response = (await ApiService.get(
-        `/api/vigil/${vigil_id}/available-slots?${query}`,
+        `${apiCalendar.AVAILABLE_SLOTS(vigil_id)}?${query}`,
       )) as any
       return response.data
     } catch (error) {
@@ -491,7 +492,7 @@ export const CalendarService = {
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.put(
-        `/api/vigil/availability-rules/${ruleId}`,
+        apiCalendar.AVAILABILITY_RULE(ruleId),
         rule,
       )) as any
       return response.data
