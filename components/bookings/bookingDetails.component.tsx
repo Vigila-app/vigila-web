@@ -403,7 +403,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           {/* AZIONI COMUNI */}
           <Button
             full
-            role={RolesEnum.VIGIL}
+            text
             label={"Contatta Assistenza"}
             action={() => {
               router.push(`${Routes.customerCare.url}`);

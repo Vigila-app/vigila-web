@@ -99,7 +99,6 @@ export async function GET(req: NextRequest) {
     const response: ConsumerCalendarResponseI = {
       bookings: calendarEvents,
     };
-console.log("Consumer calendar response:", response);
     return NextResponse.json(
       {
         code: ResponseCodesConstants.CONSUMER_CALENDAR_SUCCESS.code,

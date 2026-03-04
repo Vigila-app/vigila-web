@@ -1,6 +1,6 @@
 import React from "react";
 import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
-import Button from "../button/button";
+import Button from "@/components/button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
 
 interface CalendarActionsProps {
@@ -8,22 +8,20 @@ interface CalendarActionsProps {
   onEditRecurrence: () => void;
 }
 
-export const CalendarActionButtons= ({
+export const CalendarActionButtons = ({
   onAddVisit,
   onEditRecurrence,
 }: CalendarActionsProps) => {
   return (
     <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full">
-      {/* Bottone Modifica Ricorrenza (Outline) */}
       <Button
         action={onEditRecurrence}
         label="Modifica ricorrenza"
         full
         icon={<PencilIcon className="w-5 h-5" />}
-        role={RolesEnum.CONSUMER}
+        secondary
       />
 
-      {/* Bottone Aggiungi Visita (Filled) */}
       <Button
         action={onAddVisit}
         full

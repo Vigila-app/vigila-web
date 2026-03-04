@@ -9,6 +9,7 @@ import ModalBase from "@/components/@core/modal/modalBase.component";
 import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
 import { useCalendar } from "@/src/hooks/useCalendar";
 import { CalendarActionButtons } from "@/components/calendar-demo/CalendarActionButtons";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 const INITIAL_DATA: ConsumerCalendarResponseI = {
   bookings: [],
@@ -78,6 +79,13 @@ export default function CalendarioTab() {
             </div>
           </div>
         ))}
+        <div className="flex flex-row gap-1 border-t mt-6 pt-6"> 
+          <InformationCircleIcon className="w-7 h-7 text-gray-400 inline-block mr-2" />
+          <div>
+          <span className="text-gray-400 text-base">Puoi modificare o cancellare le visite in quasiasi momento.</span>
+          <span className="text-gray-400 text-base block">Hai sempre il pieno controllo del tuo programma.</span>
+          </div>
+        </div>
         <CalendarActionButtons
           onAddVisit={() => {}}
           onEditRecurrence={() => {}}
