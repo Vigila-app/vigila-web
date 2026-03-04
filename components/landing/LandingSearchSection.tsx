@@ -14,6 +14,10 @@ import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { Routes } from "@/src/routes";
 import useAltcha from "@/src/hooks/useAltcha";
 import { Section } from "./Section";
+import { Input, Select, TextArea, Checkbox } from "@/components/form";
+import Button from "@/components/button/button";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -26,15 +30,11 @@ const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
 
 type SearchState = "idle" | "loading" | "found" | "not_found" | "error";
 
-// Human-readable labels for service catalog types
-const SERVICE_TYPE_LABELS: Record<ServiceCatalogTypeEnum, string> = {
-  [ServiceCatalogTypeEnum.COMPANIONSHIP]: "Compagnia e conversazione",
-  [ServiceCatalogTypeEnum.LIGHT_ASSISTANCE]: "Assistenza leggera",
-  [ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE]: "Assistenza medica",
-  [ServiceCatalogTypeEnum.HOUSE_KEEPING]: "Lavori domestici",
-  [ServiceCatalogTypeEnum.TRANSPORTATION]: "Accompagnamento in auto",
-  [ServiceCatalogTypeEnum.SPECIALIZED_CARE]: "Cura specializzata",
-};
+// Derive service options from the central ServiceCatalog (filtered to valid enum values)
+const VALID_SERVICE_TYPES = Object.values(ServiceCatalogTypeEnum) as string[];
+const serviceOptions = servicesCatalogJson.services_catalog
+  .filter((s) => VALID_SERVICE_TYPES.includes(s.type))
+  .map((s) => ({ label: s.name, value: s.type }));
 
 const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");
@@ -212,7 +212,7 @@ const NotFoundSection = ({
     email: "",
     phone: "",
     message: "",
-    service_type: null as ServiceCatalogTypeEnum | null,
+    service_type: "" as string,
     consent: false,
   });
   const noticeBoardAltchaRef = useRef<{ value: string | null }>(null);
@@ -231,7 +231,14 @@ const NotFoundSection = ({
     e.preventDefault();
     const usedCaptcha =
       noticeBoardAltchaRef.current?.value || noticeCaptcha || captcha;
-    if (!usedCaptcha || !form.name || !form.email || !form.service_type || !postalCode || !form.consent)
+    if (
+      !usedCaptcha ||
+      !form.name ||
+      !form.email ||
+      !form.service_type ||
+      !postalCode ||
+      !form.consent
+    )
       return;
     try {
       setIsLoading(true);
@@ -246,7 +253,7 @@ const NotFoundSection = ({
         message: form.message || undefined,
         postal_code: postalCode,
         city: city || undefined,
-        service_type: form.service_type,
+        service_type: form.service_type as ServiceCatalogTypeEnum,
       });
       setSubmitted(true);
     } catch {
@@ -298,119 +305,77 @@ const NotFoundSection = ({
       </div>
       {!showForm ? (
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex-1 text-center bg-vigil-orange hover:bg-vigil-orange/90 text-white font-semibold py-2.5 px-5 rounded-xl transition"
-          >
-            Pubblica annuncio
-          </button>
-          <button
-            onClick={onReset}
-            className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-600 font-medium py-2.5 px-5 rounded-xl transition text-sm"
-          >
-            Nuova ricerca
-          </button>
+          <Button
+            label="Pubblica annuncio"
+            role={RolesEnum.CONSUMER}
+            full
+            action={() => setShowForm(true)}
+          />
+          <Button
+            label="Nuova ricerca"
+            secondary
+            full
+            action={onReset}
+          />
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Tipo di servizio *
-            </label>
-            <select
-              required
-              value={form.service_type ?? ""}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  service_type: (e.target.value as ServiceCatalogTypeEnum) || null,
-                }))
-              }
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30 bg-white"
-            >
-              <option value="">Seleziona il servizio…</option>
-              {Object.entries(SERVICE_TYPE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Nome *
-            </label>
-            <input
-              type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30"
-              placeholder="Il tuo nome"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Email *
-            </label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, email: e.target.value }))
-              }
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30"
-              placeholder="La tua email"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Telefono
-            </label>
-            <input
-              type="tel"
-              value={form.phone}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, phone: e.target.value }))
-              }
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30"
-              placeholder="Il tuo numero di telefono (opzionale)"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Messaggio
-            </label>
-            <textarea
-              value={form.message}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, message: e.target.value }))
-              }
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-consumer-blue/30 resize-none"
-              rows={3}
-              placeholder="Descrivi il servizio di cui hai bisogno… (opzionale)"
-            />
-          </div>
-          <div className="flex items-start gap-2">
-            <input
-              id="notice-consent"
-              type="checkbox"
-              required
-              checked={form.consent}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, consent: e.target.checked }))
-              }
-              className="mt-0.5 h-4 w-4 shrink-0 accent-vigil-orange cursor-pointer"
-            />
-            <label
-              htmlFor="notice-consent"
-              className="text-xs text-gray-500 leading-tight cursor-pointer"
-            >
-              Autorizzo Vigila a utilizzare i miei contatti per mettermi in
-              relazione con un assistente disponibile nella mia zona. *
-            </label>
-          </div>
+          <Select
+            label="Tipo di servizio"
+            required
+            options={serviceOptions}
+            value={form.service_type}
+            onChange={(value) => setForm((f) => ({ ...f, service_type: value }))}
+            placeholder="Seleziona il servizio…"
+            role={RolesEnum.CONSUMER}
+          />
+          <Input
+            label="Nome"
+            type="text"
+            required
+            value={form.name}
+            onChange={(value) => setForm((f) => ({ ...f, name: value as string }))}
+            placeholder="Il tuo nome"
+            role={RolesEnum.CONSUMER}
+          />
+          <Input
+            label="Email"
+            type="email"
+            required
+            value={form.email}
+            onChange={(value) =>
+              setForm((f) => ({ ...f, email: value as string }))
+            }
+            placeholder="La tua email"
+            role={RolesEnum.CONSUMER}
+          />
+          <Input
+            label="Telefono"
+            type="tel"
+            value={form.phone}
+            onChange={(value) =>
+              setForm((f) => ({ ...f, phone: value as string }))
+            }
+            placeholder="Il tuo numero di telefono (opzionale)"
+            role={RolesEnum.CONSUMER}
+          />
+          <TextArea
+            label="Messaggio"
+            value={form.message}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, message: e.target.value }))
+            }
+            rows={3}
+            placeholder="Descrivi il servizio di cui hai bisogno… (opzionale)"
+            role={RolesEnum.CONSUMER}
+          />
+          <Checkbox
+            label="Autorizzo Vigila a utilizzare i miei contatti per mettermi in relazione con un assistente disponibile nella mia zona."
+            required
+            checked={form.consent}
+            onChange={(checked) => setForm((f) => ({ ...f, consent: checked as boolean }))}
+            role={RolesEnum.CONSUMER}
+          />
           <div className="flex justify-center">
             <Altcha
               ref={noticeBoardAltchaRef}
@@ -418,20 +383,20 @@ const NotFoundSection = ({
             />
           </div>
           <div className="flex gap-3">
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="flex-1 bg-vigil-orange hover:bg-vigil-orange/90 text-white font-semibold py-2.5 px-5 rounded-xl transition disabled:opacity-60"
-            >
-              {isLoading ? "Invio…" : "Pubblica annuncio"}
-            </button>
-            <button
+              label={isLoading ? "Invio…" : "Pubblica annuncio"}
+              role={RolesEnum.CONSUMER}
+              isLoading={isLoading}
+              full
+            />
+            <Button
               type="button"
-              onClick={() => setShowForm(false)}
-              className="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 font-medium py-2.5 px-5 rounded-xl transition text-sm"
-            >
-              Annulla
-            </button>
+              label="Annulla"
+              secondary
+              full
+              action={() => setShowForm(false)}
+            />
           </div>
         </form>
       )}

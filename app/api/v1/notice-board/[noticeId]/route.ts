@@ -5,20 +5,16 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
 import { EmailService } from "@/server/email.service";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+import { replaceDynamicUrl } from "@/src/utils/common.utils";
+import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 import { NextRequest, NextResponse } from "next/server";
-
-const SERVICE_TYPE_LABELS: Record<string, string> = {
-  [ServiceCatalogTypeEnum.COMPANIONSHIP]: "Compagnia e conversazione",
-  [ServiceCatalogTypeEnum.LIGHT_ASSISTANCE]: "Assistenza leggera",
-  [ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE]: "Assistenza medica",
-  [ServiceCatalogTypeEnum.HOUSE_KEEPING]: "Lavori domestici",
-  [ServiceCatalogTypeEnum.TRANSPORTATION]: "Accompagnamento in auto",
-  [ServiceCatalogTypeEnum.SPECIALIZED_CARE]: "Cura specializzata",
-};
 
 /**
  * POST /api/v1/notice-board/[noticeId]/propose
@@ -91,10 +87,56 @@ export async function POST(
 
     if (updateError) throw updateError;
 
-    const serviceLabel =
-      SERVICE_TYPE_LABELS[notice.service_type] || notice.service_type;
+    // Look up label and catalog metadata from the central ServiceCatalog
+    const catalogItem = servicesCatalogJson.services_catalog.find(
+      (s) => s.type === notice.service_type
+    );
+    const serviceLabel = catalogItem?.name || notice.service_type;
     const zone = notice.city || notice.postal_code;
-    const redirectUserTo = encodeURIComponent(Routes.homeConsumer.url);
+
+    // Create a PENDING booking for the VIGIL's matching service
+    let bookingId: string | null = null;
+    if (catalogItem) {
+      const { data: vigilService } = await _admin
+        .from("services")
+        .select("id, unit_price")
+        .eq("vigil_id", userObject.id)
+        .eq("active", true)
+        .filter("info->>catalog_id", "eq", String(catalogItem.id))
+        .maybeSingle();
+
+      if (vigilService) {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() + 1);
+        const quantity = catalogItem.minimum_duration_hours || 1;
+        const endDate = new Date(
+          startDate.getTime() + quantity * 3600 * 1000
+        );
+        const { data: newBooking } = await _admin
+          .from("bookings")
+          .insert({
+            vigil_id: userObject.id,
+            service_id: vigilService.id,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            quantity,
+            price: (vigilService.unit_price + catalogItem.fee) * quantity,
+            fee: catalogItem.fee * quantity,
+            status: BookingStatusEnum.PENDING,
+            payment_status: PaymentStatusEnum.PENDING,
+            note: `notice_board:${noticeId}`,
+          })
+          .select("id")
+          .maybeSingle();
+        if (newBooking?.id) bookingId = newBooking.id;
+      }
+    }
+
+    // Build redirect URL pointing to the pending booking (or consumer home as fallback)
+    const redirectPath = bookingId
+      ? replaceDynamicUrl(Routes.bookingDetails.url, ":bookingId", bookingId)
+      : Routes.homeConsumer.url;
+    const redirectUserTo = encodeURIComponent(redirectPath);
     const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer?redirectUserTo=${redirectUserTo}`;
     const loginUrl = `${AppConstants.hostUrl}/auth/login?redirectUserTo=${redirectUserTo}`;
 

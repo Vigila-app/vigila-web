@@ -44,10 +44,15 @@ const verifyBookingAccess = async (
 
   // Check access based on role
   if (userRole === RolesEnum.CONSUMER && data.consumer_id !== userId) {
-    throw jsonErrorResponse(403, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
-      success: false,
-    });
+    // Allow consumers to view PENDING bookings with no consumer yet (notice board proposals)
+    const isNoticeProposal =
+      data.consumer_id === null && data.status === BookingStatusEnum.PENDING;
+    if (!isNoticeProposal) {
+      throw jsonErrorResponse(403, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+        success: false,
+      });
+    }
   }
 
   if (userRole === RolesEnum.VIGIL && data.vigil_id !== userId) {
