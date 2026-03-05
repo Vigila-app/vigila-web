@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
-  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { AddressI } from "@/src/types/maps.types";
 import { PublicSearchService } from "@/src/services/notice-board.service";
@@ -45,9 +44,15 @@ const LandingSearchSection = () => {
   const handleAddressSelect = async (address: AddressI) => {
     setSelectedAddress(address);
     if (!challenge) {
+      // Challenge not yet resolved — the user can click "Cerca" to trigger
       return;
     }
     await doSearch(address, challenge);
+  };
+
+  const handleSearchClick = async () => {
+    if (!selectedAddress || !challenge) return;
+    await doSearch(selectedAddress, challenge);
   };
 
   const doSearch = async (address: AddressI, captcha: string) => {
@@ -124,12 +129,14 @@ const LandingSearchSection = () => {
                 resetOnSubmit={false}
               />
             </div>
-            {searchState === "loading" && (
-              <div className="flex items-center justify-center gap-2 text-consumer-blue text-sm py-2">
-                <MagnifyingGlassIcon className="size-5 animate-pulse" />
-                <span>Ricerca in corso…</span>
-              </div>
-            )}
+            <Button
+              label="Cerca"
+              role={RolesEnum.CONSUMER}
+              full
+              isLoading={searchState === "loading"}
+              disabled={!selectedAddress || !challenge}
+              action={handleSearchClick}
+            />
             {searchState === "error" && (
               <div className="flex items-center gap-2 text-red-500 text-sm py-2">
                 <ExclamationCircleIcon className="size-5" />
