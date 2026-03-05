@@ -35,6 +35,8 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
 import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { NoticeBoardService } from "@/src/services/notice-board.service";
+import { NoticeBoardI } from "@/src/types/notice-board.types";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -88,11 +90,21 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eBooking, bookingId, bookings]);
 
-  const noticeProposal = useMemo(() => {
+  const [noticeProposal, setNoticeProposal] = useState<NoticeBoardI>();
+
+  useEffect(() => {
     if (booking?.notice_id) {
-      console.log("TODO retrieve notice_id");
+      const getNoticeDetails = async () => {
+        const notice = await NoticeBoardService.getNoticeDetails(booking.notice_id as string);
+        if (notice) {
+          setNoticeProposal(notice);
+        }
+      }
+      getNoticeDetails();
     }
   }, [booking?.notice_id]);
+
+  console.log("noticeProposal", noticeProposal);
 
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = useMemo(() => {
@@ -281,6 +293,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
     return undefined;
   }, [selectedService, serviceCatalog]);
+
+  console.log("selectedService", selectedService);
+  console.log("services", services);
+  console.log("serviceOptions", serviceOptions);
 
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">

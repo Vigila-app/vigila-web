@@ -17,6 +17,65 @@ import { ServicesService } from "@/src/services/services.service";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
+ * GET /api/v1/notice-board/[noticeId]
+ *
+ * Retrieve notice details for authenticated users only.
+ */
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ noticeId: string }> },
+) {
+  try {
+    const { noticeId } = await context.params;
+
+    if (!noticeId) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id) {
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.NOTICE_BOARD_UNAUTHORIZED.code,
+        success: false,
+      });
+    }
+
+    const _admin = getAdminClient();
+    const { data: notice, error: noticeError } = await _admin
+      .from("notice_board")
+      .select("*")
+      .eq("id", noticeId)
+      .maybeSingle();
+
+    if (noticeError || !notice) {
+      return jsonErrorResponse(404, {
+        code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
+        success: false,
+        message: "Annuncio non trovato",
+      });
+    }
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.NOTICE_BOARD_SUCCESS.code,
+        success: true,
+        data: notice,
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error in GET notice-board/[noticeId]", error);
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.NOTICE_BOARD_ERROR.code,
+      success: false,
+    });
+  }
+}
+
+/**
  * POST /api/v1/notice-board/[noticeId]/propose
  *
  * Called by a VIGIL to propose themselves for a notice board request.

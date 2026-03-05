@@ -15,11 +15,10 @@ export const ServicesUtils = {
   getServiceUnitType: (unitType: string) => {
     switch (unitType) {
       case FrequencyEnum.HOURS:
+      default:
         return "ore";
       case FrequencyEnum.DAYS:
         return "giorni";
-      default:
-        return unitType;
     }
   },
 };

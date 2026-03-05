@@ -1,6 +1,6 @@
 import { apiPublicSearch, apiNoticeBoard } from "@/src/constants/api.constants";
 import { ApiService } from "@/src/services/api.service";
-import { NoticeBoardFormI } from "@/src/types/notice-board.types";
+import { NoticeBoardFormI, NoticeBoardI } from "@/src/types/notice-board.types";
 
 export const PublicSearchService = {
   searchServices: async (params: {
@@ -24,6 +24,20 @@ export const NoticeBoardService = {
       searchParams.toString() ? `?${searchParams.toString()}` : ""
     }`;
     return ApiService.get(url);
+  },
+
+  getNoticeDetails: async (noticeId: NoticeBoardI["id"]): Promise<NoticeBoardI> => {
+    try {
+      if (!noticeId) throw new Error("Notice ID is required");
+      const response = await ApiService.get<{ data: NoticeBoardI }>(
+        apiNoticeBoard.DETAILS(noticeId),
+      );
+      if (response?.data) return response.data;
+      throw new Error("Notice not found");
+    } catch (error) {
+      console.error("NoticeBoardService getNoticeDetails error", error);
+      throw error;
+    }
   },
 
   proposeForNotice: async (noticeId: string) =>
