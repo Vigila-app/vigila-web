@@ -18,11 +18,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { bookingId, amount, currency = "eur" } = body;
 
-    console.log(`API POST payment/create-payment-intent`, { bookingId, amount, currency });
+    console.log(`API POST payment/create-payment-intent`, {
+      bookingId,
+      amount,
+      currency,
+    });
 
     // Verifica autenticazione utente
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    ) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.PAYMENT_INTENT_UNAUTHORIZED.code,
         success: false,
@@ -70,7 +77,7 @@ export async function POST(req: NextRequest) {
       },
       metadata: {
         bookingId,
-        userId: userObject.id,
+        user_id: userObject.id,
       },
       description: `Pagamento per prenotazione ${bookingId}`,
     });
@@ -83,14 +90,18 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId);
-
+    console.log(
+      `Payment Intent creato con successo per bookingId ${bookingId}:`,
+      paymentIntent,
+      userObject.id,
+    );
     return NextResponse.json(
       {
         code: ResponseCodesConstants.PAYMENT_INTENT_SUCCESS.code,
         clientSecret: paymentIntent.client_secret,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error creating payment intent:", error);
