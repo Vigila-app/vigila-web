@@ -13,6 +13,7 @@ export type BookingI = {
   service_id: ServiceI["id"];
   consumer_id: UserType["id"];
   vigil_id: UserType["id"];
+  notice_id?: string;
   startDate: Date;
   endDate: Date;
   quantity: number;

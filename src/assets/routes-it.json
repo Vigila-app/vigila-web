@@ -380,6 +380,21 @@
       "CONSUMER"
     ]
   },
+  "editBooking": {
+    "url": "/booking/edit",
+    "label": "Modifica Prenotazione",
+    "title": "Modifica Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },
   "paymentBooking": {
     "url": "/booking/payment",
     "label": "Paga Prenotazione",

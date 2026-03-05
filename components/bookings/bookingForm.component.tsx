@@ -26,7 +26,7 @@ const SearchAddress = dynamic(
     loading: () => (
       <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
     ),
-  }
+  },
 );
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
@@ -34,26 +34,31 @@ import { FrequencyEnum } from "@/src/enums/common.enums";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
 import clsx from "clsx";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
   booking?: BookingI;
+  bookingId?: BookingI["id"];
   text?: string;
   title?: string;
   serviceId?: ServiceI["id"];
   vigilId?: ServiceI["vigil_id"];
+  edit?: boolean;
 };
 
 const BookingFormComponent = (props: BookingFormComponentI) => {
   const {
     isModal = false,
     onSubmit = () => ({}),
-    booking,
+    booking: eBooking,
     text,
     title,
     serviceId,
     vigilId,
+    bookingId,
+    edit = false,
   } = props;
 
   const router = useRouter();
@@ -66,15 +71,39 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   } = useAppStore();
   const { closeModal } = useModalStore();
   const { services, getServiceDetails, getServices } = useServicesStore();
+  const { bookings, getBookingDetails } = useBookingsStore();
   const { user } = useUserStore();
   const role = useMemo(
     () => user?.user_metadata?.role,
-    [user?.user_metadata?.role]
+    [user?.user_metadata?.role],
   );
-  const { vigils, getVigilsDetails } = useVigilStore();
-  const vigilDetails = vigils.find((vigil) => vigil.id === vigilId);
-  const [selectedService, setSelectedService] = useState<ServiceI | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
+  const booking = useMemo(() => {
+    if (eBooking) return eBooking;
+    if (bookingId) {
+      const found = bookings.find((b) => b.id === bookingId);
+      if (found) return found;
+      getBookingDetails(bookingId, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eBooking, bookingId, bookings]);
+
+  const noticeProposal = useMemo(() => {
+    if (booking?.notice_id) {
+      console.log("TODO retrieve notice_id");
+    }
+  }, [booking?.notice_id]);
+
+  const { vigils, getVigilsDetails } = useVigilStore();
+  const vigilDetails = useMemo(() => {
+    const found = vigils.find(
+      (vigil) => vigil.id === (vigilId || booking?.vigil_id),
+    );
+    if (found) return found;
+    if (vigilId || booking?.vigil_id)
+      getVigilsDetails([(vigilId || booking?.vigil_id) as string], true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vigils, vigilId, booking?.vigil_id]);
 
   const averageRating = useMemo(() => {
     return (
@@ -104,36 +133,42 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedAddress = watch("address");
   const watchedExtras = watch("extras");
 
-  const serviceCatalog: ServiceCatalogItem = useMemo(
-    () =>
-      selectedService?.info?.catalog_id &&
-      ServicesService.getServiceCatalogById(selectedService.info.catalog_id),
-    [selectedService]
-  );
-
-  useEffect(() => {
-    if (vigilId) getVigilsDetails([vigilId], true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vigilId]);
-
-  useEffect(() => {
+  const selectedService = useMemo(() => {
+    if (!(watchedServiceId && serviceId && booking?.service_id)) return;
+    if (services?.length && (serviceId || booking?.service_id)) {
+      const found =
+        services.find((s) => s.id === (serviceId || booking?.service_id)) ||
+        null;
+      if (found) return found;
+    }
     if (watchedServiceId && services.length) {
       const service = services.find((s) => s.id === watchedServiceId);
       if (!service) {
         getServiceDetails(watchedServiceId as string, true);
       } else {
-        setSelectedService(service || null);
+        return service;
       }
     } else {
       if (watchedServiceId || serviceId) {
         getServiceDetails((watchedServiceId || serviceId) as string, true);
-      } else {
-        getServices(true, vigilId);
       }
     }
-    console.log("watchedServiceId:", watchedServiceId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedServiceId, services?.length]);
+  }, [watchedServiceId, services, serviceId, vigilId, booking]);
+
+  useEffect(() => {
+    if (vigilId || booking?.vigil_id) {
+      getServices(true, vigilId || booking?.vigil_id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vigilId, booking?.vigil_id]);
+
+  const serviceCatalog: ServiceCatalogItem = useMemo(
+    () =>
+      selectedService?.info?.catalog_id &&
+      ServicesService.getServiceCatalogById(selectedService.info.catalog_id),
+    [selectedService],
+  );
 
   useEffect(() => {
     if (
@@ -147,7 +182,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       setTotalAmount(
         (selectedService.unit_price +
           (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)) *
-          watchedDuration
+          watchedDuration,
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,18 +198,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   //   setValue("service_id", selectedService?.id as never);
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [selectedService]);
-  useEffect(() => {
-    if (services?.length) {
-      setSelectedService(services.find((s) => s.id === serviceId) || null);
-    }
-  }, [services, serviceId]);
 
   const age = Math.floor(
     dateDiff(
       new Date(),
       new Date(vigilDetails?.birthday || ""),
-      FrequencyEnum.DAYS
-    ) / 365.25
+      FrequencyEnum.DAYS,
+    ) / 365.25,
   );
 
   const submitForm = async (formData: BookingFormI) => {
@@ -194,7 +224,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           .filter(
             (extra) =>
               Object.keys(formData.extras || {}).includes(extra.id) &&
-              (formData.extras || {})[extra.id]
+              (formData.extras || {})[extra.id],
           )
           .map((extra) => extra.id);
 
@@ -214,7 +244,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           closeModal();
         } else {
           router.push(
-            `${Routes.paymentBooking.url}?bookingId=${newBooking.id}`
+            `${Routes.paymentBooking.url}?bookingId=${newBooking.id}`,
           );
         }
       } catch (error) {
@@ -235,18 +265,18 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       !serviceId &&
       services.map((service) => ({
         label: `${service.name} - ${service.currency} ${amountDisplay(
-          service.unit_price
+          service.unit_price,
         )}/${service.unit_type}`,
         value: service.id,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [services?.length, serviceId]
+    [services?.length, serviceId],
   );
 
   const extraOptions = useMemo(() => {
     if (selectedService?.info?.extras?.length) {
       return serviceCatalog.extra.filter((extra) =>
-        selectedService.info?.extras?.find((e: string) => e === extra.id)
+        selectedService.info?.extras?.find((e: string) => e === extra.id),
       );
     }
     return undefined;
@@ -283,7 +313,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 <span className="capitalize">
                   {dateDisplay(
                     vigilDetails?.created_at || "",
-                    "monthYearLiteral"
+                    "monthYearLiteral",
                   )}
                 </span>
               </span>
@@ -354,21 +384,21 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                     local.getMonth(),
                     local.getDate(),
                     local.getHours(),
-                    local.getMinutes()
-                  )
+                    local.getMinutes(),
+                  ),
                 );
                 field.onChange(utc.toISOString()); // salva in UTC
               }}
               // set min to today and max to 3 months from today
               min={new Date(
                 new Date(
-                  new Date().setUTCHours(new Date().getUTCHours() + 1)
-                ).setUTCMinutes(0)
+                  new Date().setUTCHours(new Date().getUTCHours() + 1),
+                ).setUTCMinutes(0),
               )
                 .toISOString()
                 .slice(0, 16)}
               max={new Date(
-                new Date().setUTCMonth(new Date().getUTCMonth() + 3)
+                new Date().setUTCMonth(new Date().getUTCMonth() + 3),
               )
                 .toISOString()
                 .slice(0, 16)}
@@ -390,7 +420,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               {...field}
               role={RolesEnum.VIGIL}
               label={`Durata (${ServicesUtils.getServiceUnitType(
-                selectedService?.unit_type as string
+                selectedService?.unit_type as string,
               )})`}
               min={selectedService?.min_unit || 1}
               max={selectedService?.max_unit || undefined}
@@ -447,12 +477,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                             "flex flex-col border border-gray-200 rounded-lg p-3 transition",
                             "hover:bg-gray-100 hover:border-vigil-orange cursor-pointer",
                             field.value &&
-                              "border-vigil-orange bg-vigil-light-orange/60"
+                              "border-vigil-orange bg-vigil-light-orange/60",
                           )}
                           onClick={() => {
                             setValue(
                               `extras.${extra.id}` as const,
-                              !field.value
+                              !field.value,
                             );
                           }}
                         >
@@ -509,7 +539,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   {selectedService.currency}
                   {amountDisplay(
                     selectedService.unit_price +
-                      (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)
+                      (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
                   )}
                 </p>
                 <p>
@@ -523,11 +553,11 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                       .filter(
                         (extra) =>
                           Object.keys(watchedExtras || {}).includes(extra.id) &&
-                          (watchedExtras || {})[extra.id]
+                          (watchedExtras || {})[extra.id],
                       )
                       .map(
                         (extra) =>
-                          `${extra.name} (${selectedService.currency}${amountDisplay(extra.fixed_price)})`
+                          `${extra.name} (${selectedService.currency}${amountDisplay(extra.fixed_price)})`,
                       )
                       .join(", ")}
                     {Object.values(watchedExtras || {}).filter((v) => v)
@@ -543,12 +573,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                             .filter(
                               (extra) =>
                                 Object.keys(watchedExtras || {}).includes(
-                                  extra.id
-                                ) && (watchedExtras || {})[extra.id]
+                                  extra.id,
+                                ) && (watchedExtras || {})[extra.id],
                             )
                             .map((extra) => extra.fixed_price)
                             .reduce((acc, price) => acc + price, 0)
-                        : 0)
+                        : 0),
                   )}
                 </p>
               </div>

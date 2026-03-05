@@ -140,17 +140,23 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
   useEffect(() => {
     const noticeProposal = async () => {
       if (
-        booking?.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL && !(booking.consumer || booking.consumer_id)
+        booking?.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
+        !(booking.consumer || booking.consumer_id)
       ) {
         try {
           await BookingUtils.noticeProposalAssociateConsumer(booking);
           StorageUtils.clearSessionValues("redirectAuthTo");
+          router.replace(`${Routes.editBooking.url}?bookingId=${booking.id}`);
         } catch (error) {
-          console.error("Errore nell'associare la proposta di prenotazione al consumer:", error);
+          console.error(
+            "Errore nell'associare la proposta di prenotazione al consumer:",
+            error,
+          );
         }
       }
     };
     noticeProposal();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking]);
 
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
@@ -444,7 +450,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {isConsumer &&
           booking.payment_status === PaymentStatusEnum.PENDING &&
-          booking.status === BookingStatusEnum.PENDING && (
+          (booking.status === BookingStatusEnum.PENDING ||
+            booking.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL) && (
             <Button
               label="Paga Prenotazione"
               role={RolesEnum.CONSUMER}
