@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
@@ -45,7 +45,8 @@ const LandingSearchSection = () => {
   const handleAddressSelect = async (address: AddressI) => {
     setSelectedAddress(address);
     if (!challenge) {
-      // Challenge not yet resolved — search will auto-fire when Altcha verifies
+      // Challenge not yet resolved — mark pending so useEffect fires when it's ready
+      setSearchPending(true);
       return;
     }
     await doSearch(address, challenge);
@@ -94,14 +95,22 @@ const LandingSearchSection = () => {
     }
   };
 
+  // Fire the pending search as soon as the Altcha challenge is resolved.
+  // This is more reliable than relying on the statechange event because the
+  // floating widget fires that event once; if React re-renders between the
+  // cleanup and re-registration of the listener the event can be missed.
+  useEffect(() => {
+    if (challenge && searchPending && selectedAddress) {
+      setSearchPending(false);
+      doSearch(selectedAddress, challenge);
+    }
+    // doSearch only uses stable setters/imports; selectedAddress is fresh from
+    // the render in which challenge (the dep) just changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challenge, searchPending]);
+
   const handleAltchaStateChange = (evt: CustomEvent) => {
     onStateChange(evt);
-    if (evt.detail?.state === "verified") {
-      if (selectedAddress) {
-        setSearchPending(false);
-        doSearch(selectedAddress, evt.detail.payload);
-      }
-    }
   };
 
   const resetSearch = () => {
