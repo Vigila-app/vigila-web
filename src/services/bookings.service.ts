@@ -19,7 +19,7 @@ export const BookingsService = {
       try {
         const { data: booking } = (await ApiService.post(
           apiBookings.CREATE(),
-          newBooking
+          newBooking,
         )) as { data: BookingI };
         resolve(booking);
       } catch (error) {
@@ -46,7 +46,7 @@ export const BookingsService = {
     new Promise<BookingI>(async (resolve, reject) => {
       try {
         const { data: bookingDetails } = (await ApiService.get(
-          apiBookings.DETAILS(bookingId)
+          apiBookings.DETAILS(bookingId),
         )) as { data: BookingI };
         resolve(bookingDetails);
       } catch (error) {
@@ -57,14 +57,14 @@ export const BookingsService = {
 
   updateBookingStatus: async (
     bookingId: BookingI["id"],
-    status: BookingStatusEnum
+    status: BookingStatusEnum,
   ) =>
     new Promise<BookingI>(async (resolve, reject) => {
       try {
         if (!bookingId) reject();
         const { data: result } = (await ApiService.put(
           apiBookings.DETAILS(bookingId),
-          { id: bookingId, status }
+          { id: bookingId, status },
         )) as { data: BookingI };
         useBookingsStore.getState().getBookingDetails(bookingId, true);
         resolve(result);
@@ -88,21 +88,37 @@ export const BookingsService = {
 
   updateBookingPaymentStatus: async (
     bookingId: BookingI["id"],
-    paymentData: UpdateBookingPaymentRequest
+    paymentData: UpdateBookingPaymentRequest,
   ) =>
     new Promise<BookingI>(async (resolve, reject) => {
       try {
         if (!bookingId) reject();
         const { data: result } = (await ApiService.put(
           apiBookings.UPDATE_PAYMENT(bookingId),
-          paymentData
+          paymentData,
         )) as { data: BookingI };
         resolve(result);
       } catch (error) {
         console.error(
           "BookingsService updateBookingPaymentStatus error",
-          error
+          error,
         );
+        reject(error);
+      }
+    }),
+
+  updateBooking: async (booking: BookingI) =>
+    new Promise<BookingI>(async (resolve, reject) => {
+      try {
+        if (!booking.id) reject();
+        const { data: result } = (await ApiService.put(
+          apiBookings.DETAILS(booking.id),
+          booking,
+        )) as { data: BookingI };
+        useBookingsStore.getState().getBookingDetails(booking.id);
+        resolve(result);
+      } catch (error) {
+        console.error("BookingsService updateBookingConsumer error", error);
         reject(error);
       }
     }),

@@ -31,6 +31,7 @@ import { BookingUtils } from "@/src/utils/booking.utils";
 import Link from "next/link";
 import { ServiceCatalogItem } from "@/src/types/services.types";
 import { ServicesService } from "@/src/services";
+import { StorageUtils } from "@/src/utils/storage.utils";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -89,7 +90,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     () =>
       service?.info?.catalog_id &&
       ServicesService.getServiceCatalogById(service.info.catalog_id),
-    [service]
+    [service],
   );
 
   const checkCancellation = useCallback(async () => {
@@ -104,7 +105,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     } catch (error) {
       console.error(
         "Errore nel verificare la possibilità di cancellazione:",
-        error
+        error,
       );
       setCanCancel(false);
     }
@@ -119,7 +120,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     } catch (error) {
       console.error(
         "Errore nel recupero dei dettagli della prenotazione:",
-        error
+        error,
       );
     } finally {
       hideLoader();
@@ -136,6 +137,22 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     checkCancellation();
   }, [checkCancellation]);
 
+  useEffect(() => {
+    const noticeProposal = async () => {
+      if (
+        booking?.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL && !(booking.consumer || booking.consumer_id)
+      ) {
+        try {
+          await BookingUtils.noticeProposalAssociateConsumer(booking);
+          StorageUtils.clearSessionValues("redirectAuthTo");
+        } catch (error) {
+          console.error("Errore nell'associare la proposta di prenotazione al consumer:", error);
+        }
+      }
+    };
+    noticeProposal();
+  }, [booking]);
+
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
     if (!booking) return;
 
@@ -143,7 +160,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       showLoader();
       const updatedBooking = await BookingUtils.handleStatusUpdate(
         booking,
-        status
+        status,
       );
       if (updatedBooking) {
         retrieveBookingDetails(true);
@@ -199,7 +216,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               ? BookingUtils.getStatusText(booking.status as BookingStatusEnum)
               : booking.payment_status === PaymentStatusEnum.PAID
                 ? BookingUtils.getStatusText(
-                    booking.status as BookingStatusEnum
+                    booking.status as BookingStatusEnum,
                   )
                 : "Da pagare"
           }
@@ -214,7 +231,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               ? BookingUtils.getStatusColor(booking.status as BookingStatusEnum)
               : booking.payment_status === PaymentStatusEnum.PAID
                 ? BookingUtils.getStatusColor(
-                    booking.status as BookingStatusEnum
+                    booking.status as BookingStatusEnum,
                   )
                 : "yellow"
           }
@@ -277,7 +294,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                   <span className="font-medium">Extra:</span>&nbsp;
                   {serviceCatalog.extra
                     .filter((extra) =>
-                      (booking.extras || []).includes(extra.id)
+                      (booking.extras || []).includes(extra.id),
                     )
                     .map((extra) => extra.name)
                     .join(", ")}
@@ -299,7 +316,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                   &nbsp;
                   {amountDisplay(
                     booking.price,
-                    booking.service?.currency as CurrencyEnum
+                    booking.service?.currency as CurrencyEnum,
                   )}
                 </p>
               )}
@@ -309,10 +326,10 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                   &nbsp;
                   <Badge
                     label={BookingUtils.getPaymentStatusText(
-                      booking.payment_status as PaymentStatusEnum
+                      booking.payment_status as PaymentStatusEnum,
                     )}
                     color={BookingUtils.getStatusColor(
-                      booking.payment_status as PaymentStatusEnum
+                      booking.payment_status as PaymentStatusEnum,
                     )}
                   />
                 </p>
@@ -334,7 +351,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                       ? replaceDynamicUrl(
                           Routes.vigilDetails.url,
                           ":vigilId",
-                          vigil?.id
+                          vigil?.id,
                         )
                       : "#"
                   }
@@ -418,7 +435,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               await handleStatusUpdate(
                 isConsumer
                   ? BookingStatusEnum.CANCELLED_USER
-                  : BookingStatusEnum.CANCELLED_VIGIL
+                  : BookingStatusEnum.CANCELLED_VIGIL,
               );
               router.push(`${Routes.homeConsumer.url}`);
             }}
@@ -433,7 +450,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               role={RolesEnum.CONSUMER}
               action={() =>
                 router.push(
-                  `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+                  `${Routes.paymentBooking.url}?bookingId=${booking.id}`,
                 )
               }
             />

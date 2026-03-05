@@ -141,12 +141,12 @@ export async function POST(
     if (updateError) throw updateError;
 
     // Build redirect URL pointing to the pending booking (or consumer home as fallback)
-    const redirectPath = bookingId
+    const bookingPath = bookingId
       ? replaceDynamicUrl(Routes.bookingDetails.url, ":bookingId", bookingId)
       : Routes.homeConsumer.url;
-    const redirectUserTo = encodeURIComponent(redirectPath);
-    const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer?redirectUserTo=${redirectUserTo}`;
-    const loginUrl = `${AppConstants.hostUrl}/auth/login?redirectUserTo=${redirectUserTo}`;
+    const redirectAuthTo = encodeURIComponent(bookingPath);
+    const registrationUrl = `${AppConstants.hostUrl}/auth/registration/consumer?redirectAuthTo=${redirectAuthTo}`;
+    const loginUrl = `${AppConstants.hostUrl}/auth/login?redirectAuthTo=${redirectAuthTo}`;
 
     // Send email notification to the notice creator using the dedicated template
     try {

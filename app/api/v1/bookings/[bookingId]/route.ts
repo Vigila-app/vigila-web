@@ -20,7 +20,7 @@ import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 const verifyBookingAccess = async (
   bookingId: string,
   userId: string,
-  userRole: string
+  userRole: string,
 ) => {
   const _admin = getAdminClient();
   const { data, error } = await _admin
@@ -68,7 +68,7 @@ const verifyBookingAccess = async (
 
 export async function DELETE(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -94,7 +94,7 @@ export async function DELETE(
     await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     );
     const _admin = getAdminClient();
 
@@ -111,7 +111,7 @@ export async function DELETE(
         data: bookingId,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -124,7 +124,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -149,7 +149,7 @@ export async function GET(
     await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     );
 
     const _admin = getAdminClient();
@@ -161,7 +161,7 @@ export async function GET(
         consumer:consumers(*),
         vigil:vigils(*),
         service:services(*)
-      `
+      `,
       )
       .eq("id", bookingId)
       .single<BookingI>();
@@ -174,7 +174,7 @@ export async function GET(
         data: booking,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -187,7 +187,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const updatedBooking = await req.json();
@@ -218,7 +218,7 @@ export async function PUT(
     const booking = (await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     )) as BookingI;
 
     const _admin = getAdminClient();
@@ -231,24 +231,28 @@ export async function PUT(
     const requiresPaymentVerification =
       isPaymentStatusUpdate ||
       (isStatusUpdate && updatedBooking.status === BookingStatusEnum.CONFIRMED);
+    const isNoticeProposalAssociation =
+      booking.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
+      !booking.consumer_id &&
+      userObject.id;
 
     if (requiresPaymentVerification && updatedBooking.payment_id) {
       try {
         console.log(
-          `Verifying payment for booking ${bookingId} with payment ID ${updatedBooking.payment_id}`
+          `Verifying payment for booking ${bookingId} with payment ID ${updatedBooking.payment_id}`,
         );
 
         await verifyPaymentWithStripe(
           updatedBooking.payment_id,
           userObject.id,
-          bookingId
+          bookingId,
         );
 
         console.log(`Payment verification successful for booking ${bookingId}`);
       } catch (paymentError) {
         console.error(
           `Payment verification failed for booking ${bookingId}:`,
-          paymentError
+          paymentError,
         );
         return jsonErrorResponse(400, {
           code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
@@ -295,6 +299,13 @@ export async function PUT(
           status: updatedBooking.status || BookingStatusEnum.CONFIRMED,
         };
       }
+
+      if (isNoticeProposalAssociation) {
+        allowedUpdates = {
+          ...allowedUpdates,
+          consumer_id: userObject.id,
+        };
+      }
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       // Vigils can update status and notes
       allowedUpdates = {
@@ -316,15 +327,12 @@ export async function PUT(
         consumer:consumers(*),
         vigil:vigils(*),
         service:services(*)
-      `
+      `,
       )
       .single<BookingI>();
 
     if (error || !data) throw error;
 
-    console.log(1, updatedBooking);
-    console.log(2, booking);
-    console.log(3, isStatusUpdate);
     // Invia email di aggiornamento stato se lo stato è cambiato
     if (isStatusUpdate && updatedBooking.status !== booking.status) {
       try {
@@ -339,7 +347,7 @@ export async function PUT(
               vigil: data.vigil || updatedBooking.vigil,
               consumer: data.consumer || updatedBooking.consumer,
             },
-            consumer
+            consumer,
           );
         }
         if (vigil?.email) {
@@ -350,7 +358,7 @@ export async function PUT(
               vigil: data.vigil || updatedBooking.vigil,
               consumer: data.consumer || updatedBooking.consumer,
             },
-            vigil
+            vigil,
           );
         }
       } catch (emailError) {
@@ -365,7 +373,7 @@ export async function PUT(
         data,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
