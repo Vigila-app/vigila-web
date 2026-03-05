@@ -91,7 +91,11 @@ export async function GET(req: NextRequest) {
       {
         code: ResponseCodesConstants.NOTICE_BOARD_SUCCESS.code,
         success: true,
-        data: data || [],
+        data: (data || []).map((notice) => ({
+          ...notice,
+          email: undefined,
+          phone: undefined,
+        })),
         pagination: {
           page,
           pages: Math.ceil((count || 0) / itemPerPage),

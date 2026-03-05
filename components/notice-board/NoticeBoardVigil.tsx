@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   MapPinIcon,
   ClockIcon,
@@ -14,6 +14,11 @@ import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import Card from "@/components/card/card";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDisplay } from "@/src/utils/date.utils";
+import { ServicesService } from "@/src/services";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { amountDisplay } from "@/src/utils/common.utils";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import Button from "../button/button";
 
 const NoticeBoardVigil = () => {
   const { showToast } = useAppStore();
@@ -45,7 +50,7 @@ const NoticeBoardVigil = () => {
         setIsLoading(false);
       }
     },
-    [showToast]
+    [showToast],
   );
 
   useEffect(() => {
@@ -71,15 +76,12 @@ const NoticeBoardVigil = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <MegaphoneIcon className="size-7 text-vigil-orange" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Bacheca annunci</h1>
-          <p className="text-sm text-gray-500">
-            Annunci attivi di utenti che cercano assistenza nella tua zona
-          </p>
-        </div>
+    <div className="mx-auto space-y-4 mt-6 py-2.5">
+      <div className="mb-6">
+        <h2 className="font-semibold text-2xl">Bacheca annunci</h2>
+        <p className="text-sm text-gray-500">
+          Annunci attivi di utenti che cercano assistenza nella tua zona
+        </p>
       </div>
 
       {isLoading ? (
@@ -149,27 +151,46 @@ const NoticeCard = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
-    setIsLoading(true);
-    await onPropose();
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      await onPropose();
+    } catch (err) {
+      console.error("Error proposing for notice:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const service = useMemo(() => {
+    return ServicesService.getServicesByType(
+      notice.service_type as ServiceCatalogTypeEnum,
+    );
+  }, [notice.service_type]);
+
   return (
-    <Card role={RolesEnum.VIGIL} hoverable>
+    <Card role={RolesEnum.VIGIL}>
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-semibold text-gray-800">{notice.name}</h3>
+            <h3 className="font-semibold text-gray-800 capitalize">
+              {notice.name}
+            </h3>
             {notice.service_type && (
-              <span className="inline-block text-xs font-medium bg-vigil-orange/10 text-vigil-orange px-2 py-0.5 rounded-full mt-1">
-                {notice.service_type}
+              <span className="inline-flex text-xs items-center font-medium bg-vigil-orange/10 text-vigil-orange px-2 py-0.5 rounded-full mt-1">
+                {service?.name || notice.service_type}
               </span>
             )}
           </div>
-          <span className="text-xs text-gray-400 shrink-0 flex items-center gap-1">
-            <ClockIcon className="size-3.5" />
-            {dateDisplay(notice.created_at)}
-          </span>
+          <div className="shrink-0 flex flex-col items-end gap-2">
+            <span className="text-xs text-gray-400">
+              {dateDisplay(notice.created_at, "date")}
+            </span>
+            {service?.min_hourly_rate && (
+              <span className="text-consumer-blue">
+                {amountDisplay(service?.min_hourly_rate, CurrencyEnum.EURO)}/ora
+              </span>
+            )}
+          </div>
         </div>
 
         {notice.message && (
@@ -192,13 +213,15 @@ const NoticeCard = ({
             la prenotazione
           </div>
         ) : (
-          <button
-            onClick={handleClick}
+          <Button
+            action={handleClick}
             disabled={isLoading}
-            className="w-full bg-vigil-orange hover:bg-vigil-orange/90 text-white text-sm font-semibold py-2 px-4 rounded-xl transition disabled:opacity-60"
-          >
-            {isLoading ? "Invio in corso…" : "Proposti per questo servizio"}
-          </button>
+            label={
+              isLoading ? "Invio in corso…" : "Proponiti per questo servizio"
+            }
+            primary
+            full
+          />
         )}
       </div>
     </Card>
