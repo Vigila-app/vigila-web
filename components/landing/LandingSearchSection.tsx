@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
@@ -15,12 +14,13 @@ import { Routes } from "@/src/routes";
 import useAltcha from "@/src/hooks/useAltcha";
 import { Section } from "./Section";
 import { Input, Select, TextArea, Checkbox } from "@/components/form";
-import Button from "@/components/button/button";
+import { Button, ButtonLink } from "@/components";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { AltchaService } from "@/src/services/altcha.service";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
@@ -39,85 +39,67 @@ const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [foundServices, setFoundServices] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressI | null>(null);
-  const [searchPending, setSearchPending] = useState(false);
-  const { challenge, onStateChange } = useAltcha();
+  const { challenge, onStateChange, isVerified } = useAltcha();
 
   const handleAddressSelect = async (address: AddressI) => {
     setSelectedAddress(address);
-    if (!challenge) {
-      // Challenge not yet resolved — mark pending so useEffect fires when it's ready
-      setSearchPending(true);
-      return;
-    }
-    await doSearch(address, challenge);
   };
 
-  const handleSearchClick = async () => {
-    if (!selectedAddress) return;
-    if (!challenge) {
-      // Challenge still resolving — mark as pending and show loading state
-      setSearchPending(true);
-      setSearchState("loading");
-      return;
-    }
-    await doSearch(selectedAddress, challenge);
-  };
-
-  const doSearch = async (address: AddressI, captcha: string) => {
+  const doSearch = async () => {
     try {
       setSearchState("loading");
-      const postalCode = address.address?.postcode || address.q || "";
-      const city =
-        address.address?.town ||
-        address.address?.county ||
-        address.city ||
-        address.display_name?.split(",")[0] ||
-        "";
+      if (challenge) {
+        await AltchaService.verifyChallenge(challenge);
+        const postalCode =
+          selectedAddress?.address?.postcode || selectedAddress?.q || "";
+        const city =
+          selectedAddress?.address?.town ||
+          selectedAddress?.address?.county ||
+          selectedAddress?.city ||
+          selectedAddress?.display_name?.split(",")[0] ||
+          "";
 
-      const result = await PublicSearchService.searchServices({
-        captcha,
-        postalCode,
-        city,
-        lat: address.lat !== undefined ? Number(address.lat) : undefined,
-        lon: address.lon !== undefined ? Number(address.lon) : undefined,
-      });
+        const result = await PublicSearchService.searchServices({
+          postalCode,
+          city,
+          lat:
+            selectedAddress?.lat !== undefined
+              ? Number(selectedAddress.lat)
+              : undefined,
+          lon:
+            selectedAddress?.lon !== undefined
+              ? Number(selectedAddress.lon)
+              : undefined,
+        });
 
-      const resultData = result as any;
-      if (resultData?.data?.found) {
-        setFoundServices(resultData.data.services || []);
-        setSearchState("found");
+        const resultData = result as any;
+        if (resultData?.data?.found) {
+          setFoundServices(resultData.data.services || []);
+          setSearchState("found");
+        } else {
+          setFoundServices([]);
+          setSearchState("not_found");
+        }
       } else {
-        setFoundServices([]);
-        setSearchState("not_found");
+        throw new Error("Captcha challenge not available");
       }
-    } catch {
+    } catch (err) {
+      console.error("Error in search:", err);
       setSearchState("error");
     }
   };
 
-  // Fire the pending search as soon as the Altcha challenge is resolved.
-  // This is more reliable than relying on the statechange event because the
-  // floating widget fires that event once; if React re-renders between the
-  // cleanup and re-registration of the listener the event can be missed.
   useEffect(() => {
-    if (challenge && searchPending && selectedAddress) {
-      setSearchPending(false);
-      doSearch(selectedAddress, challenge);
+    if (isVerified) {
+      doSearch();
     }
-    // doSearch only uses stable setters/imports; selectedAddress is fresh from
-    // the render in which challenge (the dep) just changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challenge, searchPending]);
-
-  const handleAltchaStateChange = (evt: CustomEvent) => {
-    onStateChange(evt);
-  };
+  }, [isVerified]);
 
   const resetSearch = () => {
     setSearchState("idle");
     setFoundServices([]);
     setSelectedAddress(null);
-    setSearchPending(false);
   };
 
   const showSearchInput = ["idle", "loading", "error"].includes(searchState);
@@ -129,7 +111,7 @@ const LandingSearchSection = () => {
       label="Verifica disponibilità"
       title={
         <>
-          Cerca servizi disponibili{" "}
+          Cerca servizi disponibili&nbsp;
           <span className="text-consumer-blue">nella tua zona</span>
         </>
       }
@@ -137,7 +119,12 @@ const LandingSearchSection = () => {
     >
       <div className="w-full max-w-xl mx-auto">
         {showSearchInput ? (
-          <div className="space-y-4">
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
             <div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100">
               <SearchAddress
                 onSubmit={handleAddressSelect}
@@ -150,20 +137,21 @@ const LandingSearchSection = () => {
               />
             </div>
             <Button
-              label="Cerca"
+              type="submit"
+              label={searchState === "loading" ? "Ricerca in corso…" : "Cerca"}
               role={RolesEnum.CONSUMER}
               full
               isLoading={searchState === "loading"}
               disabled={!selectedAddress}
-              action={handleSearchClick}
             />
+            <Altcha floating onStateChange={onStateChange} />
             {searchState === "error" && (
               <div className="flex items-center gap-2 text-red-500 text-sm py-2">
                 <ExclamationCircleIcon className="size-5" />
                 <span>Si è verificato un errore. Riprova.</span>
               </div>
             )}
-          </div>
+          </form>
         ) : searchState === "found" ? (
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-green-100 space-y-4">
             <div className="flex items-start gap-3">
@@ -188,30 +176,27 @@ const LandingSearchSection = () => {
               ))}
             </ul>
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link
+              <Button
+                secondary
+                full
+                label="Nuova ricerca"
+                action={resetSearch}
+              />
+              <ButtonLink
+                label="Registrati e prenota"
+                role={RolesEnum.CONSUMER}
+                full
                 href={Routes.registrationConsumer.url}
-                className="flex-1 text-center bg-consumer-blue hover:bg-consumer-blue/90 text-white font-semibold py-2.5 px-5 rounded-xl transition"
-              >
-                Registrati e prenota
-              </Link>
-              <button
-                onClick={resetSearch}
-                className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-600 font-medium py-2.5 px-5 rounded-xl transition text-sm"
-              >
-                Nuova ricerca
-              </button>
+              />
             </div>
           </div>
         ) : searchState === "not_found" ? (
           <NotFoundSection
             address={selectedAddress}
             onReset={resetSearch}
-            captcha={challenge}
           />
         ) : null}
       </div>
-      {/* Invisible floating challenge — auto-solves in the background, aligned with login/signup */}
-      <Altcha floating onStateChange={handleAltchaStateChange} />
     </Section>
   );
 };
@@ -219,11 +204,9 @@ const LandingSearchSection = () => {
 const NotFoundSection = ({
   address,
   onReset,
-  captcha,
 }: {
   address: AddressI | null;
   onReset: () => void;
-  captcha: string;
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -248,7 +231,6 @@ const NotFoundSection = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
-      !captcha ||
       !form.name ||
       !form.email ||
       !form.service_type ||
@@ -262,7 +244,6 @@ const NotFoundSection = ({
         "@/src/services/notice-board.service"
       );
       await NoticeBoardService.createNotice({
-        captcha,
         name: form.name,
         email: form.email,
         phone: form.phone || undefined,
@@ -295,12 +276,7 @@ const NotFoundSection = ({
             </p>
           </div>
         </div>
-        <button
-          onClick={onReset}
-          className="text-consumer-blue text-sm underline underline-offset-2"
-        >
-          Fai un&apos;altra ricerca
-        </button>
+        <Button label="Nuova ricerca" secondary full action={onReset} />
       </div>
     );
   }
@@ -321,17 +297,12 @@ const NotFoundSection = ({
       </div>
       {!showForm ? (
         <div className="flex flex-col sm:flex-row gap-3">
+          <Button label="Nuova ricerca" secondary full action={onReset} />
           <Button
             label="Pubblica annuncio"
             role={RolesEnum.CONSUMER}
             full
             action={() => setShowForm(true)}
-          />
-          <Button
-            label="Nuova ricerca"
-            secondary
-            full
-            action={onReset}
           />
         </div>
       ) : (
@@ -341,7 +312,9 @@ const NotFoundSection = ({
             required
             options={serviceOptions}
             value={form.service_type}
-            onChange={(value) => setForm((f) => ({ ...f, service_type: value }))}
+            onChange={(value) =>
+              setForm((f) => ({ ...f, service_type: value }))
+            }
             placeholder="Seleziona il servizio…"
             role={RolesEnum.CONSUMER}
           />
@@ -350,7 +323,9 @@ const NotFoundSection = ({
             type="text"
             required
             value={form.name}
-            onChange={(value) => setForm((f) => ({ ...f, name: value as string }))}
+            onChange={(value) =>
+              setForm((f) => ({ ...f, name: value as string }))
+            }
             placeholder="Il tuo nome"
             role={RolesEnum.CONSUMER}
           />
@@ -389,23 +364,25 @@ const NotFoundSection = ({
             label="Autorizzo Vigila a utilizzare i miei contatti per mettermi in relazione con un assistente disponibile nella mia zona."
             required
             checked={form.consent}
-            onChange={(checked) => setForm((f) => ({ ...f, consent: checked as boolean }))}
+            onChange={(checked) =>
+              setForm((f) => ({ ...f, consent: checked as boolean }))
+            }
             role={RolesEnum.CONSUMER}
           />
           <div className="flex gap-3">
-            <Button
-              type="submit"
-              label={isLoading ? "Invio…" : "Pubblica annuncio"}
-              role={RolesEnum.CONSUMER}
-              isLoading={isLoading}
-              full
-            />
             <Button
               type="button"
               label="Annulla"
               secondary
               full
               action={() => setShowForm(false)}
+            />
+            <Button
+              type="submit"
+              label={isLoading ? "Pubblicazione…" : "Pubblica annuncio"}
+              role={RolesEnum.CONSUMER}
+              isLoading={isLoading}
+              full
             />
           </div>
         </form>

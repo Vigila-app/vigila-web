@@ -1,12 +1,10 @@
 import { getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { NextRequest, NextResponse } from "next/server";
-import altcha from "altcha-lib";
 
 export async function POST(req: NextRequest) {
   try {
     const body: {
-      captcha: string;
       postalCode: string;
       city?: string;
       lat?: number;
@@ -18,33 +16,11 @@ export async function POST(req: NextRequest) {
       city: body.city,
     });
 
-    if (!body?.captcha) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.PUBLIC_SEARCH_BAD_REQUEST.code,
-        success: false,
-        message: "Captcha mancante",
-      });
-    }
-
     if (!body?.postalCode && !body?.city) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.PUBLIC_SEARCH_BAD_REQUEST.code,
         success: false,
         message: "Inserisci un CAP o una città",
-      });
-    }
-
-    // Validate altcha captcha
-    const ok = await altcha.verifySolution(
-      body.captcha,
-      process.env.ALTCHA_HMAC_KEY as string
-    );
-
-    if (!ok) {
-      return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.PUBLIC_SEARCH_BAD_REQUEST.code,
-        success: false,
-        message: "Captcha non valido",
       });
     }
 

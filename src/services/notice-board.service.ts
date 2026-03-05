@@ -4,7 +4,6 @@ import { NoticeBoardFormI } from "@/src/types/notice-board.types";
 
 export const PublicSearchService = {
   searchServices: async (params: {
-    captcha: string;
     postalCode?: string;
     city?: string;
     lat?: number;

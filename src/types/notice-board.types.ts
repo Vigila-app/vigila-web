@@ -16,7 +16,6 @@ export type NoticeBoardI = {
 };
 
 export type NoticeBoardFormI = {
-  captcha: string;
   name: string;
   email: string;
   phone?: string;

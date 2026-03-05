@@ -8,7 +8,6 @@ import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { NextRequest, NextResponse } from "next/server";
-import altcha from "altcha-lib";
 
 export type NoticeBoardI = {
   id: string;
@@ -114,7 +113,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body: {
-      captcha: string;
       name: string;
       email: string;
       phone?: string;
@@ -130,14 +128,6 @@ export async function POST(req: NextRequest) {
       service_type: body.service_type,
     });
 
-    if (!body?.captcha) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
-        success: false,
-        message: "Captcha mancante",
-      });
-    }
-
     if (!body?.name || !body?.email || !body?.postal_code) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
@@ -151,20 +141,6 @@ export async function POST(req: NextRequest) {
         code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
         success: false,
         message: "Tipo di servizio non valido",
-      });
-    }
-
-    // Validate altcha captcha
-    const ok = await altcha.verifySolution(
-      body.captcha,
-      process.env.ALTCHA_HMAC_KEY as string
-    );
-
-    if (!ok) {
-      return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.NOTICE_BOARD_BAD_REQUEST.code,
-        success: false,
-        message: "Captcha non valido",
       });
     }
 
