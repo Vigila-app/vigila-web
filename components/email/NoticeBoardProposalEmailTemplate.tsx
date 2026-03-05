@@ -1,6 +1,6 @@
-import * as React from "react";
 import { EmailHeader } from "./EmailHeader";
 import { EmailFooter } from "./EmailFooter";
+import { toPascalCase } from "@/src/utils/common.utils";
 
 interface NoticeBoardProposalEmailProps {
   recipientName: string;
@@ -35,7 +35,7 @@ export function NoticeBoardProposalEmailTemplate({
         }}
       >
         <h2 style={{ color: "#333", fontSize: "22px", marginBottom: "20px" }}>
-          Ciao {recipientName}! 👋
+          Ciao&nbsp;{toPascalCase(recipientName)}! 👋
         </h2>
 
         <p
@@ -46,7 +46,7 @@ export function NoticeBoardProposalEmailTemplate({
             marginBottom: "20px",
           }}
         >
-          Buone notizie! <strong>{vigilName}</strong> è disponibile ad aiutarti
+          <strong>{vigilName}</strong> è disponibile ad aiutarti
           con il servizio <strong>{serviceLabel}</strong> nella tua zona (
           {zone}).
         </p>
@@ -59,7 +59,7 @@ export function NoticeBoardProposalEmailTemplate({
             marginBottom: "20px",
           }}
         >
-          Per completare la prenotazione, registrati gratuitamente su Vigila e
+          Per completare la prenotazione registrati gratuitamente su Vigila e
           conferma il servizio direttamente in app. Una volta registrato, potrai:
         </p>
 
@@ -73,14 +73,14 @@ export function NoticeBoardProposalEmailTemplate({
         >
           <li>Rivedere i dettagli del servizio</li>
           <li>Scegliere data e orario</li>
-          <li>Pagare in modo sicuro tramite il portafoglio digitale Vigila</li>
+          <li>Pagare in modo sicuro</li>
         </ul>
 
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           <a
             href={registrationUrl}
             style={{
-              backgroundColor: "#E87722",
+              backgroundColor: "#007bff",
               color: "#ffffff",
               padding: "12px 30px",
               textDecoration: "none",

@@ -70,5 +70,6 @@ export interface EmailConfigI {
     welcome: string;
     reset: string;
     verification: string;
+    update: string;
   };
 }

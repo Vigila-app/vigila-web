@@ -252,7 +252,7 @@ export const EmailService = {
         }
         const result = await ResendService.sendEmailWithTemplate({
           to: data.to,
-          subject: `${EmailConstants.subjectPrefixes.notification} Un Vigil è disponibile per la tua richiesta in ${data.zone}`,
+          subject: `${EmailConstants.subjectPrefixes.update} un Vigil è disponibile per la tua richiesta a ${data.zone}!`,
           react: NoticeBoardProposalEmailTemplate({
             recipientName: data.recipientName,
             vigilName: data.vigilName,

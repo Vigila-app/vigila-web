@@ -26,7 +26,7 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function POST(
   req: NextRequest,
-  context: { params: Promise<{ noticeId: string }> }
+  context: { params: Promise<{ noticeId: string }> },
 ) {
   try {
     const { noticeId } = await context.params;
@@ -39,10 +39,7 @@ export async function POST(
     }
 
     const userObject = await authenticateUser(req);
-    if (
-      !userObject?.id ||
-      userObject.user_metadata?.role !== RolesEnum.VIGIL
-    ) {
+    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.VIGIL) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.NOTICE_BOARD_UNAUTHORIZED.code,
         success: false,
@@ -67,25 +64,7 @@ export async function POST(
       });
     }
 
-    // Fetch the VIGIL's profile for the email
-    const { data: vigilProfile } = await _admin
-      .from("vigils")
-      .select("displayName, name, surname")
-      .eq("id", userObject.id)
-      .maybeSingle();
-
-    const vigilName =
-      vigilProfile?.displayName ||
-      [vigilProfile?.name, vigilProfile?.surname].filter(Boolean).join(" ") ||
-      "Un Vigil";
-
-    // Mark notice as proposed and record which VIGIL proposed
-    const { error: updateError } = await _admin
-      .from("notice_board")
-      .update({ status: "proposed", vigil_id: userObject.id })
-      .eq("id", noticeId);
-
-    if (updateError) throw updateError;
+    const vigilName = "Un Vigil";
 
     // Look up label and catalog metadata from the central ServiceCatalog
     const catalogItem = ServicesService.getServicesByType(notice.service_type);
@@ -100,35 +79,66 @@ export async function POST(
         .select("id, unit_price")
         .eq("vigil_id", userObject.id)
         .eq("active", true)
-        .filter("info->>catalog_id", "eq", String(catalogItem.id))
+        .eq("type", notice.service_type)
         .maybeSingle();
 
-      if (vigilService) {
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() + 1);
-        const quantity = catalogItem.minimum_duration_hours || 1;
-        const endDate = new Date(
-          startDate.getTime() + quantity * 3600 * 1000
-        );
-        const { data: newBooking } = await _admin
-          .from("bookings")
-          .insert({
-            vigil_id: userObject.id,
-            service_id: vigilService.id,
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString(),
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + 7);
+      const quantity = catalogItem.minimum_duration_hours || 1;
+      const endDate = new Date(startDate.getTime() + quantity * 3600 * 1000);
+
+      const { data: newBooking, error } = await _admin
+        .from("bookings")
+        .insert({
+          vigil_id: userObject.id,
+          service_id: vigilService?.id,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          quantity,
+          address: [notice.city, notice.postal_code].filter(Boolean).join(", "),
+          price:
+            ((vigilService?.unit_price || catalogItem.min_hourly_rate) +
+              catalogItem.fee) *
             quantity,
-            price: (vigilService.unit_price + catalogItem.fee) * quantity,
-            fee: catalogItem.fee * quantity,
-            status: BookingStatusEnum.PENDING_NOTICE_PROPOSAL,
-            payment_status: PaymentStatusEnum.PENDING,
-            note: `notice_board:${noticeId}`,
-          })
-          .select("id")
-          .maybeSingle();
-        if (newBooking?.id) bookingId = newBooking.id;
+          fee: catalogItem.fee * quantity,
+          status: BookingStatusEnum.PENDING_NOTICE_PROPOSAL,
+          payment_status: PaymentStatusEnum.PENDING,
+          note: `Annuncio: ${noticeId}`,
+          notice_id: noticeId,
+        })
+        .select("id")
+        .maybeSingle();
+      if (newBooking?.id) {
+        bookingId = newBooking.id;
+      } else {
+        console.error("Failed to create booking for notice proposal", error);
+        return jsonErrorResponse(500, {
+          code: ResponseCodesConstants.NOTICE_BOARD_ERROR.code,
+          success: false,
+          message: "Errore nella creazione della prenotazione",
+        });
       }
+    } else {
+      console.error("Service not available for notice proposal");
+      return jsonErrorResponse(500, {
+        code: ResponseCodesConstants.NOTICE_BOARD_ERROR.code,
+        success: false,
+        message: "Servizio non disponibile",
+      });
     }
+
+    // Mark notice as proposed and record which VIGIL proposed
+    const { error: updateError } = await _admin
+      .from("notice_board")
+      .update({
+        status: "proposed",
+        vigil_id: userObject.id,
+        booking_id: bookingId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", noticeId);
+
+    if (updateError) throw updateError;
 
     // Build redirect URL pointing to the pending booking (or consumer home as fallback)
     const redirectPath = bookingId
@@ -160,7 +170,7 @@ export async function POST(
         success: true,
         message: "Proposta inviata con successo",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in POST notice-board/propose", error);

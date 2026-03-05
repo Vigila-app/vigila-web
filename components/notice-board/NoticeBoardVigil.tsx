@@ -209,8 +209,7 @@ const NoticeCard = ({
         {proposed ? (
           <div className="flex items-center gap-2 text-green-600 text-sm font-medium py-2">
             <CheckCircleIcon className="size-5" />
-            Proposta inviata — l&apos;utente riceverà una email per completare
-            la prenotazione
+            Proposta inviata!
           </div>
         ) : (
           <Button
