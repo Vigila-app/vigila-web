@@ -39,19 +39,26 @@ const LandingSearchSection = () => {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [foundServices, setFoundServices] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressI | null>(null);
+  const [searchPending, setSearchPending] = useState(false);
   const { challenge, onStateChange } = useAltcha();
 
   const handleAddressSelect = async (address: AddressI) => {
     setSelectedAddress(address);
     if (!challenge) {
-      // Challenge not yet resolved — the user can click "Cerca" to trigger
+      // Challenge not yet resolved — search will auto-fire when Altcha verifies
       return;
     }
     await doSearch(address, challenge);
   };
 
   const handleSearchClick = async () => {
-    if (!selectedAddress || !challenge) return;
+    if (!selectedAddress) return;
+    if (!challenge) {
+      // Challenge still resolving — mark as pending and show loading state
+      setSearchPending(true);
+      setSearchState("loading");
+      return;
+    }
     await doSearch(selectedAddress, challenge);
   };
 
@@ -89,8 +96,11 @@ const LandingSearchSection = () => {
 
   const handleAltchaStateChange = (evt: CustomEvent) => {
     onStateChange(evt);
-    if (evt.detail?.state === "verified" && selectedAddress) {
-      doSearch(selectedAddress, evt.detail.payload);
+    if (evt.detail?.state === "verified") {
+      if (selectedAddress) {
+        setSearchPending(false);
+        doSearch(selectedAddress, evt.detail.payload);
+      }
     }
   };
 
@@ -98,6 +108,7 @@ const LandingSearchSection = () => {
     setSearchState("idle");
     setFoundServices([]);
     setSelectedAddress(null);
+    setSearchPending(false);
   };
 
   const showSearchInput = ["idle", "loading", "error"].includes(searchState);
@@ -134,7 +145,7 @@ const LandingSearchSection = () => {
               role={RolesEnum.CONSUMER}
               full
               isLoading={searchState === "loading"}
-              disabled={!selectedAddress || !challenge}
+              disabled={!selectedAddress}
               action={handleSearchClick}
             />
             {searchState === "error" && (
