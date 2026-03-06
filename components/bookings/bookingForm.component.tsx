@@ -133,6 +133,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     handleSubmit,
     watch,
     setValue,
+    setError,
+    clearErrors,
   } = useForm<BookingFormI>({
     defaultValues: {
       ...booking,
@@ -140,6 +142,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       service_id: booking?.service_id || serviceId,
       consumer_id: booking?.consumer_id || user?.id,
       quantity: booking?.quantity || booking?.min_unit || 1,
+      startDate: new Date(
+        Date.UTC(
+          new Date(booking?.startDate || "").getFullYear(),
+          new Date(booking?.startDate || "").getMonth(),
+          new Date(booking?.startDate || "").getDate(),
+          new Date(booking?.startDate || "").getHours(),
+          new Date(booking?.startDate || "").getMinutes(),
+        ),
+      ).toISOString() as unknown as Date,
     },
   });
 
@@ -257,12 +268,24 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const submitForm = async (formData: BookingFormI) => {
     if (!watchedAddress) {
       document?.getElementById("address")?.focus();
+      setError("address", {
+        type: "manual",
+        message: "L'indirizzo non è valido. Inserisci un indirizzo corretto.",
+      });
       showToast({
         message: "L'indirizzo non è valido. Inserisci un indirizzo corretto.",
         type: ToastStatusEnum.ERROR,
       });
       return;
     }
+    if (!selectedService) {
+      setError("service_id", {
+        type: "manual",
+        message: "Seleziona un servizio valido.",
+      });
+      return;
+    }
+    debugger;
     if (isValid) {
       try {
         showLoader();
@@ -275,10 +298,22 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )
           .map((extra) => extra.id);
 
-        const newBooking = await BookingsService.createBooking({
-          ...formData,
-          extras,
-        });
+        let newBooking: BookingI;
+
+        if (edit && booking?.id) {
+          debugger;
+          newBooking = await BookingsService.updateBooking({
+            ...booking,
+            ...formData,
+            extras,
+            id: booking.id,
+          });
+        } else {
+          newBooking = await BookingsService.createBooking({
+            ...formData,
+            extras,
+          });
+        }
 
         showToast({
           message: "Prenotazione creata!",
@@ -389,7 +424,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         <Controller
           name="service_id"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: !(edit && booking?.notice_id && noticeProposal) }}
           render={({ field }) =>
             serviceOptions && serviceOptions?.length > 1 ? (
               <Select
@@ -469,7 +504,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           control={control}
           rules={{
             required: true,
-            min: (selectedService as ServiceI)?.min_unit || (selectedService as ServiceCatalogItem)?.minimum_duration_hours || 1,
+            min:
+              (selectedService as ServiceI)?.min_unit ||
+              (selectedService as ServiceCatalogItem)?.minimum_duration_hours ||
+              1,
             max: (selectedService as ServiceI)?.max_unit || 24,
           }}
           render={({ field }) => (
@@ -477,9 +515,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               {...field}
               role={RolesEnum.VIGIL}
               label={`Durata (${ServicesUtils.getServiceUnitType(
-                ((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type) as string,
+                ((selectedService as ServiceI)?.unit_type ||
+                  (selectedService as ServiceCatalogItem)?.type) as string,
               )})`}
-              min={(selectedService as ServiceI)?.min_unit || (selectedService as ServiceCatalogItem)?.minimum_duration_hours || 1}
+              min={
+                (selectedService as ServiceI)?.min_unit ||
+                (selectedService as ServiceCatalogItem)
+                  ?.minimum_duration_hours ||
+                1
+              }
               max={(selectedService as ServiceI)?.max_unit || 24}
               required
               error={errors.quantity}
@@ -491,14 +535,30 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           <SearchAddress
             location
             role={RolesEnum.VIGIL}
-            onSubmit={(address) =>
-              setValue("address", address?.display_name || "")
-            }
+            onSubmit={(address) => {
+              if (
+                edit &&
+                booking?.notice_id &&
+                noticeProposal?.postal_code &&
+                address.address?.postcode !== noticeProposal.postal_code
+              ) {
+                setError("address", {
+                  type: "manual",
+                  message:
+                    "Non è possibile modificare l'indirizzo in quanto diverso da quello indicato nella proposta di servizio.",
+                });
+                return;
+              } else {
+                clearErrors("address");
+              }
+              setValue("address", address?.display_name || "");
+            }}
             label="Indirizzo"
             placeholder="Inserisci l'indirizzo per il Vigil"
             autoFocus={false}
             id="address"
             name="address"
+            error={errors.address}
           />
         </div>
 
@@ -546,7 +606,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                           <div className="flex items-center justify-between mb-2">
                             <p className="font-medium">{extra.name}</p>
                             <p className="font-medium text-consumer-blue">
-                              {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
+                              {(selectedService as ServiceI)?.currency ||
+                                CurrencyEnum.EURO}
                               {amountDisplay(extra.fixed_price)}
                             </p>
                           </div>
@@ -591,17 +652,25 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 </p>
                 <p>
                   Prezzo per&nbsp;
-                  {ServicesUtils.getServiceUnitType((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type)}
+                  {ServicesUtils.getServiceUnitType(
+                    (selectedService as ServiceI)?.unit_type ||
+                      (selectedService as ServiceCatalogItem)?.type,
+                  )}
                   :&nbsp;
                   {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
                   {amountDisplay(
-                    ((selectedService as ServiceI)?.unit_price || (selectedService as ServiceCatalogItem)?.min_hourly_rate) +
+                    ((selectedService as ServiceI)?.unit_price ||
+                      (selectedService as ServiceCatalogItem)
+                        ?.min_hourly_rate) +
                       (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
                   )}
                 </p>
                 <p>
                   Quantità:&nbsp;{watchedDuration}&nbsp;
-                  {ServicesUtils.getServiceUnitType((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type)}
+                  {ServicesUtils.getServiceUnitType(
+                    (selectedService as ServiceI)?.unit_type ||
+                      (selectedService as ServiceCatalogItem)?.type,
+                  )}
                 </p>
                 {extraOptions?.length ? (
                   <div>
@@ -622,7 +691,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   </div>
                 ) : null}
                 <p className="font-medium pt-2 mt-2 border-t border-gray-200">
-                  Totale:&nbsp;{(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}&nbsp;
+                  Totale:&nbsp;
+                  {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
+                  &nbsp;
                   {amountDisplay(
                     totalAmount +
                       (extraOptions?.length

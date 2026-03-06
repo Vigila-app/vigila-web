@@ -10,7 +10,7 @@ import { VigilDetailsType } from "@/src/types/vigil.types";
 export type BookingI = {
   id: string;
   active: boolean;
-  service_id: ServiceI["id"];
+  service_id?: ServiceI["id"];
   consumer_id: UserType["id"];
   vigil_id: UserType["id"];
   notice_id?: string;

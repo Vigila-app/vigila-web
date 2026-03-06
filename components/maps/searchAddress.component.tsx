@@ -3,8 +3,8 @@
 import { FormFieldType } from "@/src/constants/form.constants";
 import { MapsService } from "@/src/services";
 import { useDebouncedSearch } from "@/src/hooks/useDebouncedSearch";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, FieldError, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
 import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
@@ -29,6 +29,7 @@ const SearchAddress = (props: {
   debounce?: number;
   addressTypes?: string[];
   resetOnSubmit?: boolean;
+  error?: FieldError;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -44,7 +45,12 @@ const SearchAddress = (props: {
     debounce = 1500,
     addressTypes,
     resetOnSubmit = false,
+    error: externalError,
   } = props;
+
+  const error = useMemo(() => {
+    return externalError;
+  }, [externalError]);
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
     "",
@@ -261,6 +267,11 @@ const SearchAddress = (props: {
           </ul>
         </div>
       ) : null}
+      {error && (
+        <div className="text-red-500">
+          {error.message || "Si è verificato un errore durante la ricerca dell'indirizzo. Per favore riprova."}
+        </div>
+      )}
       {submitted && !autocompleteResults.length ? (
         <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
       ) : searchTerm && !autocompleteResults.length && !isLoading ? (
