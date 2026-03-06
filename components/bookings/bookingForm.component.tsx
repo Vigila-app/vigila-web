@@ -45,8 +45,8 @@ const calcStartDate = (startDate?: Date | string, delta = 0) => {
       new Date(startDate || "").getFullYear(),
       new Date(startDate || "").getMonth(),
       new Date(startDate || "").getDate(),
-      new Date(startDate || "").getHours(),
-      new Date(startDate || "").getMinutes() + delta,
+      new Date(startDate || "").getHours() + delta,
+      new Date(startDate || "").getMinutes(),
     ),
   );
   const minutes = date.getMinutes();
@@ -168,6 +168,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedDuration = watch("quantity");
   const watchedAddress = watch("address");
   const watchedExtras = watch("extras");
+  const watchedStartDate = watch("startDate");
+  const watchedEndDate = watch("endDate");
+
+  console.log("dates", watchedDuration, watchedStartDate, watchedEndDate);
 
   const selectedService = useMemo(() => {
     if (noticeProposal?.service_type) {
@@ -487,6 +491,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   ),
                 );
                 field.onChange(utc.toISOString()); // salva in UTC
+                // aggiorna endDate in base alla nuova startDate
+                setValue(
+                  "endDate",
+                  calcStartDate(
+                    utc.toISOString(),
+                    Math.max(1, Number(watchedDuration)),
+                  ),
+                );
               }}
               // set min to today and max to 3 months from today
               min={new Date(
@@ -531,6 +543,17 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   ?.minimum_duration_hours ||
                 1
               }
+              onChange={(newQty) => {
+                field.onChange(newQty);
+                // aggiorna endDate in base alla nuova quantity
+                setValue(
+                  "endDate",
+                  calcStartDate(
+                    watchedStartDate,
+                    Math.max(1, Number(newQty)),
+                  ),
+                );
+              }}
               max={(selectedService as ServiceI)?.max_unit || 24}
               required
               error={errors.quantity}
