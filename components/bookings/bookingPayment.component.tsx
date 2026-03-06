@@ -139,7 +139,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   };
 
   useEffect(() => {
-    if (booking?.id && service?.id && paymentMethod === "stripe") {
+    if (booking?.id && (service?.id || booking?.notice_id) && paymentMethod === "stripe") {
       loadBookingAndCreatePayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
