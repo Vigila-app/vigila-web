@@ -5,6 +5,7 @@ import { BookingsService } from "./bookings.service";
 import { CalendarService } from "./calendar.service";
 import { CmsService } from "./cms.service";
 import { MapsService } from "./maps.service";
+import { MatchingService } from "./matching.service";
 import { PaymentService } from "./payment.service";
 import { ReviewsService } from "./reviews.service";
 import { ServicesService } from "./services.service";
@@ -19,6 +20,7 @@ export {
   CalendarService,
   CmsService,
   MapsService,
+  MatchingService,
   PaymentService,
   ReviewsService,
   ServicesService,

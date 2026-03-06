@@ -140,6 +140,10 @@ const apiControllers = {
   // region CALENDAR
   CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
   // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
+  // endregion MATCHING
 };
 
 export const apiUser = {
@@ -301,5 +305,9 @@ export const apiCalendar = {
   // Available Slots API
   AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
+};
+
+export const apiMatching = {
+  MATCH: (isMock?: boolean): string => apiControllers.MATCHING(isMock),
 };
 

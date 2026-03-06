@@ -1,0 +1,522 @@
+import { NextRequest, NextResponse } from "next/server";
+import {
+  authenticateUser,
+  getAdminClient,
+  jsonErrorResponse,
+} from "@/server/api.utils.server";
+import { ResponseCodesConstants } from "@/src/constants";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { MatchingRequestI, MatchedVigilI } from "@/src/types/matching.types";
+import {
+  VigilAvailabilityRuleI,
+  VigilUnavailabilityI,
+} from "@/src/types/calendar.types";
+
+/**
+ * Parse a time string "HH:MM" or an integer hour to a numeric hour (0-23).
+ * Handles both DB storage formats (SMALLINT integer or TIME-like string).
+ */
+function parseTimeToHour(time: string | number): number {
+  if (typeof time === "number") return time;
+  return parseInt(time.split(":")[0], 10);
+}
+
+/**
+ * Get all dates (as "YYYY-MM-DD" strings) within [startDate, endDate] that fall
+ * on the specified weekday (0=Sunday, ..., 6=Saturday).
+ */
+function getDatesForWeekday(
+  startDate: Date,
+  endDate: Date,
+  weekday: number
+): string[] {
+  const dates: string[] = [];
+  const current = new Date(startDate);
+
+  // Advance to the first occurrence of the requested weekday
+  const daysUntilWeekday = (weekday - current.getDay() + 7) % 7;
+  current.setDate(current.getDate() + daysUntilWeekday);
+
+  while (current <= endDate) {
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, "0");
+    const day = String(current.getDate()).padStart(2, "0");
+    dates.push(`${year}-${month}-${day}`);
+    current.setDate(current.getDate() + 7);
+  }
+
+  return dates;
+}
+
+/**
+ * Check whether a vigil availability rule covers a specific slot.
+ * A rule covers a slot when:
+ * - rule weekday matches the requested weekday
+ * - rule start_time <= requested start hour
+ * - rule end_time >= requested end hour
+ * - rule is valid on the given date (valid_from <= date <= valid_to or valid_to is null)
+ */
+function ruleCoversSlot(
+  rule: VigilAvailabilityRuleI,
+  weekday: number,
+  startHour: number,
+  endHour: number,
+  date: string
+): boolean {
+  if (rule.weekday !== weekday) return false;
+  const ruleStart = parseTimeToHour(rule.start_time);
+  const ruleEnd = parseTimeToHour(rule.end_time);
+  if (ruleStart > startHour) return false;
+  if (ruleEnd < endHour) return false;
+  if (rule.valid_from > date) return false;
+  if (rule.valid_to && rule.valid_to < date) return false;
+  return true;
+}
+
+/**
+ * Check whether a vigil unavailability overlaps with a requested time slot on a given date.
+ * Times are compared in UTC.
+ */
+function unavailabilityBlocksSlot(
+  unav: VigilUnavailabilityI,
+  date: string,
+  startHour: number,
+  endHour: number
+): boolean {
+  const slotStart = new Date(
+    `${date}T${String(startHour).padStart(2, "0")}:00:00Z`
+  );
+  const slotEnd = new Date(
+    `${date}T${String(endHour).padStart(2, "0")}:00:00Z`
+  );
+  const unavStart = new Date(unav.start_at);
+  const unavEnd = new Date(unav.end_at);
+  return unavStart < slotEnd && unavEnd > slotStart;
+}
+
+/**
+ * POST /api/v1/matching
+ *
+ * Multi-phase Vigil matching algorithm.
+ *
+ * Phase 1: Filter vigils by required services, CAP, and gender preference.
+ * Phase 2: Check availability against the requested schedule; count compatible slots.
+ * Phase 3 (when > 5 candidates remain): Rank by review quality (count + average).
+ *
+ * Early exits:
+ * - No vigils after Phase 1 → empty list
+ * - Perfect match found in Phase 2 → return that vigil immediately
+ * - No vigils with compatible slots → empty list
+ * - 5 or fewer vigils with compatible slots → return sorted list (skip Phase 3)
+ */
+export async function POST(req: NextRequest) {
+  try {
+    console.log("API POST matching");
+
+    // ──────────────────────────────────────────────────
+    // Auth: only Consumers can use this endpoint
+    // ──────────────────────────────────────────────────
+    const userObject = await authenticateUser(req);
+    if (!userObject?.id) {
+      return jsonErrorResponse(401, {
+        code: ResponseCodesConstants.MATCHING_UNAUTHORIZED.code,
+        success: false,
+      });
+    }
+    if (userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.MATCHING_FORBIDDEN.code,
+        success: false,
+      });
+    }
+
+    // ──────────────────────────────────────────────────
+    // Parse & validate request body
+    // ──────────────────────────────────────────────────
+    const body: MatchingRequestI = await req.json();
+    const { selectedDays, schedule, dates, address } = body;
+
+    if (
+      !selectedDays ||
+      !Array.isArray(selectedDays) ||
+      selectedDays.length === 0 ||
+      !schedule ||
+      !dates?.startDate ||
+      !dates?.endDate ||
+      !address?.postcode
+    ) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    const startDate = new Date(dates.startDate);
+    const endDate = new Date(dates.endDate);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    if (endDate < startDate) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    const postcode = address.postcode;
+    const _admin = getAdminClient();
+
+    // ══════════════════════════════════════════════════
+    // PHASE 1 – Basic filtering
+    // ══════════════════════════════════════════════════
+
+    // 1a. Fetch the consumer's preferences (gender preference lives in consumers_data)
+    const { data: consumerData } = await _admin
+      .from("consumers_data")
+      .select("*")
+      .eq("consumer_id", userObject.id)
+      .maybeSingle();
+
+    const genderPreference: string | null =
+      // "gender-preference" uses kebab-case as stored in the DB column name
+      consumerData?.["gender-preference"] ?? null;
+
+    // 1b. Collect unique service types required across all scheduled days
+    const serviceTypes = Array.from(
+      new Set(
+        selectedDays
+          .map((day: number) => schedule[String(day)]?.service)
+          .filter(Boolean)
+      )
+    ) as string[];
+
+    if (serviceTypes.length === 0) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    // 1c. Find vigil IDs that offer EACH required service type (active services only)
+    const vigilIdSetsByType = await Promise.all(
+      serviceTypes.map(async (type: string) => {
+        const { data } = await _admin
+          .from("services")
+          .select("vigil_id")
+          .eq("type", type)
+          .eq("active", true);
+        return new Set<string>((data || []).map((s: any) => s.vigil_id));
+      })
+    );
+
+    // Intersect: keep only vigils that offer ALL required types
+    const eligibleVigilIds = vigilIdSetsByType.reduce(
+      (acc, set) =>
+        new Set<string>(Array.from(acc).filter((id) => set.has(id))),
+      vigilIdSetsByType[0]
+    );
+
+    if (!eligibleVigilIds || eligibleVigilIds.size === 0) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: [],
+          success: true,
+          message: "No vigils found offering all required services",
+        },
+        { status: 200 }
+      );
+    }
+
+    const eligibleVigilIdArray = Array.from(eligibleVigilIds);
+
+    // 1d. Query vigils filtered by CAP, status, and (first attempt) gender preference
+    const shouldFilterByGender =
+      !!genderPreference &&
+      genderPreference !== "no_preference" &&
+      genderPreference !== "none";
+
+    let vigils: any[] = [];
+
+    if (shouldFilterByGender) {
+      const { data: vigilsWithGender } = await _admin
+        .from("vigils")
+        .select("*")
+        .eq("status", "active")
+        .contains("cap", [postcode])
+        .in("id", eligibleVigilIdArray)
+        .eq("gender", genderPreference)
+        .limit(20);
+
+      vigils = vigilsWithGender || [];
+    }
+
+    // 1e. If fewer than 10 results, retry without gender filter and merge
+    if (vigils.length < 10) {
+      const existingIds = new Set(vigils.map((v: any) => v.id));
+      const remaining = 20 - vigils.length;
+      // Only query vigils not already in the first result set
+      const remainingVigilIds = eligibleVigilIdArray.filter(
+        (id) => !existingIds.has(id)
+      );
+
+      if (remainingVigilIds.length > 0) {
+        const { data: additionalVigils } = await _admin
+          .from("vigils")
+          .select("*")
+          .eq("status", "active")
+          .contains("cap", [postcode])
+          .in("id", remainingVigilIds)
+          .limit(remaining);
+
+        vigils = [...vigils, ...(additionalVigils || [])];
+      }
+    }
+
+    // 1f. Early exit: no vigils found at all
+    if (vigils.length === 0) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: [],
+          success: true,
+          message: "No vigils found for this search",
+        },
+        { status: 200 }
+      );
+    }
+
+    // ══════════════════════════════════════════════════
+    // PHASE 2 – Availability matching
+    // ══════════════════════════════════════════════════
+
+    const vigilIds = vigils.map((v: any) => v.id);
+
+    // Pre-compute all occurrence dates per requested weekday inside the date range
+    const slotsByWeekday = new Map<
+      number,
+      { dates: string[]; startHour: number; endHour: number; service: string }
+    >();
+
+    for (const day of selectedDays) {
+      const entry = schedule[String(day)];
+      if (!entry) continue;
+      const startHour = parseTimeToHour(entry.start);
+      const endHour = parseTimeToHour(entry.end);
+      const occurrenceDates = getDatesForWeekday(startDate, endDate, day);
+      slotsByWeekday.set(day, {
+        dates: occurrenceDates,
+        startHour,
+        endHour,
+        service: entry.service,
+      });
+    }
+
+    // Total number of requested slot-occurrences
+    let totalSlots = 0;
+    slotsByWeekday.forEach((slotInfo) => {
+      totalSlots += slotInfo.dates.length;
+    });
+
+    // Batch-fetch availability rules for all candidate vigils (filtered to date range)
+    const { data: allRules } = await _admin
+      .from("vigil_availability_rules")
+      .select("*")
+      .in("vigil_id", vigilIds)
+      .lte("valid_from", dates.endDate)
+      .or(`valid_to.is.null,valid_to.gte.${dates.startDate}`);
+
+    // Batch-fetch unavailabilities for all candidate vigils (overlapping the date range)
+    const { data: allUnavailabilities } = await _admin
+      .from("vigil_unavailabilities")
+      .select("*")
+      .in("vigil_id", vigilIds)
+      .lte("start_at", `${dates.endDate}T23:59:59Z`)
+      .gte("end_at", `${dates.startDate}T00:00:00Z`);
+
+    // Index rules and unavailabilities by vigil ID for O(1) lookup
+    const rulesByVigilId = new Map<string, VigilAvailabilityRuleI[]>();
+    const unavByVigilId = new Map<string, VigilUnavailabilityI[]>();
+
+    for (const rule of (allRules || []) as VigilAvailabilityRuleI[]) {
+      if (!rulesByVigilId.has(rule.vigil_id)) {
+        rulesByVigilId.set(rule.vigil_id, []);
+      }
+      rulesByVigilId.get(rule.vigil_id)!.push(rule);
+    }
+
+    for (const unav of (allUnavailabilities || []) as VigilUnavailabilityI[]) {
+      if (!unavByVigilId.has(unav.vigil_id)) {
+        unavByVigilId.set(unav.vigil_id, []);
+      }
+      unavByVigilId.get(unav.vigil_id)!.push(unav);
+    }
+
+    // Count compatible slots per vigil; detect perfect matches early
+    const vigilScores: Array<{ vigil: any; compatibleSlots: number }> = [];
+    let perfectMatch: any = null;
+
+    for (const vigil of vigils) {
+      const rules = rulesByVigilId.get(vigil.id) || [];
+      const unavs = unavByVigilId.get(vigil.id) || [];
+      let compatibleSlots = 0;
+
+      const slotEntries = Array.from(slotsByWeekday.entries());
+      for (const [weekday, slotInfo] of slotEntries) {
+        const { dates: occurrenceDates, startHour, endHour } = slotInfo;
+
+        for (const date of occurrenceDates) {
+          const hasCompatibleRule = rules.some((rule) =>
+            ruleCoversSlot(rule, weekday, startHour, endHour, date)
+          );
+          if (!hasCompatibleRule) continue;
+
+          const isBlocked = unavs.some((unav) =>
+            unavailabilityBlocksSlot(unav, date, startHour, endHour)
+          );
+          if (!isBlocked) {
+            compatibleSlots++;
+          }
+        }
+
+        // Early exit from weekday loop if all slots are already covered
+        if (compatibleSlots === totalSlots) break;
+      }
+
+      if (compatibleSlots > 0) {
+        vigilScores.push({ vigil, compatibleSlots });
+
+        if (compatibleSlots === totalSlots) {
+          perfectMatch = vigil;
+          break; // Stop processing remaining vigils – perfect match found
+        }
+      }
+    }
+
+    // Early exit: no vigil has any compatible slots
+    if (vigilScores.length === 0) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: [],
+          success: true,
+          message: "No vigils available for the requested schedule",
+        },
+        { status: 200 }
+      );
+    }
+
+    // Early exit: perfect match
+    if (perfectMatch) {
+      const result: MatchedVigilI = {
+        ...perfectMatch,
+        compatibleSlots: totalSlots,
+        totalSlots,
+        averageRating: 0,
+        reviewCount: 0,
+      };
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: [result],
+          success: true,
+          perfectMatch: true,
+        },
+        { status: 200 }
+      );
+    }
+
+    // Sort candidates by compatible slots (descending)
+    vigilScores.sort((a, b) => b.compatibleSlots - a.compatibleSlots);
+
+    // Early exit: 5 or fewer candidates – return sorted list without quality ranking
+    if (vigilScores.length <= 5) {
+      const results: MatchedVigilI[] = vigilScores.map((s) => ({
+        ...s.vigil,
+        compatibleSlots: s.compatibleSlots,
+        totalSlots,
+        averageRating: 0,
+        reviewCount: 0,
+      }));
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: results,
+          success: true,
+        },
+        { status: 200 }
+      );
+    }
+
+    // ══════════════════════════════════════════════════
+    // PHASE 3 – Quality ranking (reviews)
+    // ══════════════════════════════════════════════════
+
+    const topVigilIds = vigilScores.map((s) => s.vigil.id);
+
+    const { data: reviews } = await _admin
+      .from("reviews")
+      .select("vigil_id, rating")
+      .in("vigil_id", topVigilIds)
+      .eq("visible", true);
+
+    // Aggregate review statistics per vigil
+    const reviewStatsByVigilId = new Map<
+      string,
+      { count: number; total: number }
+    >();
+    for (const review of reviews || []) {
+      if (!reviewStatsByVigilId.has(review.vigil_id)) {
+        reviewStatsByVigilId.set(review.vigil_id, { count: 0, total: 0 });
+      }
+      const stats = reviewStatsByVigilId.get(review.vigil_id)!;
+      stats.count++;
+      stats.total += review.rating;
+    }
+
+    // Build final ranked list: sort by (compatibleSlots DESC, reviewCount DESC, avgRating DESC)
+    const rankedResults: MatchedVigilI[] = vigilScores
+      .map((s) => {
+        const reviewStats = reviewStatsByVigilId.get(s.vigil.id);
+        const reviewCount = reviewStats?.count ?? 0;
+        const averageRating =
+          reviewCount > 0 ? reviewStats!.total / reviewCount : 0;
+        return {
+          ...s.vigil,
+          compatibleSlots: s.compatibleSlots,
+          totalSlots,
+          averageRating,
+          reviewCount,
+        };
+      })
+      .sort((a, b) => {
+        if (b.compatibleSlots !== a.compatibleSlots)
+          return b.compatibleSlots - a.compatibleSlots;
+        if (b.reviewCount !== a.reviewCount)
+          return b.reviewCount - a.reviewCount;
+        return b.averageRating - a.averageRating;
+      })
+      .slice(0, 5);
+
+    return NextResponse.json(
+      {
+        code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+        data: rankedResults,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Matching API error:", error);
+    return jsonErrorResponse(500, {
+      code: ResponseCodesConstants.MATCHING_ERROR.code,
+      success: false,
+      error,
+    });
+  }
+}

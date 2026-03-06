@@ -707,4 +707,22 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 10404,
   },
   // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING_SUCCESS: {
+    code: 11001,
+  },
+  MATCHING_ERROR: {
+    code: 11002,
+  },
+  MATCHING_BAD_REQUEST: {
+    code: 11003,
+  },
+  MATCHING_UNAUTHORIZED: {
+    code: 11004,
+  },
+  MATCHING_FORBIDDEN: {
+    code: 11005,
+  },
+  // endregion MATCHING
 }
