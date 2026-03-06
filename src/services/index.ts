@@ -2,6 +2,7 @@ import { AdminService } from "./admin.service";
 import { ApiService } from "./api.service";
 import { AuthService } from "./auth.service";
 import { BookingsService } from "./bookings.service";
+import { CalendarService } from "./calendar.service";
 import { CmsService } from "./cms.service";
 import { MapsService } from "./maps.service";
 import { PaymentService } from "./payment.service";
@@ -15,6 +16,7 @@ export {
   ApiService,
   AuthService,
   BookingsService,
+  CalendarService,
   CmsService,
   MapsService,
   PaymentService,

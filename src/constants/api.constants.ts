@@ -143,6 +143,10 @@ const apiControllers = {
   NOTICE_BOARD: (isMock?: boolean): string =>
     `${apiBase.V1(isMock)}/notice-board`,
   // endregion PUBLIC
+
+  // region CALENDAR
+  CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
+  // endregion CALENDAR
 };
 
 export const apiUser = {
@@ -292,3 +296,29 @@ export const apiNoticeBoard = {
   PROPOSE: (noticeId: string, isMock?: boolean): string =>
     `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : noticeId}`,
 };
+export const apiCalendar = {
+  // Consumer APIs
+  CONSUMER: (isMock?: boolean): string => 
+    `${apiControllers.CALENDAR(isMock)}/consumer`,
+  
+  // Vigil Calendar APIs
+  VIGIL_BOOKINGS: (isMock?: boolean): string => 
+    `${apiControllers.CALENDAR(isMock)}/vigil/bookings`,
+  
+  // Availability Rules APIs
+  AVAILABILITY_RULES: (isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/availability-rules`,
+  AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
+  
+  // Unavailabilities APIs
+  UNAVAILABILITIES: (isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/unavailabilities`,
+  UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
+  
+  // Available Slots API
+  AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string => 
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
+};
+

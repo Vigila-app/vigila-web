@@ -14,6 +14,7 @@ The system models a **caregiving services marketplace** where:
 * **Bookings** track service usage
 * **Reviews** are linked one-to-one with bookings
 * **Wallets** and **wallet transactions** manage payments and balances
+* **Calendar & Availability** system manages vigil schedules and slot availability
 
 ---
 
@@ -49,10 +50,41 @@ Represents end users who book services.
 * One consumer → many `bookings`
 * One consumer → many `wallet_transactions`
 * One consumer → one `wallet`
+* One consumer → one `consumers-data`
 
 ---
 
-### 2. `vigils`
+### 2. `consumers-data`
+
+Extension table for consumer onboarding information.
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `consumer_id` → `consumers.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `consumer_id` (uuid, FK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `autonomy` (text)
+* `needs` (text[], variable-length multidimensional array)
+* `gender-preference` (text)
+* `attitude` (text[], variable-length multidimensional array)
+* `qualifications` (text)
+* `transportation` (text)
+* `experience` (text)
+
+**Relationships**:
+
+* One consumers-data → one `consumer`
+
+---
+
+### 3. `vigils`
 
 Represents service providers.
 
@@ -83,7 +115,7 @@ Represents service providers.
 
 ---
 
-### 3. `services`
+### 4. `services`
 
 Defines services offered by vigils.
 
@@ -117,7 +149,7 @@ Defines services offered by vigils.
 
 ---
 
-### 4. `bookings`
+### 5. `bookings`
 
 Represents a service booking made by a consumer.
 
@@ -156,7 +188,7 @@ Represents a service booking made by a consumer.
 
 ---
 
-### 5. `reviews`
+### 6. `reviews`
 
 Stores feedback left after a booking.
 
@@ -186,7 +218,7 @@ Stores feedback left after a booking.
 
 ---
 
-### 6. `wallets`
+### 7. `wallets`
 
 Tracks balances for consumers.
 
@@ -212,7 +244,7 @@ Tracks balances for consumers.
 
 ---
 
-### 7. `wallet_transactions`
+### 8. `wallet_transactions`
 
 Represents money movements within wallets.
 
@@ -290,10 +322,79 @@ Tracks public homepage search requests for statistical analysis of service deman
 
 ---
 
+### 10. `vigil_availability_rules`
+
+Stores weekly recurring availability patterns for Vigils.
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `vigil_id` → `vigils.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `vigil_id` (uuid, FK)
+* `weekday` (smallint, 0-6, where 0=Sunday)
+* `start_time` (smallint, 0-23)
+* `end_time` (smallint, 1-24)
+* `valid_from` (date)
+* `valid_to` (date, nullable)
+
+**Relationships**:
+
+* One vigil → many `vigil_availability_rules`
+
+**Constraints**:
+
+* `weekday` must be between 0 and 6
+* `start_time` must be between 0 and 23
+* `end_time` must be between 1 and 24
+* `end_time` must be greater than `start_time`
+* If `valid_to` is set, it must be >= `valid_from`
+
+---
+
+### 11. `vigil_unavailabilities`
+
+Stores specific date/time ranges when a Vigil is unavailable (overrides availability rules).
+
+**Primary Key**: `id`
+
+**Foreign Keys**:
+
+* `vigil_id` → `vigils.id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `vigil_id` (uuid, FK)
+* `start_at` (timestamptz)
+* `end_at` (timestamptz)
+* `reason` (text, nullable)
+
+**Relationships**:
+
+* One vigil → many `vigil_unavailabilities`
+
+**Constraints**:
+
+* `end_at` must be greater than `start_at`
+
+---
+
 ## Key Relationships Summary
 
 * **Consumer → Booking**: one-to-many
+* **Consumer → Consumers-Data**: one-to-one
 * **Vigil → Service**: one-to-many
+* **Vigil → Availability Rules**: one-to-many
+* **Vigil → Unavailabilities**: one-to-many
 * **Service → Booking**: one-to-many
 * **Booking → Review**: one-to-one
 * **Consumer → Wallet**: one-to-one
@@ -308,3 +409,5 @@ Tracks public homepage search requests for statistical analysis of service deman
 * Status fields are string-based enums (no DB-level enum enforcement)
 * JSON / JSONB fields are used for flexible, semi-structured data
 * Referential integrity is enforced via foreign keys
+* **Calendar System**: All times are stored in UTC; slot granularity is 1 hour
+* **Availability Priority**: Unavailabilities override availability rules; bookings always block slots

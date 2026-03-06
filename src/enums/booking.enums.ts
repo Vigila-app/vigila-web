@@ -16,3 +16,9 @@ export enum PaymentStatusEnum {
   FAILED = "failed",
   REFUNDED = "refunded",
 }
+
+  export enum BookingTypeEnum {
+    RECURRING = "recurring",
+    OCCASIONAL = "occasional",
+    TRIAL = "trial"
+  }

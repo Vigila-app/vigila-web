@@ -151,13 +151,13 @@ const MenuMobile = () => {
                     ...(user.user_metadata?.role === RolesEnum.CONSUMER
                       ? {
                           ...Routes.profileConsumer,
-                          url: `${Routes.profileConsumer.url}?tab=prenotazioni`,
-                          label: "Prenotazioni",
+                          url: `${Routes.profileConsumer.url}?tab=calenadario`,
+                          label: "Calendario",
                         }
                       : {
                           ...Routes.profileVigil,
-                          url: `${Routes.profileVigil.url}?tab=prenotazioni`,
-                          label: "Prenotazioni",
+                          url: `${Routes.profileVigil.url}?tab=calendario`,
+                          label: "Calendario",
                         }),
                   },
                   CalendarDaysIcon,

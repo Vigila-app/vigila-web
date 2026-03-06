@@ -1,17 +1,17 @@
 const baseBtnStyle =
-  "inline-flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition";
+  "flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition active:scale-95";
 const primaryBtnStyle =
   "shadow border-primary-600 bg-primary-600 text-white hover:bg-white hover:text-primary-600";
 const secondaryBtnStyle =
-  "shadow border-primary-600 bg-white text-primary-600 hover:bg-secondary-600 hover:border-secondary-600 hover:text-white";
+  "shadow border-secondary-600 bg-white text-secondary-600 hover:bg-primary-600 hover:border-primary-600 hover:text-white";
 const textBtnStyle =
-  "border-transparent bg-transparent text-primary-600 hover:text-primary-700";
+  "border-gray-300 bg-white text-black hover:text-gray-700 hover:bg-gray-100 focus:ring-gray-300";
 const dangerBtnStyle =
   "border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500";
 
 const disabledBtnStyle = "opacity-50";
 const loadingBtnStyle = "cursor-wait";
-const fullBtnStyle = "w-full justify-center";
+const fullBtnStyle = "w-full";
 const tabBtnStyle = "bg-white text-black";
 const smallBtnStyle = "w-15 h-8 flex items-center justify-center text-xs";
 

@@ -21,7 +21,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 import clsx from "clsx";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesService } from "@/src/services";
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/onboarding.enums";
 
 type ServiceCardI = {
   service: ServiceI;
