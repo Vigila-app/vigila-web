@@ -30,13 +30,14 @@ const SearchAddress = dynamic(
 );
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
-import { FrequencyEnum } from "@/src/enums/common.enums";
+import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { ReviewsUtils } from "@/src/utils/reviews.utils";
 import clsx from "clsx";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { NoticeBoardService } from "@/src/services/notice-board.service";
 import { NoticeBoardI } from "@/src/types/notice-board.types";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -95,11 +96,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   useEffect(() => {
     if (booking?.notice_id) {
       const getNoticeDetails = async () => {
-        const notice = await NoticeBoardService.getNoticeDetails(booking.notice_id as string);
+        const notice = await NoticeBoardService.getNoticeDetails(
+          booking.notice_id as string,
+        );
         if (notice) {
           setNoticeProposal(notice);
         }
-      }
+      };
       getNoticeDetails();
     }
   }, [booking?.notice_id]);
@@ -146,6 +149,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedExtras = watch("extras");
 
   const selectedService = useMemo(() => {
+    if (noticeProposal?.service_type) {
+      const service = ServicesService.getServicesByType(
+        noticeProposal.service_type as ServiceCatalogTypeEnum,
+      );
+      if (service) return service;
+    }
     if (!(watchedServiceId && serviceId && booking?.service_id)) return;
     if (services?.length && (serviceId || booking?.service_id)) {
       const found =
@@ -166,7 +175,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedServiceId, services, serviceId, vigilId, booking]);
+  }, [
+    watchedServiceId,
+    services,
+    serviceId,
+    vigilId,
+    booking,
+    noticeProposal?.service_type,
+  ]);
 
   useEffect(() => {
     if (vigilId || booking?.vigil_id) {
@@ -175,24 +191,43 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId, booking?.vigil_id]);
 
-  const serviceCatalog: ServiceCatalogItem = useMemo(
-    () =>
-      selectedService?.info?.catalog_id &&
-      ServicesService.getServiceCatalogById(selectedService.info.catalog_id),
-    [selectedService],
-  );
+  const serviceCatalog: ServiceCatalogItem = useMemo(() => {
+    if ((selectedService as ServiceI)?.info) {
+      return (
+        (selectedService as ServiceI)?.info?.catalog_id &&
+        ServicesService.getServiceCatalogById(
+          (selectedService as ServiceI).info?.catalog_id,
+        )
+      );
+    }
+    if (noticeProposal?.service_type) {
+      const service = ServicesService.getServicesByType(
+        noticeProposal.service_type as ServiceCatalogTypeEnum,
+      );
+      if (service) return service;
+    }
+    return;
+  }, [selectedService, noticeProposal?.service_type]);
 
   useEffect(() => {
     if (
-      selectedService?.min_unit &&
+      ((selectedService as ServiceI)?.min_unit ||
+        (selectedService as ServiceCatalogItem)?.minimum_duration_hours) &&
       watchedDuration &&
-      watchedDuration < selectedService.min_unit
+      (watchedDuration < (selectedService as ServiceI).min_unit ||
+        watchedDuration <
+          (selectedService as ServiceCatalogItem).minimum_duration_hours)
     ) {
-      setValue("quantity", selectedService.min_unit);
+      setValue(
+        "quantity",
+        (selectedService as ServiceI).min_unit ||
+          (selectedService as ServiceCatalogItem).minimum_duration_hours,
+      );
     }
     if (selectedService && watchedDuration) {
       setTotalAmount(
-        (selectedService.unit_price +
+        (((selectedService as ServiceI)?.unit_price ||
+          (selectedService as ServiceCatalogItem)?.min_hourly_rate) +
           (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)) *
           watchedDuration,
       );
@@ -286,9 +321,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   );
 
   const extraOptions = useMemo(() => {
-    if (selectedService?.info?.extras?.length) {
+    if (
+      (selectedService as ServiceI)?.info?.extras?.length ||
+      (selectedService as ServiceCatalogItem)?.extra?.length
+    ) {
       return serviceCatalog.extra.filter((extra) =>
-        selectedService.info?.extras?.find((e: string) => e === extra.id),
+        (
+          (selectedService as ServiceI).info?.extras ||
+          (selectedService as ServiceCatalogItem)?.extra
+        )?.find((e: string) => e === extra.id),
       );
     }
     return undefined;
@@ -428,18 +469,18 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           control={control}
           rules={{
             required: true,
-            min: selectedService?.min_unit || 1,
-            max: selectedService?.max_unit,
+            min: (selectedService as ServiceI)?.min_unit || (selectedService as ServiceCatalogItem)?.minimum_duration_hours || 1,
+            max: (selectedService as ServiceI)?.max_unit || 24,
           }}
           render={({ field }) => (
             <InputQuantity
               {...field}
               role={RolesEnum.VIGIL}
               label={`Durata (${ServicesUtils.getServiceUnitType(
-                selectedService?.unit_type as string,
+                ((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type) as string,
               )})`}
-              min={selectedService?.min_unit || 1}
-              max={selectedService?.max_unit || undefined}
+              min={(selectedService as ServiceI)?.min_unit || (selectedService as ServiceCatalogItem)?.minimum_duration_hours || 1}
+              max={(selectedService as ServiceI)?.max_unit || 24}
               required
               error={errors.quantity}
             />
@@ -505,7 +546,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                           <div className="flex items-center justify-between mb-2">
                             <p className="font-medium">{extra.name}</p>
                             <p className="font-medium text-consumer-blue">
-                              {selectedService?.currency}
+                              {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
                               {amountDisplay(extra.fixed_price)}
                             </p>
                           </div>
@@ -550,17 +591,17 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 </p>
                 <p>
                   Prezzo per&nbsp;
-                  {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+                  {ServicesUtils.getServiceUnitType((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type)}
                   :&nbsp;
-                  {selectedService.currency}
+                  {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
                   {amountDisplay(
-                    selectedService.unit_price +
+                    ((selectedService as ServiceI)?.unit_price || (selectedService as ServiceCatalogItem)?.min_hourly_rate) +
                       (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
                   )}
                 </p>
                 <p>
                   Quantità:&nbsp;{watchedDuration}&nbsp;
-                  {ServicesUtils.getServiceUnitType(selectedService.unit_type)}
+                  {ServicesUtils.getServiceUnitType((selectedService as ServiceI)?.unit_type || (selectedService as ServiceCatalogItem)?.type)}
                 </p>
                 {extraOptions?.length ? (
                   <div>
@@ -573,7 +614,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                       )
                       .map(
                         (extra) =>
-                          `${extra.name} (${selectedService.currency}${amountDisplay(extra.fixed_price)})`,
+                          `${extra.name} (${(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}${amountDisplay(extra.fixed_price)})`,
                       )
                       .join(", ")}
                     {Object.values(watchedExtras || {}).filter((v) => v)
@@ -581,7 +622,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   </div>
                 ) : null}
                 <p className="font-medium pt-2 mt-2 border-t border-gray-200">
-                  Totale:&nbsp;{selectedService.currency}&nbsp;
+                  Totale:&nbsp;{(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}&nbsp;
                   {amountDisplay(
                     totalAmount +
                       (extraOptions?.length
