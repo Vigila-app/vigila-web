@@ -11,6 +11,7 @@ export type BookingI = {
   id: string;
   active: boolean;
   service_id?: ServiceI["id"];
+  service_type?: ServiceI["type"];
   consumer_id: UserType["id"];
   vigil_id: UserType["id"];
   notice_id?: string;

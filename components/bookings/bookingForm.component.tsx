@@ -39,6 +39,22 @@ import { NoticeBoardService } from "@/src/services/notice-board.service";
 import { NoticeBoardI } from "@/src/types/notice-board.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
+const calcStartDate = (startDate?: Date | string, delta = 0) => {
+  const date = new Date(
+    Date.UTC(
+      new Date(startDate || "").getFullYear(),
+      new Date(startDate || "").getMonth(),
+      new Date(startDate || "").getDate(),
+      new Date(startDate || "").getHours(),
+      new Date(startDate || "").getMinutes() + delta,
+    ),
+  );
+  const minutes = date.getMinutes();
+  const roundedMinutes = Math.round(minutes / 5) * 5;
+  date.setMinutes(roundedMinutes);
+  return date.toISOString() as unknown as Date;
+};
+
 type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
@@ -107,8 +123,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
   }, [booking?.notice_id]);
 
-  console.log("noticeProposal", noticeProposal);
-
   const { vigils, getVigilsDetails } = useVigilStore();
   const vigilDetails = useMemo(() => {
     const found = vigils.find(
@@ -142,15 +156,11 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       service_id: booking?.service_id || serviceId,
       consumer_id: booking?.consumer_id || user?.id,
       quantity: booking?.quantity || booking?.min_unit || 1,
-      startDate: new Date(
-        Date.UTC(
-          new Date(booking?.startDate || "").getFullYear(),
-          new Date(booking?.startDate || "").getMonth(),
-          new Date(booking?.startDate || "").getDate(),
-          new Date(booking?.startDate || "").getHours(),
-          new Date(booking?.startDate || "").getMinutes(),
-        ),
-      ).toISOString() as unknown as Date,
+      startDate: calcStartDate(booking?.startDate),
+      endDate: calcStartDate(
+        calcStartDate(booking?.startDate),
+        booking?.quantity || booking?.min_unit || 1,
+      ),
     },
   });
 
@@ -285,7 +295,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       });
       return;
     }
-    debugger;
+
     if (isValid) {
       try {
         showLoader();
@@ -301,10 +311,10 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         let newBooking: BookingI;
 
         if (edit && booking?.id) {
-          debugger;
           newBooking = await BookingsService.updateBooking({
             ...booking,
             ...formData,
+            service_type: (selectedService as ServiceI)?.type,
             extras,
             id: booking.id,
           });
@@ -312,6 +322,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           newBooking = await BookingsService.createBooking({
             ...formData,
             extras,
+            service_type: (selectedService as ServiceI)?.type,
           });
         }
 
@@ -370,10 +381,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     return undefined;
   }, [selectedService, serviceCatalog]);
 
-  console.log("selectedService", selectedService);
-  console.log("services", services);
-  console.log("serviceOptions", serviceOptions);
-
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
@@ -431,7 +438,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 {...field}
                 label="Servizio richiesto"
                 placeholder="Seleziona un servizio"
-                required
+                required={!(edit && booking?.notice_id && noticeProposal)}
                 error={errors.service_id}
                 options={serviceOptions}
                 disabled={!!selectedService?.id}
@@ -442,7 +449,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 label="Servizio"
                 type="text"
                 disabled
-                required
+                required={!(edit && booking?.notice_id && noticeProposal)}
                 role={RolesEnum.VIGIL}
                 error={errors.service_id}
                 value={selectedService?.name || ""}
@@ -531,36 +538,41 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           )}
         />
 
-        <div>
-          <SearchAddress
-            location
-            role={RolesEnum.VIGIL}
-            onSubmit={(address) => {
-              if (
-                edit &&
-                booking?.notice_id &&
-                noticeProposal?.postal_code &&
-                address.address?.postcode !== noticeProposal.postal_code
-              ) {
-                setError("address", {
-                  type: "manual",
-                  message:
-                    "Non è possibile modificare l'indirizzo in quanto diverso da quello indicato nella proposta di servizio.",
-                });
-                return;
-              } else {
-                clearErrors("address");
-              }
-              setValue("address", address?.display_name || "");
-            }}
-            label="Indirizzo"
-            placeholder="Inserisci l'indirizzo per il Vigil"
-            autoFocus={false}
-            id="address"
-            name="address"
-            error={errors.address}
-          />
-        </div>
+        <Controller
+          name="address"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <SearchAddress
+              location
+              role={RolesEnum.VIGIL}
+              onSubmit={(address) => {
+                if (
+                  edit &&
+                  booking?.notice_id &&
+                  noticeProposal?.postal_code &&
+                  address.address?.postcode !== noticeProposal.postal_code
+                ) {
+                  setError("address", {
+                    type: "manual",
+                    message:
+                      "Non è possibile modificare l'indirizzo in quanto diverso da quello indicato nella proposta di servizio.",
+                  });
+                  return;
+                } else {
+                  clearErrors("address");
+                }
+                field.onChange(address?.display_name || "");
+              }}
+              label="Indirizzo"
+              placeholder="Inserisci l'indirizzo per il Vigil"
+              autoFocus={false}
+              id="address"
+              name="address"
+              error={errors.address}
+            />
+          )}
+        />
 
         <Controller
           name="note"

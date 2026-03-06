@@ -16,6 +16,7 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
+import { ServicesService } from "@/src/services";
 
 const verifyBookingAccess = async (
   bookingId: string,
@@ -270,24 +271,44 @@ export async function PUT(
     let allowedUpdates = {};
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       // Consumers can only update certain fields and only if booking is pending
-      if (booking.status === BookingStatusEnum.PENDING) {
-        allowedUpdates = {
-          service_date: updatedBooking.service_date,
-          duration_hours: updatedBooking.duration_hours,
-          notes: updatedBooking.notes,
-          status: updatedBooking.status,
-        };
-      }
-      if (
-        booking.status === BookingStatusEnum.CONFIRMED &&
-        dateDiff(booking.endDate, new Date()) > 24
-      ) {
-        allowedUpdates = {
-          service_date: updatedBooking.service_date,
-          duration_hours: updatedBooking.duration_hours,
-          notes: updatedBooking.notes,
-          status: updatedBooking.status,
-        };
+      switch (booking.status) {
+        case BookingStatusEnum.PENDING:
+        case BookingStatusEnum.PENDING_NOTICE_PROPOSAL:
+          {
+            const service = ServicesService.getServicesByType(booking.service_type || updatedBooking.service_type);
+            const price = service ? ((service?.min_hourly_rate + service?.fee) * updatedBooking.quantity +
+              (updatedBooking.extras?.length
+                ? service.extra
+                    .filter((extra) => (updatedBooking.extras || []).includes(extra.id))
+                    .map((extra) => extra.fixed_price)
+                    .reduce((acc, price) => acc + price, 0)
+                : 0)) : updatedBooking.price;
+            allowedUpdates = {
+              address: updatedBooking.address,
+              startDate: updatedBooking.startDate,
+              endDate: updatedBooking.endDate,
+              quantity: updatedBooking.quantity,
+              price: price,
+              fee: (service?.fee || 2) * updatedBooking.quantity,
+              service_date: updatedBooking.service_date,
+              duration_hours: updatedBooking.duration_hours,
+              notes: updatedBooking.notes,
+              status: updatedBooking.status,
+            };
+          }
+          break;
+        case BookingStatusEnum.CONFIRMED:
+          {
+            if (dateDiff(booking.endDate, new Date()) > 24) {
+              allowedUpdates = {
+                service_date: updatedBooking.service_date,
+                duration_hours: updatedBooking.duration_hours,
+                notes: updatedBooking.notes,
+                status: updatedBooking.status,
+              };
+            }
+          }
+          break;
       }
 
       // Consumers can also update payment-related fields after payment completion

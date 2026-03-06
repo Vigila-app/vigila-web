@@ -50,6 +50,7 @@ export type ServiceI = {
   postalCode: string[];
   vigil?: Partial<VigilDetailsType>;
   duration?: string;
+  type: ServiceCatalogTypeEnum;
 };
 
 export type ServicesStoreType = {
