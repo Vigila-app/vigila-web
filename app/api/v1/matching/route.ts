@@ -24,6 +24,7 @@ function parseTimeToHour(time: string | number): number {
 /**
  * Get all dates (as "YYYY-MM-DD" strings) within [startDate, endDate] that fall
  * on the specified weekday (0=Sunday, ..., 6=Saturday).
+ * Uses UTC arithmetic to avoid timezone/DST shifts.
  */
 function getDatesForWeekday(
   startDate: Date,
@@ -33,16 +34,16 @@ function getDatesForWeekday(
   const dates: string[] = [];
   const current = new Date(startDate);
 
-  // Advance to the first occurrence of the requested weekday
-  const daysUntilWeekday = (weekday - current.getDay() + 7) % 7;
-  current.setDate(current.getDate() + daysUntilWeekday);
+  // Advance to the first occurrence of the requested weekday (UTC-based)
+  const daysUntilWeekday = (weekday - current.getUTCDay() + 7) % 7;
+  current.setUTCDate(current.getUTCDate() + daysUntilWeekday);
 
   while (current <= endDate) {
-    const year = current.getFullYear();
-    const month = String(current.getMonth() + 1).padStart(2, "0");
-    const day = String(current.getDate()).padStart(2, "0");
+    const year = current.getUTCFullYear();
+    const month = String(current.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(current.getUTCDate()).padStart(2, "0");
     dates.push(`${year}-${month}-${day}`);
-    current.setDate(current.getDate() + 7);
+    current.setUTCDate(current.getUTCDate() + 7);
   }
 
   return dates;
@@ -75,7 +76,7 @@ function ruleCoversSlot(
 
 /**
  * Check whether a vigil unavailability overlaps with a requested time slot on a given date.
- * Times are compared in UTC.
+ * Times are compared in UTC. Handles endHour === 24 (midnight of the next day).
  */
 function unavailabilityBlocksSlot(
   unav: VigilUnavailabilityI,
@@ -86,12 +87,43 @@ function unavailabilityBlocksSlot(
   const slotStart = new Date(
     `${date}T${String(startHour).padStart(2, "0")}:00:00Z`
   );
-  const slotEnd = new Date(
-    `${date}T${String(endHour).padStart(2, "0")}:00:00Z`
-  );
+  // endHour can be 24 (end of day) – represent as midnight of the next day
+  let slotEnd: Date;
+  if (endHour >= 24) {
+    slotEnd = new Date(slotStart);
+    slotEnd.setUTCDate(slotEnd.getUTCDate() + 1);
+    slotEnd.setUTCHours(0, 0, 0, 0);
+  } else {
+    slotEnd = new Date(
+      `${date}T${String(endHour).padStart(2, "0")}:00:00Z`
+    );
+  }
   const unavStart = new Date(unav.start_at);
   const unavEnd = new Date(unav.end_at);
   return unavStart < slotEnd && unavEnd > slotStart;
+}
+
+/**
+ * Map a raw vigil DB row to the public MatchedVigilI DTO, excluding PII fields.
+ */
+function buildMatchedVigil(
+  vigil: any,
+  compatibleSlots: number,
+  totalSlots: number,
+  averageRating = 0,
+  reviewCount = 0
+): MatchedVigilI {
+  return {
+    id: vigil.id,
+    displayName: vigil.displayName,
+    gender: vigil.gender,
+    status: vigil.status,
+    cap: vigil.cap,
+    compatibleSlots,
+    totalSlots,
+    averageRating,
+    reviewCount,
+  };
 }
 
 /**
@@ -151,8 +183,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const startDate = new Date(dates.startDate);
-    const endDate = new Date(dates.endDate);
+    // Parse as UTC to avoid timezone/DST shifts
+    const startDate = new Date(`${dates.startDate}T00:00:00Z`);
+    const endDate = new Date(`${dates.endDate}T00:00:00Z`);
 
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return jsonErrorResponse(400, {
@@ -168,6 +201,36 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Enforce maximum 90-day range to prevent CPU-bound Phase 2 loops
+    const daysDiff = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysDiff > 90) {
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
+    }
+
+    // Validate that every selected day has a complete and valid schedule entry
+    for (const day of selectedDays) {
+      const entry = schedule[String(day)];
+      if (!entry?.start || !entry?.end || !entry?.service) {
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+          success: false,
+        });
+      }
+      const startHour = parseTimeToHour(entry.start);
+      const endHour = parseTimeToHour(entry.end);
+      if (isNaN(startHour) || isNaN(endHour) || startHour >= endHour) {
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+          success: false,
+        });
+      }
+    }
+
     const postcode = address.postcode;
     const _admin = getAdminClient();
 
@@ -176,11 +239,17 @@ export async function POST(req: NextRequest) {
     // ══════════════════════════════════════════════════
 
     // 1a. Fetch the consumer's preferences (gender preference lives in consumers_data)
-    const { data: consumerData } = await _admin
+    const { data: consumerData, error: consumerError } = await _admin
       .from("consumers_data")
       .select("*")
       .eq("consumer_id", userObject.id)
       .maybeSingle();
+
+    if (consumerError) {
+      throw new Error(
+        `Failed to fetch consumer preferences: ${consumerError.message}`
+      );
+    }
 
     const genderPreference: string | null =
       // "gender-preference" uses kebab-case as stored in the DB column name
@@ -324,20 +393,32 @@ export async function POST(req: NextRequest) {
     });
 
     // Batch-fetch availability rules for all candidate vigils (filtered to date range)
-    const { data: allRules } = await _admin
+    const { data: allRules, error: rulesError } = await _admin
       .from("vigil_availability_rules")
       .select("*")
       .in("vigil_id", vigilIds)
       .lte("valid_from", dates.endDate)
       .or(`valid_to.is.null,valid_to.gte.${dates.startDate}`);
 
+    if (rulesError) {
+      throw new Error(
+        `Failed to fetch vigil availability rules: ${rulesError.message}`
+      );
+    }
+
     // Batch-fetch unavailabilities for all candidate vigils (overlapping the date range)
-    const { data: allUnavailabilities } = await _admin
+    const { data: allUnavailabilities, error: unavError } = await _admin
       .from("vigil_unavailabilities")
       .select("*")
       .in("vigil_id", vigilIds)
       .lte("start_at", `${dates.endDate}T23:59:59Z`)
       .gte("end_at", `${dates.startDate}T00:00:00Z`);
+
+    if (unavError) {
+      throw new Error(
+        `Failed to fetch vigil unavailabilities: ${unavError.message}`
+      );
+    }
 
     // Index rules and unavailabilities by vigil ID for O(1) lookup
     const rulesByVigilId = new Map<string, VigilAvailabilityRuleI[]>();
@@ -413,17 +494,10 @@ export async function POST(req: NextRequest) {
 
     // Early exit: perfect match
     if (perfectMatch) {
-      const result: MatchedVigilI = {
-        ...perfectMatch,
-        compatibleSlots: totalSlots,
-        totalSlots,
-        averageRating: 0,
-        reviewCount: 0,
-      };
       return NextResponse.json(
         {
           code: ResponseCodesConstants.MATCHING_SUCCESS.code,
-          data: [result],
+          data: [buildMatchedVigil(perfectMatch, totalSlots, totalSlots)],
           success: true,
           perfectMatch: true,
         },
@@ -436,13 +510,9 @@ export async function POST(req: NextRequest) {
 
     // Early exit: 5 or fewer candidates – return sorted list without quality ranking
     if (vigilScores.length <= 5) {
-      const results: MatchedVigilI[] = vigilScores.map((s) => ({
-        ...s.vigil,
-        compatibleSlots: s.compatibleSlots,
-        totalSlots,
-        averageRating: 0,
-        reviewCount: 0,
-      }));
+      const results: MatchedVigilI[] = vigilScores.map((s) =>
+        buildMatchedVigil(s.vigil, s.compatibleSlots, totalSlots)
+      );
       return NextResponse.json(
         {
           code: ResponseCodesConstants.MATCHING_SUCCESS.code,
@@ -486,13 +556,13 @@ export async function POST(req: NextRequest) {
         const reviewCount = reviewStats?.count ?? 0;
         const averageRating =
           reviewCount > 0 ? reviewStats!.total / reviewCount : 0;
-        return {
-          ...s.vigil,
-          compatibleSlots: s.compatibleSlots,
+        return buildMatchedVigil(
+          s.vigil,
+          s.compatibleSlots,
           totalSlots,
           averageRating,
-          reviewCount,
-        };
+          reviewCount
+        );
       })
       .sort((a, b) => {
         if (b.compatibleSlots !== a.compatibleSlots)

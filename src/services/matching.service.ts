@@ -18,11 +18,13 @@ export const MatchingService = {
     request: MatchingRequestI
   ): Promise<MatchingResponseI> => {
     try {
-      const response = (await ApiService.post(
-        apiMatching.MATCH(),
-        request
-      )) as MatchingResponseI;
-      return response;
+      const response = await ApiService.post(apiMatching.MATCH(), request);
+      if (!response) {
+        throw new Error(
+          "MatchingService.findMatches received no response from ApiService.post"
+        );
+      }
+      return response as MatchingResponseI;
     } catch (error) {
       console.error("MatchingService.findMatches error", error);
       throw error;
