@@ -255,7 +255,68 @@ export async function POST(req: NextRequest) {
       // "gender-preference" uses kebab-case as stored in the DB column name
       consumerData?.["gender-preference"] ?? null;
 
-    // 1b. Collect unique service types required across all scheduled days
+    const shouldFilterByGender =
+      !!genderPreference &&
+      genderPreference !== "no_preference" &&
+      genderPreference !== "none";
+
+    // 1b. Query active vigils in the requested CAP first – this is the most selective
+    // filter (few vigils operate in any given postcode), so we apply it before the
+    // service filter to minimise work and enable an early exit.
+    // First attempt: include gender preference when set.
+    let vigils: any[] = [];
+
+    if (shouldFilterByGender) {
+      const { data: vigilsWithGender } = await _admin
+        .from("vigils")
+        .select("*")
+        .eq("status", "active")
+        .contains("cap", [postcode])
+        .eq("gender", genderPreference)
+        .limit(20);
+
+      vigils = vigilsWithGender || [];
+    }
+
+    // 1c. If fewer than 10 results, supplement without gender filter and merge up to 20
+    if (vigils.length < 10) {
+      const existingIds = new Set(vigils.map((v: any) => v.id));
+      const remaining = 20 - vigils.length;
+
+      // Exclude vigils already fetched in the gender-filtered pass (if any)
+      const { data: additionalVigils } =
+        existingIds.size > 0
+          ? await _admin
+              .from("vigils")
+              .select("*")
+              .eq("status", "active")
+              .contains("cap", [postcode])
+              .not("id", "in", `(${Array.from(existingIds).join(",")})`)
+              .limit(remaining)
+          : await _admin
+              .from("vigils")
+              .select("*")
+              .eq("status", "active")
+              .contains("cap", [postcode])
+              .limit(remaining);
+
+      vigils = [...vigils, ...(additionalVigils || [])];
+    }
+
+    // 1d. Early exit: no active vigils in this CAP at all (saves the service queries)
+    if (vigils.length === 0) {
+      return NextResponse.json(
+        {
+          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
+          data: [],
+          success: true,
+          message: "No vigils found for this search",
+        },
+        { status: 200 }
+      );
+    }
+
+    // 1e. Collect unique service types required across all scheduled days
     const serviceTypes = Array.from(
       new Set(
         selectedDays
@@ -271,26 +332,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 1c. Find vigil IDs that offer EACH required service type (active services only)
+    // 1f. From the CAP-filtered candidates, keep only those that offer EACH required
+    // service type (active services only). Scoping to the candidate IDs avoids a
+    // full-table scan on `services`.
+    const candidateVigilIds = vigils.map((v: any) => v.id);
+
     const vigilIdSetsByType = await Promise.all(
       serviceTypes.map(async (type: string) => {
         const { data } = await _admin
           .from("services")
           .select("vigil_id")
           .eq("type", type)
-          .eq("active", true);
+          .eq("active", true)
+          .in("vigil_id", candidateVigilIds);
         return new Set<string>((data || []).map((s: any) => s.vigil_id));
       })
     );
 
-    // Intersect: keep only vigils that offer ALL required types
-    const eligibleVigilIds = vigilIdSetsByType.reduce(
+    // Intersect: keep only vigil IDs that offer ALL required types
+    const eligibleVigilIdSet = vigilIdSetsByType.reduce(
       (acc, set) =>
         new Set<string>(Array.from(acc).filter((id) => set.has(id))),
       vigilIdSetsByType[0]
     );
 
-    if (!eligibleVigilIds || eligibleVigilIds.size === 0) {
+    if (!eligibleVigilIdSet || eligibleVigilIdSet.size === 0) {
       return NextResponse.json(
         {
           code: ResponseCodesConstants.MATCHING_SUCCESS.code,
@@ -302,63 +368,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const eligibleVigilIdArray = Array.from(eligibleVigilIds);
-
-    // 1d. Query vigils filtered by CAP, status, and (first attempt) gender preference
-    const shouldFilterByGender =
-      !!genderPreference &&
-      genderPreference !== "no_preference" &&
-      genderPreference !== "none";
-
-    let vigils: any[] = [];
-
-    if (shouldFilterByGender) {
-      const { data: vigilsWithGender } = await _admin
-        .from("vigils")
-        .select("*")
-        .eq("status", "active")
-        .contains("cap", [postcode])
-        .in("id", eligibleVigilIdArray)
-        .eq("gender", genderPreference)
-        .limit(20);
-
-      vigils = vigilsWithGender || [];
-    }
-
-    // 1e. If fewer than 10 results, retry without gender filter and merge
-    if (vigils.length < 10) {
-      const existingIds = new Set(vigils.map((v: any) => v.id));
-      const remaining = 20 - vigils.length;
-      // Only query vigils not already in the first result set
-      const remainingVigilIds = eligibleVigilIdArray.filter(
-        (id) => !existingIds.has(id)
-      );
-
-      if (remainingVigilIds.length > 0) {
-        const { data: additionalVigils } = await _admin
-          .from("vigils")
-          .select("*")
-          .eq("status", "active")
-          .contains("cap", [postcode])
-          .in("id", remainingVigilIds)
-          .limit(remaining);
-
-        vigils = [...vigils, ...(additionalVigils || [])];
-      }
-    }
-
-    // 1f. Early exit: no vigils found at all
-    if (vigils.length === 0) {
-      return NextResponse.json(
-        {
-          code: ResponseCodesConstants.MATCHING_SUCCESS.code,
-          data: [],
-          success: true,
-          message: "No vigils found for this search",
-        },
-        { status: 200 }
-      );
-    }
+    // 1g. Narrow the vigils array to only those that passed the service filter
+    // (preserves the CAP/gender ordering from step 1b/1c)
+    vigils = vigils.filter((v: any) => eligibleVigilIdSet.has(v.id));
 
     // ══════════════════════════════════════════════════
     // PHASE 2 – Availability matching
