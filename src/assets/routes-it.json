@@ -11,7 +11,6 @@
     "private": false,
     "roles": []
   },
-  
   "homeConsumer": {
     "url": "/home",
     "label": "Home",
@@ -136,10 +135,25 @@
       "VIGIL"
     ]
   },
-   "onBoardConsumerComplete": {
+  "onBoardConsumerComplete": {
     "url": "/onboard/complete",
     "label": "Registrazione completata",
     "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "CONSUMER"
+    ]
+  },
+  "matchingLoading": {
+    "url": "/matching/loading",
+    "label": "Stiamo cercando il vigil più adatto a te",
+    "title": "Stiamo cercando il vigil più adatto a te",
     "menu": {
       "mobile": false,
       "desktop": false,
@@ -232,7 +246,7 @@
       "VIGIL"
     ]
   },
-    "bookingRecurring": {
+  "bookingRecurring": {
     "url": "/booking/recurrence",
     "label": "Prenotazione ricorrente",
     "title": "Prenotazione ricorrente",
@@ -441,7 +455,8 @@
     "roles": [
       "CONSUMER"
     ]
-  },"recurrenceBooking": {
+  },
+  "recurrenceBooking": {
     "url": "/recurrence",
     "label": "Prenotazione Ricorrente",
     "title": "Prenotazione Ricorrente",
@@ -529,7 +544,6 @@
       "CONSUMER"
     ]
   },
-  
   "notifications": {
     "url": "/notifications",
     "label": "Notifiche",

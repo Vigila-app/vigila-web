@@ -323,7 +323,7 @@ export const CalendarService = {
       const query = new URLSearchParams({
         from: formatDateToISO(startDate),
         to: formatDateToISO(endDate),
-      }).toString();
+      }).toString()
 
       const response = (await ApiService.get(
         `${apiCalendar.CONSUMER()}?${query}`,
@@ -342,10 +342,10 @@ export const CalendarService = {
   /**
    * Get vigil availability rules
    */
-  getVigilAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
+  getCustomerAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
     try {
       const response = (await ApiService.get(
-        apiCalendar.AVAILABILITY_RULES(),
+        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
       )) as any
       return response.data
     } catch (error) {
@@ -357,12 +357,12 @@ export const CalendarService = {
   /**
    * Create vigil availability rule
    */
-  createVigilAvailabilityRule: async (
+  createCustomerAvailabilityRule: async (
     rule: VigilAvailabilityRuleFormI,
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.AVAILABILITY_RULES(),
+        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
         rule,
       )) as any
       return response.data
@@ -375,9 +375,9 @@ export const CalendarService = {
   /**
    * Delete vigil availability rule
    */
-  deleteVigilAvailabilityRule: async (ruleId: string): Promise<void> => {
+  deleteCustomerAvailabilityRule: async (ruleId: string): Promise<void> => {
     try {
-      await ApiService.delete(apiCalendar.AVAILABILITY_RULE(ruleId))
+      await ApiService.delete(apiCalendar.CONSUMER_AVAILABILITY_RULE(ruleId))
     } catch (error) {
       console.error("CalendarService.deleteVigilAvailabilityRule error", error)
       throw error
@@ -394,7 +394,7 @@ export const CalendarService = {
   getVigilUnavailabilities: async (): Promise<VigilUnavailabilityI[]> => {
     try {
       const response = (await ApiService.get(
-        apiCalendar.UNAVAILABILITIES(),
+        apiCalendar.VIGIL_UNAVAILABILITIES(),
       )) as any
       return response.data
     } catch (error) {
@@ -411,7 +411,7 @@ export const CalendarService = {
   ): Promise<VigilUnavailabilityI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.UNAVAILABILITIES(),
+        apiCalendar.VIGIL_UNAVAILABILITIES(),
         unavailability,
       )) as any
       return response.data
@@ -424,9 +424,13 @@ export const CalendarService = {
   /**
    * Delete vigil unavailability
    */
-  deleteVigilUnavailability: async (unavailabilityId: string): Promise<void> => {
+  deleteVigilUnavailability: async (
+    unavailabilityId: string,
+  ): Promise<void> => {
     try {
-      await ApiService.delete(apiCalendar.UNAVAILABILITY(unavailabilityId))
+      await ApiService.delete(
+        apiCalendar.VIGIL_UNAVAILABILITY(unavailabilityId),
+      )
     } catch (error) {
       console.error("CalendarService.deleteVigilUnavailability error", error)
       throw error
@@ -448,8 +452,8 @@ export const CalendarService = {
       const query = new URLSearchParams({
         from: formatDateToISO(startDate),
         to: formatDateToISO(endDate),
-      }).toString();
-      
+      }).toString()
+
       const response = (await ApiService.get(
         `${apiCalendar.VIGIL_BOOKINGS()}?${query}`,
       )) as any
@@ -474,7 +478,7 @@ export const CalendarService = {
       const { vigil_id, ...queryParams } = params
       const query = new URLSearchParams(queryParams as any).toString()
       const response = (await ApiService.get(
-        `${apiCalendar.AVAILABLE_SLOTS(vigil_id)}?${query}`,
+        `${apiCalendar.VIGIL_AVAILABLE_SLOTS(vigil_id)}?${query}`,
       )) as any
       return response.data
     } catch (error) {
@@ -492,7 +496,7 @@ export const CalendarService = {
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.put(
-        apiCalendar.AVAILABILITY_RULE(ruleId),
+        apiCalendar.VIGIL_AVAILABILITY_RULE(ruleId),
         rule,
       )) as any
       return response.data

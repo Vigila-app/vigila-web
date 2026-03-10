@@ -14,6 +14,7 @@ import { Step } from "./Step"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { Services } from "./Services"
 import { BookingTypeEnum } from "@/src/enums/booking.enums"
+import clsx from "clsx"
 
 export default function AvailabilityFlow({
   onComplete,
@@ -26,7 +27,7 @@ export default function AvailabilityFlow({
   // ---
 
   const config: MultiStepOnboardingProps["config"] = {
-    role: RolesEnum.VIGIL,
+    role: RolesEnum.CONSUMER,
     steps: [
       {
         id: "welcome",
@@ -37,12 +38,15 @@ export default function AvailabilityFlow({
           {
             id: "booking-type",
             type: QuestionType.RADIO,
-          description: "Scegli se la prenotazione è una tantum o ricorrente",
+            description: "Scegli se la prenotazione è una tantum o ricorrente",
             label: "Tipo di prenotazione",
             options: [
               { label: "Una volta", value: BookingTypeEnum.OCCASIONAL },
-              { label: "Ricorrente", value: BookingTypeEnum.RECURRING }]
-          }]
+              { label: "Ricorrente", value: BookingTypeEnum.RECURRING },
+              { label: "Non lo so", value: BookingTypeEnum.TRIAL },
+            ],
+          },
+        ],
       },
       {
         id: "availabilities",
@@ -114,15 +118,36 @@ export default function AvailabilityFlow({
           config={config}
           setAnswers={setAnswers}
         />
-        <div className="text-zinc-500  text-sm flex items-start gap-3">
-          <InformationCircleIcon className="text-zinc-500 h-6 w-10" />
-          {currentStep.note}
-        </div>
+        {currentStep.note && (
+          <div className="text-zinc-500  text-sm flex items-start gap-3">
+            <InformationCircleIcon className="text-zinc-500 h-6 w-10" />
+            {currentStep.note}
+          </div>
+        )}
         <div className="flex gap-2 flex-wrap">
-          <button className="border-2 border-vigil-orange flex-1 py-3 rounded-full" type="button" onClick={back}>
+          <button
+            className={clsx(
+              "border-2 flex-1 py-3 rounded-full",
+              config.role === RolesEnum.VIGIL
+                ? "border-vigil-orange"
+                : "border-consumer-blue",
+            )}
+            type="button"
+            onClick={back}
+          >
             Back
           </button>
-          <button className="bg-vigil-orange flex-1 py-3 rounded-full" type="submit">Next</button>
+          <button
+            className={clsx(
+              "flex-1 py-3 rounded-full",
+              config.role === RolesEnum.VIGIL
+                ? "bg-vigil-orange"
+                : "bg-consumer-blue text-white",
+            )}
+            type="submit"
+          >
+            Next
+          </button>
         </div>
       </form>
     </div>

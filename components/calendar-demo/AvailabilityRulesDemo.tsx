@@ -1,26 +1,32 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
-import { CalendarService } from "@/src/services"
+import clsx from "clsx"
 import {
   VigilAvailabilityRuleI,
   VigilAvailabilityRuleFormI,
   WeekdayEnum,
 } from "@/src/types/calendar.types"
+import { CalendarService } from "@/src/services"
 import {
   formatTimeRange,
   getWeekdaysArray,
   getTimeSlots,
   formatDateToISO,
 } from "@/src/utils/calendar.utils"
+import { RolesEnum } from "@/src/enums/roles.enums"
 
 /**
  * Demo component for Availability Rules CRUD operations
  */
 export const AvailabilityRulesDemo = ({
   setAnswers,
+  role,
 }: {
-  setAnswers?: (updater: (prev: Record<string, any>) => Record<string, any>) => void
+  role?: RolesEnum
+  setAnswers?: (
+    updater: (prev: Record<string, any>) => Record<string, any>,
+  ) => void
 } = {}) => {
   const weekdays = getWeekdaysArray()
   const times = getTimeSlots(15) // 15-minute intervals
@@ -28,6 +34,14 @@ export const AvailabilityRulesDemo = ({
   const [rules, setRules] = useState<VigilAvailabilityRuleI[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Propagate local rules to parent answers so the parent can decide
+  // when to persist them (e.g. when user moves to next step).
+  useEffect(() => {
+    if (setAnswers) {
+      setAnswers((prev) => ({ ...(prev || {}), availabilityRules: rules }))
+    }
+  }, [rules, setAnswers])
 
   const [activeDays, setActiveDays] = useState<Record<number, boolean>>(() => {
     const initial: Record<number, boolean> = {}
@@ -47,36 +61,9 @@ export const AvailabilityRulesDemo = ({
     return initial
   })
 
-  useEffect(() => {
-    loadRules()
-  }, [])
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
-  const loadRules = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await CalendarService.getVigilAvailabilityRules()
-      setRules(data)
-      setAnswers?.((prev) => {
-        if (JSON.stringify(prev?.availabilities) !== JSON.stringify(data)) {
-          return { ...prev, availabilities: data }
-        }
-        return prev
-      })
-      setActiveDays((prev) => {
-        const next = { ...prev }
-        data.forEach((rule) => {
-          next[rule.weekday] = true
-        })
-        return next
-      })
-    } catch (err: any) {
-      setError(err.message || "Failed to load availability rules")
-      console.error("Error loading rules:", err)
-    } finally {
-      setLoading(false)
-    }
-  }, [setAnswers])
+  // Rules are read-only after being saved to the API; no inline edit state needed
 
   /**
    * Convert HH:MM to TIME format string (HH:MM:00)
@@ -105,6 +92,26 @@ export const AvailabilityRulesDemo = ({
     return `${hours} ore ${mins} min`
   }
 
+  /**
+   * Check whether a proposed time range overlaps any existing rule for the same weekday.
+   * Returns true if overlapping, false otherwise.
+   */
+  const isOverlapping = (
+    weekday: WeekdayEnum,
+    newStartMinutes: number,
+    newEndMinutes: number,
+    ignoreRuleId?: string,
+  ) => {
+    return rules.some((r) => {
+      if (r.weekday !== weekday) return false
+      if (ignoreRuleId && r.id === ignoreRuleId) return false
+      const existingStart = getMinutesFromTime(r.start_time.slice(0, 5))
+      const existingEnd = getMinutesFromTime(r.end_time.slice(0, 5))
+      // Overlap occurs when max(start) < min(end)
+      return Math.max(existingStart, newStartMinutes) < Math.min(existingEnd, newEndMinutes)
+    })
+  }
+
   const durationOptions = [1, 2, 3, 4, 6, 8]
 
   const rulesByWeekday = useMemo(() => {
@@ -125,6 +132,51 @@ export const AvailabilityRulesDemo = ({
     })
     return grouped
   }, [rules, weekdays])
+
+  // Compute whether the current draft for each weekday overlaps existing rules
+  const draftOverlaps = useMemo(() => {
+    const map: Record<number, boolean> = {}
+    weekdays.forEach((day) => {
+      const draft = draftSlots[day.value]
+      if (!draft) {
+        map[day.value] = false
+        return
+      }
+      const startMinutes = getMinutesFromTime(draft.start)
+      const endMinutes = startMinutes + draft.durationHours * 60
+      if (endMinutes > 24 * 60 || endMinutes <= startMinutes) {
+        // treat invalid times as overlapping to prevent adding
+        map[day.value] = true
+        return
+      }
+      map[day.value] = isOverlapping(day.value as WeekdayEnum, startMinutes, endMinutes)
+    })
+    return map
+  }, [weekdays, draftSlots, rules])
+
+  // Edit-related state and handlers removed — rules are read-only after saving
+
+  const colorClasses = useMemo(() => {
+    const vigil = {
+      bgLight: "bg-vigil-light-orange",
+      text: "text-vigil-orange",
+      border: "border-vigil-light-orange",
+      hoverBorder: "hover:border-vigil-light-orange",
+      hoverText: "hover:text-vigil-orange",
+      peerCheckedBg: "peer-checked:bg-vigil-orange",
+      textMuted: "text-vigil-orange",
+    }
+    const consumer = {
+      bgLight: "bg-consumer-light-blue",
+      text: "text-consumer-blue",
+      border: "border-consumer-light-blue",
+      hoverBorder: "hover:border-consumer-light-blue",
+      hoverText: "hover:text-consumer-blue",
+      peerCheckedBg: "peer-checked:bg-consumer-blue",
+      textMuted: "text-consumer-blue",
+    }
+    return role === RolesEnum.CONSUMER ? consumer : vigil
+  }, [role])
 
   const handleCreate = async (weekday: WeekdayEnum) => {
     setLoading(true)
@@ -154,9 +206,21 @@ export const AvailabilityRulesDemo = ({
         valid_from: formatDateToISO(new Date()),
         valid_to: null,
       }
-
-      await CalendarService.createVigilAvailabilityRule(ruleData)
-      await loadRules()
+      // Check client-side for overlapping rules and prevent adding if overlaps.
+      const newStartMinutes = getMinutesFromTime(draft.start)
+      const newEndMinutes = endMinutes
+      if (isOverlapping(weekday, newStartMinutes, newEndMinutes)) {
+        setError("La fascia si sovrappone a una esistente")
+        setLoading(false)
+        return
+      }
+      // Persist immediately via CalendarService
+      try {
+        const saved = await CalendarService.createCustomerAvailabilityRule(ruleData)
+        setRules((prev) => [...prev, saved])
+      } catch (err: any) {
+        setError(err?.message || "Failed to persist availability rule")
+      }
     } catch (err: any) {
       setError(err.message || "Failed to create availability rule")
       console.error("Error creating rule:", err)
@@ -166,13 +230,16 @@ export const AvailabilityRulesDemo = ({
   }
 
   const handleDelete = async (ruleId: string) => {
-    if (!confirm("Are you sure you want to delete this rule?")) return
-
     setLoading(true)
     setError(null)
     try {
-      await CalendarService.deleteVigilAvailabilityRule(ruleId)
-      await loadRules()
+      // Persist deletion immediately via CalendarService
+      try {
+        await CalendarService.deleteCustomerAvailabilityRule(ruleId)
+        setRules((prev) => prev.filter((r) => r.id !== ruleId))
+      } catch (err: any) {
+        setError(err?.message || "Failed to delete availability rule")
+      }
     } catch (err: any) {
       setError(err.message || "Failed to delete availability rule")
       console.error("Error deleting rule:", err)
@@ -187,7 +254,13 @@ export const AvailabilityRulesDemo = ({
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+              <span
+                className={clsx(
+                  "flex h-8 w-8 items-center justify-center rounded-xl",
+                  colorClasses.bgLight,
+                  colorClasses.text,
+                )}
+              >
                 <svg
                   width="18"
                   height="18"
@@ -212,17 +285,18 @@ export const AvailabilityRulesDemo = ({
               Seleziona i giorni e gli orari per la tua assistenza.
             </p>
           </div>
-          <button
-            onClick={loadRules}
-            disabled={loading}
-            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 hover:border-slate-300 hover:text-slate-800 disabled:opacity-50"
-          >
-            {loading ? "Carico..." : "Aggiorna"}
-          </button>
         </div>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div
+            className={clsx(
+              "mt-4 rounded-xl px-4 py-3 text-sm",
+              "border",
+              colorClasses.border,
+              colorClasses.bgLight,
+              colorClasses.text,
+            )}
+          >
             {error}
           </div>
         )}
@@ -241,24 +315,42 @@ export const AvailabilityRulesDemo = ({
                         type="checkbox"
                         className="peer sr-only"
                         checked={isActive}
-                        onChange={() =>
-                          setActiveDays((prev) => ({
-                            ...prev,
-                            [day.value]: !prev[day.value],
-                          }))
-                        }
+                        onChange={() => {
+                          setActiveDays((prev) => {
+                            const nextVal = !prev[day.value]
+                            // when activating a day, immediately persist the draft rule for that day
+                            if (nextVal) {
+                              setTimeout(() => handleCreate(day.value as WeekdayEnum), 0)
+                            }
+                            return { ...prev, [day.value]: nextVal }
+                          })
+                        }}
                       />
-                      <span className="h-5 w-9 rounded-full bg-slate-200 transition peer-checked:bg-rose-500" />
+                      <span
+                        className={clsx(
+                          "h-5 w-9 rounded-full bg-slate-200 transition",
+                          colorClasses.peerCheckedBg,
+                        )}
+                      />
                       <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
                     </label>
-                    <span className="text-sm font-semibold text-slate-900">
+                    <span
+                      className="text-sm font-semibold text-slate-900 cursor-pointer"
+                      onClick={() => setSelectedDay(day.value)}
+                    >
                       {day.labelIT}
                     </span>
                   </div>
                   <button
                     onClick={() => handleCreate(day.value as WeekdayEnum)}
-                    disabled={loading || !isActive}
-                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-40"
+                    disabled={
+                      loading || !isActive || Boolean(draftOverlaps[day.value])
+                    }
+                    className={clsx(
+                      "text-xs font-semibold disabled:opacity-40",
+                      colorClasses.text,
+                      colorClasses.hoverText,
+                    )}
                   >
                     + Aggiungi fascia
                   </button>
@@ -267,7 +359,14 @@ export const AvailabilityRulesDemo = ({
                 {isActive && (
                   <div className="mt-4 space-y-4">
                     {dayRules.length === 0 ? (
-                      <div className="rounded-2xl border border-rose-200 bg-rose-50/40 px-4 py-3 text-sm text-slate-500">
+                      <div
+                        className={clsx(
+                          "rounded-2xl px-4 py-3 text-sm text-slate-500",
+                          "border",
+                          colorClasses.border,
+                          `${colorClasses.bgLight}/40`,
+                        )}
+                      >
                         Nessuna fascia attiva. Aggiungine una qui sotto.
                       </div>
                     ) : (
@@ -278,7 +377,11 @@ export const AvailabilityRulesDemo = ({
                           return (
                             <div
                               key={rule.id}
-                              className="rounded-2xl border border-rose-200 bg-white px-4 py-3 shadow-sm"
+                              className={clsx(
+                                "rounded-2xl px-4 py-3 shadow-sm",
+                                "border",
+                                colorClasses.border,
+                              )}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-semibold text-slate-500">
@@ -287,7 +390,14 @@ export const AvailabilityRulesDemo = ({
                                 <button
                                   onClick={() => handleDelete(rule.id)}
                                   disabled={loading}
-                                  className="rounded-full border border-rose-200 px-2 py-0.5 text-xs text-rose-600 hover:border-rose-300 hover:text-rose-700 disabled:opacity-40"
+                                  className={clsx(
+                                    "rounded-full px-2 py-0.5 text-xs disabled:opacity-40",
+                                    "border",
+                                    colorClasses.border,
+                                    colorClasses.text,
+                                    colorClasses.hoverBorder,
+                                    colorClasses.hoverText,
+                                  )}
                                 >
                                   Elimina
                                 </button>
@@ -297,7 +407,13 @@ export const AvailabilityRulesDemo = ({
                                   <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                                     Ora inizio
                                   </p>
-                                  <div className="mt-1 rounded-full border border-rose-200 px-3 py-2 text-sm font-semibold text-slate-800">
+                                  <div
+                                    className={clsx(
+                                      "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                                      "border",
+                                      colorClasses.border,
+                                    )}
+                                  >
                                     {start}
                                   </div>
                                 </div>
@@ -305,7 +421,13 @@ export const AvailabilityRulesDemo = ({
                                   <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                                     Durata
                                   </p>
-                                  <div className="mt-1 rounded-full border border-rose-200 px-3 py-2 text-sm font-semibold text-slate-800">
+                                  <div
+                                    className={clsx(
+                                      "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                                      "border",
+                                      colorClasses.border,
+                                    )}
+                                  >
                                     {formatDuration(start, end)}
                                   </div>
                                 </div>
@@ -322,8 +444,20 @@ export const AvailabilityRulesDemo = ({
                       </div>
                     )}
 
-                    <div className="rounded-2xl border border-rose-200 bg-rose-50/60 px-4 py-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">
+                    <div
+                      className={clsx(
+                        "rounded-2xl px-4 py-4",
+                        "border",
+                        colorClasses.border,
+                        `${colorClasses.bgLight}/60`,
+                      )}
+                    >
+                      <p
+                        className={clsx(
+                          "text-xs font-semibold uppercase tracking-wide",
+                          colorClasses.text,
+                        )}
+                      >
                         Nuova fascia
                       </p>
                       <div className="mt-3 grid grid-cols-2 gap-3">
@@ -342,7 +476,12 @@ export const AvailabilityRulesDemo = ({
                                 },
                               }))
                             }
-                            className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-rose-300 focus:outline-none"
+                            className={clsx(
+                              "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                              "border",
+                              colorClasses.border,
+                              colorClasses.hoverBorder,
+                            )}
                           >
                             {times.map((time) => (
                               <option key={time} value={time}>
@@ -366,7 +505,12 @@ export const AvailabilityRulesDemo = ({
                                 },
                               }))
                             }
-                            className="mt-1 w-full rounded-full border border-rose-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:border-rose-300 focus:outline-none"
+                            className={clsx(
+                              "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                              "border",
+                              colorClasses.border,
+                              colorClasses.hoverBorder,
+                            )}
                           >
                             {durationOptions.map((hours) => (
                               <option key={hours} value={hours}>

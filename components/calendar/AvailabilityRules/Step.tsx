@@ -6,7 +6,9 @@ import {
   OnboardingStep,
   QuestionType,
 } from "@/src/types/multiStepOnboard.types"
-import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, ChatBubbleBottomCenterIcon, MapPinIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
+import clsx from "clsx"
+import { RolesEnum } from "@/src/enums/roles.enums"
 
 export const Step = ({
   currentStep,
@@ -40,9 +42,20 @@ export const Step = ({
         >
           <div>
             <div className="flex gap-2 items-center mb-5">
-              <div className="w-10 h-10 rounded rounded-full text-vigil-orange p-2 bg-vigil-light-orange">
+              <div
+                className={clsx(
+                  "w-10 h-10 rounded rounded-full p-2 ",
+                  config.role == RolesEnum.VIGIL
+                    ? "text-vigil-orange bg-vigil-light-orange"
+                    : "text-consumer-blue bg-consumer-light-blue",
+                )}
+              >
                 {q.type == QuestionType.DATE && <CalendarIcon />}
                 {q.type == QuestionType.ADDRESS && <MapPinIcon />}
+                {q.type !== QuestionType.DATE &&
+                  q.type !== QuestionType.ADDRESS && (
+                    <ChatBubbleBottomCenterIcon />
+                  )}
               </div>
               <div>
                 <h3 className="fw-bold">{q.label}</h3>
