@@ -1,5 +1,6 @@
-import React, { ComponentType } from "react"
+import React, { ComponentType, useMemo } from "react"
 import clsx from "clsx"
+import { RolesEnum } from "@/src/enums/roles.enums"
 
 export const SingleService = ({
   Icon,
@@ -8,6 +9,7 @@ export const SingleService = ({
   price,
   checked, // optional controlled
   onChange, // optional controlled
+  role,
 }: {
   Icon: ComponentType<{ className?: string }>
   name: string
@@ -15,6 +17,7 @@ export const SingleService = ({
   price: number
   checked?: boolean
   onChange?: (next: boolean) => void
+  role?: RolesEnum
 }) => {
   const [internalSelected, setInternalSelected] = React.useState(false)
   const selected = typeof checked === "boolean" ? checked : internalSelected
@@ -24,29 +27,40 @@ export const SingleService = ({
     if (typeof onChange === "function") onChange(next)
     else setInternalSelected((v) => !v)
   }
+
+  const colorClasses = useMemo(() => {
+    const vigil = {
+      border: "border-vigil-orange",
+      bgLight: "bg-vigil-light-orange",
+      text: "text-vigil-orange",
+      bg: "bg-vigil-orange",
+    }
+    const consumer = {
+      border: "border-consumer-light-blue",
+      bgLight: "bg-consumer-light-blue",
+      text: "text-consumer-blue",
+      bg: "bg-consumer-blue",
+    }
+    return role === RolesEnum.CONSUMER ? consumer : vigil
+  }, [role])
   return (
     <label
       className={clsx(
         "flex flex-col items-center justify-between gap-2 border-3 p-3 rounded-3xl cursor-pointer transition-all",
-        selected
-          ? "border-vigil-orange border-2 bg-vigil-light-orange"
-          : "border-zinc-400 bg-white",
+        selected ? clsx(colorClasses.border, "border-2", colorClasses.bgLight) : "border-zinc-400 bg-white",
       )}
       onMouseDown={(e) => toggle(e)}
     >
       <input type="checkbox" checked={selected} readOnly className="hidden" />
       <Icon
-        className={clsx(
-          "w-10",
-          selected ? "text-vigil-orange" : "text-zinc-400",
-        )}
+        className={clsx("w-10", selected ? colorClasses.text : "text-zinc-400")}
       />
       <span className="font-semibold text-zinc-900 text-center">{name}</span>
       <span className="text-sm text-zinc-500 text-center">{desc}</span>
       <div
         className={clsx(
           "badge px-2 py-1 rounded text-white text-xs font-bold",
-          selected ? "bg-vigil-orange" : "bg-zinc-400",
+          selected ? colorClasses.bg : "bg-zinc-400",
         )}
       >
         {price} EUR/h

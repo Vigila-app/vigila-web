@@ -1,12 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums" // Assicurati che il path sia corretto
-import { Button } from "@/components"
 import { Routes } from "@/src/routes"
-import { BookingTypeEnum } from "@/src/enums/booking.enums"
 import AvailabilityFlow from "@/components/calendar/AvailabilityRules/AvailabilityFlow"
 // Se hai icone specifiche importale, altrimenti le ho lasciate opzionali nel tipo
 

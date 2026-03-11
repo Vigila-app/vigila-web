@@ -7,7 +7,6 @@ import {
   VigilAvailabilityRuleFormI,
   WeekdayEnum,
 } from "@/src/types/calendar.types"
-import { CalendarService } from "@/src/services"
 import {
   formatTimeRange,
   getWeekdaysArray,
@@ -22,16 +21,18 @@ import { RolesEnum } from "@/src/enums/roles.enums"
 export const AvailabilityRulesDemo = ({
   setAnswers,
   role,
+  availabilityRules,
 }: {
   role?: RolesEnum
   setAnswers?: (
     updater: (prev: Record<string, any>) => Record<string, any>,
   ) => void
+  availabilityRules?: VigilAvailabilityRuleI[]
 } = {}) => {
   const weekdays = getWeekdaysArray()
   const times = getTimeSlots(15) // 15-minute intervals
 
-  const [rules, setRules] = useState<VigilAvailabilityRuleI[]>([])
+  const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(() => availabilityRules ?? [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,6 +43,13 @@ export const AvailabilityRulesDemo = ({
       setAnswers((prev) => ({ ...(prev || {}), availabilityRules: rules }))
     }
   }, [rules, setAnswers])
+
+  // If parent provides availabilityRules (e.g. from answers object), keep local state in sync
+  useEffect(() => {
+    if (availabilityRules) {
+      setRules(availabilityRules)
+    }
+  }, [availabilityRules?.length])
 
   const [activeDays, setActiveDays] = useState<Record<number, boolean>>(() => {
     const initial: Record<number, boolean> = {}
@@ -62,6 +70,11 @@ export const AvailabilityRulesDemo = ({
   })
 
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [creatingSlots, setCreatingSlots] = useState<Record<number, boolean>>(() => {
+    const initial: Record<number, boolean> = {}
+    weekdays.forEach((d) => (initial[d.value] = false))
+    return initial
+  })
 
   // Rules are read-only after being saved to the API; no inline edit state needed
 
@@ -214,13 +227,23 @@ export const AvailabilityRulesDemo = ({
         setLoading(false)
         return
       }
-      // Persist immediately via CalendarService
-      try {
-        const saved = await CalendarService.createCustomerAvailabilityRule(ruleData)
-        setRules((prev) => [...prev, saved])
-      } catch (err: any) {
-        setError(err?.message || "Failed to persist availability rule")
+      // For this flow: persist to local state only. Parent will persist to API
+      // when the user completes the flow — the parent reads `availabilityRules`
+      // from `setAnswers` (see useEffect above).
+      const now = new Date().toISOString()
+      const newRule: VigilAvailabilityRuleI = {
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        created_at: now,
+        updated_at: now,
+        vigil_id: ruleData.vigil_id,
+        weekday: ruleData.weekday,
+        start_time: ruleData.start_time,
+        end_time: ruleData.end_time,
+        valid_from: ruleData.valid_from,
+        valid_to: ruleData.valid_to ?? null,
       }
+
+      setRules((prev) => [...prev, newRule])
     } catch (err: any) {
       setError(err.message || "Failed to create availability rule")
       console.error("Error creating rule:", err)
@@ -233,13 +256,8 @@ export const AvailabilityRulesDemo = ({
     setLoading(true)
     setError(null)
     try {
-      // Persist deletion immediately via CalendarService
-      try {
-        await CalendarService.deleteCustomerAvailabilityRule(ruleId)
-        setRules((prev) => prev.filter((r) => r.id !== ruleId))
-      } catch (err: any) {
-        setError(err?.message || "Failed to delete availability rule")
-      }
+      // Remove locally; parent will persist deletions when flow completes.
+      setRules((prev) => prev.filter((r) => r.id !== ruleId))
     } catch (err: any) {
       setError(err.message || "Failed to delete availability rule")
       console.error("Error deleting rule:", err)
@@ -316,14 +334,7 @@ export const AvailabilityRulesDemo = ({
                         className="peer sr-only"
                         checked={isActive}
                         onChange={() => {
-                          setActiveDays((prev) => {
-                            const nextVal = !prev[day.value]
-                            // when activating a day, immediately persist the draft rule for that day
-                            if (nextVal) {
-                              setTimeout(() => handleCreate(day.value as WeekdayEnum), 0)
-                            }
-                            return { ...prev, [day.value]: nextVal }
-                          })
+                          setActiveDays((prev) => ({ ...prev, [day.value]: !prev[day.value] }))
                         }}
                       />
                       <span
@@ -342,10 +353,8 @@ export const AvailabilityRulesDemo = ({
                     </span>
                   </div>
                   <button
-                    onClick={() => handleCreate(day.value as WeekdayEnum)}
-                    disabled={
-                      loading || !isActive || Boolean(draftOverlaps[day.value])
-                    }
+                    onClick={() => setCreatingSlots((prev) => ({ ...prev, [day.value]: true }))}
+                    disabled={loading || !isActive || creatingSlots[day.value]}
                     className={clsx(
                       "text-xs font-semibold disabled:opacity-40",
                       colorClasses.text,
@@ -444,83 +453,151 @@ export const AvailabilityRulesDemo = ({
                       </div>
                     )}
 
-                    <div
-                      className={clsx(
-                        "rounded-2xl px-4 py-4",
-                        "border",
-                        colorClasses.border,
-                        `${colorClasses.bgLight}/60`,
-                      )}
-                    >
-                      <p
+                    {creatingSlots[day.value] ? (
+                      <div
                         className={clsx(
-                          "text-xs font-semibold uppercase tracking-wide",
-                          colorClasses.text,
+                          "rounded-2xl px-4 py-4",
+                          "border",
+                          colorClasses.border,
+                          `${colorClasses.bgLight}/60`,
                         )}
                       >
-                        Nuova fascia
-                      </p>
-                      <div className="mt-3 grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                            Ora inizio
-                          </p>
-                          <select
-                            value={draft.start}
-                            onChange={(e) =>
-                              setDraftSlots((prev) => ({
-                                ...prev,
-                                [day.value]: {
-                                  ...prev[day.value],
-                                  start: e.target.value,
-                                },
-                              }))
-                            }
-                            className={clsx(
-                              "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
-                              "border",
-                              colorClasses.border,
-                              colorClasses.hoverBorder,
-                            )}
-                          >
-                            {times.map((time) => (
-                              <option key={time} value={time}>
-                                {time}
-                              </option>
-                            ))}
-                          </select>
+                        <p
+                          className={clsx(
+                            "text-xs font-semibold uppercase tracking-wide",
+                            colorClasses.text,
+                          )}
+                        >
+                          Nuova fascia
+                        </p>
+                        <div className="mt-3 grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                              Ora inizio
+                            </p>
+                            <select
+                              value={draft.start}
+                              onChange={(e) =>
+                                setDraftSlots((prev) => ({
+                                  ...prev,
+                                  [day.value]: {
+                                    ...prev[day.value],
+                                    start: e.target.value,
+                                  },
+                                }))
+                              }
+                              className={clsx(
+                                "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                                "border",
+                                colorClasses.border,
+                                colorClasses.hoverBorder,
+                              )}
+                            >
+                              {times.map((time) => (
+                                <option key={time} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                              Durata
+                            </p>
+                            <select
+                              value={draft.durationHours}
+                              onChange={(e) =>
+                                setDraftSlots((prev) => ({
+                                  ...prev,
+                                  [day.value]: {
+                                    ...prev[day.value],
+                                    durationHours: Number(e.target.value),
+                                  },
+                                }))
+                              }
+                              className={clsx(
+                                "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                                "border",
+                                colorClasses.border,
+                                colorClasses.hoverBorder,
+                              )}
+                            >
+                              {durationOptions.map((hours) => (
+                                <option key={hours} value={hours}>
+                                  {hours} ore
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                            Durata
-                          </p>
-                          <select
-                            value={draft.durationHours}
-                            onChange={(e) =>
-                              setDraftSlots((prev) => ({
-                                ...prev,
-                                [day.value]: {
-                                  ...prev[day.value],
-                                  durationHours: Number(e.target.value),
-                                },
-                              }))
-                            }
+                        <div className="mt-4 flex gap-2">
+                          <button
+                            onClick={async () => {
+                              // Save draft
+                              setLoading(true)
+                              setError(null)
+                              try {
+                                const d = draftSlots[day.value]
+                                const startM = getMinutesFromTime(d.start)
+                                const endM = startM + d.durationHours * 60
+                                if (endM > 24 * 60) {
+                                  setError("La durata supera il limite giornaliero")
+                                  return
+                                }
+                                if (endM <= startM) {
+                                  setError("Orario di fine non valido")
+                                  return
+                                }
+                                if (isOverlapping(day.value as WeekdayEnum, startM, endM)) {
+                                  setError("La fascia si sovrappone a una esistente")
+                                  return
+                                }
+                                const now = new Date().toISOString()
+                                const newRule: VigilAvailabilityRuleI = {
+                                  id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                                  created_at: now,
+                                  updated_at: now,
+                                  vigil_id: "demo-vigil-id",
+                                  weekday: day.value,
+                                  start_time: convertTimeToTimeFormat(d.start),
+                                  end_time: convertTimeToTimeFormat(toTimeString(endM)),
+                                  valid_from: formatDateToISO(new Date()),
+                                  valid_to: null,
+                                }
+                                setRules((prev) => [...prev, newRule])
+                                setCreatingSlots((prev) => ({ ...prev, [day.value]: false }))
+                                // reset draft to defaults after successful save
+                                setDraftSlots((prev) => ({ ...prev, [day.value]: { start: "12:00", durationHours: 3 } }))
+                              } catch (err: any) {
+                                setError(err?.message || "Failed to save draft")
+                              } finally {
+                                setLoading(false)
+                              }
+                            }}
                             className={clsx(
-                              "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
-                              "border",
-                              colorClasses.border,
-                              colorClasses.hoverBorder,
+                              "rounded-full px-3 py-1 text-sm font-semibold",
+                              colorClasses.text,
+                              colorClasses.hoverText,
                             )}
                           >
-                            {durationOptions.map((hours) => (
-                              <option key={hours} value={hours}>
-                                {hours} ore
-                              </option>
-                            ))}
-                          </select>
+                            Salva
+                          </button>
+                          <button
+                            onClick={() => {
+                              setCreatingSlots((prev) => ({ ...prev, [day.value]: false }))
+                              // reset draft to defaults
+                              setDraftSlots((prev) => ({ ...prev, [day.value]: { start: "12:00", durationHours: 3 } }))
+                              setError(null)
+                            }}
+                            className="rounded-full px-3 py-1 text-sm border"
+                          >
+                            Annulla
+                          </button>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="mt-2 text-xs text-slate-400">Clicca "+ Aggiungi fascia" per creare una nuova fascia.</div>
+                    )}
                   </div>
                 )}
               </div>

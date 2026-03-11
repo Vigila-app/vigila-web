@@ -1,4 +1,6 @@
-import { ComponentType, useEffect, useState } from "react"
+import { ComponentType, useEffect, useState, useMemo } from "react"
+import clsx from "clsx"
+import { RolesEnum } from "@/src/enums/roles.enums"
 import { SingleService } from "./SingleService"
 import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline"
 import Caffe from "@/components/svg/Caffe"
@@ -8,6 +10,7 @@ import { Car } from "@/components/svg"
 export const Services = ({
   answers,
   setAnswers,
+  role,
 }: {
   answers?: Record<string, any>
   setAnswers?: (
@@ -15,6 +18,7 @@ export const Services = ({
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>),
   ) => void
+  role?: RolesEnum
 }) => {
   console.log(answers)
   const ServiceIcons = [
@@ -57,8 +61,6 @@ export const Services = ({
     "Guardare TV insieme",
     "Passeggiata leggera",
   ]
-  // Fetch availability rules from API using vigil_id from answers
-  const [rules, setRules] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -72,9 +74,9 @@ export const Services = ({
     "Sabato",
   ]
 
-  // derive unique ordered weekdays from answers.availabilities
+  // derive unique ordered weekdays from answers.availabilityRules
   const selectedDays: number[] = Array.from(
-    new Set((answers?.availabilities || []).map((r: any) => Number(r.weekday))),
+    new Set((answers?.availabilityRules || []).map((r: any) => Number(r.weekday))),
   )
 
   const [currentDayIdx, setCurrentDayIdx] = useState(0)
@@ -89,6 +91,26 @@ export const Services = ({
   const [selectedMansioni, setSelectedMansioni] = useState<string[]>([])
   const [car, setCar] = useState(false)
   const [notes, setNotes] = useState("")
+
+  const colorClasses = useMemo(() => {
+    const vigil = {
+      bg: "bg-vigil-orange",
+      bgLight: "bg-vigil-light-orange",
+      text: "text-vigil-orange",
+      border: "border-vigil-orange",
+      hoverBorder: "hover:border-vigil-light-orange",
+      hoverText: "hover:text-vigil-orange",
+    }
+    const consumer = {
+      bg: "bg-consumer-blue",
+      bgLight: "bg-consumer-light-blue",
+      text: "text-consumer-blue",
+      border: "border-consumer-light-blue",
+      hoverBorder: "hover:border-consumer-light-blue",
+      hoverText: "hover:text-consumer-blue",
+    }
+    return role === RolesEnum.CONSUMER ? consumer : vigil
+  }, [role])
 
   // load per-day values when current day changes
   useEffect(() => {
@@ -125,12 +147,12 @@ export const Services = ({
               <div key={"rule_" + day} className="flex items-center">
                 <button
                   onClick={() => setCurrentDayIdx(idx)}
-                  className={
-                    "font-bold text-sm px-4 py-2 rounded-full " +
-                    (isActive || hasEdited
-                      ? "text-white bg-vigil-orange"
-                      : "text-zinc-700 bg-white border")
-                  }
+                  className={clsx(
+                    "font-bold text-sm px-4 py-2 rounded-full",
+                    isActive || hasEdited
+                      ? clsx("text-white", colorClasses.bg)
+                      : "text-zinc-700 bg-white border",
+                  )}
                 >
                   {dayNames[Number(day)]}
                 </button>
@@ -148,7 +170,7 @@ export const Services = ({
           <>
             <h2>{dayNames[Number(selectedDays[currentDayIdx])]}</h2>
             <span className="ml-2 text-zinc-600 text-sm">
-              {(answers?.availabilities || [])
+              {(answers?.availabilityRules || [])
                 .filter(
                   (r: any) =>
                     Number(r.weekday) === Number(selectedDays[currentDayIdx]),
@@ -198,11 +220,10 @@ export const Services = ({
                         : [...prev, label],
                     )
                   }}
-                  className={`cursor-pointer w-full py-3 text-center rounded-full border ${
-                    isChecked
-                      ? "border-vigil-orange bg-vigil-light-orange"
-                      : "border-zinc-200 bg-white"
-                  }`}
+                  className={clsx(
+                    "cursor-pointer w-full py-3 text-center rounded-full",
+                    isChecked ? clsx(colorClasses.border, colorClasses.bgLight) : "border-zinc-200 bg-white",
+                  )}
                 >
                   <input
                     type="checkbox"
@@ -220,11 +241,10 @@ export const Services = ({
         {/* Accompagnamento in auto */}
         <div className="mb-4">
           <label
-            className={`block cursor-pointer w-full p-3 rounded-2xl border ${
-              car
-                ? "border-vigil-orange bg-vigil-light-orange"
-                : "border-zinc-200 bg-white"
-            }`}
+            className={clsx(
+              "block cursor-pointer w-full p-3 rounded-2xl",
+              car ? clsx(colorClasses.border, colorClasses.bgLight) : "border-zinc-200 bg-white",
+            )}
           >
             <input
               type="checkbox"
@@ -233,13 +253,13 @@ export const Services = ({
               className="hidden"
             />
             <h3 className="flex items-center gap-2 w-full font-bold text-lg">
-              <Car className="w-5 h-5 text-vigil-orange " />
+              <Car className={clsx("w-5 h-5", colorClasses.text)} />
               <span>Accompagnamento in auto</span>
             </h3>
             <p className="text-md text-zinc-400">
               L'operatore accompagna con la sua propria auto
             </p>
-            <p className="text-xs text-vigil-orange">
+            <p className={clsx("text-xs", colorClasses.text)}>
               +5 EUR rimborso carburante per visita
             </p>
           </label>
@@ -311,7 +331,7 @@ export const Services = ({
                   console.log("All days filled, salva ricorrenza")
                 }
               }}
-              className="px-4 py-2 rounded bg-rose-500 text-white disabled:opacity-50"
+              className={clsx("px-4 py-2 rounded text-white disabled:opacity-50", colorClasses.bg)}
             >
               {currentDayIdx === selectedDays.length - 1
                 ? "Salva ricorrenza"
