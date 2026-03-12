@@ -1,19 +1,19 @@
 import { ErrorI } from "@/src/types/error.types";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 
-const defaultError = "An error occurred";
 const getErrorByCode = (error: ErrorI) => {
   if (!error.show) return;
   switch (error.code) {
     case "required":
-      return "The field is required";
+      return ErrorMessages.FORM.FIELD_REQUIRED;
     case "minLength":
-      return "The value is too short";
+      return ErrorMessages.FORM.VALUE_TOO_SHORT;
     case "maxLength":
-      return "The value is too long";
+      return ErrorMessages.FORM.VALUE_TOO_LONG;
     case "custom":
-      return error.message || defaultError;
+      return error.message || ErrorMessages.GENERIC.DEFAULT;
     default:
-      return defaultError;
+      return ErrorMessages.GENERIC.DEFAULT;
   }
 };
 

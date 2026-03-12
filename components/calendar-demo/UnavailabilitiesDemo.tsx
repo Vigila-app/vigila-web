@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CalendarService } from "@/src/services";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import {
   VigilUnavailabilityI,
   VigilUnavailabilityFormI,
@@ -39,7 +40,7 @@ export const UnavailabilitiesDemo = () => {
       const data = await CalendarService.getVigilUnavailabilities();
       setUnavailabilities(data);
     } catch (err: any) {
-      setError(err.message || "Failed to load unavailabilities");
+      setError(err.message || ErrorMessages.AVAILABILITY.FAILED_LOAD_UNAVAILABILITIES);
       console.error("Error loading unavailabilities:", err);
     } finally {
       setLoading(false);
@@ -72,7 +73,7 @@ export const UnavailabilitiesDemo = () => {
     } catch (err: any) {
   
       setError(
-        err.message || "Failed to create unavailability",
+        err.message || ErrorMessages.AVAILABILITY.FAILED_CREATE_UNAVAILABILITY,
       );
       console.error("Error creating unavailability:", err);
     } finally {

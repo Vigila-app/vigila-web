@@ -6,6 +6,7 @@
  */
 
 import { AgendaWeekGroup, CalendarDay, CalendarEventI, WeekdayEnum } from "@/src/types/calendar.types";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 
 /**
  * Get weekday name from enum value
@@ -295,8 +296,7 @@ export const parseTimeString = (
     return {
       hour: null,
       minute: null,
-      error:
-        "Invalid TIME format. Use HH:MM or HH:MM:SS (e.g., '09:00' or '09:15:30')",
+      error: ErrorMessages.DATE_TIME.INVALID_TIME_FORMAT,
     };
   }
 
@@ -337,14 +337,14 @@ export const isValidTimeRange = (
   if (!isValidTimeComponents(startResult.hour!, startResult.minute!)) {
     return {
       valid: false,
-      error: "start_time must be between 00:00 and 23:59",
+      error: ErrorMessages.DATE_TIME.START_TIME_OUT_OF_RANGE,
     };
   }
 
   if (!isValidTimeComponents(endResult.hour!, endResult.minute!)) {
     return {
       valid: false,
-      error: "end_time must be between 00:00 and 23:59",
+      error: ErrorMessages.DATE_TIME.END_TIME_OUT_OF_RANGE,
     };
   }
 
@@ -352,7 +352,7 @@ export const isValidTimeRange = (
   if (comparison >= 0) {
     return {
       valid: false,
-      error: "end_time must be after start_time",
+      error: ErrorMessages.DATE_TIME.END_TIME_BEFORE_START,
     };
   }
 
@@ -370,11 +370,11 @@ export const isValidUnavailabilityDateRange = (
   const end = parseISODate(endAt);
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    return { valid: false, error: "Invalid date format" };
+    return { valid: false, error: ErrorMessages.DATE_TIME.INVALID_DATE_FORMAT };
   }
 
   if (end <= start) {
-    return { valid: false, error: "end_at must be after start_at" };
+    return { valid: false, error: ErrorMessages.DATE_TIME.END_DATE_BEFORE_START };
   }
 
   return { valid: true };
@@ -390,16 +390,16 @@ export const isValidAvailabilityRuleDateRange = (
   const from = parseISODate(validFrom);
 
   if (isNaN(from.getTime())) {
-    return { valid: false, error: "Invalid valid_from date format" };
+    return { valid: false, error: ErrorMessages.DATE_TIME.INVALID_VALID_FROM_DATE };
   }
 
   if (validTo) {
     const to = parseISODate(validTo);
     if (isNaN(to.getTime())) {
-      return { valid: false, error: "Invalid valid_to date format" };
+      return { valid: false, error: ErrorMessages.DATE_TIME.INVALID_VALID_TO_DATE };
     }
     if (to <= from) {
-      return { valid: false, error: "valid_to must be after valid_from" };
+      return { valid: false, error: ErrorMessages.DATE_TIME.VALID_TO_BEFORE_VALID_FROM };
     }
   }
 

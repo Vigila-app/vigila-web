@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react"
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
 import { useForm, Controller } from "react-hook-form"
+import { ErrorMessages } from "@/src/constants/errorMessages.constants"
 import { Button, ProgressBar } from "@/components"
 import Card from "@/components/card/card"
 import {
@@ -49,7 +50,7 @@ const MultiStepOnboarding = ({
       try {
         await next(currentStep, validatedAnswers)
       } catch (err: any) {
-        setError(err?.message || "An error occurred")
+        setError(err?.message || ErrorMessages.GENERIC.ERROR_OCCURRED)
       }
     },
     [currentStep, next],
@@ -66,7 +67,7 @@ const MultiStepOnboarding = ({
     try {
       await next(currentStep, currentValues)
     } catch (err: any) {
-      setError(err?.message || "An error occurred")
+      setError(err?.message || ErrorMessages.GENERIC.ERROR_OCCURRED)
     }
   }, [currentStep, trigger, getValues, next])
 

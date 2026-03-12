@@ -1,20 +1,21 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 
 const errorHanlder = (error: any) => {
   switch (error?.code) {
     case "storage/object-not-found":
-      console.error("File doesn't exist");
+      console.error(ErrorMessages.FILE.NOT_FOUND);
       break;
     case "storage/unauthorized":
-      console.error("User doesn't have permission to access the object");
+      console.error(ErrorMessages.FILE.NO_PERMISSION);
       break;
     case "storage/canceled":
-      console.error("User canceled the upload");
+      console.error(ErrorMessages.FILE.UPLOAD_CANCELED);
       break;
 
     case "storage/unknown":
     default:
-      console.error("Unknown error occurred, inspect the server response");
+      console.error(ErrorMessages.FILE.UNKNOWN_ERROR);
       break;
   }
 };

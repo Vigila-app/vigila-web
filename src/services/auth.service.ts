@@ -1,5 +1,6 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
 import { HeadersEnum } from "@/src/enums/headers.enums";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import { useAppStore } from "@/src/store/app/app.store";
 import { ApiService, UserService } from "@/src/services";
 import { UserTermsType } from "@/src/types/user.types";
@@ -206,7 +207,7 @@ export const AuthService = {
           error
         );
         useAppStore.getState().showToast({
-          message: "Sorry, something went wrong with social login",
+          message: ErrorMessages.AUTH.SOCIAL_LOGIN_FAILED,
           type: ToastStatusEnum.ERROR,
         });
         reject(error);

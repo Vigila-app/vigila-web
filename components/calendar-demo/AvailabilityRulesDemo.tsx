@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { CalendarService } from "@/src/services"
+import { ErrorMessages } from "@/src/constants/errorMessages.constants"
 import {
   VigilAvailabilityRuleI,
   VigilAvailabilityRuleFormI,
@@ -71,7 +72,7 @@ export const AvailabilityRulesDemo = ({
         return next
       })
     } catch (err: any) {
-      setError(err.message || "Failed to load availability rules")
+      setError(err.message || ErrorMessages.AVAILABILITY.FAILED_LOAD_RULES)
       console.error("Error loading rules:", err)
     } finally {
       setLoading(false)
@@ -158,7 +159,7 @@ export const AvailabilityRulesDemo = ({
       await CalendarService.createVigilAvailabilityRule(ruleData)
       await loadRules()
     } catch (err: any) {
-      setError(err.message || "Failed to create availability rule")
+      setError(err.message || ErrorMessages.AVAILABILITY.FAILED_CREATE_RULE)
       console.error("Error creating rule:", err)
     } finally {
       setLoading(false)
@@ -174,7 +175,7 @@ export const AvailabilityRulesDemo = ({
       await CalendarService.deleteVigilAvailabilityRule(ruleId)
       await loadRules()
     } catch (err: any) {
-      setError(err.message || "Failed to delete availability rule")
+      setError(err.message || ErrorMessages.AVAILABILITY.FAILED_DELETE_RULE)
       console.error("Error deleting rule:", err)
     } finally {
       setLoading(false)

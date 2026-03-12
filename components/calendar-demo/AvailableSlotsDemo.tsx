@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { CalendarService } from "@/src/services";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import {
   AvailableSlotsRequestI,
   AvailableSlotsResponseI,
@@ -48,9 +49,9 @@ export const AvailableSlotsDemo = () => {
     } catch (err: any) {
       // Provide helpful error messages for demo
       if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("Authentication required. This is expected in demo mode - in production, you would be authenticated.");
+        setError(ErrorMessages.AUTH.AUTHENTICATION_REQUIRED);
       } else {
-        setError(err.message || "Failed to fetch available slots");
+        setError(err.message || ErrorMessages.AVAILABILITY.FAILED_FETCH_SLOTS);
       }
       console.error("Error fetching slots:", err);
     } finally {

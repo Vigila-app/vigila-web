@@ -1,6 +1,7 @@
 "use client";
 
 import { FormUtils } from "@/src/utils/form.utils";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import clsx from "clsx";
 import { useState, forwardRef } from "react";
 import { FieldError } from "react-hook-form";
@@ -40,11 +41,11 @@ const InputFile = forwardRef<HTMLInputElement, InputFileI>((props, ref) => {
   const checkFile = (file?: File) => {
     if (file) {
       if (!InputFileExtension[type].includes(file.type)) {
-        setError({ type: "custom", message: "File type not supported" });
+        setError({ type: "custom", message: ErrorMessages.FILE.TYPE_NOT_SUPPORTED });
         return false;
       }
       if (file.size > maxSize) {
-        setError({ type: "custom", message: "File size too big" });
+        setError({ type: "custom", message: ErrorMessages.FILE.SIZE_TOO_BIG });
         return false;
       }
       return true;

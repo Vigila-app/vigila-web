@@ -1,6 +1,7 @@
 "use client";
 
 import { FormFieldType } from "@/src/constants/form.constants";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import { MapsService } from "@/src/services";
 import { useDebouncedSearch } from "@/src/hooks/useDebouncedSearch";
 import { useEffect, useState } from "react";
@@ -87,7 +88,7 @@ const SearchAddress = (props: {
     } catch (error) {
       throw new Error(
         `Error validating address: ${
-          error instanceof Error ? error.message : "Unknown error"
+          error instanceof Error ? error.message : ErrorMessages.GENERIC.ERROR_OCCURRED
         }`
       );
     } finally {
@@ -106,7 +107,7 @@ const SearchAddress = (props: {
         }
       } else {
         console.error(isValid, formData, errors);
-        throw new Error("Form is not valid");
+        throw new Error(ErrorMessages.FORM.NOT_VALID);
       }
     } catch (error) {
       console.error("Error searching on maps", error);
@@ -124,7 +125,7 @@ const SearchAddress = (props: {
         setSearchTerm(displayName); // Sincronizza con il nostro hook
         return address;
       } else {
-        throw new Error("Address not found for the given coordinates");
+        throw new Error(ErrorMessages.LOCATION.ADDRESS_NOT_FOUND);
       }
     } catch (error) {
       console.error("Error getting address from coordinates", error);

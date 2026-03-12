@@ -5,6 +5,7 @@ import ProviderButton from "@/components/button/providerButton";
 import { Input } from "@/components/form";
 import { SupabaseErrors } from "@/src/constants/supabase.constants";
 import { FormFieldType } from "@/src/constants/form.constants";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 import { ProviderEnum } from "@/src/enums/common.enums";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { Routes } from "@/src/routes";
@@ -78,14 +79,14 @@ const SignupComponent = (props: SignupComponentI) => {
       case SupabaseErrors.USER_EXIST: {
         router.replace(Routes.login.url);
         showToast({
-          message: "Login with your credentials",
+          message: ErrorMessages.AUTH.LOGIN_REQUIRED,
           type: ToastStatusEnum.WARNING,
         });
         break;
       }
       default: {
         showToast({
-          message: "Sorry, something went wrong",
+          message: ErrorMessages.GENERIC.SOMETHING_WENT_WRONG,
           type: ToastStatusEnum.ERROR,
         });
         break;
@@ -142,7 +143,7 @@ const SignupComponent = (props: SignupComponentI) => {
     } else if (formData.password !== formData.confirmPassword) {
       setError("confirmPassword", {
         type: "custom",
-        message: "Password and Confirm password mismatch!",
+        message: ErrorMessages.FORM.PASSWORD_MISMATCH,
       });
     }
   };

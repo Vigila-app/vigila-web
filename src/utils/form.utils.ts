@@ -1,20 +1,20 @@
 import { FieldError } from "react-hook-form";
+import { ErrorMessages } from "@/src/constants/errorMessages.constants";
 
-const defaultError = "The value is not correct";
 const getErrorByType = (error: FieldError) => {
   switch (error.type) {
     case "required":
-      return "This field is required";
+      return ErrorMessages.FORM.FIELD_REQUIRED;
     case "minLength":
-      return "The value is too short";
+      return ErrorMessages.FORM.VALUE_TOO_SHORT;
     case "maxLength":
-      return "The value is too long";
+      return ErrorMessages.FORM.VALUE_TOO_LONG;
     case "pattern":
-      return "The format is not valid";
+      return ErrorMessages.FORM.FORMAT_INVALID;
     case "custom":
-      return error.message || defaultError;
+      return error.message || ErrorMessages.FORM.VALUE_INCORRECT;
     default:
-      return defaultError;
+      return ErrorMessages.FORM.VALUE_INCORRECT;
   }
 };
 
