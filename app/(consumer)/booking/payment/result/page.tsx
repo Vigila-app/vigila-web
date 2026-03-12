@@ -127,7 +127,7 @@ function BookingPaymentResultContent() {
                 full
                 role={RolesEnum.CONSUMER}
                 label="Torna alle prenotazioni"
-                href={`${Routes.bookings.url}?tab=prenotazioni`}
+                href={`${Routes.profileConsumer.url}?tab=calendario`}
               />
               <ButtonLink
                 role={RolesEnum.VIGIL}
@@ -164,7 +164,7 @@ function BookingPaymentResultContent() {
                 full
                 role={RolesEnum.VIGIL}
                 label="Visualizza le mie prenotazioni"
-                href={`${Routes.profileConsumer.url}?tab=prenotazioni`}
+                href={`${Routes.profileConsumer.url}?tab=calendario`}
               />
               <ButtonLink
                 role={RolesEnum.CONSUMER}
@@ -192,7 +192,7 @@ function BookingPaymentResultContent() {
                 full
                 role={RolesEnum.VIGIL}
                 label="Torna alle prenotazioni"
-                href={`${Routes.profileConsumer.url}?tab=prenotazioni`}
+                href={`${Routes.profileConsumer.url}?tab=calendario`}
               />
               <ButtonLink
                 role={RolesEnum.CONSUMER}

@@ -171,7 +171,9 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
           payment_id: paymentIntentId,
           payment_status: PaymentStatusEnum.PAID,
         });
-        router.push(`${Routes.bookings.url}?success=true`);
+        router.push(
+      `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_intent=${paymentIntentId}`
+    );
       }
     } catch (e) {
       console.error(e);
