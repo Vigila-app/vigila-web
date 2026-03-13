@@ -384,11 +384,15 @@ export const MatchingDemo = () => {
                             {vigil.reviewCount > 0 && (
                               <span>
                                 ★{" "}
-                                <strong>{vigil.averageRating.toFixed(1)}</strong>{" "}
+                                <strong>
+                                  {vigil.averageRating.toFixed(1)}
+                                </strong>{" "}
                                 ({vigil.reviewCount} reviews)
                               </span>
                             )}
-                            {vigil.gender && <span>Gender: {vigil.gender}</span>}
+                            {vigil.gender && (
+                              <span>Gender: {vigil.gender}</span>
+                            )}
                             {vigil.cap && vigil.cap.length > 0 && (
                               <span>CAP: {vigil.cap.join(", ")}</span>
                             )}
@@ -400,7 +404,8 @@ export const MatchingDemo = () => {
                         vigil.compatibleSlotDetails.length > 0 && (
                           <details className="ml-9">
                             <summary className="text-xs text-blue-500 cursor-pointer hover:text-blue-700">
-                              Compatible slots ({vigil.compatibleSlotDetails.length})
+                              Compatible slots (
+                              {vigil.compatibleSlotDetails.length})
                             </summary>
                             <ul className="mt-1 space-y-0.5">
                               {vigil.compatibleSlotDetails.map((slot, si) => (
@@ -408,7 +413,9 @@ export const MatchingDemo = () => {
                                   key={si}
                                   className="text-xs text-gray-600 flex gap-2"
                                 >
-                                  <span className="font-medium">{slot.date}</span>
+                                  <span className="font-medium">
+                                    {slot.date}
+                                  </span>
                                   <span>
                                     {slot.startTime}–{slot.endTime}
                                   </span>
@@ -426,24 +433,29 @@ export const MatchingDemo = () => {
               )}
 
               {/* Unmatched slots */}
-              {response.unmatchedSlots && response.unmatchedSlots.length > 0 && (
-                <details className="mt-2">
-                  <summary className="text-xs text-amber-600 cursor-pointer hover:text-amber-800">
-                    Unmatched slots ({response.unmatchedSlots.length}) — no vigil covers these
-                  </summary>
-                  <ul className="mt-1 space-y-0.5 ml-2">
-                    {response.unmatchedSlots.map((slot, si) => (
-                      <li key={si} className="text-xs text-gray-600 flex gap-2">
-                        <span className="font-medium">{slot.date}</span>
-                        <span>
-                          {slot.startTime}–{slot.endTime}
-                        </span>
-                        <span className="text-gray-400">{slot.service}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
+              {response.unmatchedSlots &&
+                response.unmatchedSlots.length > 0 && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-amber-600 cursor-pointer hover:text-amber-800">
+                      Unmatched slots ({response.unmatchedSlots.length}) — no
+                      vigil covers these
+                    </summary>
+                    <ul className="mt-1 space-y-0.5 ml-2">
+                      {response.unmatchedSlots.map((slot, si) => (
+                        <li
+                          key={si}
+                          className="text-xs text-gray-600 flex gap-2"
+                        >
+                          <span className="font-medium">{slot.date}</span>
+                          <span>
+                            {slot.startTime}–{slot.endTime}
+                          </span>
+                          <span className="text-gray-400">{slot.service}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
 
               {/* Raw JSON toggle */}
               <details className="mt-2">

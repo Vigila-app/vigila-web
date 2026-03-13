@@ -16,6 +16,7 @@ import {
   VigilAvailabilityRuleI,
   VigilUnavailabilityI,
 } from "@/src/types/calendar.types";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
 /**
  * Parse a time string "HH:MM" or an integer hour to a numeric hour (0-23).
@@ -41,7 +42,7 @@ function formatHourToTime(hour: number): string {
 function getDatesForWeekday(
   startDate: Date,
   endDate: Date,
-  weekday: number
+  weekday: number,
 ): string[] {
   const dates: string[] = [];
   const current = new Date(startDate);
@@ -74,7 +75,7 @@ function ruleCoversSlot(
   weekday: number,
   startHour: number,
   endHour: number,
-  date: string
+  date: string,
 ): boolean {
   if (rule.weekday !== weekday) return false;
   const ruleStart = parseTimeToHour(rule.start_time);
@@ -94,10 +95,10 @@ function unavailabilityBlocksSlot(
   unav: VigilUnavailabilityI,
   date: string,
   startHour: number,
-  endHour: number
+  endHour: number,
 ): boolean {
   const slotStart = new Date(
-    `${date}T${String(startHour).padStart(2, "0")}:00:00Z`
+    `${date}T${String(startHour).padStart(2, "0")}:00:00Z`,
   );
   // endHour can be 24 (end of day) – represent as midnight of the next day
   let slotEnd: Date;
@@ -106,9 +107,7 @@ function unavailabilityBlocksSlot(
     slotEnd.setUTCDate(slotEnd.getUTCDate() + 1);
     slotEnd.setUTCHours(0, 0, 0, 0);
   } else {
-    slotEnd = new Date(
-      `${date}T${String(endHour).padStart(2, "0")}:00:00Z`
-    );
+    slotEnd = new Date(`${date}T${String(endHour).padStart(2, "0")}:00:00Z`);
   }
   const unavStart = new Date(unav.start_at);
   const unavEnd = new Date(unav.end_at);
@@ -124,7 +123,7 @@ function buildMatchedVigil(
   totalSlots: number,
   compatibleSlotDetails: CompatibleSlotI[] = [],
   averageRating = 0,
-  reviewCount = 0
+  reviewCount = 0,
 ): MatchedVigilI {
   return {
     id: vigil.id,
@@ -218,7 +217,7 @@ export async function POST(req: NextRequest) {
 
     // Enforce maximum 90-day range to prevent CPU-bound Phase 2 loops
     const daysDiff = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
     if (daysDiff > 90) {
       return jsonErrorResponse(400, {
@@ -262,7 +261,7 @@ export async function POST(req: NextRequest) {
 
     if (consumerError) {
       throw new Error(
-        `Failed to fetch consumer preferences: ${consumerError.message}`
+        `Failed to fetch consumer preferences: ${consumerError.message}`,
       );
     }
 
@@ -327,7 +326,7 @@ export async function POST(req: NextRequest) {
           success: true,
           message: "No vigils found for this search",
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -336,8 +335,8 @@ export async function POST(req: NextRequest) {
       new Set(
         selectedDays
           .map((day: number) => schedule[String(day)]?.service)
-          .filter(Boolean)
-      )
+          .filter(Boolean),
+      ),
     ) as string[];
 
     if (serviceTypes.length === 0) {
@@ -361,14 +360,14 @@ export async function POST(req: NextRequest) {
           .eq("active", true)
           .in("vigil_id", candidateVigilIds);
         return new Set<string>((data || []).map((s: any) => s.vigil_id));
-      })
+      }),
     );
 
     // Intersect: keep only vigil IDs that offer ALL required types
     const eligibleVigilIdSet = vigilIdSetsByType.reduce(
       (acc, set) =>
         new Set<string>(Array.from(acc).filter((id) => set.has(id))),
-      vigilIdSetsByType[0]
+      vigilIdSetsByType[0],
     );
 
     if (!eligibleVigilIdSet || eligibleVigilIdSet.size === 0) {
@@ -379,7 +378,7 @@ export async function POST(req: NextRequest) {
           success: true,
           message: "No vigils found offering all required services",
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -429,7 +428,7 @@ export async function POST(req: NextRequest) {
 
     if (rulesError) {
       throw new Error(
-        `Failed to fetch vigil availability rules: ${rulesError.message}`
+        `Failed to fetch vigil availability rules: ${rulesError.message}`,
       );
     }
 
@@ -443,7 +442,7 @@ export async function POST(req: NextRequest) {
 
     if (unavError) {
       throw new Error(
-        `Failed to fetch vigil unavailabilities: ${unavError.message}`
+        `Failed to fetch vigil unavailabilities: ${unavError.message}`,
       );
     }
 
@@ -487,16 +486,21 @@ export async function POST(req: NextRequest) {
 
       const slotEntries = Array.from(slotsByWeekday.entries());
       for (const [weekday, slotInfo] of slotEntries) {
-        const { dates: occurrenceDates, startHour, endHour, service } = slotInfo;
+        const {
+          dates: occurrenceDates,
+          startHour,
+          endHour,
+          service,
+        } = slotInfo;
 
         for (const date of occurrenceDates) {
           const hasCompatibleRule = rules.some((rule) =>
-            ruleCoversSlot(rule, weekday, startHour, endHour, date)
+            ruleCoversSlot(rule, weekday, startHour, endHour, date),
           );
           if (!hasCompatibleRule) continue;
 
           const isBlocked = unavs.some((unav) =>
-            unavailabilityBlocksSlot(unav, date, startHour, endHour)
+            unavailabilityBlocksSlot(unav, date, startHour, endHour),
           );
           if (!isBlocked) {
             compatibleSlots++;
@@ -504,7 +508,7 @@ export async function POST(req: NextRequest) {
               date,
               startTime: formatHourToTime(startHour),
               endTime: formatHourToTime(endHour),
-              service,
+              service: service as ServiceCatalogTypeEnum,
             });
             coveredSlotKeys.add(`${date}|${startHour}|${endHour}|${service}`);
           }
@@ -534,7 +538,7 @@ export async function POST(req: NextRequest) {
           success: true,
           message: "No vigils available for the requested schedule",
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -543,12 +547,14 @@ export async function POST(req: NextRequest) {
     for (const [, slotInfo] of Array.from(slotsByWeekday.entries())) {
       const { dates: occurrenceDates, startHour, endHour, service } = slotInfo;
       for (const date of occurrenceDates) {
-        if (!coveredSlotKeys.has(`${date}|${startHour}|${endHour}|${service}`)) {
+        if (
+          !coveredSlotKeys.has(`${date}|${startHour}|${endHour}|${service}`)
+        ) {
           unmatchedSlots.push({
             date,
             startTime: formatHourToTime(startHour),
             endTime: formatHourToTime(endHour),
-            service,
+            service: service as ServiceCatalogTypeEnum,
           });
         }
       }
@@ -566,14 +572,14 @@ export async function POST(req: NextRequest) {
               perfectMatch,
               totalSlots,
               totalSlots,
-              perfectMatchDetails
+              perfectMatchDetails,
             ),
           ],
           success: true,
           perfectMatch: true,
           unmatchedSlots: [],
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -587,8 +593,8 @@ export async function POST(req: NextRequest) {
           s.vigil,
           s.compatibleSlots,
           totalSlots,
-          s.compatibleSlotDetails
-        )
+          s.compatibleSlotDetails,
+        ),
       );
       return NextResponse.json(
         {
@@ -597,7 +603,7 @@ export async function POST(req: NextRequest) {
           success: true,
           unmatchedSlots,
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -640,7 +646,7 @@ export async function POST(req: NextRequest) {
           totalSlots,
           s.compatibleSlotDetails,
           averageRating,
-          reviewCount
+          reviewCount,
         );
       })
       .sort((a, b) => {
@@ -659,7 +665,7 @@ export async function POST(req: NextRequest) {
         success: true,
         unmatchedSlots,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Matching API error:", error);
