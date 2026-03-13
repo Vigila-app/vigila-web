@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MatchingService } from "@/src/services";
+import { MatchingService, ServicesService } from "@/src/services";
 import {
   MatchingRequestI,
   MatchingResponseI,
@@ -10,6 +10,9 @@ import {
 } from "@/src/types/matching.types";
 import { WeekdayEnum } from "@/src/types/calendar.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { Button } from "@/components";
+import { Input, Select } from "@/components/form";
+import { OptionI } from "../form/select";
 
 const WEEKDAYS: { label: string; value: WeekdayEnum }[] = [
   { label: "Sun", value: WeekdayEnum.SUNDAY },
@@ -21,13 +24,47 @@ const WEEKDAYS: { label: string; value: WeekdayEnum }[] = [
   { label: "Sat", value: WeekdayEnum.SATURDAY },
 ];
 
-const SERVICE_OPTIONS: { label: string; value: ServiceCatalogTypeEnum }[] = [
-  { label: "Companionship", value: ServiceCatalogTypeEnum.COMPANIONSHIP },
-  { label: "Light Assistance", value: ServiceCatalogTypeEnum.LIGHT_ASSISTANCE },
-  { label: "Medical Assistance", value: ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE },
-  { label: "House Keeping", value: ServiceCatalogTypeEnum.HOUSE_KEEPING },
-  { label: "Transportation", value: ServiceCatalogTypeEnum.TRANSPORTATION },
-  { label: "Specialized Care", value: ServiceCatalogTypeEnum.SPECIALIZED_CARE },
+const SERVICE_OPTIONS: { label: string; value: string }[] = [
+  {
+    label:
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.COMPANIONSHIP)[0]
+        ?.name || ServiceCatalogTypeEnum.COMPANIONSHIP,
+    value: ServiceCatalogTypeEnum.COMPANIONSHIP,
+  },
+  {
+    label:
+      ServicesService.getServicesByType(
+        ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
+      )[0]?.name || ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
+    value: ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
+  },
+  {
+    label:
+      ServicesService.getServicesByType(
+        ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
+      )[0]?.name || ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
+    value: ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
+  },
+  {
+    label:
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.HOUSE_KEEPING)[0]
+        ?.name || ServiceCatalogTypeEnum.HOUSE_KEEPING,
+    value: ServiceCatalogTypeEnum.HOUSE_KEEPING,
+  },
+  {
+    label:
+      ServicesService.getServicesByType(
+        ServiceCatalogTypeEnum.TRANSPORTATION,
+      )[0]?.name || ServiceCatalogTypeEnum.TRANSPORTATION,
+    value: ServiceCatalogTypeEnum.TRANSPORTATION,
+  },
+  {
+    label:
+      ServicesService.getServicesByType(
+        ServiceCatalogTypeEnum.SPECIALIZED_CARE,
+      )[0]?.name || ServiceCatalogTypeEnum.SPECIALIZED_CARE,
+    value: ServiceCatalogTypeEnum.SPECIALIZED_CARE,
+  },
 ];
 
 const today = new Date().toISOString().split("T")[0];
@@ -69,7 +106,7 @@ export const MatchingDemo = () => {
   const [endDate, setEndDate] = useState(defaultEndDate);
 
   // Address
-  const [postcode, setPostcode] = useState("23900");
+  const [postcode, setPostcode] = useState("23811");
 
   const toggleDay = (day: WeekdayEnum) => {
     setSelectedDays((prev) => {
@@ -94,7 +131,7 @@ export const MatchingDemo = () => {
   const updateScheduleEntry = (
     day: WeekdayEnum,
     field: keyof ScheduleEntryI,
-    value: string
+    value: string,
   ) => {
     setSchedule((prev) => ({
       ...prev,
@@ -123,13 +160,11 @@ export const MatchingDemo = () => {
       const result = await MatchingService.findMatches(payload);
       setResponse(result);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Matching request failed";
-      if (
-        message.includes("401") ||
-        message.includes("Unauthorized")
-      ) {
+      const message =
+        err instanceof Error ? err.message : "Matching request failed";
+      if (message.includes("401") || message.includes("Unauthorized")) {
         setError(
-          "Authentication required. Log in as a Consumer to use this endpoint."
+          "Authentication required. Log in as a Consumer to use this endpoint.",
         );
       } else {
         setError(message);
@@ -190,57 +225,51 @@ export const MatchingDemo = () => {
           )}
           {selectedDays.map((day) => {
             const entry = schedule[String(day)] ?? DEFAULT_SCHEDULE_ENTRY;
-            const dayLabel = WEEKDAYS.find((w) => w.value === day)?.label ?? day;
+            const dayLabel =
+              WEEKDAYS.find((w) => w.value === day)?.label ?? day;
             return (
               <div
                 key={day}
                 className="border border-gray-100 rounded-lg p-4 bg-gray-50 space-y-3"
               >
-                <p className="text-sm font-semibold text-gray-700">{dayLabel}</p>
-                <div className="grid grid-cols-3 gap-3">
+                <p className="text-sm font-semibold text-gray-700">
+                  {dayLabel}
+                </p>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      Start
-                    </label>
-                    <input
+                    <Input
+                      label="Inizio"
                       type="time"
                       value={entry.start}
-                      onChange={(e) =>
-                        updateScheduleEntry(day, "start", e.target.value)
+                      onChange={(value) =>
+                        updateScheduleEntry(day, "start", value.toString())
                       }
-                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      End
-                    </label>
-                    <input
+                    <Input
+                      label="Fine"
                       type="time"
                       value={entry.end}
-                      onChange={(e) =>
-                        updateScheduleEntry(day, "end", e.target.value)
+                      onChange={(value) =>
+                        updateScheduleEntry(day, "end", value.toString())
                       }
-                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      Service
-                    </label>
-                    <select
+                    <Select
+                      label="Servizio"
                       value={entry.service}
-                      onChange={(e) =>
-                        updateScheduleEntry(day, "service", e.target.value)
+                      onChange={(value) =>
+                        updateScheduleEntry(day, "service", value?.toString())
                       }
-                      className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    >
-                      {SERVICE_OPTIONS.map(({ label, value }) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
+                      options={
+                        SERVICE_OPTIONS.map(({ label, value }) => ({
+                          label,
+                          value,
+                        })) as OptionI[]
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -250,50 +279,40 @@ export const MatchingDemo = () => {
           {/* Date range */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Start date
-              </label>
-              <input
+              <Input
+                label="Data inizio"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(value) => setStartDate(value.toString())}
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                End date
-              </label>
-              <input
+              <Input
+                label="Data fine"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                onChange={(value) => setEndDate(value.toString())}
               />
             </div>
           </div>
 
           {/* Postcode */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Postcode (CAP)
-            </label>
-            <input
+            <Input
+              label="Codice Postale (CAP)"
               type="text"
               value={postcode}
-              onChange={(e) => setPostcode(e.target.value)}
-              placeholder="e.g. 23900"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onChange={(value) => setPostcode(value.toString())}
+              placeholder="e.g. 23811"
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading || selectedDays.length === 0}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-          >
-            {loading ? "Searching…" : "Find Matching Vigils"}
-          </button>
+            full
+            label={loading ? "Ricerca in corso.." : "Trova Vigil compatibili"}
+          />
         </form>
 
         {/* ── Right: payload preview + results ── */}
@@ -353,9 +372,7 @@ export const MatchingDemo = () => {
                           {vigil.reviewCount > 0 && (
                             <span>
                               ★{" "}
-                              <strong>
-                                {vigil.averageRating.toFixed(1)}
-                              </strong>{" "}
+                              <strong>{vigil.averageRating.toFixed(1)}</strong>{" "}
                               ({vigil.reviewCount} reviews)
                             </span>
                           )}
