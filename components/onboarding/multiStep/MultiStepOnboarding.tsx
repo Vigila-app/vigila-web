@@ -37,6 +37,7 @@ const MultiStepOnboarding = ({
     formState: { errors },
     trigger,
     getValues,
+    setValue,
   } = useForm({
     mode: "onChange",
     defaultValues: state.answers,
@@ -120,6 +121,14 @@ const MultiStepOnboarding = ({
                       role={role}
                       step={currentStep}
                       answers={state.answers}
+                      setAnswers={(updater: (prev: Record<string, any>) => Record<string, any>) => {
+                        const prev = getValues()
+                        const next = updater(prev || {})
+                        Object.keys(next).forEach((key) => {
+                          setValue(key as any, next[key])
+                        })
+                      }}
+                      availabilityRules={state.answers?.availabilityRules}
                       onNext={onNext}
                       onBack={back}
                     />

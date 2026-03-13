@@ -93,6 +93,7 @@ const VigilOnboardComponent = () => {
   const onSubmit = async (formData: OnboardFormI) => {
     if (!isValid) return;
     try {
+      
       showLoader();
       const {
         birthday,
@@ -107,6 +108,8 @@ const VigilOnboardComponent = () => {
       const caps = Array.from(
         new Set(addresses.map((addr) => addr.address?.postcode).filter(Boolean))
       );
+
+      console.log(addresses, caps);
 
       const servicesWithCaps = services.map((service) => ({
         ...service,

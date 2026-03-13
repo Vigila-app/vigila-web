@@ -353,7 +353,20 @@ export const CalendarService = {
       throw error
     }
   },
-
+createVigilAvailabilityRule: async (
+    rule: VigilAvailabilityRuleFormI,
+  ): Promise<VigilAvailabilityRuleI> => {
+    try {
+      const response = (await ApiService.post(
+        apiCalendar.VIGIL_AVAILABILITY_RULES(),
+        rule,
+      )) as any
+      return response.data
+    } catch (error) {
+      console.error("CalendarService.createVigilAvailabilityRule error", error)
+      throw error
+    }
+  },
   /**
    * Create vigil availability rule
    */
