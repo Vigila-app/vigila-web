@@ -90,11 +90,7 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId);
-    console.log(
-      `Payment Intent creato con successo per bookingId ${bookingId}:`,
-      paymentIntent,
-      userObject.id,
-    );
+   
     return NextResponse.json(
       {
         code: ResponseCodesConstants.PAYMENT_INTENT_SUCCESS.code,
