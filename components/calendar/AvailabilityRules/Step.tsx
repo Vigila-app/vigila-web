@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react"
 import { QuestionRenderer } from "@/components/onboarding/multiStep"
 import {
@@ -6,7 +7,7 @@ import {
   OnboardingStep,
   QuestionType,
 } from "@/src/types/multiStepOnboard.types"
-import { CalendarIcon, ChatBubbleBottomCenterIcon, MapPinIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, ChatBubbleBottomCenterIcon, MapPinIcon } from "@heroicons/react/24/outline"
 import clsx from "clsx"
 import { RolesEnum } from "@/src/enums/roles.enums"
 

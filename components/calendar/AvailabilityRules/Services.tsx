@@ -20,37 +20,31 @@ export const Services = ({
   ) => void
   role?: RolesEnum
 }) => {
-  console.log(answers)
-  const ServiceIcons = [
-    () => <span className="inline-block w-5 h-5 bg-blue-200 rounded-full" />, // Replace with real icons
-    () => <span className="inline-block w-5 h-5 bg-green-200 rounded-full" />,
-    () => <span className="inline-block w-5 h-5 bg-yellow-200 rounded-full" />,
-    () => <span className="inline-block w-5 h-5 bg-pink-200 rounded-full" />,
-  ]
+  
 
   const SERVICES = [
     {
       name: "Compagnia e conversazione",
       desc: "Presenza, dialogo e supporto emotivo",
-      Icon: Caffe as ComponentType<{ className?: string | undefined }>,
+      Icon: Caffe as ComponentType<{ className?: string }>,
       price: 12,
     },
     {
       name: "Assistenza leggera",
       desc: "Supervisione, promemoria farmaci, piccole commissioni",
-      Icon: HeartIcon as ComponentType<{ className?: string | undefined }>,
+      Icon: HeartIcon as ComponentType<{ className?: string }>,
       price: 14,
     },
     {
       name: "Assistenza alla persona",
       desc: "Mobiiltà, pasti, vestizione",
-      Icon: UserGroupIcon as ComponentType<{ className?: string | undefined }>,
+      Icon: UserGroupIcon as ComponentType<{ className?: string }>,
       price: 16,
     },
     {
       name: "Igiene personale",
       desc: "Bagno, cambio, cura personale",
-      Icon: Vasca as ComponentType<{ className?: string | undefined }>,
+      Icon: Vasca as ComponentType<{ className?: string }>,
       price: 18,
     },
   ]
@@ -76,7 +70,9 @@ export const Services = ({
 
   // derive unique ordered weekdays from answers.availabilityRules
   const selectedDays: number[] = Array.from(
-    new Set((answers?.availabilityRules || []).map((r: any) => Number(r.weekday))),
+    new Set(
+      (answers?.availabilityRules || []).map((r: any) => Number(r.weekday)),
+    ),
   )
 
   const [currentDayIdx, setCurrentDayIdx] = useState(0)
@@ -183,7 +179,6 @@ export const Services = ({
             </span>
           </>
         )}
-        {/* TODO: add how many hours is each slot in this format (2h) */}
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
           <div className="grid grid-cols-2 gap-3">
@@ -222,7 +217,9 @@ export const Services = ({
                   }}
                   className={clsx(
                     "cursor-pointer w-full py-3 text-center rounded-full",
-                    isChecked ? clsx(colorClasses.border, colorClasses.bgLight) : "border-zinc-200 bg-white",
+                    isChecked
+                      ? clsx(colorClasses.border, colorClasses.bgLight)
+                      : "border-zinc-200 bg-white",
                   )}
                 >
                   <input
@@ -243,7 +240,9 @@ export const Services = ({
           <label
             className={clsx(
               "block cursor-pointer w-full p-3 rounded-2xl",
-              car ? clsx(colorClasses.border, colorClasses.bgLight) : "border-zinc-200 bg-white",
+              car
+                ? clsx(colorClasses.border, colorClasses.bgLight)
+                : "border-zinc-200 bg-white",
             )}
           >
             <input
@@ -288,8 +287,8 @@ export const Services = ({
                 // Save current day selections into answers
                 if (setAnswers) {
                   setAnswers((prev: Record<string, any>) => {
-                    const next = { ...(prev || {}) }
-                    next.services = { ...(next.services || {}) }
+                    const next = { ...prev }
+                    next.services = { ...next.services }
                     // Save actual selections for the day
                     next.services[day] = {
                       weekday: Number(day),
@@ -300,10 +299,6 @@ export const Services = ({
                     }
                     return next
                   })
-
-                  // TODO: POST to API to save services for this day
-                  // const payload = { services: selectedServices, mansioni: selectedMansioni, car, notes }
-                  // await ApiService.post(`/api/vigil/availability-rules/${day}/services`, payload)
                 }
 
                 // move to next day or finalize
@@ -327,11 +322,13 @@ export const Services = ({
                   setCurrentDayIdx(nextIdx)
                 } else {
                   // last day: finalize / salva ricorrenza
-                  // TODO: trigger final save/API call for whole recurrence
                   console.log("All days filled, salva ricorrenza")
                 }
               }}
-              className={clsx("px-4 py-2 rounded text-white disabled:opacity-50", colorClasses.bg)}
+              className={clsx(
+                "px-4 py-2 rounded text-white disabled:opacity-50",
+                colorClasses.bg,
+              )}
             >
               {currentDayIdx === selectedDays.length - 1
                 ? "Salva ricorrenza"

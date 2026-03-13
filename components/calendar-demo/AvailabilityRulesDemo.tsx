@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect, useMemo } from "react"
 import clsx from "clsx"
 import {
   VigilAvailabilityRuleI,
@@ -40,7 +40,7 @@ export const AvailabilityRulesDemo = ({
   // when to persist them (e.g. when user moves to next step).
   useEffect(() => {
     if (setAnswers) {
-      setAnswers((prev) => ({ ...(prev || {}), availabilityRules: rules }))
+      setAnswers((prev) => ({ ...(prev), availabilityRules: rules }))
     }
   }, [rules, setAnswers])
 
@@ -145,29 +145,6 @@ export const AvailabilityRulesDemo = ({
     })
     return grouped
   }, [rules, weekdays])
-
-  // Compute whether the current draft for each weekday overlaps existing rules
-  const draftOverlaps = useMemo(() => {
-    const map: Record<number, boolean> = {}
-    weekdays.forEach((day) => {
-      const draft = draftSlots[day.value]
-      if (!draft) {
-        map[day.value] = false
-        return
-      }
-      const startMinutes = getMinutesFromTime(draft.start)
-      const endMinutes = startMinutes + draft.durationHours * 60
-      if (endMinutes > 24 * 60 || endMinutes <= startMinutes) {
-        // treat invalid times as overlapping to prevent adding
-        map[day.value] = true
-        return
-      }
-      map[day.value] = isOverlapping(day.value as WeekdayEnum, startMinutes, endMinutes)
-    })
-    return map
-  }, [weekdays, draftSlots, rules])
-
-  // Edit-related state and handlers removed — rules are read-only after saving
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -548,7 +525,7 @@ export const AvailabilityRulesDemo = ({
                                   setError("Orario di fine non valido")
                                   return
                                 }
-                                if (isOverlapping(day.value as WeekdayEnum, startM, endM)) {
+                                if (isOverlapping(day.value, startM, endM)) {
                                   setError("La fascia si sovrappone a una esistente")
                                   return
                                 }

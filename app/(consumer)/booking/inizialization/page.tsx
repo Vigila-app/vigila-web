@@ -2,10 +2,13 @@
 
 import { useRouter } from "next/navigation"
 import { Routes } from "@/src/routes"
-import AvailabilityFlow from "@/components/calendar/AvailabilityRules/AvailabilityFlow"
-// Se hai icone specifiche importale, altrimenti le ho lasciate opzionali nel tipo
-
-
+import dynamic from "next/dynamic"
+const AvailabilityFlow = dynamic(
+  () => import("@/components/calendar/AvailabilityRules/AvailabilityFlow"),
+  {
+    ssr: false,
+  },
+)
 
 const FirstBookingSelection = () => {
   const router = useRouter()

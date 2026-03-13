@@ -10,7 +10,6 @@ import {
   CalendarEventI,
 } from "@/src/types/calendar.types";
 import { NextRequest, NextResponse } from "next/server";
-import { BookingI } from "@/src/types/booking.types";
 
 /**
  * GET /api/calendar/consumer

@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react"
+"use client"
+import React from "react"
 import { useForm } from "react-hook-form"
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
 import {
@@ -7,9 +8,6 @@ import {
 } from "@/src/types/multiStepOnboard.types"
 import { RolesEnum } from "@/src/enums/roles.enums"
 import { AvailabilityRulesDemo } from "@/components/calendar-demo"
-// Dummy icons for demo (replace with your own icons as needed)
-
-import QuestionRenderer from "@/components/onboarding/multiStep/QuestionRenderer"
 import { Step } from "./Step"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { Services } from "./Services"
@@ -21,10 +19,7 @@ export default function AvailabilityFlow({
 }: Readonly<{
   onComplete: () => void
 }>) {
-  // --- New state for selected days and per-day service selection ---
-  // In a real app, get this from answers or context. Here, we use a demo default:
 
-  // ---
 
   const config: MultiStepOnboardingProps["config"] = {
     role: RolesEnum.CONSUMER,
@@ -83,7 +78,6 @@ export default function AvailabilityFlow({
         title: "Seleziona servizi per giorno",
         description: "",
         questions: [],
-        // Pass answers as prop to Services
         component: Services,
         note: "Seleziona i servizi e mansioni per ogni giorno scelto.",
         nextStep: "",

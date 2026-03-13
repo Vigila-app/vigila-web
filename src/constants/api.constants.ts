@@ -1,16 +1,15 @@
 import { isServer } from "@/src/utils/common.utils";
-import { isMocked, isReleased } from "@/src/utils/envs.utils";
-import { SupabaseConstants } from "@/src/constants/supabase.constants";
-import { CmsContentType } from "@/src/enums/cms.enums";
-import { AppConstants } from "@/src/constants";
-import { ServiceI } from "@/src/types/services.types";
-import { BookingI } from "@/src/types/booking.types";
-import { RolesEnum } from "@/src/enums/roles.enums";
-import { VigilDetailsType } from "@/src/types/vigil.types";
-import { ConsumerDetailsType } from "@/src/types/consumer.types";
+import { isMocked, isReleased } from "@/src/utils/envs.utils"
+import { CmsContentType } from "@/src/enums/cms.enums"
+import { AppConstants } from "@/src/constants"
+import { ServiceI } from "@/src/types/services.types"
+import { BookingI } from "@/src/types/booking.types"
+import { RolesEnum } from "@/src/enums/roles.enums"
+import { VigilDetailsType } from "@/src/types/vigil.types"
+import { ConsumerDetailsType } from "@/src/types/consumer.types"
 
 const checkIfIsMock = (isMock: boolean): boolean =>
-  (isMock || isMocked) && !isReleased;
+  (isMock || isMocked) && !isReleased
 
 const apiRoot = {
   MOCKS: "http://localhost:3000",
@@ -18,23 +17,24 @@ const apiRoot = {
     ? isMocked
       ? "http://localhost:3000"
       : AppConstants.hostUrl
-    : `${window.location.origin}`,
-};
+    : typeof window !== "undefined"
+      ? window.location.origin
+      : AppConstants.hostUrl,
+}
 
 const getEnv = (isMock: boolean) => {
   if (isReleased) {
-    return apiRoot.RELEASE;
+    return apiRoot.RELEASE
   }
   if (checkIfIsMock(isMock)) {
-    return apiRoot.MOCKS;
+    return apiRoot.MOCKS
   }
-  return apiRoot.RELEASE;
-};
+  return apiRoot.RELEASE
+}
 
 const apiBase = {
   V1: (isMock = false) => `${getEnv(isMock)}/api/v1`,
-  V2: (isMock = false) => `${getEnv(isMock)}/api/v2`
-};
+}
 
 const apiControllers = {
   // region ADMIN
@@ -77,7 +77,7 @@ const apiControllers = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean
+    isMock?: boolean,
   ): string => `${apiBase.V1(isMock)}/cms/${contentType}/${contentId}`,
   // endregion CMS
 
@@ -139,9 +139,9 @@ const apiControllers = {
   // endregion EMAIL
 
   // region CALENDAR
-  CALENDAR: (isMock?: boolean): string => `${apiBase.V2(isMock)}/calendar`,
+  CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
   // endregion CALENDAR
-};
+}
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
