@@ -354,37 +354,95 @@ export const MatchingDemo = () => {
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {response.data.map((vigil: MatchedVigilI, idx: number) => (
-                    <li key={vigil.id} className="py-3 flex items-start gap-3">
-                      <span className="text-lg font-bold text-blue-600 w-6 shrink-0">
-                        {idx + 1}
-                      </span>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <p className="font-medium text-gray-900 truncate">
-                          {vigil.displayName ?? vigil.id}
-                        </p>
-                        <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                          <span>
-                            Slots:{" "}
-                            <strong>
-                              {vigil.compatibleSlots}/{vigil.totalSlots}
-                            </strong>
-                          </span>
-                          {vigil.reviewCount > 0 && (
+                    <li key={vigil.id} className="py-3 space-y-2">
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg font-bold text-blue-600 w-6 shrink-0">
+                          {idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-medium text-gray-900 truncate">
+                              {vigil.displayName ?? vigil.id}
+                            </p>
+                            {vigil.partialMatch ? (
+                              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                Partial match
+                              </span>
+                            ) : (
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                Full match
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                             <span>
-                              ★{" "}
-                              <strong>{vigil.averageRating.toFixed(1)}</strong>{" "}
-                              ({vigil.reviewCount} reviews)
+                              Slots:{" "}
+                              <strong>
+                                {vigil.compatibleSlots}/{vigil.totalSlots}
+                              </strong>
                             </span>
-                          )}
-                          {vigil.gender && <span>Gender: {vigil.gender}</span>}
-                          {vigil.cap && vigil.cap.length > 0 && (
-                            <span>CAP: {vigil.cap.join(", ")}</span>
-                          )}
+                            {vigil.reviewCount > 0 && (
+                              <span>
+                                ★{" "}
+                                <strong>{vigil.averageRating.toFixed(1)}</strong>{" "}
+                                ({vigil.reviewCount} reviews)
+                              </span>
+                            )}
+                            {vigil.gender && <span>Gender: {vigil.gender}</span>}
+                            {vigil.cap && vigil.cap.length > 0 && (
+                              <span>CAP: {vigil.cap.join(", ")}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
+                      {/* Compatible slot details */}
+                      {vigil.compatibleSlotDetails &&
+                        vigil.compatibleSlotDetails.length > 0 && (
+                          <details className="ml-9">
+                            <summary className="text-xs text-blue-500 cursor-pointer hover:text-blue-700">
+                              Compatible slots ({vigil.compatibleSlotDetails.length})
+                            </summary>
+                            <ul className="mt-1 space-y-0.5">
+                              {vigil.compatibleSlotDetails.map((slot, si) => (
+                                <li
+                                  key={si}
+                                  className="text-xs text-gray-600 flex gap-2"
+                                >
+                                  <span className="font-medium">{slot.date}</span>
+                                  <span>
+                                    {slot.startTime}–{slot.endTime}
+                                  </span>
+                                  <span className="text-gray-400">
+                                    {slot.service}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {/* Unmatched slots */}
+              {response.unmatchedSlots && response.unmatchedSlots.length > 0 && (
+                <details className="mt-2">
+                  <summary className="text-xs text-amber-600 cursor-pointer hover:text-amber-800">
+                    Unmatched slots ({response.unmatchedSlots.length}) — no vigil covers these
+                  </summary>
+                  <ul className="mt-1 space-y-0.5 ml-2">
+                    {response.unmatchedSlots.map((slot, si) => (
+                      <li key={si} className="text-xs text-gray-600 flex gap-2">
+                        <span className="font-medium">{slot.date}</span>
+                        <span>
+                          {slot.startTime}–{slot.endTime}
+                        </span>
+                        <span className="text-gray-400">{slot.service}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               )}
 
               {/* Raw JSON toggle */}

@@ -6,7 +6,12 @@ import {
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { MatchingRequestI, MatchedVigilI } from "@/src/types/matching.types";
+import {
+  MatchingRequestI,
+  MatchedVigilI,
+  CompatibleSlotI,
+  UnmatchedSlotI,
+} from "@/src/types/matching.types";
 import {
   VigilAvailabilityRuleI,
   VigilUnavailabilityI,
@@ -19,6 +24,13 @@ import {
 function parseTimeToHour(time: string | number): number {
   if (typeof time === "number") return time;
   return parseInt(time.split(":")[0], 10);
+}
+
+/**
+ * Format a numeric hour (e.g. 9 or 18) to an HH:MM time string (e.g. "09:00" or "18:00").
+ */
+function formatHourToTime(hour: number): string {
+  return String(hour).padStart(2, "0") + ":00";
 }
 
 /**
@@ -110,6 +122,7 @@ function buildMatchedVigil(
   vigil: any,
   compatibleSlots: number,
   totalSlots: number,
+  compatibleSlotDetails: CompatibleSlotI[] = [],
   averageRating = 0,
   reviewCount = 0
 ): MatchedVigilI {
@@ -121,6 +134,8 @@ function buildMatchedVigil(
     cap: vigil.cap,
     compatibleSlots,
     totalSlots,
+    partialMatch: compatibleSlots < totalSlots,
+    compatibleSlotDetails,
     averageRating,
     reviewCount,
   };
@@ -451,17 +466,28 @@ export async function POST(req: NextRequest) {
     }
 
     // Count compatible slots per vigil; detect perfect matches early
-    const vigilScores: Array<{ vigil: any; compatibleSlots: number }> = [];
+    const vigilScores: Array<{
+      vigil: any;
+      compatibleSlots: number;
+      compatibleSlotDetails: CompatibleSlotI[];
+    }> = [];
     let perfectMatch: any = null;
+    let perfectMatchDetails: CompatibleSlotI[] = [];
+
+    // Track which slot-occurrences are covered by at least one vigil (for unmatchedSlots).
+    // Key: "<date>|<startHour>|<endHour>|<service>" — uniquely identifies each slot-occurrence
+    // even if future schema changes allow multiple schedule entries on the same weekday.
+    const coveredSlotKeys = new Set<string>();
 
     for (const vigil of vigils) {
       const rules = rulesByVigilId.get(vigil.id) || [];
       const unavs = unavByVigilId.get(vigil.id) || [];
       let compatibleSlots = 0;
+      const compatibleSlotDetails: CompatibleSlotI[] = [];
 
       const slotEntries = Array.from(slotsByWeekday.entries());
       for (const [weekday, slotInfo] of slotEntries) {
-        const { dates: occurrenceDates, startHour, endHour } = slotInfo;
+        const { dates: occurrenceDates, startHour, endHour, service } = slotInfo;
 
         for (const date of occurrenceDates) {
           const hasCompatibleRule = rules.some((rule) =>
@@ -474,6 +500,13 @@ export async function POST(req: NextRequest) {
           );
           if (!isBlocked) {
             compatibleSlots++;
+            compatibleSlotDetails.push({
+              date,
+              startTime: formatHourToTime(startHour),
+              endTime: formatHourToTime(endHour),
+              service,
+            });
+            coveredSlotKeys.add(`${date}|${startHour}|${endHour}|${service}`);
           }
         }
 
@@ -482,10 +515,11 @@ export async function POST(req: NextRequest) {
       }
 
       if (compatibleSlots > 0) {
-        vigilScores.push({ vigil, compatibleSlots });
+        vigilScores.push({ vigil, compatibleSlots, compatibleSlotDetails });
 
         if (compatibleSlots === totalSlots) {
           perfectMatch = vigil;
+          perfectMatchDetails = compatibleSlotDetails;
           break; // Stop processing remaining vigils – perfect match found
         }
       }
@@ -504,14 +538,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Compute unmatched slots: slot-occurrences not covered by any vigil in the result set
+    const unmatchedSlots: UnmatchedSlotI[] = [];
+    for (const [, slotInfo] of Array.from(slotsByWeekday.entries())) {
+      const { dates: occurrenceDates, startHour, endHour, service } = slotInfo;
+      for (const date of occurrenceDates) {
+        if (!coveredSlotKeys.has(`${date}|${startHour}|${endHour}|${service}`)) {
+          unmatchedSlots.push({
+            date,
+            startTime: formatHourToTime(startHour),
+            endTime: formatHourToTime(endHour),
+            service,
+          });
+        }
+      }
+    }
+
     // Early exit: perfect match
+    // A perfect match means compatibleSlots === totalSlots, so by definition
+    // all requested slot-occurrences are covered and unmatchedSlots is empty.
     if (perfectMatch) {
       return NextResponse.json(
         {
           code: ResponseCodesConstants.MATCHING_SUCCESS.code,
-          data: [buildMatchedVigil(perfectMatch, totalSlots, totalSlots)],
+          data: [
+            buildMatchedVigil(
+              perfectMatch,
+              totalSlots,
+              totalSlots,
+              perfectMatchDetails
+            ),
+          ],
           success: true,
           perfectMatch: true,
+          unmatchedSlots: [],
         },
         { status: 200 }
       );
@@ -523,13 +583,19 @@ export async function POST(req: NextRequest) {
     // Early exit: 5 or fewer candidates – return sorted list without quality ranking
     if (vigilScores.length <= 5) {
       const results: MatchedVigilI[] = vigilScores.map((s) =>
-        buildMatchedVigil(s.vigil, s.compatibleSlots, totalSlots)
+        buildMatchedVigil(
+          s.vigil,
+          s.compatibleSlots,
+          totalSlots,
+          s.compatibleSlotDetails
+        )
       );
       return NextResponse.json(
         {
           code: ResponseCodesConstants.MATCHING_SUCCESS.code,
           data: results,
           success: true,
+          unmatchedSlots,
         },
         { status: 200 }
       );
@@ -572,6 +638,7 @@ export async function POST(req: NextRequest) {
           s.vigil,
           s.compatibleSlots,
           totalSlots,
+          s.compatibleSlotDetails,
           averageRating,
           reviewCount
         );
@@ -590,6 +657,7 @@ export async function POST(req: NextRequest) {
         code: ResponseCodesConstants.MATCHING_SUCCESS.code,
         data: rankedResults,
         success: true,
+        unmatchedSlots,
       },
       { status: 200 }
     );

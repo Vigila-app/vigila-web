@@ -40,6 +40,28 @@ export interface MatchingRequestI {
 }
 
 /**
+ * A single compatible slot occurrence for a matched Vigil.
+ * Describes the specific date, time window, and service type that this vigil can cover.
+ */
+export interface CompatibleSlotI {
+  date: string; // ISO date YYYY-MM-DD
+  startTime: string; // HH:MM format, e.g. "09:00"
+  endTime: string; // HH:MM format, e.g. "13:00"
+  service: ServiceCatalogTypeEnum; // ServiceCatalogTypeEnum value, e.g. "light_assistance"
+}
+
+/**
+ * A requested slot occurrence that no vigil in the result set can cover.
+ * Allows consumers to understand which parts of their schedule remain unmatched.
+ */
+export interface UnmatchedSlotI {
+  date: string; // ISO date YYYY-MM-DD
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  service: ServiceCatalogTypeEnum; // The service type requested for this slot
+}
+
+/**
  * A matched Vigil entry with scoring metadata.
  * Only contains public-safe fields (no PII).
  */
@@ -53,6 +75,10 @@ export interface MatchedVigilI {
   reviewCount: number;
   compatibleSlots: number;
   totalSlots: number;
+  /** Whether this vigil covers fewer than totalSlots (i.e. is a partial match). */
+  partialMatch: boolean;
+  /** Detailed list of slot occurrences this vigil is compatible with. */
+  compatibleSlotDetails: CompatibleSlotI[];
 }
 
 /**
@@ -64,5 +90,7 @@ export interface MatchingResponseI {
   data: MatchedVigilI[];
   perfectMatch?: boolean;
   totalSlots?: number;
+  /** Slot occurrences from the request that no returned vigil can cover. */
+  unmatchedSlots?: UnmatchedSlotI[];
   message?: string;
 }
