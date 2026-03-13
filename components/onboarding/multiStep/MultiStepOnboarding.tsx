@@ -49,6 +49,14 @@ const MultiStepOnboarding = ({
       if (!currentStep) return
       try {
         await next(currentStep, validatedAnswers)
+        // Scroll to top when moving to the next step for better UX
+        if (typeof window !== "undefined") {
+          try {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          } catch (e) {
+            window.scrollTo(0, 0)
+          }
+        }
       } catch (err: any) {
         setError(err?.message || "An error occurred")
       }
@@ -66,6 +74,14 @@ const MultiStepOnboarding = ({
     const currentValues = getValues()
     try {
       await next(currentStep, currentValues)
+      // Scroll to top after advancing
+      if (typeof window !== "undefined") {
+        try {
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        } catch (e) {
+          window.scrollTo(0, 0)
+        }
+      }
     } catch (err: any) {
       setError(err?.message || "An error occurred")
     }
@@ -76,7 +92,7 @@ const MultiStepOnboarding = ({
   }
 
   return (
-    <div className="w-full max-w-full mx-auto px-4 pt-8 pb-4">
+    <div className="relative w-full max-w-full mx-auto px-4 pt-8 pb-4">
       {/* TODO: posso consigliare di aggiungere un testo all’inizio, es. Step1, in cui spieghiamo che abbiamo bisogno di alcune risposte per creare un’esperienza su misura e di qualità e che il tutto impiegherà meno di 5 minut */}
       <div className="mb-7">
         <ProgressBar percentage={progress} />
@@ -162,7 +178,11 @@ const MultiStepOnboarding = ({
                 ))}
             <hr />
             {/* Navigation buttons */}
-            <div className="flex justify-between items-center pt-4">
+            {/* 
+            // Versione con bottoni floating: non sono convinta, l'utente potrebbe perdersi le domande in basso
+            <div className="fixed h-[15vh] md:h-unset bottom-0 left-0 md:static z-10 backdrop-blur-lg bg-white/30 bg-clip-padding p-5 w-full flex justify-between items-center pb-10 md:pb-5"> */}
+
+            <div className=" p-5 w-full flex justify-between items-center pt-4">
               {state.visitedSteps.length > 1 ? (
                 <Button
                   type="button"
