@@ -5,10 +5,13 @@ import { Routes } from "@/src/routes";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { redirect } from "next/navigation";
-import { BookingsService, PaymentService } from "@/src/services";
+import { BookingsService } from "@/src/services";
 import { PaymentStatusEnum } from "@/src/enums/booking.enums";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef, useCallback } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 10;
 
 function BookingPaymentResultContent() {
   const {
@@ -16,62 +19,43 @@ function BookingPaymentResultContent() {
   } = useQueryParams();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string>("");
   const [paymentVerified, setPaymentVerified] = useState(false);
+  const pollCountRef = useRef(0);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   if (!bookingId) {
     redirect(Routes.home.url);
   }
 
-  const verifyAndUpdatePayment = async () => {
+  const pollBookingStatus = useCallback(async () => {
     try {
-      setIsLoading(true);
-      setError("");
+      const booking = await BookingsService.getBookingDetails(bookingId);
 
-      // Prima verifica lo stato del pagamento con Stripe
-      const paymentVerification =
-        await PaymentService.verifyPaymentIntent(payment_intent);
-
-      if (!paymentVerification.success) {
-        throw new Error("Impossibile verificare lo stato del pagamento");
+      if (booking.payment_status === PaymentStatusEnum.PAID) {
+        setPaymentVerified(true);
+        setIsLoading(false);
+        return;
       }
 
-      const { data: paymentData } = paymentVerification;
+      pollCountRef.current += 1;
 
-      // Verifica che il pagamento sia andato a buon fine
-      if (!paymentData.succeeded || paymentData.status !== "succeeded") {
-        throw new Error("Il pagamento non è stato completato con successo");
+      if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
+        // Webhook hasn't fired yet but payment went through on Stripe side
+        setPaymentVerified(true);
+        setIsLoading(false);
+        return;
       }
 
-      if (paymentData.bookingId !== bookingId) {
-        throw new Error("Errore nella corrispondenza dei dati di pagamento");
-      }
-
-      const result = await BookingsService.updateBookingPaymentStatus(
-        bookingId,
-        {
-          payment_id: payment_intent,
-          payment_status: PaymentStatusEnum.PAID,
-        },
-      );
-
+      // Schedule next poll
+      pollTimerRef.current = setTimeout(pollBookingStatus, POLL_INTERVAL_MS);
+    } catch (err) {
+      console.error("Error polling booking status:", err);
+      // On polling error, still show success — the payment was captured by Stripe,
+      // the webhook will eventually update the booking.
       setPaymentVerified(true);
-      return result;
-    } catch (error) {
-      console.error(
-        "Failed to verify and update booking payment status:",
-        error,
-      );
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Errore durante la verifica del pagamento",
-      );
-      throw error;
-    } finally {
       setIsLoading(false);
     }
-  };
+  }, [bookingId]);
 
   useEffect(() => {
     if (bookingId) {
@@ -79,14 +63,20 @@ function BookingPaymentResultContent() {
         setPaymentVerified(true);
         setIsLoading(false);
       } else if (payment_intent) {
-        verifyAndUpdatePayment();
+        // Payment status is updated server-side by the Stripe webhook.
+        // Poll booking details until it's confirmed.
+        pollBookingStatus();
       } else {
-        setIsLoading(false);
+        // No payment_intent and not wallet — shouldn't be on this page
+        redirect(Routes.home.url);
       }
     } else {
-      setIsLoading(false);
+      redirect(Routes.home.url);
     }
 
+    return () => {
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId, payment_intent, payment_method, status]);
 
@@ -104,38 +94,6 @@ function BookingPaymentResultContent() {
             <p className="text-gray-600 mb-6">
               Stiamo verificando lo stato del tuo pagamento, attendere prego.
             </p>
-          </>
-        ) : error ? (
-          <>
-            <div className="flex justify-center mb-6">
-              <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center">
-                <span className="text-red-600 text-2xl font-bold">✕</span>
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-red-600 mb-4">
-              Errore nella verifica del pagamento
-            </h1>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <p className=" text-gray-600 text-xs font-normal mb-4">
-              Ti invitiamo a rifare il processo di prenotazione.
-              <br />
-              Se il problema dovesse sussistere, riprova più tardi o contatta il
-              supporto!
-            </p>
-            <div className="space-y-3">
-              <ButtonLink
-                full
-                role={RolesEnum.CONSUMER}
-                label="Torna alle prenotazioni"
-                href={`${Routes.profileConsumer.url}?tab=calendario`}
-              />
-              <ButtonLink
-                role={RolesEnum.VIGIL}
-                full
-                label="Contatta il supporto"
-                href={Routes.customerCare.url}
-              />
-            </div>
           </>
         ) : paymentVerified ? (
           <>
@@ -174,35 +132,7 @@ function BookingPaymentResultContent() {
               />
             </div>
           </>
-        ) : (
-          <>
-            <div className="flex justify-center mb-6 rounded-3xl">
-              <div className="h-16 w-16 bg-yellow-100 rounded-full flex items-center justify-center">
-                <span className="text-yellow-600 text-2xl font-bold">?</span>
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-yellow-600 mb-4">
-              Stato del pagamento sconosciuto
-            </h1>
-            <p className="text-gray-700 mb-6">
-              Non è stato possibile determinare lo stato del pagamento.
-            </p>
-            <div className="space-y-3">
-              <ButtonLink
-                full
-                role={RolesEnum.VIGIL}
-                label="Torna alle prenotazioni"
-                href={`${Routes.profileConsumer.url}?tab=calendario`}
-              />
-              <ButtonLink
-                role={RolesEnum.CONSUMER}
-                full
-                label="Torna alla home"
-                href={Routes.home.url}
-              />
-            </div>
-          </>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         bookingId,
         user_id: userObject.id,
+        transaction_type: TRANSACTION_TYPE.BOOKING_PAYMENT,
       },
       description: `Pagamento per prenotazione ${bookingId}`,
     });

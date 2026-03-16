@@ -4,6 +4,7 @@ export enum TRANSACTION_TYPE {
   DEBIT = "DEBIT",
   BONUS = "BONUS",
   REFUND = "REFUND",
+  BOOKING_PAYMENT = "BOOKING_PAYMENT",
 }
 
 /**

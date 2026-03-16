@@ -3,15 +3,8 @@ import { apiBookings } from "@/src/constants/api.constants";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
 import {
   BookingStatusEnum,
-  PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
-
-export type UpdateBookingPaymentRequest = {
-  payment_id: string;
-  payment_status: PaymentStatusEnum;
-  status?: BookingStatusEnum;
-};
 
 export const BookingsService = {
   createBooking: async (newBooking: BookingFormI) =>
@@ -82,27 +75,6 @@ export const BookingsService = {
         resolve(true);
       } catch (error) {
         console.error("BookingsService cancelBooking error", error);
-        reject(error);
-      }
-    }),
-
-  updateBookingPaymentStatus: async (
-    bookingId: BookingI["id"],
-    paymentData: UpdateBookingPaymentRequest
-  ) =>
-    new Promise<BookingI>(async (resolve, reject) => {
-      try {
-        if (!bookingId) reject();
-        const { data: result } = (await ApiService.put(
-          apiBookings.UPDATE_PAYMENT(bookingId),
-          paymentData
-        )) as { data: BookingI };
-        resolve(result);
-      } catch (error) {
-        console.error(
-          "BookingsService updateBookingPaymentStatus error",
-          error
-        );
         reject(error);
       }
     }),
