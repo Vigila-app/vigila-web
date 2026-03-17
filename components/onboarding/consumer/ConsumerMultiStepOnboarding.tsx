@@ -67,7 +67,7 @@ const ConsumerMultiStepOnboarding = () => {
 
         await AuthService.renewAuthentication();
         await getUserDetails(true);
-        router.replace(Routes.onBoardVigilComplete.url);
+        router.replace(Routes.onBoardConsumerComplete.url);
       } catch (err) {
         console.error("Errore durante la registrazione dei dati", err);
         showToast({

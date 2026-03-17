@@ -25,6 +25,9 @@ import Undraw from "./undraw/undraw";
 // Reviews components
 export * from "./reviews";
 
+// Landing page components
+export * from "./landing";
+
 export {
   Accordion,
   Avatar,
