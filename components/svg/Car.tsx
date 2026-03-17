@@ -1,7 +1,7 @@
-import React from "react";
+import type { SVGProps } from "react";
 import { IconShell } from "./IconShell";
 
-export const Car = (props: React.SVGProps<SVGSVGElement>) => (
+export const Car = (props: SVGProps<SVGSVGElement>) => (
   <IconShell viewBox="0 0 28 21" {...props}>
     <path
       d="M3.88892 16.8889C3.88892 17.6551 4.19328 18.3899 4.73505 18.9316C5.27682 19.4734 6.01162 19.7778 6.7778 19.7778C7.54399 19.7778 8.27879 19.4734 8.82056 18.9316C9.36233 18.3899 9.66669 17.6551 9.66669 16.8889C9.66669 16.1227 9.36233 15.3879 8.82056 14.8461C8.27879 14.3044 7.54399 14 6.7778 14C6.01162 14 5.27682 14.3044 4.73505 14.8461C4.19328 15.3879 3.88892 16.1227 3.88892 16.8889Z"

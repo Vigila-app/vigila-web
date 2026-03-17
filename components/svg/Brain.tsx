@@ -1,7 +1,7 @@
-import React from "react";
+import type { SVGProps } from "react";
 import { IconShell } from "./IconShell";
 
-export const Brain = (props: React.SVGProps<SVGSVGElement>) => (
+export const Brain = (props: SVGProps<SVGSVGElement>) => (
   <IconShell viewBox="0 0 28 28" {...props}>
     <path
       d="M19.375 16.25C18.2147 16.25 17.1019 16.7109 16.2814 17.5314C15.4609 18.3519 15 19.4647 15 20.625V21.875C15 23.0353 15.4609 24.1481 16.2814 24.9686C17.1019 25.7891 18.2147 26.25 19.375 26.25C20.5353 26.25 21.6481 25.7891 22.4686 24.9686C23.2891 24.1481 23.75 23.0353 23.75 21.875V19.625"

@@ -8,7 +8,6 @@ import {
   UserIcon,
   HeartIcon,
   UsersIcon,
- 
   FaceSmileIcon,
 } from "@heroicons/react/24/outline";
 import { Brain, Car, Man, Woman } from "@/components/svg";
@@ -18,6 +17,7 @@ import {
   ConsumerNeedsEnum,
   ConsumerNeedsLabels,
 } from "@/src/enums/onboarding.enums";
+import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 /**
  * Multi-step onboarding flow configuration for CONSUMER users
  */
@@ -144,7 +144,7 @@ export const createConsumerOnboardingConfig = (
       title: "Quali sono i bisogni principali?",
       description:
         "Puoi selezionare più opzioni per descrivere al meglio le necessità.",
-      
+
       questions: [
         {
           id: "needs",
@@ -173,26 +173,10 @@ export const createConsumerOnboardingConfig = (
           id: "gender_preference",
           type: QuestionType.CARD,
           label: "",
-          options: [
-            {
-              label: "Donna",
-              value: "Donna",
-              description: "Preferibilmente una donna",
-              icon: Woman,
-            },
-            {
-              label: "Uomo",
-              value: "Uomo",
-              description: "Preferibilmente un uomo",
-              icon: Man,
-            },
-            {
-              label: "Indifferente",
-              value: "Indifferente",
-              description: "Non importa il genere",
-              icon: Couple,
-            },
-          ],
+          options: Object.values(GenderEnum).map((value) => ({
+            value,
+            label: GenderLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -206,7 +190,7 @@ export const createConsumerOnboardingConfig = (
       title: "Che tipo di attitudine cerchi?",
       description:
         "Puoi selezionare più opzioni per descrivere al meglio le caratteristiche.",
-     
+
       questions: [
         {
           id: "attitude",
