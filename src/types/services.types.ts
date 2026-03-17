@@ -62,9 +62,7 @@ export type ServicesStoreType = {
     vigilId?: ServiceI["vigil_id"],
     filters?: Record<string, any>,
   ) => void;
-  getActiveServices: (
-    vigilId?: ServiceI["vigil_id"],
-  ) => void;
+  
   getServiceDetails: (serviceId: ServiceI["id"], force?: boolean) => void;
   deleteService: (serviceId: ServiceI["id"]) => void;
   resetLastUpdate: () => void;
