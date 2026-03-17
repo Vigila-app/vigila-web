@@ -1,26 +1,24 @@
-"use client"
-import React from "react"
-import { useForm } from "react-hook-form"
-import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
+"use client";
+import React from "react";
+import { useForm } from "react-hook-form";
+import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
   MultiStepOnboardingProps,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { AvailabilityRulesDemo } from "@/components/calendar-demo"
-import { Step } from "./Step"
-import { InformationCircleIcon } from "@heroicons/react/24/outline"
-import { Services } from "./Services"
-import { BookingTypeEnum } from "@/src/enums/booking.enums"
-import clsx from "clsx"
+} from "@/src/types/multiStepOnboard.types";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { AvailabilityRulesDemo } from "@/components/calendar-demo";
+import { Step } from "./Step";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { Services } from "./Services";
+import { BookingTypeEnum } from "@/src/enums/booking.enums";
+import clsx from "clsx";
 
 export default function AvailabilityFlow({
   onComplete,
 }: Readonly<{
-  onComplete: () => void
+  onComplete: () => void;
 }>) {
-
-
   const config: MultiStepOnboardingProps["config"] = {
     role: RolesEnum.CONSUMER,
     steps: [
@@ -85,24 +83,24 @@ export default function AvailabilityFlow({
     ],
     initialStepId: "welcome",
     onComplete: async () => {
-      console.log("Availability flow completed")
-      onComplete()
+      console.log("Availability flow completed");
+      onComplete();
     },
-  }
+  };
   const { setAnswers, state, currentStep, next, back } = useMultiStepFlow({
     role: config.role,
     steps: config.steps,
     initialStepId: config.initialStepId,
     onComplete,
-  } as any)
-  const { handleSubmit } = useForm({ defaultValues: state.answers })
+  } as any);
+  const { handleSubmit } = useForm({ defaultValues: state.answers });
 
-  if (!currentStep) return null
+  if (!currentStep) return null;
 
   const onNext = async (values: { [key: string]: unknown }) => {
     // values are validated by react-hook-form
-    await next(currentStep, values)
-  }
+    await next(currentStep, values);
+  };
   return (
     <div className="mx-auto w-full max-w-md">
       <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
@@ -145,5 +143,5 @@ export default function AvailabilityFlow({
         </div>
       </form>
     </div>
-  )
+  );
 }

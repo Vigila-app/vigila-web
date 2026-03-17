@@ -1,12 +1,9 @@
-import { RolesEnum } from "@/src/enums/roles.enums"
+import { RolesEnum } from "@/src/enums/roles.enums";
 import {
   OnboardingFlowConfig,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline"
+} from "@/src/types/multiStepOnboard.types";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 import {
   OccupationEnum,
@@ -34,9 +31,9 @@ import {
   VigilTransportationLabels,
   VigilZoneEnum,
   VigilZoneLabels,
-} from "@/src/enums/onboarding.enums"
-import { GenderEnum, GenderLabels } from "@/src/enums/common.enums"
-import { AvailabilityRulesDemo } from "@/components/calendar-demo"
+} from "@/src/enums/onboarding.enums";
+import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
+import { AvailabilityRulesDemo } from "@/components/calendar-demo";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -99,7 +96,6 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: "zones",
-      
     },
     {
       id: "zones", //non salvare per ora
@@ -163,11 +159,14 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: (answers) => {
-        const requiresDocs = [OccupationEnum.PROFESSIONAL, OccupationEnum.NURSE]
+        const requiresDocs = [
+          OccupationEnum.PROFESSIONAL,
+          OccupationEnum.NURSE,
+        ];
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
-          return "professional_docs_info"
+          return "professional_docs_info";
         }
-        return "courses"
+        return "courses";
       },
     },
     {
@@ -295,9 +294,9 @@ export const createVigilOnboardingConfig = (
         if (answers.services?.includes(VigilHygieneServiceEnum.NONE)) {
           answers.services = answers.services.filter(
             (s: string) => s == VigilHygieneServiceEnum.NONE,
-          ) //if "none" is selected, ignore everything else
+          ); //if "none" is selected, ignore everything else
         }
-        return "outside"
+        return "outside";
       },
     },
     {
@@ -323,9 +322,9 @@ export const createVigilOnboardingConfig = (
         if (answers.outside?.includes(VigilOutdoorServiceEnum.NONE)) {
           answers.outside = answers.outside.filter(
             (s: string) => s == VigilOutdoorServiceEnum.NONE,
-          ) //if "none" is selected, ignore everything else
+          ); //if "none" is selected, ignore everything else
         }
-        return "past_exp"
+        return "past_exp";
       },
     },
     {
@@ -505,4 +504,4 @@ export const createVigilOnboardingConfig = (
       ],
     },
   ],
-})
+});

@@ -85,7 +85,8 @@ export async function POST(req: NextRequest) {
     const userObject = await authenticateUser(req);
     if (!userObject?.id) {
       return jsonErrorResponse(401, {
-        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_UNAUTHORIZED.code,
+        code: ResponseCodesConstants.AVAILABILITY_RULES_CREATE_UNAUTHORIZED
+          .code,
         success: false,
         message: "Unauthorized",
       } as any);

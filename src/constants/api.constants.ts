@@ -1,15 +1,15 @@
 import { isServer } from "@/src/utils/common.utils";
-import { isMocked, isReleased } from "@/src/utils/envs.utils"
-import { CmsContentType } from "@/src/enums/cms.enums"
-import { AppConstants } from "@/src/constants"
-import { ServiceI } from "@/src/types/services.types"
-import { BookingI } from "@/src/types/booking.types"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { VigilDetailsType } from "@/src/types/vigil.types"
-import { ConsumerDetailsType } from "@/src/types/consumer.types"
+import { isMocked, isReleased } from "@/src/utils/envs.utils";
+import { CmsContentType } from "@/src/enums/cms.enums";
+import { AppConstants } from "@/src/constants";
+import { ServiceI } from "@/src/types/services.types";
+import { BookingI } from "@/src/types/booking.types";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { VigilDetailsType } from "@/src/types/vigil.types";
+import { ConsumerDetailsType } from "@/src/types/consumer.types";
 
 const checkIfIsMock = (isMock: boolean): boolean =>
-  (isMock || isMocked) && !isReleased
+  (isMock || isMocked) && !isReleased;
 
 const apiRoot = {
   MOCKS: "http://localhost:3000",
@@ -20,21 +20,21 @@ const apiRoot = {
     : typeof window !== "undefined"
       ? window.location.origin
       : AppConstants.hostUrl,
-}
+};
 
 const getEnv = (isMock: boolean) => {
   if (isReleased) {
-    return apiRoot.RELEASE
+    return apiRoot.RELEASE;
   }
   if (checkIfIsMock(isMock)) {
-    return apiRoot.MOCKS
+    return apiRoot.MOCKS;
   }
-  return apiRoot.RELEASE
-}
+  return apiRoot.RELEASE;
+};
 
 const apiBase = {
   V1: (isMock = false) => `${getEnv(isMock)}/api/v1`,
-}
+};
 
 const apiControllers = {
   // region ADMIN
@@ -141,7 +141,7 @@ const apiControllers = {
   // region CALENDAR
   CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
   // endregion CALENDAR
-}
+};
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
@@ -161,7 +161,7 @@ export const apiUser = {
     `${apiControllers.USER(isMock)}/devices/${id}`,
   TERMS: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/terms/${id}`,
-}
+};
 
 export const apiAltcha = {
   CHALLENGE: (isMock?: boolean): string =>
@@ -221,7 +221,7 @@ export const apiCms = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean
+    isMock?: boolean,
   ): string => apiControllers.CONTENT(contentType, contentId, isMock),
 };
 
@@ -312,5 +312,4 @@ export const apiCalendar = {
   // Available Slots API
   VIGIL_AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
-}
-
+};

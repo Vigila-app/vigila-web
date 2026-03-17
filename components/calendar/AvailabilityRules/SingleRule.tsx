@@ -1,43 +1,43 @@
-"use client"
-import React, { useMemo } from "react"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { VigilAvailabilityRuleI } from "@/src/types/calendar.types"
+"use client";
+import React, { useMemo } from "react";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { VigilAvailabilityRuleI } from "@/src/types/calendar.types";
 
 type EditState = {
-  start: string
-  durationHours: number
-  error?: string
-  editing: boolean
-}
+  start: string;
+  durationHours: number;
+  error?: string;
+  editing: boolean;
+};
 interface Helpers {
-  times: string[]
-  durationOptions: number[]
-  formatDuration: (start: string, end: string) => string
-  formatTimeRange: (start: string, end: string) => string
-  getMinutesFromTime: (time: string) => number
-  toTimeString: (totalMinutes: number) => string
-  convertTimeToTimeFormat: (time: string) => string
+  times: string[];
+  durationOptions: number[];
+  formatDuration: (start: string, end: string) => string;
+  formatTimeRange: (start: string, end: string) => string;
+  getMinutesFromTime: (time: string) => number;
+  toTimeString: (totalMinutes: number) => string;
+  convertTimeToTimeFormat: (time: string) => string;
 }
 
 interface Actions {
-  setEditRules: React.Dispatch<React.SetStateAction<Record<string, EditState>>>
-  onDelete: (id: string) => void
-  saveEditedRule: (args: any) => Promise<void>
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
-  setError: React.Dispatch<React.SetStateAction<string | null>>
-  loadRules: () => Promise<void>
+  setEditRules: React.Dispatch<React.SetStateAction<Record<string, EditState>>>;
+  onDelete: (id: string) => void;
+  saveEditedRule: (args: any) => Promise<void>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  loadRules: () => Promise<void>;
 }
 
 interface Props {
-  rule: VigilAvailabilityRuleI
-  index: number
-  editState?: EditState
-  editRules: Record<string, EditState>
-  helpers: Helpers
-  actions: Actions
-  loading: boolean
-  role?: RolesEnum
+  rule: VigilAvailabilityRuleI;
+  index: number;
+  editState?: EditState;
+  editRules: Record<string, EditState>;
+  helpers: Helpers;
+  actions: Actions;
+  loading: boolean;
+  role?: RolesEnum;
 }
 
 export default function SingleRule({
@@ -50,9 +50,9 @@ export default function SingleRule({
   loading,
   role,
 }: Props) {
-  const start = rule.start_time.slice(0, 5)
-  const end = rule.end_time.slice(0, 5)
-  const isEditing = editRules[rule.id]?.editing
+  const start = rule.start_time.slice(0, 5);
+  const end = rule.end_time.slice(0, 5);
+  const isEditing = editRules[rule.id]?.editing;
   const {
     times,
     durationOptions,
@@ -61,8 +61,15 @@ export default function SingleRule({
     getMinutesFromTime,
     toTimeString,
     convertTimeToTimeFormat,
-  } = helpers
-  const { setEditRules, onDelete, saveEditedRule, setLoading, setError, loadRules } = actions
+  } = helpers;
+  const {
+    setEditRules,
+    onDelete,
+    saveEditedRule,
+    setLoading,
+    setError,
+    loadRules,
+  } = actions;
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -74,7 +81,7 @@ export default function SingleRule({
       hoverText: "hover:text-vigil-orange",
       focusBorder: "focus:border-vigil-light-orange",
       ring: "ring-vigil-light-orange",
-    }
+    };
     const consumer = {
       border: "border-consumer-light-blue",
       text: "text-consumer-blue",
@@ -84,9 +91,9 @@ export default function SingleRule({
       hoverText: "hover:text-consumer-blue",
       focusBorder: "focus:border-consumer-light-blue",
       ring: "ring-consumer-light-blue",
-    }
-    return role === RolesEnum.CONSUMER ? consumer : vigil
-  }, [role])
+    };
+    return role === RolesEnum.CONSUMER ? consumer : vigil;
+  }, [role]);
 
   return (
     <div
@@ -99,29 +106,33 @@ export default function SingleRule({
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-500">Fascia {index + 1}</span>
+        <span className="text-xs font-semibold text-slate-500">
+          Fascia {index + 1}
+        </span>
         <div className="flex gap-2">
-              {!isEditing && (
-                <button
-                  onClick={() =>
-                    setEditRules((prev) => ({
-                      ...prev,
-                      [rule.id]: {
-                        start,
-                        durationHours: (getMinutesFromTime(end) - getMinutesFromTime(start)) / 60,
-                        editing: true,
-                      },
-                    }))
-                  }
-                  className={clsx(
-                    "rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-500",
-                    colorClasses.hoverBorder,
-                    colorClasses.hoverText,
-                  )}
-                >
-                  Modifica
-                </button>
+          {!isEditing && (
+            <button
+              onClick={() =>
+                setEditRules((prev) => ({
+                  ...prev,
+                  [rule.id]: {
+                    start,
+                    durationHours:
+                      (getMinutesFromTime(end) - getMinutesFromTime(start)) /
+                      60,
+                    editing: true,
+                  },
+                }))
+              }
+              className={clsx(
+                "rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-500",
+                colorClasses.hoverBorder,
+                colorClasses.hoverText,
               )}
+            >
+              Modifica
+            </button>
+          )}
           <button
             onClick={() => onDelete(rule.id)}
             disabled={loading}
@@ -143,7 +154,9 @@ export default function SingleRule({
         <>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Ora inizio</p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Ora inizio
+              </p>
               <select
                 value={editState?.start}
                 onChange={(e) =>
@@ -171,7 +184,9 @@ export default function SingleRule({
               </select>
             </div>
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Durata</p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Durata
+              </p>
               <select
                 value={editState?.durationHours}
                 onChange={(e) =>
@@ -199,7 +214,9 @@ export default function SingleRule({
               </select>
             </div>
           </div>
-          {editState?.error && <div className="mt-2 text-xs text-rose-600">{editState.error}</div>}
+          {editState?.error && (
+            <div className="mt-2 text-xs text-rose-600">{editState.error}</div>
+          )}
           <div className="flex gap-2 mt-4">
             <button
               className={clsx(
@@ -219,7 +236,7 @@ export default function SingleRule({
                   getMinutesFromTime,
                   toTimeString,
                   convertTimeToTimeFormat,
-                })
+                });
               }}
             >
               Salva
@@ -233,9 +250,9 @@ export default function SingleRule({
               disabled={loading}
               onClick={() =>
                 setEditRules((prev) => {
-                  const next = { ...prev }
-                  delete next[rule.id]
-                  return next
+                  const next = { ...prev };
+                  delete next[rule.id];
+                  return next;
                 })
               }
             >
@@ -247,17 +264,39 @@ export default function SingleRule({
         <>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Ora inizio</p>
-              <div className={clsx("mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800", "border", colorClasses.border)}>{start}</div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Ora inizio
+              </p>
+              <div
+                className={clsx(
+                  "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                  "border",
+                  colorClasses.border,
+                )}
+              >
+                {start}
+              </div>
             </div>
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Durata</p>
-              <div className={clsx("mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800", "border", colorClasses.border)}>{formatDuration(start, end)}</div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                Durata
+              </p>
+              <div
+                className={clsx(
+                  "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                  "border",
+                  colorClasses.border,
+                )}
+              >
+                {formatDuration(start, end)}
+              </div>
             </div>
           </div>
-          <p className="mt-3 text-xs text-slate-400">{formatTimeRange(rule.start_time, rule.end_time)}</p>
+          <p className="mt-3 text-xs text-slate-400">
+            {formatTimeRange(rule.start_time, rule.end_time)}
+          </p>
         </>
       )}
     </div>
-  )
+  );
 }

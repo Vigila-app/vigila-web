@@ -1,27 +1,25 @@
-import { ComponentType, useEffect, useState, useMemo } from "react"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { SingleService } from "./SingleService"
-import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline"
-import Caffe from "@/components/svg/Caffe"
-import Vasca from "@/components/svg/Vasca"
-import { Car } from "@/components/svg"
+import { ComponentType, useEffect, useState, useMemo } from "react";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { SingleService } from "./SingleService";
+import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import Caffe from "@/components/svg/Caffe";
+import Vasca from "@/components/svg/Vasca";
+import { Car } from "@/components/svg";
 
 export const Services = ({
   answers,
   setAnswers,
   role,
 }: {
-  answers?: Record<string, any>
+  answers?: Record<string, any>;
   setAnswers?: (
     updater:
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>),
-  ) => void
-  role?: RolesEnum
+  ) => void;
+  role?: RolesEnum;
 }) => {
-  
-
   const SERVICES = [
     {
       name: "Compagnia e conversazione",
@@ -47,16 +45,16 @@ export const Services = ({
       Icon: Vasca as ComponentType<{ className?: string }>,
       price: 18,
     },
-  ]
+  ];
   const MANSIONI_LABELS = [
     "Conversazione e ascolto",
     "Lettura libri / giornali",
     "Giochi di società / carte",
     "Guardare TV insieme",
     "Passeggiata leggera",
-  ]
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  ];
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const dayNames = [
     "Domenica",
@@ -66,27 +64,27 @@ export const Services = ({
     "Giovedì",
     "Venerdì",
     "Sabato",
-  ]
+  ];
 
   // derive unique ordered weekdays from answers.availabilityRules
   const selectedDays: number[] = Array.from(
     new Set(
       (answers?.availabilityRules || []).map((r: any) => Number(r.weekday)),
     ),
-  )
+  );
 
-  const [currentDayIdx, setCurrentDayIdx] = useState(0)
+  const [currentDayIdx, setCurrentDayIdx] = useState(0);
 
   useEffect(() => {
     // reset to first day when availabilities change
-    setCurrentDayIdx(0)
-  }, [selectedDays.length])
+    setCurrentDayIdx(0);
+  }, [selectedDays.length]);
 
   // per-day local selections
-  const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [selectedMansioni, setSelectedMansioni] = useState<string[]>([])
-  const [car, setCar] = useState(false)
-  const [notes, setNotes] = useState("")
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedMansioni, setSelectedMansioni] = useState<string[]>([]);
+  const [car, setCar] = useState(false);
+  const [notes, setNotes] = useState("");
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -96,7 +94,7 @@ export const Services = ({
       border: "border-vigil-orange",
       hoverBorder: "hover:border-vigil-light-orange",
       hoverText: "hover:text-vigil-orange",
-    }
+    };
     const consumer = {
       bg: "bg-consumer-blue",
       bgLight: "bg-consumer-light-blue",
@@ -104,41 +102,41 @@ export const Services = ({
       border: "border-consumer-light-blue",
       hoverBorder: "hover:border-consumer-light-blue",
       hoverText: "hover:text-consumer-blue",
-    }
-    return role === RolesEnum.CONSUMER ? consumer : vigil
-  }, [role])
+    };
+    return role === RolesEnum.CONSUMER ? consumer : vigil;
+  }, [role]);
 
   // load per-day values when current day changes
   useEffect(() => {
-    const day = selectedDays[currentDayIdx]
-    const saved = answers?.services?.[day]
+    const day = selectedDays[currentDayIdx];
+    const saved = answers?.services?.[day];
     if (saved) {
-      setSelectedServices(Array.isArray(saved.services) ? saved.services : [])
-      setSelectedMansioni(Array.isArray(saved.mansioni) ? saved.mansioni : [])
-      setCar(!!saved.car)
-      setNotes(saved.notes || "")
+      setSelectedServices(Array.isArray(saved.services) ? saved.services : []);
+      setSelectedMansioni(Array.isArray(saved.mansioni) ? saved.mansioni : []);
+      setCar(!!saved.car);
+      setNotes(saved.notes || "");
     } else {
-      setSelectedServices([])
-      setSelectedMansioni([])
-      setCar(false)
-      setNotes("")
+      setSelectedServices([]);
+      setSelectedMansioni([]);
+      setCar(false);
+      setNotes("");
     }
-  }, [currentDayIdx, selectedDays.join("-")])
+  }, [currentDayIdx, selectedDays.join("-")]);
 
   if (loading)
     return (
       <div className="text-zinc-500 text-sm">Caricamento disponibilità…</div>
-    )
-  if (error) return <div className="text-red-500 text-sm">{error}</div>
+    );
+  if (error) return <div className="text-red-500 text-sm">{error}</div>;
 
   return (
     <div className="bg-zinc-200 p-4">
       <div className="bg-white rounded-full mb-4">
         <div className="flex gap-2 flex-wrap p-3">
           {selectedDays.map((day, idx) => {
-            const isActive = idx === currentDayIdx
-            const dayServices = answers?.services?.[day]
-            const hasEdited = !!dayServices
+            const isActive = idx === currentDayIdx;
+            const dayServices = answers?.services?.[day];
+            const hasEdited = !!dayServices;
             return (
               <div key={"rule_" + day} className="flex items-center">
                 <button
@@ -153,7 +151,7 @@ export const Services = ({
                   {dayNames[Number(day)]}
                 </button>
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -189,9 +187,9 @@ export const Services = ({
                 checked={selectedServices.includes(srv.name)}
                 onChange={(next: boolean) => {
                   setSelectedServices((prev) => {
-                    if (next) return Array.from(new Set([...prev, srv.name]))
-                    return prev.filter((s) => s !== srv.name)
-                  })
+                    if (next) return Array.from(new Set([...prev, srv.name]));
+                    return prev.filter((s) => s !== srv.name);
+                  });
                 }}
               />
             ))}
@@ -203,17 +201,17 @@ export const Services = ({
           <div className="font-semibold mb-2">Mansioni</div>
           <div className="flex flex-col gap-2">
             {MANSIONI_LABELS.map((label) => {
-              const isChecked = selectedMansioni.includes(label)
+              const isChecked = selectedMansioni.includes(label);
               return (
                 <label
                   key={label}
                   onMouseDown={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     setSelectedMansioni((prev) =>
                       prev.includes(label)
                         ? prev.filter((p) => p !== label)
                         : [...prev, label],
-                    )
+                    );
                   }}
                   className={clsx(
                     "cursor-pointer w-full py-3 text-center rounded-full",
@@ -230,7 +228,7 @@ export const Services = ({
                   />
                   <span>{label}</span>
                 </label>
-              )
+              );
             })}
           </div>
         </div>
@@ -283,12 +281,12 @@ export const Services = ({
             <button
               type="button"
               onClick={async () => {
-                const day = selectedDays[currentDayIdx]
+                const day = selectedDays[currentDayIdx];
                 // Save current day selections into answers
                 if (setAnswers) {
                   setAnswers((prev: Record<string, any>) => {
-                    const next = { ...prev }
-                    next.services = { ...next.services }
+                    const next = { ...prev };
+                    next.services = { ...next.services };
                     // Save actual selections for the day
                     next.services[day] = {
                       weekday: Number(day),
@@ -296,33 +294,33 @@ export const Services = ({
                       mansioni: selectedMansioni,
                       car: !!car,
                       notes: notes || "",
-                    }
-                    return next
-                  })
+                    };
+                    return next;
+                  });
                 }
 
                 // move to next day or finalize
                 if (currentDayIdx < selectedDays.length - 1) {
-                  const nextIdx = currentDayIdx + 1
-                  const nextDay = selectedDays[nextIdx]
+                  const nextIdx = currentDayIdx + 1;
+                  const nextDay = selectedDays[nextIdx];
                   // load saved values for next day (if any) so UI reflects them immediately
-                  const savedNext = answers?.services?.[nextDay]
+                  const savedNext = answers?.services?.[nextDay];
                   setSelectedServices(
                     Array.isArray(savedNext?.services)
                       ? savedNext.services
                       : [],
-                  )
+                  );
                   setSelectedMansioni(
                     Array.isArray(savedNext?.mansioni)
                       ? savedNext.mansioni
                       : [],
-                  )
-                  setCar(!!savedNext?.car)
-                  setNotes(savedNext?.notes || "")
-                  setCurrentDayIdx(nextIdx)
+                  );
+                  setCar(!!savedNext?.car);
+                  setNotes(savedNext?.notes || "");
+                  setCurrentDayIdx(nextIdx);
                 } else {
                   // last day: finalize / salva ricorrenza
-                  console.log("All days filled, salva ricorrenza")
+                  console.log("All days filled, salva ricorrenza");
                 }
               }}
               className={clsx(
@@ -338,5 +336,5 @@ export const Services = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

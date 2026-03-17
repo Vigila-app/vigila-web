@@ -28,14 +28,16 @@ const VigilMultiStepOnboarding = () => {
     async (data: Record<string, any>) => {
       try {
         const { addresses, propic } = data;
-        const ps = []
+        const ps = [];
         // Support availability demo which writes rules under `availabilityRules`
         if (data.availabilityRules && !data.availabilities) {
           data.availabilities = data.availabilityRules;
         }
 
         // Extract postal code from address
-        const caps = addresses?.map((a:{address: {postcode: string}}) => a.address.postcode);
+        const caps = addresses?.map(
+          (a: { address: { postcode: string } }) => a.address.postcode,
+        );
 
         // Prepare addresses array (for now, single address)
 
@@ -49,13 +51,15 @@ const VigilMultiStepOnboarding = () => {
         delete onboardData.language_confirmation;
         delete onboardData.understandsDocRequirement;
         if (propic && user?.id) {
-          ps.push(StorageUtils.uploadFile("profile-pics", propic, user.id, {
-            contentType: propic.type || "image/png",
-          }))
+          ps.push(
+            StorageUtils.uploadFile("profile-pics", propic, user.id, {
+              contentType: propic.type || "image/png",
+            }),
+          );
         }
         if (data.availabilities) {
           for (const rule of data.availabilities) {
-            ps.push(CalendarService.createVigilAvailabilityRule(rule))
+            ps.push(CalendarService.createVigilAvailabilityRule(rule));
           }
         }
 
@@ -63,7 +67,7 @@ const VigilMultiStepOnboarding = () => {
         const services = Object.keys(data)
           .flatMap((k) => (serviceKeys.includes(k) ? data[k] : null))
           .filter(Boolean);
-          console.log(services)
+        console.log(services);
         for (const service of services) {
           const srvRaw = services_catalog.services_catalog.find(
             (s) => s.type == service,
@@ -79,9 +83,9 @@ const VigilMultiStepOnboarding = () => {
             vigil_id: user?.id,
             description: srvRaw?.description,
             unit_price: srvRaw?.recommended_hourly_rate,
-            unit_type: "hours"
+            unit_type: "hours",
           } as ServiceI;
-          ps.push(ServicesService.createService(srv))
+          ps.push(ServicesService.createService(srv));
         }
 
         delete onboardData.propic;
@@ -89,12 +93,14 @@ const VigilMultiStepOnboarding = () => {
         // remove temporary availabilityRules key if present
         delete onboardData.availabilityRules;
 
-        ps.push(OnboardService.update({
-          role: RolesEnum.VIGIL,
-          data: onboardData,
-        }))
+        ps.push(
+          OnboardService.update({
+            role: RolesEnum.VIGIL,
+            data: onboardData,
+          }),
+        );
 
-        await Promise.all(ps)
+        await Promise.all(ps);
 
         showToast({
           message: "Profilo aggiornato con successo",

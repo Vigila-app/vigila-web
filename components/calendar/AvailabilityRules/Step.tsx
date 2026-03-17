@@ -1,15 +1,19 @@
-"use client"
-import { useState } from "react"
-import { QuestionRenderer } from "@/components/onboarding/multiStep"
+"use client";
+import { useState } from "react";
+import { QuestionRenderer } from "@/components/onboarding/multiStep";
 import {
   OnboardingFlowConfig,
   OnboardingFlowState,
   OnboardingStep,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import { CalendarIcon, ChatBubbleBottomCenterIcon, MapPinIcon } from "@heroicons/react/24/outline"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
+} from "@/src/types/multiStepOnboard.types";
+import {
+  CalendarIcon,
+  ChatBubbleBottomCenterIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const Step = ({
   currentStep,
@@ -17,17 +21,17 @@ export const Step = ({
   config,
   setAnswers,
 }: {
-  currentStep: OnboardingStep
-  state: OnboardingFlowState
-  config: OnboardingFlowConfig
+  currentStep: OnboardingStep;
+  state: OnboardingFlowState;
+  config: OnboardingFlowConfig;
   setAnswers?: (
     updater:
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>),
-  ) => void
+  ) => void;
 }) => {
   // local tick forces this component to re-render when answers are mutated in-place
-  const [, setTick] = useState(0)
+  const [, setTick] = useState(0);
   return (
     <>
       {currentStep.component && (
@@ -68,8 +72,8 @@ export const Step = ({
               value={state.answers[q.id]}
               onChange={(value) => {
                 // persist answer and trigger a local re-render so controlled inputs update
-                state.answers[q.id] = value
-                setTick((t) => t + 1)
+                state.answers[q.id] = value;
+                setTick((t) => t + 1);
               }}
               error={undefined} // Adjusted to match the expected prop
               role={config.role} // Added role prop as required by QuestionRenderer
@@ -78,5 +82,5 @@ export const Step = ({
         </div>
       ))}
     </>
-  )
-}
+  );
+};

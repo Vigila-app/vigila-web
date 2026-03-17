@@ -1,6 +1,6 @@
-import React, { ComponentType, useMemo } from "react"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
+import React, { ComponentType, useMemo } from "react";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const SingleService = ({
   Icon,
@@ -11,22 +11,22 @@ export const SingleService = ({
   onChange, // optional controlled
   role,
 }: {
-  Icon: ComponentType<{ className?: string }>
-  name: string
-  desc: string
-  price: number
-  checked?: boolean
-  onChange?: (next: boolean) => void
-  role?: RolesEnum
+  Icon: ComponentType<{ className?: string }>;
+  name: string;
+  desc: string;
+  price: number;
+  checked?: boolean;
+  onChange?: (next: boolean) => void;
+  role?: RolesEnum;
 }) => {
-  const [internalSelected, setInternalSelected] = React.useState(false)
-  const selected = typeof checked === "boolean" ? checked : internalSelected
+  const [internalSelected, setInternalSelected] = React.useState(false);
+  const selected = typeof checked === "boolean" ? checked : internalSelected;
   const toggle = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault()
-    const next = !selected
-    if (typeof onChange === "function") onChange(next)
-    else setInternalSelected((v) => !v)
-  }
+    if (e) e.preventDefault();
+    const next = !selected;
+    if (typeof onChange === "function") onChange(next);
+    else setInternalSelected((v) => !v);
+  };
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -34,20 +34,22 @@ export const SingleService = ({
       bgLight: "bg-vigil-light-orange",
       text: "text-vigil-orange",
       bg: "bg-vigil-orange",
-    }
+    };
     const consumer = {
       border: "border-consumer-light-blue",
       bgLight: "bg-consumer-light-blue",
       text: "text-consumer-blue",
       bg: "bg-consumer-blue",
-    }
-    return role === RolesEnum.CONSUMER ? consumer : vigil
-  }, [role])
+    };
+    return role === RolesEnum.CONSUMER ? consumer : vigil;
+  }, [role]);
   return (
     <label
       className={clsx(
         "flex flex-col items-center justify-between gap-2 border-3 p-3 rounded-3xl cursor-pointer transition-all",
-        selected ? clsx(colorClasses.border, "border-2", colorClasses.bgLight) : "border-zinc-400 bg-white",
+        selected
+          ? clsx(colorClasses.border, "border-2", colorClasses.bgLight)
+          : "border-zinc-400 bg-white",
       )}
       onMouseDown={(e) => toggle(e)}
     >
@@ -66,5 +68,5 @@ export const SingleService = ({
         {price} EUR/h
       </div>
     </label>
-  )
-}
+  );
+};
