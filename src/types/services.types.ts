@@ -35,6 +35,7 @@ export type ServiceCatalog = {
 // Existing Service Types
 export type ServiceI = {
   active: boolean;
+  type:string,
   id: string;
   created_at: Date;
   updated_at?: Date;
@@ -59,7 +60,10 @@ export type ServicesStoreType = {
   getServices: (
     force?: boolean,
     vigilId?: ServiceI["vigil_id"],
-    filters?: Record<string, any>
+    filters?: Record<string, any>,
+  ) => void;
+  getActiveServices: (
+    vigilId?: ServiceI["vigil_id"],
   ) => void;
   getServiceDetails: (serviceId: ServiceI["id"], force?: boolean) => void;
   deleteService: (serviceId: ServiceI["id"]) => void;

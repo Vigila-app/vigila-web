@@ -14,6 +14,7 @@ import {
   formatDateToISO,
 } from "@/src/utils/calendar.utils";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { AuthService, UserService } from "@/src/services";
 
 /**
  * Demo component for Availability Rules CRUD operations
@@ -31,8 +32,8 @@ export const AvailabilityRulesDemo = ({
 } = {}) => {
   const weekdays = getWeekdaysArray();
   const times = getTimeSlots(15); // 15-minute intervals
-
-  const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(
+  const user = UserService.getUser() 
+   const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(
     () => availabilityRules ?? [],
   );
   const [loading, setLoading] = useState(false);
@@ -197,7 +198,7 @@ export const AvailabilityRulesDemo = ({
 
       // Note: In a real scenario, vigil_id would come from authenticated user
       const ruleData: VigilAvailabilityRuleFormI = {
-        vigil_id: "demo-vigil-id", // This would be from auth context
+        vigil_id: (await user)!.id, // This would be from auth context
         weekday,
         start_time: convertTimeToTimeFormat(draft.start),
         end_time: convertTimeToTimeFormat(endTime),
@@ -305,270 +306,305 @@ export const AvailabilityRulesDemo = ({
         )}
 
         <div className="mt-6 divide-y divide-slate-200">
-          {weekdays.map((day) => {
-            const dayRules = rulesByWeekday[day.value] || [];
-            const isActive = activeDays[day.value];
-            const draft = draftSlots[day.value];
-            return (
-              <div key={day.value} className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        className="peer sr-only"
-                        checked={isActive}
-                        onChange={() => {
-                          setActiveDays((prev) => ({
-                            ...prev,
-                            [day.value]: !prev[day.value],
-                          }));
-                        }}
-                      />
-                      <span
-                        className={clsx(
-                          "h-5 w-9 rounded-full bg-slate-200 transition",
-                          colorClasses.peerCheckedBg,
-                        )}
-                      />
-                      <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
-                    </label>
-                    <span
-                      className="text-sm font-semibold text-slate-900 cursor-pointer"
-                      onClick={() => setSelectedDay(day.value)}
-                    >
-                      {day.labelIT}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() =>
-                      setCreatingSlots((prev) => ({
-                        ...prev,
-                        [day.value]: true,
-                      }))
-                    }
-                    disabled={loading || !isActive || creatingSlots[day.value]}
-                    className={clsx(
-                      "text-xs font-semibold disabled:opacity-40",
-                      colorClasses.text,
-                      colorClasses.hoverText,
-                    )}
-                  >
-                    + Aggiungi fascia
-                  </button>
-                </div>
-
-                {isActive && (
-                  <div className="mt-4 space-y-4">
-                    {dayRules.length === 0 ? (
-                      <div
-                        className={clsx(
-                          "rounded-2xl px-4 py-3 text-sm text-slate-500",
-                          "border",
-                          colorClasses.border,
-                          `${colorClasses.bgLight}/40`,
-                        )}
-                      >
-                        Nessuna fascia attiva. Aggiungine una qui sotto.
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {dayRules.map((rule, index) => {
-                          const start = rule.start_time.slice(0, 5);
-                          const end = rule.end_time.slice(0, 5);
-                          return (
-                            <div
-                              key={rule.id}
-                              className={clsx(
-                                "rounded-2xl px-4 py-3 shadow-sm",
-                                "border",
-                                colorClasses.border,
-                              )}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-semibold text-slate-500">
-                                  Fascia {index + 1}
-                                </span>
-                                <button
-                                  onClick={() => handleDelete(rule.id)}
-                                  disabled={loading}
-                                  className={clsx(
-                                    "rounded-full px-2 py-0.5 text-xs disabled:opacity-40",
-                                    "border",
-                                    colorClasses.border,
-                                    colorClasses.text,
-                                    colorClasses.hoverBorder,
-                                    colorClasses.hoverText,
-                                  )}
-                                >
-                                  Elimina
-                                </button>
-                              </div>
-                              <div className="mt-3 grid grid-cols-2 gap-3">
-                                <div>
-                                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                                    Ora inizio
-                                  </p>
-                                  <div
-                                    className={clsx(
-                                      "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
-                                      "border",
-                                      colorClasses.border,
-                                    )}
-                                  >
-                                    {start}
-                                  </div>
-                                </div>
-                                <div>
-                                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                                    Durata
-                                  </p>
-                                  <div
-                                    className={clsx(
-                                      "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
-                                      "border",
-                                      colorClasses.border,
-                                    )}
-                                  >
-                                    {formatDuration(start, end)}
-                                  </div>
-                                </div>
-                              </div>
-                              <p className="mt-3 text-xs text-slate-400">
-                                {formatTimeRange(
-                                  rule.start_time,
-                                  rule.end_time,
-                                )}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {creatingSlots[day.value] ? (
-                      <div
-                        className={clsx(
-                          "rounded-2xl px-4 py-4",
-                          "border",
-                          colorClasses.border,
-                          `${colorClasses.bgLight}/60`,
-                        )}
-                      >
-                        <p
+          {weekdays.map(
+            (day: { value: WeekdayEnum; label: string; labelIT: string }) => {
+              const dayRules = rulesByWeekday[day.value] || [];
+              const isActive = activeDays[day.value];
+              const draft = draftSlots[day.value];
+              return (
+                <div key={day.value} className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          checked={isActive}
+                          onChange={() => {
+                            setActiveDays((prev) => ({
+                              ...prev,
+                              [day.value]: !prev[day.value],
+                            }));
+                          }}
+                        />
+                        <span
                           className={clsx(
-                            "text-xs font-semibold uppercase tracking-wide",
-                            colorClasses.text,
+                            "h-5 w-9 rounded-full bg-slate-200 transition",
+                            colorClasses.peerCheckedBg,
+                          )}
+                        />
+                        <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+                      </label>
+                      <span
+                        className="text-sm font-semibold text-slate-900 cursor-pointer"
+                        onClick={() => setSelectedDay(day.value)}
+                      >
+                        {day.labelIT}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setCreatingSlots((prev) => ({
+                          ...prev,
+                          [day.value]: true,
+                        }))
+                      }
+                      disabled={
+                        loading || !isActive || creatingSlots[day.value]
+                      }
+                      className={clsx(
+                        "text-xs font-semibold disabled:opacity-40",
+                        colorClasses.text,
+                        colorClasses.hoverText,
+                      )}
+                    >
+                      + Aggiungi fascia
+                    </button>
+                  </div>
+
+                  {isActive && (
+                    <div className="mt-4 space-y-4">
+                      {dayRules.length === 0 ? (
+                        <div
+                          className={clsx(
+                            "rounded-2xl px-4 py-3 text-sm text-slate-500",
+                            "border",
+                            colorClasses.border,
+                            `${colorClasses.bgLight}/40`,
                           )}
                         >
-                          Nuova fascia
-                        </p>
-                        <div className="mt-3 grid grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                              Ora inizio
-                            </p>
-                            <select
-                              value={draft.start}
-                              onChange={(e) =>
-                                setDraftSlots((prev) => ({
-                                  ...prev,
-                                  [day.value]: {
-                                    ...prev[day.value],
-                                    start: e.target.value,
-                                  },
-                                }))
-                              }
-                              className={clsx(
-                                "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
-                                "border",
-                                colorClasses.border,
-                                colorClasses.hoverBorder,
-                              )}
-                            >
-                              {times.map((time) => (
-                                <option key={time} value={time}>
-                                  {time}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                              Durata
-                            </p>
-                            <select
-                              value={draft.durationHours}
-                              onChange={(e) =>
-                                setDraftSlots((prev) => ({
-                                  ...prev,
-                                  [day.value]: {
-                                    ...prev[day.value],
-                                    durationHours: Number(e.target.value),
-                                  },
-                                }))
-                              }
-                              className={clsx(
-                                "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
-                                "border",
-                                colorClasses.border,
-                                colorClasses.hoverBorder,
-                              )}
-                            >
-                              {durationOptions.map((hours) => (
-                                <option key={hours} value={hours}>
-                                  {hours} ore
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                          Nessuna fascia attiva. Aggiungine una qui sotto.
                         </div>
-                        <div className="mt-4 flex gap-2">
-                          <button
-                            onClick={async () => {
-                              // Save draft
-                              setLoading(true);
-                              setError(null);
-                              try {
-                                const d = draftSlots[day.value];
-                                const startM = getMinutesFromTime(d.start);
-                                const endM = startM + d.durationHours * 60;
-                                if (endM > 24 * 60) {
+                      ) : (
+                        <div className="space-y-3">
+                          {dayRules.map((rule, index) => {
+                            const start = rule.start_time.slice(0, 5);
+                            const end = rule.end_time.slice(0, 5);
+                            return (
+                              <div
+                                key={rule.id}
+                                className={clsx(
+                                  "rounded-2xl px-4 py-3 shadow-sm",
+                                  "border",
+                                  colorClasses.border,
+                                )}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-semibold text-slate-500">
+                                    Fascia {index + 1}
+                                  </span>
+                                  <button
+                                    onClick={() => handleDelete(rule.id)}
+                                    disabled={loading}
+                                    className={clsx(
+                                      "rounded-full px-2 py-0.5 text-xs disabled:opacity-40",
+                                      "border",
+                                      colorClasses.border,
+                                      colorClasses.text,
+                                      colorClasses.hoverBorder,
+                                      colorClasses.hoverText,
+                                    )}
+                                  >
+                                    Elimina
+                                  </button>
+                                </div>
+                                <div className="mt-3 grid grid-cols-2 gap-3">
+                                  <div>
+                                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                      Ora inizio
+                                    </p>
+                                    <div
+                                      className={clsx(
+                                        "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                                        "border",
+                                        colorClasses.border,
+                                      )}
+                                    >
+                                      {start}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                      Durata
+                                    </p>
+                                    <div
+                                      className={clsx(
+                                        "mt-1 rounded-full px-3 py-2 text-sm font-semibold text-slate-800",
+                                        "border",
+                                        colorClasses.border,
+                                      )}
+                                    >
+                                      {formatDuration(start, end)}
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="mt-3 text-xs text-slate-400">
+                                  {formatTimeRange(
+                                    rule.start_time,
+                                    rule.end_time,
+                                  )}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {creatingSlots[day.value] ? (
+                        <div
+                          className={clsx(
+                            "rounded-2xl px-4 py-4",
+                            "border",
+                            colorClasses.border,
+                            `${colorClasses.bgLight}/60`,
+                          )}
+                        >
+                          <p
+                            className={clsx(
+                              "text-xs font-semibold uppercase tracking-wide",
+                              colorClasses.text,
+                            )}
+                          >
+                            Nuova fascia
+                          </p>
+                          <div className="mt-3 grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                Ora inizio
+                              </p>
+                              <select
+                                value={draft.start}
+                                onChange={(e) =>
+                                  setDraftSlots((prev) => ({
+                                    ...prev,
+                                    [day.value]: {
+                                      ...prev[day.value],
+                                      start: e.target.value,
+                                    },
+                                  }))
+                                }
+                                className={clsx(
+                                  "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                                  "border",
+                                  colorClasses.border,
+                                  colorClasses.hoverBorder,
+                                )}
+                              >
+                                {times.map((time) => (
+                                  <option key={time} value={time}>
+                                    {time}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                                Durata
+                              </p>
+                              <select
+                                value={draft.durationHours}
+                                onChange={(e) =>
+                                  setDraftSlots((prev) => ({
+                                    ...prev,
+                                    [day.value]: {
+                                      ...prev[day.value],
+                                      durationHours: Number(e.target.value),
+                                    },
+                                  }))
+                                }
+                                className={clsx(
+                                  "mt-1 w-full rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none",
+                                  "border",
+                                  colorClasses.border,
+                                  colorClasses.hoverBorder,
+                                )}
+                              >
+                                {durationOptions.map((hours) => (
+                                  <option key={hours} value={hours}>
+                                    {hours} ore
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="mt-4 flex gap-2">
+                            <button
+                              onClick={async () => {
+                                // Save draft
+                                setLoading(true);
+                                setError(null);
+                                try {
+                                  const d = draftSlots[day.value];
+                                  const startM = getMinutesFromTime(d.start);
+                                  const endM = startM + d.durationHours * 60;
+                                  if (endM > 24 * 60) {
+                                    setError(
+                                      "La durata supera il limite giornaliero",
+                                    );
+                                    return;
+                                  }
+                                  if (endM <= startM) {
+                                    setError("Orario di fine non valido");
+                                    return;
+                                  }
+                                  if (isOverlapping(day.value, startM, endM)) {
+                                    setError(
+                                      "La fascia si sovrappone a una esistente",
+                                    );
+                                    return;
+                                  }
+                                  const now = new Date().toISOString();
+                                  const newRule: VigilAvailabilityRuleI = {
+                                    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                                    created_at: now,
+                                    updated_at: now,
+                                    vigil_id: (await user)!.id,
+                                    weekday: day.value,
+                                    start_time: convertTimeToTimeFormat(
+                                      d.start,
+                                    ),
+                                    end_time: convertTimeToTimeFormat(
+                                      toTimeString(endM),
+                                    ),
+                                    valid_from: formatDateToISO(new Date()),
+                                    valid_to: null,
+                                  };
+                                  setRules((prev) => [...prev, newRule]);
+                                  setCreatingSlots((prev) => ({
+                                    ...prev,
+                                    [day.value]: false,
+                                  }));
+                                  // reset draft to defaults after successful save
+                                  setDraftSlots((prev) => ({
+                                    ...prev,
+                                    [day.value]: {
+                                      start: "12:00",
+                                      durationHours: 3,
+                                    },
+                                  }));
+                                } catch (err: any) {
                                   setError(
-                                    "La durata supera il limite giornaliero",
+                                    err?.message || "Failed to save draft",
                                   );
-                                  return;
+                                } finally {
+                                  setLoading(false);
                                 }
-                                if (endM <= startM) {
-                                  setError("Orario di fine non valido");
-                                  return;
-                                }
-                                if (isOverlapping(day.value, startM, endM)) {
-                                  setError(
-                                    "La fascia si sovrappone a una esistente",
-                                  );
-                                  return;
-                                }
-                                const now = new Date().toISOString();
-                                const newRule: VigilAvailabilityRuleI = {
-                                  id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-                                  created_at: now,
-                                  updated_at: now,
-                                  vigil_id: "demo-vigil-id",
-                                  weekday: day.value,
-                                  start_time: convertTimeToTimeFormat(d.start),
-                                  end_time: convertTimeToTimeFormat(
-                                    toTimeString(endM),
-                                  ),
-                                  valid_from: formatDateToISO(new Date()),
-                                  valid_to: null,
-                                };
-                                setRules((prev) => [...prev, newRule]);
+                              }}
+                              className={clsx(
+                                "rounded-full px-3 py-1 text-sm font-semibold",
+                                colorClasses.text,
+                                colorClasses.hoverText,
+                              )}
+                            >
+                              Salva
+                            </button>
+                            <button
+                              onClick={() => {
                                 setCreatingSlots((prev) => ({
                                   ...prev,
                                   [day.value]: false,
                                 }));
-                                // reset draft to defaults after successful save
+                                // reset draft to defaults
                                 setDraftSlots((prev) => ({
                                   ...prev,
                                   [day.value]: {
@@ -576,54 +612,26 @@ export const AvailabilityRulesDemo = ({
                                     durationHours: 3,
                                   },
                                 }));
-                              } catch (err: any) {
-                                setError(
-                                  err?.message || "Failed to save draft",
-                                );
-                              } finally {
-                                setLoading(false);
-                              }
-                            }}
-                            className={clsx(
-                              "rounded-full px-3 py-1 text-sm font-semibold",
-                              colorClasses.text,
-                              colorClasses.hoverText,
-                            )}
-                          >
-                            Salva
-                          </button>
-                          <button
-                            onClick={() => {
-                              setCreatingSlots((prev) => ({
-                                ...prev,
-                                [day.value]: false,
-                              }));
-                              // reset draft to defaults
-                              setDraftSlots((prev) => ({
-                                ...prev,
-                                [day.value]: {
-                                  start: "12:00",
-                                  durationHours: 3,
-                                },
-                              }));
-                              setError(null);
-                            }}
-                            className="rounded-full px-3 py-1 text-sm border"
-                          >
-                            Annulla
-                          </button>
+                                setError(null);
+                              }}
+                              className="rounded-full px-3 py-1 text-sm border"
+                            >
+                              Annulla
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="mt-2 text-xs text-slate-400">
-                        Clicca "+ Aggiungi fascia" per creare una nuova fascia.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                      ) : (
+                        <div className="mt-2 text-xs text-slate-400">
+                          Clicca "+ Aggiungi fascia" per creare una nuova
+                          fascia.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            },
+          )}
         </div>
       </div>
     </div>

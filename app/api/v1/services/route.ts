@@ -219,7 +219,6 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.log(error);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.SERVICES_CREATE_ERROR.code,
       success: false,

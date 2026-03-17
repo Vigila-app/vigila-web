@@ -75,6 +75,7 @@ const VigilMultiStepOnboarding = () => {
           const srv = {
             active: true,
             postalCode: caps,
+            type:service,
             min_unit: srvRaw?.minimum_duration_hours,
             currency: "€",
             name: service,

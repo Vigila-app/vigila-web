@@ -13,6 +13,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Services } from "./Services";
 import { BookingTypeEnum } from "@/src/enums/booking.enums";
 import clsx from "clsx";
+import Button from "@/components/button/button";
 
 export default function AvailabilityFlow({
   onComplete,
@@ -117,7 +118,7 @@ export default function AvailabilityFlow({
           </div>
         )}
         <div className="flex gap-2 flex-wrap">
-          <button
+          <Button
             className={clsx(
               "border-2 flex-1 py-3 rounded-full",
               config.role === RolesEnum.VIGIL
@@ -126,10 +127,10 @@ export default function AvailabilityFlow({
             )}
             type="button"
             onClick={back}
-          >
-            Back
-          </button>
-          <button
+            label="Indietro"
+          ></Button>
+          <Button
+            label="Avanti"
             className={clsx(
               "flex-1 py-3 rounded-full",
               config.role === RolesEnum.VIGIL
@@ -137,9 +138,7 @@ export default function AvailabilityFlow({
                 : "bg-consumer-blue text-white",
             )}
             type="submit"
-          >
-            Next
-          </button>
+          ></Button>
         </div>
       </form>
     </div>

@@ -25,7 +25,7 @@ export default function VigilOnboardPage() {
     if (user?.user_metadata?.role === RolesEnum.VIGIL) {
       switch (user?.user_metadata?.status) {
         case UserStatusEnum.ACTIVE:
-          // router.replace(Routes.profileVigil.url);
+          router.replace(Routes.profileVigil.url);
           break;
         default:
           break;
