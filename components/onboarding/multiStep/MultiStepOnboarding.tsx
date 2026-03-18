@@ -1,20 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react"
-import useMultiStepFlow from "@/src/hooks/useMultiStepFlow"
-import { useForm, Controller } from "react-hook-form"
-import { Button, ProgressBar } from "@/components"
-import Card from "@/components/card/card"
+import { useCallback, useMemo, useState } from "react";
+import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
+import { useForm, Controller } from "react-hook-form";
+import { Button, ProgressBar } from "@/components";
+import Card from "@/components/card/card";
 import {
   MultiStepOnboardingProps,
-  OnboardingFlowState,
-  OnboardingStep,
   OnboardingQuestion,
-} from "@/src/types/multiStepOnboard.types"
-import QuestionRenderer from "./QuestionRenderer"
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline"
-import clsx from "clsx"
-import { RolesEnum } from "@/src/enums/roles.enums"
+} from "@/src/types/multiStepOnboard.types";
+import QuestionRenderer from "./QuestionRenderer";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 /**
  * Main component that manages the multi-step onboarding flow
@@ -23,12 +21,12 @@ const MultiStepOnboarding = ({
   config,
   onCancel,
 }: MultiStepOnboardingProps) => {
-  const { role, steps, initialStepId, onComplete } = config
+  const { role, steps, initialStepId, onComplete } = config;
 
   const { state, currentStep, isLastStep, next, back, progress } =
-    useMultiStepFlow({ role, steps, initialStepId, onComplete } as any)
+    useMultiStepFlow({ role, steps, initialStepId, onComplete } as any);
 
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   const {
     control,
@@ -40,38 +38,40 @@ const MultiStepOnboarding = ({
   } = useForm({
     mode: "onChange",
     defaultValues: state.answers,
-  })
+  });
 
   // Helper for custom step components to advance with validated answers
   const onNext = useCallback(
     async (validatedAnswers: Record<string, any>) => {
-      if (!currentStep) return
+      if (!currentStep) return;
       try {
-        await next(currentStep, validatedAnswers)
+        await next(currentStep, validatedAnswers);
       } catch (err: any) {
-        setError(err?.message || "An error occurred")
+        setError(err?.message || "An error occurred");
       }
     },
     [currentStep, next],
-  )
+  );
 
   const handleNext = useCallback(async () => {
-    if (!currentStep) return
+    if (!currentStep) return;
 
-    const questionIds = currentStep.questions?.map((q) => q.id)
-    const isValid = await trigger(questionIds)
-    if (!isValid) return
+    const questionIds = currentStep.questions?.map((q) => q.id);
+    const isValid = await trigger(questionIds);
+    if (!isValid) return;
 
-    const currentValues = getValues()
+    const currentValues = getValues();
     try {
-      await next(currentStep, currentValues)
+      await next(currentStep, currentValues);
     } catch (err: any) {
-      setError(err?.message || "An error occurred")
+      setError(err?.message || "An error occurred");
     }
-  }, [currentStep, trigger, getValues, next])
+  }, [currentStep, trigger, getValues, next]);
 
   if (!currentStep) {
-    return <div className="text-center text-red-500">Error: Step not found</div>
+    return (
+      <div className="text-center text-red-500">Error: Step not found</div>
+    );
   }
 
   return (
@@ -111,7 +111,7 @@ const MultiStepOnboarding = ({
             {currentStep.component
               ? // Render custom step component (backwards-compatible)
                 (() => {
-                  const StepComponent = currentStep.component as any
+                  const StepComponent = currentStep.component as any;
                   return (
                     <StepComponent
                       control={control}
@@ -123,7 +123,7 @@ const MultiStepOnboarding = ({
                       onNext={onNext}
                       onBack={back}
                     />
-                  )
+                  );
                 })()
               : currentStep.questions?.map((question: OnboardingQuestion) => (
                   <Controller
@@ -190,7 +190,7 @@ const MultiStepOnboarding = ({
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 export default MultiStepOnboarding;

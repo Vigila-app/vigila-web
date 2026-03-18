@@ -4,20 +4,34 @@ import {
   OnboardingFlowConfig,
   QuestionType,
 } from "@/src/types/multiStepOnboard.types";
-import {
-  UserIcon,
-  HeartIcon,
-  UsersIcon,
-  FaceSmileIcon,
-} from "@heroicons/react/24/outline";
-import { Brain, Car, Man, Woman } from "@/components/svg";
-import { Couple } from "@/components/svg/Couple";
-import Stetoscopio from "@/components/svg/Stetoscopio";
+import { UserIcon, HeartIcon, UsersIcon } from "@heroicons/react/24/outline";
 import {
   ConsumerNeedsEnum,
   ConsumerNeedsLabels,
+  ConsumerAutonomyEnum,
+  ConsumerAutonomyLabels,
+  ConsumerAutonomyDescriptions,
+  ConsumerAttitudeEnum,
+  ConsumerAttitudeLabels,
+  ConsumerQualificationEnum,
+  ConsumerQualificationLabels,
+  ConsumerQualificationDescriptions,
+  ConsumerQualificationIcons,
+  ConsumerTransportationPreferenceEnum,
+  ConsumerTransportationPreferenceLabels,
+  ConsumerTransportationPreferenceDescriptions,
+  ConsumerTransportationPreferenceIcons,
+  ConsumerExperiencePreferenceEnum,
+  ConsumerExperiencePreferenceLabels,
+  ConsumerExperiencePreferenceDescriptions,
+  ConsumerExperiencePreferenceIcons,
 } from "@/src/enums/onboarding.enums";
-import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
+import {
+  GenderDescriptions,
+  GenderEnum,
+  GenderIcons,
+  GenderLabels,
+} from "@/src/enums/common.enums";
 /**
  * Multi-step onboarding flow configuration for CONSUMER users
  */
@@ -75,7 +89,9 @@ export const createConsumerOnboardingConfig = (
           placeholder: "15/06/1960",
           validation: {
             required: true,
-            min: new Date(new Date().setFullYear(new Date().getFullYear() - 80))
+            min: new Date(
+              new Date().setFullYear(new Date().getFullYear() - 110),
+            )
               .toISOString()
               .split("T")[0],
             max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
@@ -113,23 +129,11 @@ export const createConsumerOnboardingConfig = (
           id: "autonomy",
           type: QuestionType.CARD,
           label: "",
-          options: [
-            {
-              label: "Autosufficiente",
-              value: "Autosufficiente",
-              description: "È completamente autonoma nella vita quotidiana.",
-            },
-            {
-              label: "Parzialmente autosufficiente",
-              value: "Parzialmente autosufficiente",
-              description: "Ha bisogno di aiuto in alcune attività quotidiane.",
-            },
-            {
-              label: "Non autosufficiente",
-              value: "Non autosufficiente",
-              description: "Necessita d'assistenza continua.",
-            },
-          ],
+          options: Object.values(ConsumerAutonomyEnum).map((value) => ({
+            value,
+            label: ConsumerAutonomyLabels[value],
+            description: ConsumerAutonomyDescriptions[value],
+          })),
           validation: {
             required: true,
           },
@@ -176,6 +180,8 @@ export const createConsumerOnboardingConfig = (
           options: Object.values(GenderEnum).map((value) => ({
             value,
             label: GenderLabels[value],
+            description: GenderDescriptions[value],
+            icon: GenderIcons[value],
           })),
           validation: {
             required: true,
@@ -196,28 +202,10 @@ export const createConsumerOnboardingConfig = (
           id: "attitude",
           type: QuestionType.MULTI_CHECKBOX,
           label: "",
-          options: [
-            {
-              label: "Molto paziente",
-              value: "Molto paziente",
-            },
-            {
-              label: "Tranquillo/a e riservato/a",
-              value: "Tranquillo/a e riservato/a",
-            },
-            {
-              label: "Molto organizzato/a",
-              value: "Molto organizzato/a",
-            },
-            {
-              label: "Flessibile con gli orari",
-              value: "Flessibile con gli orari",
-            },
-            {
-              label: "Molto puntuale",
-              value: "Molto puntuale",
-            },
-          ],
+          options: Object.values(ConsumerAttitudeEnum).map((value) => ({
+            value,
+            label: ConsumerAttitudeLabels[value],
+          })),
           validation: {
             required: true,
           },
@@ -236,26 +224,12 @@ export const createConsumerOnboardingConfig = (
           id: "qualifications",
           type: QuestionType.CARD,
           label: "",
-          options: [
-            {
-              label: "Sì, OSS qualificato",
-              value: "OSS",
-              description: "Operatore Socio Sanitario qualificato",
-              icon: Stetoscopio,
-            },
-            {
-              label: "Assistente familiare (no qualfica)",
-              value: "no OSS",
-              description: "Assistenza domiciliare senza qualifica specifica",
-              icon: HeartIcon,
-            },
-            {
-              label: "Nessuna preferenza",
-              value: "Indifferente",
-              description: "Va bene qualsiasi profilo con esperienza",
-              icon: FaceSmileIcon,
-            },
-          ],
+          options: Object.values(ConsumerQualificationEnum).map((value) => ({
+            value,
+            label: ConsumerQualificationLabels[value],
+            description: ConsumerQualificationDescriptions[value],
+            icon: ConsumerQualificationIcons[value],
+          })),
           validation: {
             required: true,
           },
@@ -273,26 +247,14 @@ export const createConsumerOnboardingConfig = (
           id: "transportation",
           type: QuestionType.CARD,
           label: "",
-          options: [
-            {
-              label: "Sì, automunito",
-              value: "auto",
-              description: "Il vigil deve avere patente e un'auto",
-              icon: Car,
-            },
-            {
-              label: "No, non necessario",
-              value: "no auto",
-              description: "Non serve che il vigil abbia un'auto",
-              icon: UserIcon,
-            },
-            {
-              label: "Nessuna preferenza",
-              value: "Indifferente",
-              description: "Non è un requisito importante",
-              icon: FaceSmileIcon,
-            },
-          ],
+          options: Object.values(ConsumerTransportationPreferenceEnum).map(
+            (value) => ({
+              value,
+              label: ConsumerTransportationPreferenceLabels[value],
+              description: ConsumerTransportationPreferenceDescriptions[value],
+              icon: ConsumerTransportationPreferenceIcons[value],
+            }),
+          ),
           validation: {
             required: true,
           },
@@ -310,27 +272,14 @@ export const createConsumerOnboardingConfig = (
           id: "experience",
           type: QuestionType.CARD,
           label: "",
-          options: [
-            {
-              label: "Sì, esperienza necessaria",
-              value: "dementia",
-              description:
-                "Il vigil deve aver avuto esperienza con pazienti con demenza o Alzheimer",
-              icon: Brain,
-            },
-            {
-              label: "No, non necessario",
-              value: "no experience",
-              description: "Non è richiesta esperienza specifica",
-              icon: UserIcon,
-            },
-            {
-              label: "Nessuna preferenza",
-              value: "Indifferente",
-              description: "Non è un requisito importante",
-              icon: FaceSmileIcon,
-            },
-          ],
+          options: Object.values(ConsumerExperiencePreferenceEnum).map(
+            (value) => ({
+              value,
+              label: ConsumerExperiencePreferenceLabels[value],
+              description: ConsumerExperiencePreferenceDescriptions[value],
+              icon: ConsumerExperiencePreferenceIcons[value],
+            }),
+          ),
           validation: {
             required: true,
           },
