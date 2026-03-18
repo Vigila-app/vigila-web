@@ -19,14 +19,18 @@ const BookingCounterComponent = () => {
 
   const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
   const numeroPrenotazioniConfermate = confirmedBookings.length;
+  const mostraPlus = confirmedBookings.length >= 10;
 
   const numeroPrenotazioni = bookings.length || 0;
+  const mostraPlusTotal = bookings.length >= 10;
+
   return (
     <div className="flex flex-col pb-8 gap-4 mt-8">
       <Card>
         <div className="flex gap-4 justify-start items-center">
           <span className="text-4xl text-consumer-blue font-semibold">
             {numeroPrenotazioniConfermate}
+            {mostraPlus && <span className="text-2xl">+</span>}
           </span>
           <span className="font-semibold  text-sm ">
             Prenotazioni Confermate
@@ -37,6 +41,7 @@ const BookingCounterComponent = () => {
         <div className="flex gap-4 justify-start items-center">
           <span className="text-4xl text-vigil-orange font-semibold">
             {numeroPrenotazioni}
+            {mostraPlusTotal && <span className="text-2xl">+</span>}
           </span>
           <span className="font-semibold text-sm ">Totale Prenotazioni</span>
         </div>
