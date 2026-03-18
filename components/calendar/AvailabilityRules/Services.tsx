@@ -46,13 +46,47 @@ export const Services = ({
       price: 18,
     },
   ];
-  const MANSIONI_LABELS = [
-    "Conversazione e ascolto",
-    "Lettura libri / giornali",
-    "Giochi di società / carte",
-    "Guardare TV insieme",
-    "Passeggiata leggera",
-  ];
+
+  const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
+    "Compagnia e conversazione": [
+      "Conversazione e ascolto",
+      "Lettura libri / giornali",
+      "Giochi di società / carte",
+      "Guardare TV insieme",
+      "Passeggiata leggera",
+    ],
+    "Assistenza leggera": [
+      "Promemoria farmaci",
+      "Spesa e commissioni",
+      "Preparazione pasti semplici",
+      "Accompagnamento Visite",
+      "Rassetto e pulizia leggera",
+    ],
+    "Assistenza alla persona": [
+      "Aiuto mobilità",
+      "Vestizione / svestizione",
+      "Somministrazione pasti",
+      "Trasferimento letto / poltrona",
+    ],
+    "Igiene personale": [
+      "Bagno completo",
+      "Spugnature a letto",
+      "Cambio pannolone",
+      "Igiene orale",
+      "Cura capelli e barba",
+    ],
+  };
+
+  const getVisibleMansioni = (): string[] => {
+    if (selectedServices.length === 0) return [];
+    const allMansioni = new Set<string>();
+    selectedServices.forEach((service) => {
+      (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
+        allMansioni.add(m),
+      );
+    });
+    return Array.from(allMansioni);
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,8 +145,21 @@ export const Services = ({
     const day = selectedDays[currentDayIdx];
     const saved = answers?.services?.[day];
     if (saved) {
-      setSelectedServices(Array.isArray(saved.services) ? saved.services : []);
-      setSelectedMansioni(Array.isArray(saved.mansioni) ? saved.mansioni : []);
+      const loadedServices = Array.isArray(saved.services)
+        ? saved.services
+        : [];
+      setSelectedServices(loadedServices);
+      // Filter mansioni to only include those valid for loaded services
+      const validMansioni = new Set<string>();
+      loadedServices.forEach((service) => {
+        (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
+          validMansioni.add(m),
+        );
+      });
+      const filteredMansioni = Array.isArray(saved.mansioni)
+        ? saved.mansioni.filter((m: string) => validMansioni.has(m))
+        : [];
+      setSelectedMansioni(filteredMansioni);
       setCar(!!saved.car);
       setNotes(saved.notes || "");
     } else {
@@ -199,38 +246,44 @@ export const Services = ({
         {/* Mansioni checkboxes without icons */}
         <div className="mb-4">
           <div className="font-semibold mb-2">Mansioni</div>
-          <div className="flex flex-col gap-2">
-            {MANSIONI_LABELS.map((label) => {
-              const isChecked = selectedMansioni.includes(label);
-              return (
-                <label
-                  key={label}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    setSelectedMansioni((prev) =>
-                      prev.includes(label)
-                        ? prev.filter((p) => p !== label)
-                        : [...prev, label],
-                    );
-                  }}
-                  className={clsx(
-                    "cursor-pointer w-full py-3 text-center rounded-full",
-                    isChecked
-                      ? clsx(colorClasses.border, colorClasses.bgLight)
-                      : "border-zinc-200 bg-white",
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    readOnly
-                    className="hidden"
-                  />
-                  <span>{label}</span>
-                </label>
-              );
-            })}
-          </div>
+          {selectedServices.length === 0 ? (
+            <div className="text-sm text-zinc-500">
+              Seleziona almeno un servizio per visualizzare le mansioni
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {getVisibleMansioni().map((label) => {
+                const isChecked = selectedMansioni.includes(label);
+                return (
+                  <label
+                    key={label}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setSelectedMansioni((prev) =>
+                        prev.includes(label)
+                          ? prev.filter((p) => p !== label)
+                          : [...prev, label],
+                      );
+                    }}
+                    className={clsx(
+                      "cursor-pointer w-full py-3 text-center rounded-full",
+                      isChecked
+                        ? clsx(colorClasses.border, colorClasses.bgLight)
+                        : "border-zinc-200 bg-white",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      readOnly
+                      className="hidden"
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Accompagnamento in auto */}
@@ -305,16 +358,23 @@ export const Services = ({
                   const nextDay = selectedDays[nextIdx];
                   // load saved values for next day (if any) so UI reflects them immediately
                   const savedNext = answers?.services?.[nextDay];
-                  setSelectedServices(
-                    Array.isArray(savedNext?.services)
-                      ? savedNext.services
-                      : [],
-                  );
-                  setSelectedMansioni(
-                    Array.isArray(savedNext?.mansioni)
-                      ? savedNext.mansioni
-                      : [],
-                  );
+                  const nextServices = Array.isArray(savedNext?.services)
+                    ? savedNext.services
+                    : [];
+                  setSelectedServices(nextServices);
+                  // Calculate valid mansioni for next day's services
+                  const nextValidMansioni = new Set<string>();
+                  nextServices.forEach((service) => {
+                    (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
+                      nextValidMansioni.add(m),
+                    );
+                  });
+                  const nextFilteredMansioni = Array.isArray(savedNext?.mansioni)
+                    ? savedNext.mansioni.filter((m: string) =>
+                        nextValidMansioni.has(m),
+                      )
+                    : [];
+                  setSelectedMansioni(nextFilteredMansioni);
                   setCar(!!savedNext?.car);
                   setNotes(savedNext?.notes || "");
                   setCurrentDayIdx(nextIdx);
