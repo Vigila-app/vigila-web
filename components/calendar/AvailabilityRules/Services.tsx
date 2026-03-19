@@ -1,4 +1,4 @@
-import { ComponentType, useEffect, useState, useMemo } from "react";
+import { ComponentType, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { SingleService } from "./SingleService";
@@ -6,6 +6,101 @@ import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import Caffe from "@/components/svg/Caffe";
 import Vasca from "@/components/svg/Vasca";
 import { Car } from "@/components/svg";
+import { CurrentDay } from "./CurrentDay";
+import { SelectedDays } from "./SelectedDays";
+export const dayNames = [
+  "Domenica",
+  "Lunedì",
+  "Martedì",
+  "Mercoledì",
+  "Giovedì",
+  "Venerdì",
+  "Sabato",
+];
+
+const SERVICES = [
+  {
+    name: "Compagnia e conversazione",
+    desc: "Presenza, dialogo e supporto emotivo",
+    Icon: Caffe as ComponentType<{ className?: string }>,
+    price: 12,
+  },
+  {
+    name: "Assistenza leggera",
+    desc: "Supervisione, promemoria farmaci, piccole commissioni",
+    Icon: HeartIcon as ComponentType<{ className?: string }>,
+    price: 14,
+  },
+  {
+    name: "Assistenza alla persona",
+    desc: "Mobiiltà, pasti, vestizione",
+    Icon: UserGroupIcon as ComponentType<{ className?: string }>,
+    price: 16,
+  },
+  {
+    name: "Igiene personale",
+    desc: "Bagno, cambio, cura personale",
+    Icon: Vasca as ComponentType<{ className?: string }>,
+    price: 18,
+  },
+];
+
+const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
+  "Compagnia e conversazione": [
+    "Conversazione e ascolto",
+    "Lettura libri / giornali",
+    "Giochi di società / carte",
+    "Guardare TV insieme",
+    "Passeggiata leggera",
+  ],
+  "Assistenza leggera": [
+    "Promemoria farmaci",
+    "Spesa e commissioni",
+    "Preparazione pasti semplici",
+    "Accompagnamento Visite",
+    "Rassetto e pulizia leggera",
+  ],
+  "Assistenza alla persona": [
+    "Aiuto mobilità",
+    "Vestizione / svestizione",
+    "Somministrazione pasti",
+    "Trasferimento letto / poltrona",
+  ],
+  "Igiene personale": [
+    "Bagno completo",
+    "Spugnature a letto",
+    "Cambio pannolone",
+    "Igiene orale",
+    "Cura capelli e barba",
+  ],
+};
+
+const getVisibleMansioni = (service: string | null): string[] =>
+  service ? SERVICE_MANSIONI_MAP[service] || [] : [];
+
+const normalizeMansioniByService = (
+  services: string[],
+  saved: Record<string, any> | undefined,
+): Record<string, string[]> => {
+  const savedByService: Record<string, string[]> =
+    saved?.mansioniByService && typeof saved.mansioniByService === "object"
+      ? saved.mansioniByService
+      : {};
+
+  const normalized: Record<string, string[]> = {};
+  services.forEach((service) => {
+    const allowed = new Set(SERVICE_MANSIONI_MAP[service] || []);
+    const fromByService = Array.isArray(savedByService[service])
+      ? savedByService[service]
+      : [];
+    const fromFlat = Array.isArray(saved?.mansioni)
+      ? saved.mansioni.filter((m: string) => allowed.has(m))
+      : [];
+    normalized[service] = Array.from(new Set([...fromByService, ...fromFlat]));
+  });
+
+  return normalized;
+};
 
 export const Services = ({
   answers,
@@ -20,92 +115,19 @@ export const Services = ({
   ) => void;
   role?: RolesEnum;
 }) => {
-  const SERVICES = [
-    {
-      name: "Compagnia e conversazione",
-      desc: "Presenza, dialogo e supporto emotivo",
-      Icon: Caffe as ComponentType<{ className?: string }>,
-      price: 12,
-    },
-    {
-      name: "Assistenza leggera",
-      desc: "Supervisione, promemoria farmaci, piccole commissioni",
-      Icon: HeartIcon as ComponentType<{ className?: string }>,
-      price: 14,
-    },
-    {
-      name: "Assistenza alla persona",
-      desc: "Mobiiltà, pasti, vestizione",
-      Icon: UserGroupIcon as ComponentType<{ className?: string }>,
-      price: 16,
-    },
-    {
-      name: "Igiene personale",
-      desc: "Bagno, cambio, cura personale",
-      Icon: Vasca as ComponentType<{ className?: string }>,
-      price: 18,
-    },
-  ];
-
-  const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
-    "Compagnia e conversazione": [
-      "Conversazione e ascolto",
-      "Lettura libri / giornali",
-      "Giochi di società / carte",
-      "Guardare TV insieme",
-      "Passeggiata leggera",
-    ],
-    "Assistenza leggera": [
-      "Promemoria farmaci",
-      "Spesa e commissioni",
-      "Preparazione pasti semplici",
-      "Accompagnamento Visite",
-      "Rassetto e pulizia leggera",
-    ],
-    "Assistenza alla persona": [
-      "Aiuto mobilità",
-      "Vestizione / svestizione",
-      "Somministrazione pasti",
-      "Trasferimento letto / poltrona",
-    ],
-    "Igiene personale": [
-      "Bagno completo",
-      "Spugnature a letto",
-      "Cambio pannolone",
-      "Igiene orale",
-      "Cura capelli e barba",
-    ],
-  };
-
-  const getVisibleMansioni = (): string[] => {
-    if (selectedServices.length === 0) return [];
-    const allMansioni = new Set<string>();
-    selectedServices.forEach((service) => {
-      (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
-        allMansioni.add(m),
-      );
-    });
-    return Array.from(allMansioni);
-  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const dayNames = [
-    "Domenica",
-    "Lunedì",
-    "Martedì",
-    "Mercoledì",
-    "Giovedì",
-    "Venerdì",
-    "Sabato",
-  ];
-
   // derive unique ordered weekdays from answers.availabilityRules
-  const selectedDays: number[] = Array.from(
-    new Set(
-      (answers?.availabilityRules || []).map((r: any) => Number(r.weekday)),
-    ),
-  );
+  const selectedDays = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (answers?.availabilityRules || []).map((r: any) => Number(r.weekday)),
+        ),
+      ),
+    [answers?.availabilityRules],
+  ) as number[]
 
   const [currentDayIdx, setCurrentDayIdx] = useState(0);
 
@@ -116,7 +138,10 @@ export const Services = ({
 
   // per-day local selections
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [selectedMansioni, setSelectedMansioni] = useState<string[]>([]);
+  const [activeService, setActiveService] = useState<string | null>(null);
+  const [selectedMansioniByService, setSelectedMansioniByService] = useState<
+    Record<string, string[]>
+  >({});
   const [car, setCar] = useState(false);
   const [notes, setNotes] = useState("");
 
@@ -149,22 +174,20 @@ export const Services = ({
         ? saved.services
         : [];
       setSelectedServices(loadedServices);
-      // Filter mansioni to only include those valid for loaded services
-      const validMansioni = new Set<string>();
-      loadedServices.forEach((service) => {
-        (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
-          validMansioni.add(m),
-        );
-      });
-      const filteredMansioni = Array.isArray(saved.mansioni)
-        ? saved.mansioni.filter((m: string) => validMansioni.has(m))
-        : [];
-      setSelectedMansioni(filteredMansioni);
+      setSelectedMansioniByService(
+        normalizeMansioniByService(loadedServices, saved),
+      );
+      setActiveService((prev) =>
+        loadedServices.includes(prev || "")
+          ? (prev as string)
+          : loadedServices[0] || null,
+      );
       setCar(!!saved.car);
       setNotes(saved.notes || "");
     } else {
       setSelectedServices([]);
-      setSelectedMansioni([]);
+      setActiveService(null);
+      setSelectedMansioniByService({});
       setCar(false);
       setNotes("");
     }
@@ -176,54 +199,92 @@ export const Services = ({
     );
   if (error) return <div className="text-red-500 text-sm">{error}</div>;
 
+  const handleServiceToggle = (serviceName: string, next: boolean) => {
+    setSelectedServices((prev) => {
+      if (next) {
+        const nextServices = Array.from(new Set([...prev, serviceName]));
+        setActiveService(serviceName);
+        return nextServices;
+      }
+      const remaining = prev.filter((s) => s !== serviceName);
+      if (activeService === serviceName) {
+        setActiveService(remaining[0] || null);
+      }
+      return remaining;
+    });
+  };
+
+  const toggleMansione = (serviceName: string, label: string) => {
+    if (!serviceName) return;
+    setSelectedMansioniByService((prev) => {
+      const existing = prev[serviceName] || [];
+      const nextMansioni = existing.includes(label)
+        ? existing.filter((p) => p !== label)
+        : [...existing, label];
+      return { ...prev, [serviceName]: nextMansioni };
+    });
+  };
+
+  const saveCurrentDaySelections = () => {
+    const day = selectedDays[currentDayIdx];
+    if (!setAnswers) return;
+
+    setAnswers((prev: Record<string, any>) => {
+      const next = { ...prev };
+      next.services = { ...next.services };
+
+      const mansioniAll = Array.from(
+        new Set(
+          selectedServices.flatMap(
+            (service) => selectedMansioniByService[service] || [],
+          ),
+        ),
+      );
+
+      next.services[day] = {
+        weekday: Number(day),
+        services: selectedServices,
+        mansioni: mansioniAll,
+        mansioniByService: selectedMansioniByService,
+        car: !!car,
+        notes: notes || "",
+      };
+      return next;
+    });
+  };
+
+  const loadDaySelections = (saved: Record<string, any> | undefined) => {
+    const nextServices = Array.isArray(saved?.services) ? saved.services : [];
+    setSelectedServices(nextServices);
+    setSelectedMansioniByService(
+      normalizeMansioniByService(nextServices, saved),
+    );
+    setActiveService(nextServices[0] || null);
+    setCar(!!saved?.car);
+    setNotes(saved?.notes || "");
+  };
+
   return (
     <div className="bg-zinc-200 p-4">
       <div className="bg-white rounded-full mb-4">
         <div className="flex gap-2 flex-wrap p-3">
-          {selectedDays.map((day, idx) => {
-            const isActive = idx === currentDayIdx;
-            const dayServices = answers?.services?.[day];
-            const hasEdited = !!dayServices;
-            return (
-              <div key={"rule_" + day} className="flex items-center">
-                <button
-                  onClick={() => setCurrentDayIdx(idx)}
-                  className={clsx(
-                    "font-bold text-sm px-4 py-2 rounded-full",
-                    isActive || hasEdited
-                      ? clsx("text-white", colorClasses.bg)
-                      : "text-zinc-700 bg-white border",
-                  )}
-                >
-                  {dayNames[Number(day)]}
-                </button>
-              </div>
-            );
-          })}
+          <SelectedDays
+            answers={answers}
+            selectedDays={selectedDays}
+            currentDayIdx={currentDayIdx}
+            setCurrentDayIdx={setCurrentDayIdx}
+            classes={colorClasses}
+          />
         </div>
       </div>
 
       {/* Service checkboxes with icons */}
       <div className="bg-white p-4 rounded-2xl">
-        {selectedDays.length === 0 ? (
-          <div className="text-sm text-zinc-500">Nessun giorno selezionato</div>
-        ) : (
-          <>
-            <h2>{dayNames[Number(selectedDays[currentDayIdx])]}</h2>
-            <span className="ml-2 text-zinc-600 text-sm">
-              {(answers?.availabilityRules || [])
-                .filter(
-                  (r: any) =>
-                    Number(r.weekday) === Number(selectedDays[currentDayIdx]),
-                )
-                .map(
-                  (r: any) =>
-                    `${r.start_time.slice(0, 5)} - ${r.end_time.slice(0, 5)}`,
-                )
-                .join(", ")}
-            </span>
-          </>
-        )}
+        <CurrentDay
+          answers={answers}
+          selectedDays={selectedDays}
+          currentDayIdx={currentDayIdx}
+        />
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
           <div className="grid grid-cols-2 gap-3">
@@ -232,12 +293,9 @@ export const Services = ({
                 key={srv.name}
                 {...srv}
                 checked={selectedServices.includes(srv.name)}
-                onChange={(next: boolean) => {
-                  setSelectedServices((prev) => {
-                    if (next) return Array.from(new Set([...prev, srv.name]));
-                    return prev.filter((s) => s !== srv.name);
-                  });
-                }}
+                onChange={(next: boolean) =>
+                  handleServiceToggle(srv.name, next)
+                }
               />
             ))}
           </div>
@@ -252,21 +310,20 @@ export const Services = ({
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {getVisibleMansioni().map((label) => {
-                const isChecked = selectedMansioni.includes(label);
+              {getVisibleMansioni(activeService).map((label) => {
+                const currentService = activeService || "";
+                const serviceMansioni =
+                  selectedMansioniByService[currentService] || [];
+                const isChecked = serviceMansioni.includes(label);
                 return (
                   <label
                     key={label}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      setSelectedMansioni((prev) =>
-                        prev.includes(label)
-                          ? prev.filter((p) => p !== label)
-                          : [...prev, label],
-                      );
+                      toggleMansione(currentService, label);
                     }}
                     className={clsx(
-                      "cursor-pointer w-full py-3 text-center rounded-full",
+                      "cursor-pointer w-full py-3 text-center rounded-full border-zinc-200 border-1",
                       isChecked
                         ? clsx(colorClasses.border, colorClasses.bgLight)
                         : "border-zinc-200 bg-white",
@@ -329,28 +386,11 @@ export const Services = ({
 
         {/* Navigation */}
         <div className="flex justify-between mt-6">
-          <div />
           <div className="flex gap-2">
             <button
               type="button"
               onClick={async () => {
-                const day = selectedDays[currentDayIdx];
-                // Save current day selections into answers
-                if (setAnswers) {
-                  setAnswers((prev: Record<string, any>) => {
-                    const next = { ...prev };
-                    next.services = { ...next.services };
-                    // Save actual selections for the day
-                    next.services[day] = {
-                      weekday: Number(day),
-                      services: selectedServices,
-                      mansioni: selectedMansioni,
-                      car: !!car,
-                      notes: notes || "",
-                    };
-                    return next;
-                  });
-                }
+                saveCurrentDaySelections();
 
                 // move to next day or finalize
                 if (currentDayIdx < selectedDays.length - 1) {
@@ -358,29 +398,12 @@ export const Services = ({
                   const nextDay = selectedDays[nextIdx];
                   // load saved values for next day (if any) so UI reflects them immediately
                   const savedNext = answers?.services?.[nextDay];
-                  const nextServices = Array.isArray(savedNext?.services)
-                    ? savedNext.services
-                    : [];
-                  setSelectedServices(nextServices);
-                  // Calculate valid mansioni for next day's services
-                  const nextValidMansioni = new Set<string>();
-                  nextServices.forEach((service) => {
-                    (SERVICE_MANSIONI_MAP[service] || []).forEach((m) =>
-                      nextValidMansioni.add(m),
-                    );
-                  });
-                  const nextFilteredMansioni = Array.isArray(savedNext?.mansioni)
-                    ? savedNext.mansioni.filter((m: string) =>
-                        nextValidMansioni.has(m),
-                      )
-                    : [];
-                  setSelectedMansioni(nextFilteredMansioni);
-                  setCar(!!savedNext?.car);
-                  setNotes(savedNext?.notes || "");
+                  loadDaySelections(savedNext);
                   setCurrentDayIdx(nextIdx);
                 } else {
                   // last day: finalize / salva ricorrenza
                   console.log("All days filled, salva ricorrenza");
+                  console.log(answers);
                 }
               }}
               className={clsx(

@@ -48,12 +48,12 @@ export const SingleService = ({
       className={clsx(
         "flex flex-col items-center justify-between gap-2 border-3 p-3 rounded-3xl cursor-pointer transition-all",
         selected
-          ? clsx(colorClasses.border, "border-2", colorClasses.bgLight)
+          ? clsx(colorClasses.border, "border-2 ", colorClasses.bgLight)
           : "border-zinc-400 bg-white",
       )}
       onMouseDown={(e) => toggle(e)}
     >
-      <input type="checkbox" checked={selected} readOnly className="hidden" />
+      <input type="radio" checked={selected} readOnly className="hidden" name="services" />
       <Icon
         className={clsx("w-10", selected ? colorClasses.text : "text-zinc-400")}
       />
