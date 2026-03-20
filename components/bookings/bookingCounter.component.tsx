@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Card } from "@/components";
 
 const BookingCounterComponent = () => {
-  const { bookings, getBookings } = useBookingsStore();
+  const { bookings, totalCount, getBookings } = useBookingsStore();
 
   const { user } = useUserStore();
 
@@ -18,11 +18,11 @@ const BookingCounterComponent = () => {
   }, [user?.id]);
 
   const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
-  const numeroPrenotazioniConfermate = confirmedBookings.length;
-  const mostraPlus = confirmedBookings.length >= 10;
+  const numeroPrenotazioniConfermate = Math.min(confirmedBookings.length, 99);
+  const mostraPlus = confirmedBookings.length >= 99;
 
-  const numeroPrenotazioni = bookings.length || 0;
-  const mostraPlusTotal = bookings.length >= 10;
+  const numeroPrenotazioni = Math.min(totalCount, 99);
+  const mostraPlusTotal = totalCount >= 99;
 
   return (
     <div className="flex flex-col pb-8 gap-4 mt-8">
