@@ -1,7 +1,7 @@
-import { Checkbox } from "@/components/form"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
-import clsx from "clsx"
+import { Checkbox } from "@/components/form";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
+import clsx from "clsx";
 
 export const CheckboxInput = ({
   question,
@@ -18,10 +18,8 @@ export const CheckboxInput = ({
       onChange={(checked) => onChange(checked)}
       error={error}
     />
-  )
-}
-
-
+  );
+};
 
 export const MulticheckboxInput = ({
   question,
@@ -29,7 +27,6 @@ export const MulticheckboxInput = ({
   role,
   error,
   value,
-  
 }: QuestionRendererProps) => {
   const currentValues = Array.isArray(value) ? value : [];
   const noneValue = question.options?.find(
@@ -40,13 +37,13 @@ export const MulticheckboxInput = ({
     <div>
       <label
         className={clsx(
-          "block font-medium mb-2",
+          "block font-medium mb-2 text-center",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
         )}
       >
         {question.label}
-        {question.validation?.required }
+        {question.validation?.required}
       </label>
       {question.description && (
         <p className="text-sm text-gray-600 mb-3">{question.description}</p>
@@ -75,7 +72,7 @@ export const MulticheckboxInput = ({
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
                   "border-consumer-blue bg-consumer-light-blue text-consumer-blue",
-                isDisabled && "opacity-50 pointer-events-none"
+                isDisabled && "opacity-50 pointer-events-none",
               )}
             >
               <label
@@ -141,9 +138,9 @@ export const MulticheckboxInput = ({
           );
         })}
       </div>
-      {typeof question.max === 'number' && (
+      {typeof question.max === "number" && (
         <p className="text-xs text-gray-500 mt-1">{`Max selezionabili: ${question.max}`}</p>
       )}
     </div>
   );
-}
+};

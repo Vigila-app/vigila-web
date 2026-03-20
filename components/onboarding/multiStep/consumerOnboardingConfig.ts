@@ -52,11 +52,11 @@ export const createConsumerOnboardingConfig = (
           type: QuestionType.CARD,
           label: "",
           options: [
-            { label: "Me stesso/a", value: "Me stesso/a", icon: UserIcon },
-            { label: "Mamma/Papà", value: "Mamma/Papà", icon: HeartIcon },
-            { label: "Nonna/Nonno", value: "Nonna/Nonno", icon: UsersIcon },
-            { label: "Parente", value: "Parente", icon: UsersIcon },
-            { label: "Amico", value: "Amico", icon: HeartIcon },
+            { label: "Me stesso/a", value: "me", icon: UserIcon },
+            { label: "Mamma/Papà", value: "mom_dad", icon: HeartIcon },
+            { label: "Nonna/Nonno", value: "grandparent", icon: UsersIcon },
+            { label: "Parente", value: "relative", icon: UsersIcon },
+            { label: "Amico", value: "friend", icon: HeartIcon },
           ],
           validation: {
             required: true,
@@ -104,7 +104,7 @@ export const createConsumerOnboardingConfig = (
     },
     {
       id: "address",
-      title: "Dove avverrà l'assistenza?",
+      title: "Il tuo indirizzo principale",
       description:
         "L'indirizzo ci aiuterà a trovare i vigil intorno a te ed organizzare l'assistenza.",
       questions: [

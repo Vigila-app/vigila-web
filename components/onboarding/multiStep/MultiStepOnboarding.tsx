@@ -85,11 +85,11 @@ const MultiStepOnboarding = ({
           {/* Step header */}
           {currentStep.title && (
             <section className="flex flex-col items-center gap-2 mb-8">
-              <h1 className={clsx("font-semibold text-2xl")}>
+              <h1 className={clsx("font-semibold text-2xl  text-center ")}>
                 {currentStep.title}
               </h1>
               {currentStep.description && (
-                <span className="font-normal text-lg text-center">
+                <span className="font-normal text-lg  text-center">
                   {currentStep.description}
                 </span>
               )}

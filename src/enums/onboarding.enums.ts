@@ -299,7 +299,7 @@ export const ConsumerAutonomyDescriptions: Record<
   string
 > = {
   [ConsumerAutonomyEnum.SELF_SUFFICIENT]:
-    "È completamente autonoma nella vita quotidiana.",
+    "È completamente autosufficiente nella vita quotidiana.",
   [ConsumerAutonomyEnum.PARTIALLY]:
     "Ha bisogno di aiuto in alcune attività quotidiane.",
   [ConsumerAutonomyEnum.NOT_SUFFICIENT]: "Necessita d'assistenza continua.",

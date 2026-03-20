@@ -12,14 +12,15 @@ export const CardInput = ({
     <div>
       <label
         className={clsx(
-          "block font-medium mb-2 text-center text-xl",
+          "block font-medium mb-2 text-center text-xl ",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
-        )}>
+        )}
+      >
         {question.label}
       </label>
 
-      <div className="flex flex-col gap-4 mt-2">
+      <div className="flex flex-col gap-2 md:gap-4 mt-2">
         {" "}
         {question.options?.map((option) => {
           const isChecked = value === option.value;
@@ -29,7 +30,7 @@ export const CardInput = ({
               key={option.value}
               onClick={() => onChange(option.value)}
               className={clsx(
-                "cursor-pointer relative w-full p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[100px]",
+                "cursor-pointer relative w-full px-4 py-2 md:p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[100px]",
 
                 !isChecked && "bg-white border-gray-200  hover:border-gray-300",
 
@@ -39,7 +40,8 @@ export const CardInput = ({
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
                   "border-consumer-blue bg-consumer-light-blue text-consumer-blue ",
-              )}>
+              )}
+            >
               {option.icon && (
                 <option.icon
                   className={clsx(
@@ -55,7 +57,9 @@ export const CardInput = ({
                 />
               )}
 
-              <span className="font-medium text-lg ">{option.label}</span>
+              <span className="font-medium text-lg text-center ">
+                {option.label}
+              </span>
               {option.description && (
                 <span className="text-xs text-center">
                   {option.description}
