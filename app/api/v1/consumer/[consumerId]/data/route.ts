@@ -28,6 +28,13 @@ export async function GET(
         success: false,
       });
 
+    // Enforce ownership: users can only access their own consumer data
+    if (userObject.id !== consumerId) {
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.CONSUMER_DATA_FORBIDDEN.code,
+        success: false,
+      });
+    }
     const _admin = getAdminClient();
     const { data, error } = await _admin
       .from("consumers_data")
