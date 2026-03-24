@@ -4,6 +4,7 @@ import {
   XCircleIcon,
   FaceSmileIcon,
   UserIcon,
+  BeakerIcon,
 } from "@heroicons/react/24/outline";
 import { ComponentType, SVGProps } from "react";
 import Wheelchair from "@/components/svg/Wheelchair";
@@ -189,10 +190,10 @@ export const VigilOutdoorServiceIcons: Record<
 };
 
 export enum VigilPastExperienceEnum {
-  SELFSUFFICIENT = "selfsufficient",
+  SELFSUFFICIENT = "self_sufficient",
   REDUCED_MOBILITY = "reduced_mobility",
   WHEELCHAIR = "wheelchair",
-  ALZHEIMER = "alzheimer",
+  ALZHEIMER = "alzheimer_dementia",
   PARKINSON = "parkinson",
   POST_OP = "post-op",
   NIGHT = "night",
@@ -378,7 +379,7 @@ export const ConsumerTransportationPreferenceDescriptions: Record<
   [ConsumerTransportationPreferenceEnum.CAR_REQUIRED]:
     "Il vigil deve avere patente e un'auto",
   [ConsumerTransportationPreferenceEnum.NOT_REQUIRED]:
-    "Non serve che il vigil abbia un'auto",
+    "Non serve che il vigil abbia un'auto propria",
   [ConsumerTransportationPreferenceEnum.NO_PREFERENCE]:
     "Non è un requisito importante",
 };
@@ -393,9 +394,11 @@ export const ConsumerTransportationPreferenceIcons: Record<
 };
 
 export enum ConsumerExperiencePreferenceEnum {
-  DEMENTIA_REQUIRED = "dementia",
+  DEMENTIA_REQUIRED = "alzheimer_dementia",
+  PARKINSON = "parkinson",
+  POST_OP = "post-op",
+  WHEELCHAIR = "wheelchair",
   NOT_REQUIRED = "not_required",
-  NO_PREFERENCE = "no_preference",
 }
 
 export const ConsumerExperiencePreferenceLabels: Record<
@@ -403,9 +406,14 @@ export const ConsumerExperiencePreferenceLabels: Record<
   string
 > = {
   [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]:
-    "Sì, esperienza necessaria",
+    "Esperienza con pazienti con demenza o Alzheimer",
+  [ConsumerExperiencePreferenceEnum.PARKINSON]:
+    "Esperienza con pazienti con Parkinson",
+  [ConsumerExperiencePreferenceEnum.POST_OP]:
+    "Esperienza con assistenza post-operatoria",
+  [ConsumerExperiencePreferenceEnum.WHEELCHAIR]:
+    "Esperienza con assistenza a persone in carrozzina",
   [ConsumerExperiencePreferenceEnum.NOT_REQUIRED]: "No, non necessario",
-  [ConsumerExperiencePreferenceEnum.NO_PREFERENCE]: "Nessuna preferenza",
 };
 
 export const ConsumerExperiencePreferenceDescriptions: Record<
@@ -414,10 +422,14 @@ export const ConsumerExperiencePreferenceDescriptions: Record<
 > = {
   [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]:
     "Il vigil deve aver avuto esperienza con pazienti con demenza o Alzheimer",
+  [ConsumerExperiencePreferenceEnum.PARKINSON]:
+    "Il vigil deve aver avuto esperienza con pazienti con Parkinson",
+  [ConsumerExperiencePreferenceEnum.POST_OP]:
+    "Il vigil deve aver avuto esperienza con assistenza post-operatoria",
+  [ConsumerExperiencePreferenceEnum.WHEELCHAIR]:
+    "Il vigil deve aver avuto esperienza con assistenza a persone in carrozzina",
   [ConsumerExperiencePreferenceEnum.NOT_REQUIRED]:
     "Non è richiesta esperienza specifica",
-  [ConsumerExperiencePreferenceEnum.NO_PREFERENCE]:
-    "Non è un requisito importante",
 };
 
 export const ConsumerExperiencePreferenceIcons: Record<
@@ -425,8 +437,10 @@ export const ConsumerExperiencePreferenceIcons: Record<
   ComponentType<SVGProps<SVGSVGElement>>
 > = {
   [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]: Brain,
+  [ConsumerExperiencePreferenceEnum.PARKINSON]: Brain,
+  [ConsumerExperiencePreferenceEnum.POST_OP]: BeakerIcon,
+  [ConsumerExperiencePreferenceEnum.WHEELCHAIR]: Wheelchair,
   [ConsumerExperiencePreferenceEnum.NOT_REQUIRED]: UserIcon,
-  [ConsumerExperiencePreferenceEnum.NO_PREFERENCE]: FaceSmileIcon,
 };
 
 export enum ConsumerNeedsEnum {

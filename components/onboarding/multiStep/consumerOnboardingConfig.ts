@@ -32,6 +32,7 @@ import {
   GenderIcons,
   GenderLabels,
 } from "@/src/enums/common.enums";
+import { Couple, Man, Woman } from "@/components/svg";
 /**
  * Multi-step onboarding flow configuration for CONSUMER users
  */
@@ -68,13 +69,13 @@ export const createConsumerOnboardingConfig = (
     },
     {
       id: "name-birthday",
-      title: "Presenta la tua persona cara",
+      title: "Presenta chi ha bisogno di assistenza",
       description: "Come si chiama e quando è nato/a?",
       questions: [
         {
           id: "lovedOneName",
           type: QuestionType.TEXT,
-          label: "Nome e Cognome della persona cara",
+          label: "Nome e Cognome ",
           placeholder: "Es. Giovanni Bianchi",
           validation: {
             required: true,
@@ -104,9 +105,9 @@ export const createConsumerOnboardingConfig = (
     },
     {
       id: "address",
-      title: "Il tuo indirizzo principale",
+      title: "Qual è l'indirizzo di residenza?",
       description:
-        "L'indirizzo ci aiuterà a trovare i vigil intorno a te ed organizzare l'assistenza.",
+        "L'indirizzo ci aiuterà a trovare i vigil ed organizzare l'assistenza.",
       questions: [
         {
           id: "address",
@@ -123,7 +124,8 @@ export const createConsumerOnboardingConfig = (
     {
       id: "autonomy",
       title: "Quanto è autonomo/a nella vita quotidiana?",
-      description: "Ci aiuterà a trovare il vigil più adatto alle necessità.",
+      description:
+        "Questo ci aiuterà a trovare il vigil più adatto alle necessità.",
       questions: [
         {
           id: "autonomy",
@@ -177,12 +179,15 @@ export const createConsumerOnboardingConfig = (
           id: "gender_preference",
           type: QuestionType.CARD,
           label: "",
-          options: Object.values(GenderEnum).map((value) => ({
-            value,
-            label: GenderLabels[value],
-            description: GenderDescriptions[value],
-            icon: GenderIcons[value],
-          })),
+          options: [
+            { value: "male", label: "Uomo", icon: Man },
+            { value: "female", label: "Donna", icon: Woman },
+            {
+              value: "no_preference",
+              label: "Nessuna preferenza",
+              icon: Couple,
+            },
+          ],
           validation: {
             required: true,
           },
@@ -265,8 +270,9 @@ export const createConsumerOnboardingConfig = (
     },
     {
       id: "experience",
-      title: "È necessaria esperienza con demenza/Alzheimer?",
-      description: "Indica se il vigil deve avere esperienza specifica.",
+      title: "È necessaria esperienza specifica ?",
+      description:
+        "Indica se il vigil deve avere esperienza specifica con malattie come Alzheimer, demenza, Parkinson, ecc.",
       questions: [
         {
           id: "experience",
