@@ -71,12 +71,17 @@ export const Step = ({
               question={{ ...q, label: "", description: "" }}
               value={state.answers[q.id]}
               onChange={(value) => {
-                // persist answer and trigger a local re-render so controlled inputs update
-                state.answers[q.id] = value;
-                setTick((t) => t + 1);
+                // Prefer updating via provided setter to avoid direct mutation and re-render loops
+                if (setAnswers) {
+                  setAnswers((prev) => ({ ...(prev || {}), [q.id]: value }));
+                } else {
+                  // Fallback: mutate and force local re-render
+                  state.answers[q.id] = value;
+                  setTick((t) => t + 1);
+                }
               }}
-              error={undefined} // Adjusted to match the expected prop
-              role={config.role} // Added role prop as required by QuestionRenderer
+              error={undefined}
+              role={config.role}
             />
           </div>
         </div>

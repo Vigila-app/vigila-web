@@ -29,7 +29,16 @@ export default function AvailabilityFlow({
         id: "welcome",
         title: "Prenota l'assistenza domiciliare",
         description: "",
-        nextStep: "availabilities",
+        nextStep: (answers) => {
+          console.log(answers["booking-type"]);
+          if (
+            answers["booking-type"] == BookingTypeEnum.OCCASIONAL ||
+            answers["booking-type"] == BookingTypeEnum.TRIAL
+          ) {
+            return "single-booking";
+          }
+          return "availabilities";
+        },
         questions: [
           {
             id: "booking-type",
@@ -43,6 +52,33 @@ export default function AvailabilityFlow({
             ],
           },
         ],
+      },
+      {
+        id: "single-booking",
+        title: "",
+        description: "",
+        questions: [
+          {
+            id: "start-date",
+            type: QuestionType.DATE,
+            label: "Data del servizio",
+            placeholder: "",
+            validation: {
+              required: true,
+            },
+          },
+          {
+            id: "address",
+            type: QuestionType.ADDRESS,
+            label: "Indirizzo",
+            placeholder: "Via Napoli 123",
+            description: "Dove si svolgerà l'assistenza",
+            validation: {
+              required: true,
+            },
+          },
+        ],
+        nextStep: "services",
       },
       {
         id: "availabilities",
@@ -97,13 +133,17 @@ export default function AvailabilityFlow({
     onComplete,
   } as any);
   const [address, setAddress] = useState<any>(undefined);
-  const { handleSubmit, reset, getValues } = useForm({ defaultValues: { ...state.answers } });
+  const { handleSubmit, reset, getValues } = useForm({
+    defaultValues: { ...state.answers },
+  });
 
   const getAddress = useCallback(async () => {
     try {
       const id = (await UserService.getUser())?.id;
       if (!id) throw new Error("User is not logged in or id is not available");
-      const { data: details } = (await ApiService.get(apiConsumer.DETAILS(id))) as {
+      const { data: details } = (await ApiService.get(
+        apiConsumer.DETAILS(id),
+      )) as {
         data: any;
       };
       const addr = details?.address;

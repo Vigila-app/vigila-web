@@ -264,19 +264,25 @@ export const Services = ({
     setNotes(saved?.notes || "");
   };
 
+  const bookingType = answers?.["booking-type"];
+  const isSingleDate =
+    bookingType === "occasional" || bookingType === "trial";
+
   return (
     <div className="bg-zinc-200 p-4">
-      <div className="bg-white rounded-full mb-4">
-        <div className="flex gap-2 flex-wrap p-3">
-          <SelectedDays
-            answers={answers}
-            selectedDays={selectedDays}
-            currentDayIdx={currentDayIdx}
-            setCurrentDayIdx={setCurrentDayIdx}
-            classes={colorClasses}
-          />
+      {!isSingleDate && (
+        <div className="bg-white rounded-full mb-4">
+          <div className="flex gap-2 flex-wrap p-3">
+            <SelectedDays
+              answers={answers}
+              selectedDays={selectedDays}
+              currentDayIdx={currentDayIdx}
+              setCurrentDayIdx={setCurrentDayIdx}
+              classes={colorClasses}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Service checkboxes with icons */}
       <div className="bg-white p-4 rounded-2xl">
