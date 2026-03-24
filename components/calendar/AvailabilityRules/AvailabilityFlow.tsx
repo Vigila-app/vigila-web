@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -14,6 +14,8 @@ import { Services } from "./Services";
 import { BookingTypeEnum } from "@/src/enums/booking.enums";
 import clsx from "clsx";
 import Button from "@/components/button/button";
+import { ApiService, AuthService, UserService } from "@/src/services";
+import { apiConsumer, apiVigil } from "@/src/constants/api.constants";
 
 export default function AvailabilityFlow({
   onComplete,
@@ -94,10 +96,33 @@ export default function AvailabilityFlow({
     initialStepId: config.initialStepId,
     onComplete,
   } as any);
-  const { handleSubmit } = useForm({ defaultValues: state.answers });
+  const [address, setAddress] = useState<any>(undefined);
+  const { handleSubmit, reset, getValues } = useForm({ defaultValues: { ...state.answers } });
+
+  const getAddress = useCallback(async () => {
+    try {
+      const id = (await UserService.getUser())?.id;
+      if (!id) throw new Error("User is not logged in or id is not available");
+      const { data: details } = (await ApiService.get(apiConsumer.DETAILS(id))) as {
+        data: any;
+      };
+      const addr = details?.address;
+      setAddress(addr);
+      // Preserve any current form values (so user input like date isn't overwritten)
+      const current = getValues();
+      reset({ ...(current || {}), address: addr });
+      // Keep the multi-step flow answers in sync using current values
+      setAnswers({ ...(current || {}), address: addr });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [reset, setAnswers, getValues]);
+
+  useEffect(() => {
+    getAddress();
+  }, [getAddress]);
 
   if (!currentStep) return null;
-
   const onNext = async (values: { [key: string]: unknown }) => {
     // values are validated by react-hook-form
     await next(currentStep, values);

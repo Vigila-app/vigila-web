@@ -127,7 +127,7 @@ export const Services = ({
         ),
       ),
     [answers?.availabilityRules],
-  ) as number[]
+  ) as number[];
 
   const [currentDayIdx, setCurrentDayIdx] = useState(0);
 
