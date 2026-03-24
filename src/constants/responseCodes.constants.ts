@@ -516,6 +516,24 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   CONSUMER_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7806,
   },
+  CONSUMER_DATA_SUCCESS: {
+    code: 7811,
+  },
+  CONSUMER_DATA_ERROR: {
+    code: 7812,
+  },
+  CONSUMER_DATA_BAD_REQUEST: {
+    code: 7813,
+  },
+  CONSUMER_DATA_UNAUTHORIZED: {
+    code: 7814,
+  },
+  CONSUMER_DATA_FORBIDDEN: {
+    code: 7815,
+  },
+  CONSUMER_DATA_NOT_FOUND: {
+    code: 7816,
+  },
   // endregion CONSUMER
 
   // region VIGIL
@@ -707,4 +725,4 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 10404,
   },
   // endregion CALENDAR
-}
+};
