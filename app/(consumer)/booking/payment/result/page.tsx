@@ -5,10 +5,10 @@ import { Routes } from "@/src/routes";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { useQueryParams } from "@/src/hooks/useQueryParams";
 import { redirect } from "next/navigation";
-import { BookingsService } from "@/src/services";
 import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { useEffect, useState, Suspense, useRef, useCallback } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
+import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLL_ATTEMPTS = 10;
@@ -18,6 +18,7 @@ function BookingPaymentResultContent() {
     params: { bookingId, payment_intent, payment_method, status },
   } = useQueryParams();
 
+  const { getBookingDetails } = useBookingsStore();
   const [isLoading, setIsLoading] = useState(true);
   const [paymentVerified, setPaymentVerified] = useState(false);
   const pollCountRef = useRef(0);
@@ -29,7 +30,7 @@ function BookingPaymentResultContent() {
 
   const pollBookingStatus = useCallback(async () => {
     try {
-      const booking = await BookingsService.getBookingDetails(bookingId);
+      const booking = await getBookingDetails(bookingId, true);
 
       if (booking.payment_status === PaymentStatusEnum.PAID) {
         setPaymentVerified(true);
@@ -55,11 +56,12 @@ function BookingPaymentResultContent() {
       setPaymentVerified(true);
       setIsLoading(false);
     }
-  }, [bookingId]);
+  }, [bookingId, getBookingDetails]);
 
   useEffect(() => {
     if (bookingId) {
       if (payment_method === "wallet" && status === "success") {
+        getBookingDetails(bookingId, true).catch(() => {});
         setPaymentVerified(true);
         setIsLoading(false);
       } else if (payment_intent) {
@@ -141,7 +143,8 @@ function BookingPaymentResultContent() {
 export default function BookingPaymentResultPage() {
   return (
     <Suspense
-      fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}>
+      fallback={<div className="h-12 bg-gray-100 rounded-lg animate-pulse" />}
+    >
       <BookingPaymentResultContent />
     </Suspense>
   );

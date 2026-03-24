@@ -22,6 +22,7 @@ Consumer → POST /api/v1/wallet/pay-booking
   → Create wallet_transactions record (type: DEBIT)
   → Update booking: payment_status = PAID, status = PENDING, payment_method = WALLET
   → Redirect to result page (?payment_method=wallet&status=success)
+  → Result page fires getBookingDetails(bookingId, force=true) to sync Zustand store
   → Result page shows success immediately
 ```
 
@@ -95,12 +96,15 @@ The result page (`/booking/payment/result`) cannot know exactly when the webhook
 
 ```
 Result page mounts
-  → Every 3 seconds: GET /api/v1/bookings/:bookingId
-  → If booking.payment_status === PAID → stop polling, show success
+  → Every 3 seconds: useBookingsStore.getBookingDetails(bookingId, force=true)
+      (calls GET /api/v1/bookings/:bookingId AND writes the result into the Zustand store)
+  → If booking.payment_status === PAID → stop polling, update store, show success
   → After 10 attempts (~30 seconds) → show success anyway
       (payment was captured by Stripe; webhook is just delayed)
   → On error → show success anyway (same reasoning)
 ```
+
+> **Store sync:** Both the Stripe polling path and the wallet path call `useBookingsStore.getBookingDetails(bookingId, force=true)` on the result page so the Zustand store reflects the updated `payment_status` before the user navigates back. This avoids stale cache issues when the booking detail modal is opened after payment.
 
 ---
 
