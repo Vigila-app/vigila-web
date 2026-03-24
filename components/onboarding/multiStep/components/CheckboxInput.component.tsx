@@ -37,7 +37,7 @@ export const MulticheckboxInput = ({
     <div>
       <label
         className={clsx(
-          "block font-medium mb-2 text-center",
+          "block font-semibold mb-2 text-center text-balance",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
         )}
