@@ -46,7 +46,8 @@ export type VigilDetailsType = {
 
 export type ViglStoreType = {
   onLogout: () => void;
-  lastUpdate?: Date;
+  lastUpdateDetails?: Date;
+  lastUpdateData?: Date;
   vigils: VigilDetailsType[];
   vigilsData: VigilDataType[];
   getVigilsDetails: (

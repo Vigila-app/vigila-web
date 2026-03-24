@@ -13,11 +13,13 @@ import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 const initVigilStore: {
-  lastUpdate?: ViglStoreType["lastUpdate"];
+  lastUpdateDetails?: Date;
+  lastUpdateData?: Date;
   vigils: VigilDetailsType[];
   vigilsData: VigilDataType[];
 } = {
-  lastUpdate: undefined,
+  lastUpdateDetails: undefined,
+  lastUpdateData: undefined,
   vigils: [],
   vigilsData: [],
 };
@@ -38,10 +40,10 @@ export const useVigilStore = create<ViglStoreType>()(
                   const promises = vigils
                     .filter((vigilId) =>
                       force ||
-                      !get().lastUpdate ||
+                      !get().lastUpdateDetails ||
                       dateDiff(
                         new Date(),
-                        get().lastUpdate,
+                        get().lastUpdateDetails,
                         FrequencyEnum.MINUTES,
                       ) > 15
                         ? vigilId
@@ -76,7 +78,7 @@ export const useVigilStore = create<ViglStoreType>()(
                       set(
                         () => ({
                           vigils: mergedVigils,
-                          lastUpdate: new Date(),
+                          lastUpdateDetails: new Date(),
                         }),
                         false,
                         { type: "getVigilsDetails" },
@@ -96,7 +98,7 @@ export const useVigilStore = create<ViglStoreType>()(
             }
           };
 
-          const uniqueKey = vigils.sort().join(",");
+          const uniqueKey = vigils.slice().sort().join(",");
           return createDebouncedAction(
             "getVigilsDetails",
             action,
@@ -110,14 +112,15 @@ export const useVigilStore = create<ViglStoreType>()(
         getVigilData: async (vigilId: string, force = false) => {
           const action = async () => {
             try {
-              const lastUpdate = get().lastUpdate;
-              if (!force && lastUpdate) {
+              const lastUpdateData = get().lastUpdateData;
+              if (!force && lastUpdateData) {
                 const existing = get().vigilsData.find(
                   (vd) => vd.vigil_id === vigilId,
                 );
                 if (
                   existing &&
-                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) <= 15
+                  dateDiff(new Date(), lastUpdateData, FrequencyEnum.MINUTES) <=
+                    15
                 ) {
                   return existing;
                 }
@@ -138,7 +141,7 @@ export const useVigilStore = create<ViglStoreType>()(
               set(
                 () => ({
                   vigilsData: Array.from(mergedMap.values()),
-                  lastUpdate: new Date(),
+                  lastUpdateData: new Date(),
                 }),
                 false,
                 { type: "getVigilData" },

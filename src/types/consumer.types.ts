@@ -37,7 +37,8 @@ export type ConsumerDetailsType = {
 
 export type ConsumerStoreType = {
   onLogout: () => void;
-  lastUpdate?: Date;
+  lastUpdateDetails?: Date;
+  lastUpdateData?: Date;
   consumers: ConsumerDetailsType[];
   consumersData: ConsumerDataType[];
   getConsumersDetails: (

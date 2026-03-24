@@ -13,11 +13,13 @@ import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 const initConsumerStore: {
-  lastUpdate?: ConsumerStoreType["lastUpdate"];
+  lastUpdateDetails?: ConsumerStoreType["lastUpdateDetails"];
+  lastUpdateData?: ConsumerStoreType["lastUpdateData"];
   consumers: ConsumerDetailsType[];
   consumersData: ConsumerDataType[];
 } = {
-  lastUpdate: undefined,
+  lastUpdateDetails: undefined,
+  lastUpdateData: undefined,
   consumers: [],
   consumersData: [],
 };
@@ -34,11 +36,17 @@ export const useConsumerStore = create<ConsumerStoreType>()(
           const action = async () => {
             try {
               // decide which consumer ids actually need to be fetched
-              const lastUpdate = get().lastUpdate;
+              const lastUpdateDetails = get().lastUpdateDetails;
               const idsToFetch = consumers.filter((consumerId) => {
                 if (force) return true;
-                if (!lastUpdate) return true;
-                if (dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1)
+                if (!lastUpdateDetails) return true;
+                if (
+                  dateDiff(
+                    new Date(),
+                    lastUpdateDetails,
+                    FrequencyEnum.MINUTES,
+                  ) > 1
+                )
                   return true;
                 // otherwise fetch only if not already present
                 return !get().consumers.find((c) => c.id === consumerId);
@@ -76,7 +84,10 @@ export const useConsumerStore = create<ConsumerStoreType>()(
               const mergedArray = Array.from(mergedMap.values());
 
               set(
-                () => ({ consumers: mergedArray, lastUpdate: new Date() }),
+                () => ({
+                  consumers: mergedArray,
+                  lastUpdateDetails: new Date(),
+                }),
                 false,
                 { type: "getConsumersDetails" },
               );
@@ -105,14 +116,15 @@ export const useConsumerStore = create<ConsumerStoreType>()(
         getConsumerData: async (consumerId: string, force = false) => {
           const action = async () => {
             try {
-              const lastUpdate = get().lastUpdate;
-              if (!force && lastUpdate) {
+              const lastUpdateData = get().lastUpdateData;
+              if (!force && lastUpdateData) {
                 const existing = get().consumersData.find(
                   (cd) => cd.consumer_id === consumerId,
                 );
                 if (
                   existing &&
-                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) <= 1
+                  dateDiff(new Date(), lastUpdateData, FrequencyEnum.MINUTES) <=
+                    1
                 ) {
                   return existing;
                 }
@@ -133,7 +145,7 @@ export const useConsumerStore = create<ConsumerStoreType>()(
               set(
                 () => ({
                   consumersData: Array.from(mergedMap.values()),
-                  lastUpdate: new Date(),
+                  lastUpdateData: new Date(),
                 }),
                 false,
                 { type: "getConsumerData" },
