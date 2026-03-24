@@ -241,6 +241,8 @@ export const apiConsumer = {
 export const apiVigil = {
   DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
+  DATA: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/data`,
 };
 
 export const apiAdmin = {

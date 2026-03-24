@@ -555,6 +555,24 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   VIGIL_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7906,
   },
+  VIGIL_DATA_SUCCESS: {
+    code: 7911,
+  },
+  VIGIL_DATA_ERROR: {
+    code: 7912,
+  },
+  VIGIL_DATA_BAD_REQUEST: {
+    code: 7913,
+  },
+  VIGIL_DATA_UNAUTHORIZED: {
+    code: 7914,
+  },
+  VIGIL_DATA_FORBIDDEN: {
+    code: 7915,
+  },
+  VIGIL_DATA_NOT_FOUND: {
+    code: 7916,
+  },
   // endregion VIGIL
 
   // region CALENDAR

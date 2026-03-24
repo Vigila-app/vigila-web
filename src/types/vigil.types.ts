@@ -1,6 +1,17 @@
 import { ReviewI } from "@/src/types/review.types";
 import { AddressI } from "./maps.types";
 
+export type VigilDataType = {
+  id: string;
+  vigil_id: string;
+  created_at?: string;
+  updated_at?: string;
+  transportation_mode?: string;
+  occupation?: string;
+  courses?: string;
+  experience_years?: string;
+};
+
 export type VigilDetailsType = {
   displayName?: string;
   verified?: boolean;
@@ -37,8 +48,13 @@ export type ViglStoreType = {
   onLogout: () => void;
   lastUpdate?: Date;
   vigils: VigilDetailsType[];
+  vigilsData: VigilDataType[];
   getVigilsDetails: (
     vigils: VigilDetailsType["id"][],
-    force?: boolean
+    force?: boolean,
   ) => Promise<VigilDetailsType[]>;
+  getVigilData: (
+    vigilId: VigilDetailsType["id"],
+    force?: boolean,
+  ) => Promise<VigilDataType | null>;
 };
