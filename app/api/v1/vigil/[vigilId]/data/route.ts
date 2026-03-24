@@ -28,6 +28,13 @@ export async function GET(
         success: false,
       });
 
+    // Enforce that the authenticated user is only allowed to access their own vigil data
+    if (userObject.id !== vigilId) {
+      return jsonErrorResponse(403, {
+        code: ResponseCodesConstants.VIGIL_DATA_FORBIDDEN.code,
+        success: false,
+      });
+    }
     const _admin = getAdminClient();
     const { data, error } = await _admin
       .from("vigils_data")
