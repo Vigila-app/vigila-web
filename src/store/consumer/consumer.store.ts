@@ -2,6 +2,7 @@ import { apiConsumer } from "@/src/constants/api.constants";
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { ApiService } from "@/src/services";
 import {
+  ConsumerDataType,
   ConsumerDetailsType,
   ConsumerStoreType,
 } from "@/src/types/consumer.types";
@@ -12,15 +13,19 @@ import { create } from "zustand";
 import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 const initConsumerStore: {
-  lastUpdate?: ConsumerStoreType["lastUpdate"];
+  lastUpdateDetails?: ConsumerStoreType["lastUpdateDetails"];
+  lastUpdateData?: ConsumerStoreType["lastUpdateData"];
   consumers: ConsumerDetailsType[];
+  consumersData: ConsumerDataType[];
 } = {
-  lastUpdate: undefined,
+  lastUpdateDetails: undefined,
+  lastUpdateData: undefined,
   consumers: [],
+  consumersData: [],
 };
 
 // Crea il debouncer per lo store consumer
-const { createDebouncedAction } = createStoreDebouncer('consumer-store');
+const { createDebouncedAction } = createStoreDebouncer("consumer-store");
 
 export const useConsumerStore = create<ConsumerStoreType>()(
   devtools(
@@ -31,12 +36,16 @@ export const useConsumerStore = create<ConsumerStoreType>()(
           const action = async () => {
             try {
               // decide which consumer ids actually need to be fetched
-              const lastUpdate = get().lastUpdate;
+              const lastUpdateDetails = get().lastUpdateDetails;
               const idsToFetch = consumers.filter((consumerId) => {
                 if (force) return true;
-                if (!lastUpdate) return true;
+                if (!lastUpdateDetails) return true;
                 if (
-                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
+                  dateDiff(
+                    new Date(),
+                    lastUpdateDetails,
+                    FrequencyEnum.MINUTES,
+                  ) > 1
                 )
                   return true;
                 // otherwise fetch only if not already present
@@ -50,8 +59,8 @@ export const useConsumerStore = create<ConsumerStoreType>()(
 
               const promises = idsToFetch.map((consumerId) =>
                 ApiService.get<{ data: ConsumerDetailsType }>(
-                  apiConsumer.DETAILS(consumerId)
-                )
+                  apiConsumer.DETAILS(consumerId),
+                ),
               );
 
               const consumersDetailsStoreBE = await Promise.all(promises);
@@ -61,7 +70,7 @@ export const useConsumerStore = create<ConsumerStoreType>()(
 
               const newConsumers = consumersDetailsStoreBE
                 .filter((item): item is { data: ConsumerDetailsType } =>
-                  Boolean(item)
+                  Boolean(item),
                 )
                 .map(({ data }) => data);
 
@@ -75,30 +84,93 @@ export const useConsumerStore = create<ConsumerStoreType>()(
               const mergedArray = Array.from(mergedMap.values());
 
               set(
-                () => ({ consumers: mergedArray, lastUpdate: new Date() }),
+                () => ({
+                  consumers: mergedArray,
+                  lastUpdateDetails: new Date(),
+                }),
                 false,
-                { type: "getConsumersDetails" }
+                { type: "getConsumersDetails" },
               );
 
               return newConsumers;
             } catch (error) {
-              console.error("useConsumerStore getConsumersDetails error:", error);
+              console.error(
+                "useConsumerStore getConsumersDetails error:",
+                error,
+              );
               throw error;
             }
           };
 
           const uniqueKey = consumers.slice().sort().join(",");
-          return createDebouncedAction("getConsumersDetails", action, force, uniqueKey);
+          return createDebouncedAction(
+            "getConsumersDetails",
+            action,
+            force,
+            uniqueKey,
+          );
         },
         onLogout: () => {
           set(initConsumerStore, false, { type: "onLogout" });
+        },
+        getConsumerData: async (consumerId: string, force = false) => {
+          const action = async () => {
+            try {
+              const lastUpdateData = get().lastUpdateData;
+              if (!force && lastUpdateData) {
+                const existing = get().consumersData.find(
+                  (cd) => cd.consumer_id === consumerId,
+                );
+                if (
+                  existing &&
+                  dateDiff(new Date(), lastUpdateData, FrequencyEnum.MINUTES) <=
+                    1
+                ) {
+                  return existing;
+                }
+              }
+
+              const result = await ApiService.get<{ data: ConsumerDataType }>(
+                apiConsumer.DATA(consumerId),
+              );
+
+              if (!result?.data) return null;
+
+              const newData = result.data;
+              const existingData = get().consumersData || [];
+              const mergedMap = new Map<string, ConsumerDataType>();
+              existingData.forEach((cd) => mergedMap.set(cd.consumer_id, cd));
+              mergedMap.set(newData.consumer_id, newData);
+
+              set(
+                () => ({
+                  consumersData: Array.from(mergedMap.values()),
+                  lastUpdateData: new Date(),
+                }),
+                false,
+                { type: "getConsumerData" },
+              );
+
+              return newData;
+            } catch (error) {
+              console.error("useConsumerStore getConsumerData error:", error);
+              throw error;
+            }
+          };
+
+          return createDebouncedAction(
+            "getConsumerData",
+            action,
+            force,
+            consumerId,
+          );
         },
       }),
       {
         name: "consumer",
         storage: createJSONStorage(() => sessionStorage),
-      }
+      },
     ),
-    { enabled: isDev, anonymousActionType: "consumer" }
-  )
+    { enabled: isDev, anonymousActionType: "consumer" },
+  ),
 );

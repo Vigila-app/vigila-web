@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { jsonErrorResponse } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
 import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
-import { handleTopUp } from "./webhooks.fn";
+import { handleTopUp, handleBookingPayment } from "./webhooks.fn";
 
 // Initialize Stripe with the latest API version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -111,14 +111,17 @@ async function handlePaymentIntentSucceeded(
   switch (transaction_type) {
     case TRANSACTION_TYPE.TOP_UP:
       return handleTopUp(paymentIntent)
+
+    case TRANSACTION_TYPE.BOOKING_PAYMENT:
+      return handleBookingPayment(paymentIntent)
   
     default:
-    console.log(`Ignoring non-TOP_UP transaction: ${transaction_type}`);
+    console.log(`Unhandled transaction type: ${transaction_type}`);
     return NextResponse.json(
       {
         code: ResponseCodesConstants.PAYMENT_WEBHOOK_SUCCESS.code,
         success: true,
-        message: "Event ignored: not a TOP_UP transaction",
+        message: `Event ignored: unhandled transaction type ${transaction_type}`,
       },
       { status: 200 }
     );

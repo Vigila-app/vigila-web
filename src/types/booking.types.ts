@@ -40,6 +40,7 @@ export type BookingFormI = BookingI & {};
 export type BookingStoreType = {
   onLogout: () => void;
   bookings: BookingI[];
+  totalCount: number;
   lastUpdate?: Date;
   getBookings: (force?: boolean) => void;
   getBookingDetails: (
