@@ -26,12 +26,7 @@ import {
   ConsumerExperiencePreferenceDescriptions,
   ConsumerExperiencePreferenceIcons,
 } from "@/src/enums/onboarding.enums";
-import {
-  GenderDescriptions,
-  GenderEnum,
-  GenderIcons,
-  GenderLabels,
-} from "@/src/enums/common.enums";
+
 import { Couple, Man, Woman } from "@/components/svg";
 /**
  * Multi-step onboarding flow configuration for CONSUMER users

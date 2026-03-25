@@ -30,7 +30,7 @@ export const CardInput = ({
               key={option.value}
               onClick={() => onChange(option.value)}
               className={clsx(
-                "cursor-pointer relative w-full px-4 py-2 md:p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[100px]",
+                "cursor-pointer relative w-full px-4 py-2 md:p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ",
 
                 !isChecked && "bg-white border-gray-200  hover:border-gray-300",
 
@@ -45,7 +45,7 @@ export const CardInput = ({
               {option.icon && (
                 <option.icon
                   className={clsx(
-                    "w-8 h-8",
+                    "w-7 h-7",
                     !isChecked && "text-gray-400",
                     isChecked &&
                       role === RolesEnum.VIGIL &&
