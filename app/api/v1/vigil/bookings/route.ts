@@ -14,9 +14,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/calendar/vigil/bookings
- * 
+ *
  * Returns the vigil's calendar with bookings, unavailabilities, and availability rules
- * 
+ *
  * @returns VigilCalendarResponseI
  */
 export async function GET(req: NextRequest) {
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
         *,
         consumer:consumers(displayName),
         service:services(name)
-      `
+      `,
       )
       .eq("vigil_id", userObject.id)
       .order("startDate", { ascending: true });
@@ -92,22 +92,22 @@ export async function GET(req: NextRequest) {
           payment_status: booking.payment_status,
           price: booking.price,
         },
-      })
+      }),
     );
 
     // Transform unavailabilities into calendar events
-    const unavailabilityEvents: CalendarEventI[] = (
-      unavailabilities || []
-    ).map((unavailability: any) => ({
-      id: unavailability.id,
-      type: "unavailability" as const,
-      title: unavailability.reason || "Unavailable",
-      start: unavailability.start_at,
-      end: unavailability.end_at,
-      metadata: {
-        reason: unavailability.reason,
-      },
-    }));
+    const unavailabilityEvents: CalendarEventI[] = (unavailabilities || []).map(
+      (unavailability: any) => ({
+        id: unavailability.id,
+        type: "unavailability" as const,
+        title: unavailability.reason || "Unavailable",
+        start: unavailability.start_at,
+        end: unavailability.end_at,
+        metadata: {
+          reason: unavailability.reason,
+        },
+      }),
+    );
 
     const response: VigilCalendarResponseI = {
       bookings: bookingEvents,
@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
         data: response,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Vigil calendar error:", error);

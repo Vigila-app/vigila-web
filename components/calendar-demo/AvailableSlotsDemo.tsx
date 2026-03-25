@@ -23,10 +23,10 @@ export const AvailableSlotsDemo = () => {
 
   // Form state
   const [formData, setFormData] = useState<AvailableSlotsRequestI>({
-    vigil_id: "demo-vigil-id", // In real scenario, this would be selected from a list
+    vigil_id: "", // In real scenario, this would be selected from a list
     start_date: formatDateToISO(new Date()),
     end_date: getDateRange(30).endDate, // 30 days from now
-    service_id: "demo-service-id", // In real scenario, this would be selected from a list
+    service_id: "", // In real scenario, this would be selected from a list
   });
 
   const handleFetchSlots = async (e: React.FormEvent) => {
