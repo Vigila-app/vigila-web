@@ -22,6 +22,8 @@ const consumerBtnStyle =
 
 const walletBtnStyle =
   "bg-white text-consumer-blue border-transparent hover:bg-gray-50 focus:ring-white/50 shadow-sm font-semibold py-2.5";
+const onboardingBtnStyle =
+  "bg-white text-vigil-orange border-consumer-blue hover:bg-consumer-blue hover:text-white font-semibold";
 export const ButtonStyle = {
   baseBtnStyle,
   primaryBtnStyle,
@@ -36,4 +38,5 @@ export const ButtonStyle = {
   fullBtnStyle,
   tabBtnStyle,
   smallBtnStyle,
+  onboardingBtnStyle,
 };

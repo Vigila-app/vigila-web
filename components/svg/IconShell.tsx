@@ -1,4 +1,3 @@
-// src/components/icons/IconShell.tsx
 import type { SVGProps } from "react";
 
 export const IconShell = ({

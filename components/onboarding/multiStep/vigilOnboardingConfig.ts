@@ -1,12 +1,9 @@
-import { RolesEnum } from "@/src/enums/roles.enums"
+import { RolesEnum } from "@/src/enums/roles.enums";
 import {
   OnboardingFlowConfig,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline"
+} from "@/src/types/multiStepOnboard.types";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 import {
   OccupationEnum,
@@ -34,8 +31,8 @@ import {
   VigilTransportationLabels,
   VigilZoneEnum,
   VigilZoneLabels,
-} from "@/src/enums/onboarding.enums"
-import { GenderEnum, GenderLabels } from "@/src/enums/common.enums"
+} from "@/src/enums/onboarding.enums";
+import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -44,7 +41,7 @@ export const createVigilOnboardingConfig = (
   onComplete: (data: Record<string, any>) => Promise<void>,
 ): OnboardingFlowConfig => ({
   role: RolesEnum.VIGIL,
-  initialStepId: "welcome",
+  initialStepId: "languages",
   onComplete,
   //Nota: ho modificare leggermente il primo step rispetto a figma: alcune info le abbiamo dal form di registrazione
   steps: [
@@ -98,7 +95,6 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: "zones",
-      
     },
     {
       id: "zones", //non salvare per ora
@@ -150,7 +146,7 @@ export const createVigilOnboardingConfig = (
         {
           id: "occupation",
           label: "",
-          type: QuestionType.RADIO,
+          type: QuestionType.CARD,
           options: Object.values(OccupationEnum).map((value) => ({
             value,
             label: OccupationLabels[value],
@@ -162,11 +158,14 @@ export const createVigilOnboardingConfig = (
         },
       ],
       nextStep: (answers) => {
-        const requiresDocs = [OccupationEnum.PROFESSIONAL, OccupationEnum.NURSE]
+        const requiresDocs = [
+          OccupationEnum.PROFESSIONAL,
+          OccupationEnum.NURSE,
+        ];
         if (requiresDocs.includes(answers.occupation as OccupationEnum)) {
-          return "professional_docs_info"
+          return "professional_docs_info";
         }
-        return "courses"
+        return "courses";
       },
     },
     {
@@ -234,7 +233,7 @@ export const createVigilOnboardingConfig = (
       id: "about",
       title: "Raccontaci brevemente la tua esperienza",
       description:
-        "3-4 righe che appariranno sul tuo profilo. Massimo 400 caratteri. ",
+        "Presentati, raccontaci un po' di te e della tua esperienza. Massimo 400 caratteri.",
       questions: [
         {
           id: "bio", //anagrafica
@@ -294,9 +293,9 @@ export const createVigilOnboardingConfig = (
         if (answers.services?.includes(VigilHygieneServiceEnum.NONE)) {
           answers.services = answers.services.filter(
             (s: string) => s == VigilHygieneServiceEnum.NONE,
-          ) //if "none" is selected, ignore everything else
+          ); //if "none" is selected, ignore everything else
         }
-        return "outside"
+        return "outside";
       },
     },
     {
@@ -322,9 +321,9 @@ export const createVigilOnboardingConfig = (
         if (answers.outside?.includes(VigilOutdoorServiceEnum.NONE)) {
           answers.outside = answers.outside.filter(
             (s: string) => s == VigilOutdoorServiceEnum.NONE,
-          ) //if "none" is selected, ignore everything else
+          ); //if "none" is selected, ignore everything else
         }
-        return "past_exp"
+        return "past_exp";
       },
     },
     {
@@ -452,15 +451,16 @@ export const createVigilOnboardingConfig = (
       nextStep: "languages",
     },
     {
-      title: "Parli italiano fluentemente?",
-      description: "",
+      title: "Qual è il tuo livello di conoscenza della lingua italiana?",
+      description:
+        "Per garantire uno standard qualitativo, richiediamo una buona conoscenza della lingua.",
       id: "languages",
       questions: [
         {
           id: "language_confirmation",
           // type: QuestionType.SELECT_MULTI,
-          type: QuestionType.CHECKBOX,
-          label: "Confermo di saper parlare italiano fluentemente.",
+          type: QuestionType.CARD,
+          label: "",
           // options: [
           //   { label: "Italiano", value: "italian", icon: HomeIcon }, //TODO: add flags
           //   { label: "Inglese", value: "english" },
@@ -484,10 +484,23 @@ export const createVigilOnboardingConfig = (
           //   { label: "Persiano (Farsi)", value: "persian" },
           //   { label: "Altri", value: "other" },
           // ],
+          options: [
+            {
+              label: "Conosco l'italiano come madre lingua",
+              value: "native",
+            },
+            {
+              label: "Parlo italiano fluentemente",
+              value: "fluent",
+            },
+            {
+              label:
+                "Sto imparando l'italiano ma posso comunicare efficacemente",
+              value: "intermediate",
+            },
+          ],
           validation: {
             required: true,
-            validate: (value) =>
-              value === true || "Devi confermare per continuare",
           },
         },
       ],
@@ -509,4 +522,4 @@ export const createVigilOnboardingConfig = (
       ],
     },
   ],
-})
+});

@@ -16,6 +16,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   danger?: boolean;
   icon?: React.ReactNode;
   label: string | React.ReactNode;
+  onboard?: boolean;
   primary?: boolean;
   secondary?: boolean;
   small?: boolean;
@@ -33,6 +34,7 @@ const Button = (props: ButtonI) => {
     customClass,
     label,
     icon,
+    onboard = false,
     primary = true,
     secondary = false,
     role,
@@ -49,19 +51,21 @@ const Button = (props: ButtonI) => {
     ButtonStyle.baseBtnStyle,
     danger
       ? ButtonStyle.dangerBtnStyle
-      : text
-        ? ButtonStyle.textBtnStyle
-        : secondary
-          ? ButtonStyle.secondaryBtnStyle
-          : tab
-            ? ButtonStyle.tabBtnStyle
-            : role === RolesEnum.VIGIL
-              ? ButtonStyle.vigilBtnStyle
-              : role === RolesEnum.CONSUMER
-                ? ButtonStyle.consumerBtnStyle
-                : primary
-                  ? ButtonStyle.primaryBtnStyle
-                  : "",
+      : onboard
+        ? ButtonStyle.onboardingBtnStyle
+        : text
+          ? ButtonStyle.textBtnStyle
+          : secondary
+            ? ButtonStyle.secondaryBtnStyle
+            : tab
+              ? ButtonStyle.tabBtnStyle
+              : role === RolesEnum.VIGIL
+                ? ButtonStyle.vigilBtnStyle
+                : role === RolesEnum.CONSUMER
+                  ? ButtonStyle.consumerBtnStyle
+                  : primary
+                    ? ButtonStyle.primaryBtnStyle
+                    : "",
   );
   const isDisabled = isLoading || props.disabled;
 
@@ -80,6 +84,7 @@ const Button = (props: ButtonI) => {
         ...props,
         action: undefined,
         customClass: undefined,
+        onboard: undefined,
         primary: undefined,
         secondary: undefined,
         danger: undefined,
@@ -92,7 +97,8 @@ const Button = (props: ButtonI) => {
         full: undefined,
       }}
       disabled={isDisabled}
-      onClick={action}>
+      onClick={action}
+    >
       {isLoading ? (
         <span className="mr-2">
           <LoaderSpinner size="small" />

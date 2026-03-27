@@ -84,7 +84,7 @@ const MultiStepOnboarding = ({
         <div className="p-4 ">
           {/* Step header */}
           {currentStep.title && (
-            <section className="flex flex-col items-center gap-2 mb-8">
+            <section className="flex flex-col items-center gap-2 mb-6">
               <h1 className={clsx("font-semibold text-2xl  text-center ")}>
                 {currentStep.title}
               </h1>
@@ -106,7 +106,7 @@ const MultiStepOnboarding = ({
           {/* Questions form */}
           <form
             onSubmit={handleSubmit(handleNext)}
-            className="max-w-lg mx-auto space-y-6"
+            className="max-w-lg mx-auto space-y-4"
           >
             {currentStep.component
               ? // Render custom step component (backwards-compatible)
@@ -153,12 +153,12 @@ const MultiStepOnboarding = ({
                 ))}
             <hr />
             {/* Navigation buttons */}
-            <div className="flex justify-between items-center pt-4">
+            <div className="flex justify-between items-center pt-2">
               {state.visitedSteps.length > 1 ? (
                 <Button
                   type="button"
                   action={back}
-                  role={role}
+                  onboard
                   label="Indietro"
                   icon={<ArrowLeftIcon className="size-5" />}
                   disabled={state.isLoading}
@@ -168,7 +168,7 @@ const MultiStepOnboarding = ({
                   <Button
                     type="button"
                     action={onCancel}
-                    role={role}
+                    onboard
                     label="Annulla"
                     disabled={state.isLoading}
                   />
@@ -177,8 +177,7 @@ const MultiStepOnboarding = ({
 
               <Button
                 type="submit"
-                primary
-                role={role}
+                onboard
                 label={isLastStep ? "Completa" : "Avanti "}
                 icon={<ArrowRightIcon className="size-5" />}
                 iconPosition="right"

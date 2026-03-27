@@ -82,7 +82,7 @@ export const MulticheckboxInput = ({
               >
                 {option.icon && (
                   <option.icon
-                    className={`text-gray-400 max-w-1/15 ${
+                    className={`text-gray-400 w-7 h-7 ${
                       isChecked
                         ? clsx(
                             role === RolesEnum.VIGIL && "text-vigil-orange",
