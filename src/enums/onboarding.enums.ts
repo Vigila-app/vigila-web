@@ -285,13 +285,14 @@ export const OccupationLabels: Record<OccupationEnum, string> = {
 
 export enum ConsumerAutonomyEnum {
   SELF_SUFFICIENT = "self_sufficient",
-  PARTIALLY = "partially_sufficient",
+  PARTIALLY = "reduced_mobility",
   NOT_SUFFICIENT = "not_sufficient",
 }
 
 export const ConsumerAutonomyLabels: Record<ConsumerAutonomyEnum, string> = {
   [ConsumerAutonomyEnum.SELF_SUFFICIENT]: "Autosufficiente",
-  [ConsumerAutonomyEnum.PARTIALLY]: "Parzialmente autosufficiente",
+  [ConsumerAutonomyEnum.PARTIALLY]:
+    "Parzialmente autosufficiente/mobilità ridotta",
   [ConsumerAutonomyEnum.NOT_SUFFICIENT]: "Non autosufficiente",
 };
 
