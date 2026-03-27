@@ -64,7 +64,7 @@ export const createVigilOnboardingConfig = (
               .toISOString()
               .split("T")[0],
           },
-          autoFocus: true,
+          autoFocus: false,
         },
         {
           id: "gender", //anagrafica

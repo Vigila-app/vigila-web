@@ -258,7 +258,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "experience",
@@ -284,7 +284,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "info",
