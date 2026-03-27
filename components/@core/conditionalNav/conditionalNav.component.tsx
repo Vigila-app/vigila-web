@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Footer, Header } from "@/components";
 
-const HIDDEN_NAV_ROUTES = ["/onboard"];
+const HIDDEN_NAV_ROUTES = ["/onboard", "/vigil/onboard"];
 
 const shouldHideNav = (pathname: string) =>
   HIDDEN_NAV_ROUTES.some((route) => pathname.startsWith(route));
