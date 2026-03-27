@@ -76,7 +76,7 @@ export const createConsumerOnboardingConfig = (
             required: true,
             ...FormFieldType.NAME,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
         {
           id: "birthday",
@@ -134,7 +134,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "needs",
@@ -159,7 +159,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "gender_preference",
@@ -186,7 +186,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "attitude",
@@ -209,7 +209,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "qualifications",
@@ -233,7 +233,7 @@ export const createConsumerOnboardingConfig = (
           validation: {
             required: true,
           },
-          autoFocus: true,
+          autoFocus: false,
         },
       ],
       nextStep: "transportation",
