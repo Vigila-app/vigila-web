@@ -1,12 +1,19 @@
-import { useState } from "react"
-import { QuestionRenderer } from "@/components/onboarding/multiStep"
+"use client";
+import { useState } from "react";
+import { QuestionRenderer } from "@/components/onboarding/multiStep";
 import {
   OnboardingFlowConfig,
   OnboardingFlowState,
   OnboardingStep,
   QuestionType,
-} from "@/src/types/multiStepOnboard.types"
-import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline"
+} from "@/src/types/multiStepOnboard.types";
+import {
+  CalendarIcon,
+  ChatBubbleBottomCenterIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const Step = ({
   currentStep,
@@ -14,17 +21,17 @@ export const Step = ({
   config,
   setAnswers,
 }: {
-  currentStep: OnboardingStep
-  state: OnboardingFlowState
-  config: OnboardingFlowConfig
+  currentStep: OnboardingStep;
+  state: OnboardingFlowState;
+  config: OnboardingFlowConfig;
   setAnswers?: (
     updater:
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>),
-  ) => void
+  ) => void;
 }) => {
   // local tick forces this component to re-render when answers are mutated in-place
-  const [, setTick] = useState(0)
+  const [, setTick] = useState(0);
   return (
     <>
       {currentStep.component && (
@@ -40,9 +47,20 @@ export const Step = ({
         >
           <div>
             <div className="flex gap-2 items-center mb-5">
-              <div className="w-10 h-10 rounded rounded-full text-vigil-orange p-2 bg-vigil-light-orange">
+              <div
+                className={clsx(
+                  "w-10 h-10 rounded rounded-full p-2 ",
+                  config.role == RolesEnum.VIGIL
+                    ? "text-vigil-orange bg-vigil-light-orange"
+                    : "text-consumer-blue bg-consumer-light-blue",
+                )}
+              >
                 {q.type == QuestionType.DATE && <CalendarIcon />}
                 {q.type == QuestionType.ADDRESS && <MapPinIcon />}
+                {q.type !== QuestionType.DATE &&
+                  q.type !== QuestionType.ADDRESS && (
+                    <ChatBubbleBottomCenterIcon />
+                  )}
               </div>
               <div>
                 <h3 className="fw-bold">{q.label}</h3>
@@ -53,16 +71,21 @@ export const Step = ({
               question={{ ...q, label: "", description: "" }}
               value={state.answers[q.id]}
               onChange={(value) => {
-                // persist answer and trigger a local re-render so controlled inputs update
-                state.answers[q.id] = value
-                setTick((t) => t + 1)
+                // Prefer updating via provided setter to avoid direct mutation and re-render loops
+                if (setAnswers) {
+                  setAnswers((prev) => ({ ...(prev || {}), [q.id]: value }));
+                } else {
+                  // Fallback: mutate and force local re-render
+                  state.answers[q.id] = value;
+                  setTick((t) => t + 1);
+                }
               }}
-              error={undefined} // Adjusted to match the expected prop
-              role={config.role} // Added role prop as required by QuestionRenderer
+              error={undefined}
+              role={config.role}
             />
           </div>
         </div>
       ))}
     </>
-  )
-}
+  );
+};
