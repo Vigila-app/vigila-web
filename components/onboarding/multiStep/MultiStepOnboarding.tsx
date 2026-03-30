@@ -153,7 +153,7 @@ const MultiStepOnboarding = ({
                 ))}
             <hr />
             {/* Navigation buttons */}
-            <div className="flex justify-between items-center pt-2">
+            <div className="flex items-center pt-2">
               {state.visitedSteps.length > 1 ? (
                 <Button
                   type="button"
@@ -183,6 +183,7 @@ const MultiStepOnboarding = ({
                 iconPosition="right"
                 isLoading={state.isLoading}
                 disabled={state.isLoading}
+                customClass="ml-auto"
               />
             </div>
           </form>

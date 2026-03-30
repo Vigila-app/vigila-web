@@ -406,14 +406,10 @@ export const ConsumerExperiencePreferenceLabels: Record<
   ConsumerExperiencePreferenceEnum,
   string
 > = {
-  [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]:
-    "Esperienza con pazienti con demenza o Alzheimer",
-  [ConsumerExperiencePreferenceEnum.PARKINSON]:
-    "Esperienza con pazienti con Parkinson",
-  [ConsumerExperiencePreferenceEnum.POST_OP]:
-    "Esperienza con assistenza post-operatoria",
-  [ConsumerExperiencePreferenceEnum.WHEELCHAIR]:
-    "Esperienza con assistenza a persone in carrozzina",
+  [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]: "Demenza o Alzheimer",
+  [ConsumerExperiencePreferenceEnum.PARKINSON]: "Parkinson",
+  [ConsumerExperiencePreferenceEnum.POST_OP]: "Post-operatoria",
+  [ConsumerExperiencePreferenceEnum.WHEELCHAIR]: "Uso della carrozzina",
   [ConsumerExperiencePreferenceEnum.NOT_REQUIRED]: "No, non necessario",
 };
 
@@ -422,13 +418,13 @@ export const ConsumerExperiencePreferenceDescriptions: Record<
   string
 > = {
   [ConsumerExperiencePreferenceEnum.DEMENTIA_REQUIRED]:
-    "Il vigil deve aver avuto esperienza con pazienti con demenza o Alzheimer",
+    "Richiesta esperienza con pazienti con demenza o Alzheimer",
   [ConsumerExperiencePreferenceEnum.PARKINSON]:
-    "Il vigil deve aver avuto esperienza con pazienti con Parkinson",
+    "Richiesta esperienza con pazienti con Parkinson",
   [ConsumerExperiencePreferenceEnum.POST_OP]:
-    "Il vigil deve aver avuto esperienza con assistenza post-operatoria",
+    "Gestione del recupero post-operatorio",
   [ConsumerExperiencePreferenceEnum.WHEELCHAIR]:
-    "Il vigil deve aver avuto esperienza con assistenza a persone in carrozzina",
+    "Supporto nella mobilità e spostamenti",
   [ConsumerExperiencePreferenceEnum.NOT_REQUIRED]:
     "Non è richiesta esperienza specifica",
 };
@@ -454,7 +450,7 @@ export const ConsumerNeedsLabels: Record<ConsumerNeedsEnum, string> = {
   [ConsumerNeedsEnum.COMPANY]: "Compagnia / Sorveglianza",
   [ConsumerNeedsEnum.ESCORT]: "Accompagnamento (commissioni, visite)",
   [ConsumerNeedsEnum.DAILY_ACTIVITIES]:
-    "Aiuto Attività Quotidiane (farmaci,pasti,mobilità)",
+    "Aiuto Attività Quotidiane (farmaci, pasti, mobilità)",
   [ConsumerNeedsEnum.FULL_HELP]:
     "Assistenza intensa (sollevamento, igiene, allettato)",
 };

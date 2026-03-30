@@ -9,7 +9,7 @@ const ProgressBar = (props: ProgressBarI) => {
   const safePercentage = Math.max(0, Math.min(percentage, 100));
 
   return (
-    <div className="w-full bg-gray-200 rounded-full my-2 h-4 overflow-hidden shadow">
+    <div className="w-full bg-gray-200 rounded-full my-2 h-2 overflow-hidden shadow">
       <div
         style={{
           width: `${safePercentage}%`,

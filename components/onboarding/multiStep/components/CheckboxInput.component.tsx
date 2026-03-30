@@ -64,8 +64,8 @@ export const MulticheckboxInput = ({
             <div
               key={option.value}
               className={clsx(
-                option.icon ? "border-3 rounded-xl" : "border-1 rounded-3xl",
-                "p-2 border-grey-200",
+                option.icon ? "border-2 " : "border-1 ",
+                "p-2 border-grey-200 rounded-4xl",
                 isChecked &&
                   role === RolesEnum.VIGIL &&
                   "border-vigil-orange bg-vigil-light-orange",
@@ -78,7 +78,7 @@ export const MulticheckboxInput = ({
               <label
                 key={option.value}
                 htmlFor={option.label}
-                className="flex flex-col items-center gap-2 text-center text-balance"
+                className="flex flex-col items-center gap-2 text-center text-balance font-normal text-lg"
               >
                 {option.icon && (
                   <option.icon
@@ -92,7 +92,11 @@ export const MulticheckboxInput = ({
                     }`}
                   />
                 )}
-                {option.label}
+                <span className="text-xl text-center font-normal">
+                  {" "}
+                  {option.label}
+                </span>
+
                 <div className="hidden">
                   <Checkbox
                     id={option.label}
@@ -139,7 +143,7 @@ export const MulticheckboxInput = ({
         })}
       </div>
       {typeof question.max === "number" && (
-        <p className="text-xs text-gray-500 mt-1">{`Max selezionabili: ${question.max}`}</p>
+        <p className="text-xs text-gray-500 mt-2">{`Max selezionabili: ${question.max}`}</p>
       )}
     </div>
   );

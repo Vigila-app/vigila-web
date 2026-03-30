@@ -66,7 +66,8 @@ const Select = ({
             role === RolesEnum.VIGIL && "text-vigil-orange",
             error && "text-red-500",
             disabled && "!bg-gray-100",
-          )}>
+          )}
+        >
           {label}
           {required && <>*</>}
         </label>
@@ -80,7 +81,7 @@ const Select = ({
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={clsx(
-          "w-full p-3 text-left rounded-4xl border bg-white shadow-sm",
+          "w-full pl-5 pr-3 py-3 text-left rounded-4xl border bg-white shadow-sm",
           "focus:outline-none",
           role === RolesEnum.CONSUMER &&
             "border-consumer-blue focus:ring-1 focus:ring-consumer-blue",
@@ -89,7 +90,8 @@ const Select = ({
           error && "border-red-500",
           disabled && "!bg-gray-100 cursor-not-allowed",
           "scroll-m-12",
-        )}>
+        )}
+      >
         {/* {selected ? selected.label : placeholder || "Seleziona..."} */}
         <span className={clsx(!selected && "text-gray-500")}>
           {selected ? selected.label : placeholder || "Seleziona..."}
@@ -99,7 +101,7 @@ const Select = ({
             "w-5 h-5 transition-transform duration-200 float-right",
             role === RolesEnum.CONSUMER && "text-consumer-blue",
             role === RolesEnum.VIGIL && "text-vigil-orange",
-            open && "rotate-180"
+            open && "rotate-180",
           )}
         />
       </button>
@@ -111,7 +113,8 @@ const Select = ({
             "absolute z-10 mt-2 w-full rounded-2xl border bg-white shadow-md max-h-64 overflow-auto",
             role === RolesEnum.CONSUMER && "border-consumer-blue ",
             role === RolesEnum.VIGIL && "border-vigil-orange ",
-          )}>
+          )}
+        >
           {options.map((option) => (
             <li
               key={option.value}
@@ -123,7 +126,8 @@ const Select = ({
                 if (option.disabled) return;
                 onChange?.(String(option.value));
                 setOpen(false);
-              }}>
+              }}
+            >
               {option.label}
               <div
                 className={clsx(
@@ -132,7 +136,8 @@ const Select = ({
                   option.value === value
                     ? ` border-2 ${role === RolesEnum.CONSUMER ? "border-consumer-blue" : "border-vigil-orange"}`
                     : "border-gray-300 border-1",
-                )}>
+                )}
+              >
                 <div
                   className={clsx(
                     "w-2.5 h-2.5 rounded-full  transition-transform duration-200",

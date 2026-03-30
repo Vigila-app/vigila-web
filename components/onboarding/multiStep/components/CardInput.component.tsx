@@ -30,9 +30,9 @@ export const CardInput = ({
               key={option.value}
               onClick={() => onChange(option.value)}
               className={clsx(
-                "cursor-pointer relative w-full px-4 py-2 md:p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ",
+                "cursor-pointer relative w-full px-4 py-2 md:p-4 rounded-4xl border-1 transition-all duration-200 flex flex-col items-center justify-center gap-2 ",
 
-                !isChecked && "bg-white border-gray-200  hover:border-gray-300",
+                !isChecked && "bg-white border-gray-300  hover:border-gray-400",
 
                 isChecked &&
                   role === RolesEnum.VIGIL &&
@@ -57,11 +57,16 @@ export const CardInput = ({
                 />
               )}
 
-              <span className="font-medium text-lg text-center ">
+              <span
+                className={clsx(
+                  option.description ? "font-medium" : "font-normal",
+                  " text-xl text-center ",
+                )}
+              >
                 {option.label}
               </span>
               {option.description && (
-                <span className="text-xs text-center">
+                <span className={clsx("text-base text-center font-normal")}>
                   {option.description}
                 </span>
               )}
