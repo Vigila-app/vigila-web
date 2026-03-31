@@ -33,6 +33,7 @@ import {
   VigilZoneLabels,
 } from "@/src/enums/onboarding.enums";
 import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
+import { AvailabilityRulesDemo } from "@/components/calendar-demo";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -390,16 +391,8 @@ export const createVigilOnboardingConfig = (
       id: "availabilities",
       title: "Qual è la tua disponibilità settimanale?",
       description: "Seleziona i giorni in cui sei disponibile e gli orari",
-      questions: [
-        {
-          id: "availabilities",
-          type: QuestionType.AVAILABILITIES,
-          label: "Disponibilità",
-          validation: {
-            required: false,
-          },
-        },
-      ],
+      questions: [],
+      component: AvailabilityRulesDemo,
       nextStep: "urgent",
     },
     {
@@ -409,8 +402,8 @@ export const createVigilOnboardingConfig = (
       questions: [
         {
           id: "urgent_requests",
-          type: QuestionType.CARD,
           label: "",
+          type: QuestionType.CARD,
           options: [
             {
               label: "Si, sono disponibile",
@@ -425,6 +418,9 @@ export const createVigilOnboardingConfig = (
               value: "no",
             },
           ],
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "character",

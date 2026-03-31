@@ -5,7 +5,7 @@
  * including the core Availability Engine algorithm.
  */
 
-import { ApiService } from "@/src/services/api.service"
+import { ApiService } from "@/src/services/api.service";
 import {
   VigilAvailabilityRuleI,
   VigilAvailabilityRuleFormI,
@@ -18,11 +18,14 @@ import {
   VigilCalendarResponseI,
   SlotConflictI,
   WeekdayEnum,
-} from "@/src/types/calendar.types"
-import { BookingI } from "@/src/types/booking.types"
-import { BookingStatusEnum, PaymentStatusEnum } from "@/src/enums/booking.enums"
-import { formatDateToISO } from "@/src/utils/calendar.utils"
-import { apiCalendar } from "@/src/constants/api.constants"
+} from "@/src/types/calendar.types";
+import { BookingI } from "@/src/types/booking.types";
+import {
+  BookingStatusEnum,
+  PaymentStatusEnum,
+} from "@/src/enums/booking.enums";
+import { formatDateToISO } from "@/src/utils/calendar.utils";
+import { apiCalendar } from "@/src/constants/api.constants";
 
 /**
  * Availability Engine Algorithm
@@ -44,20 +47,20 @@ export class AvailabilityEngine {
    * Helper: Parse TIME format string (HH:MM:SS) to hour number (0-23)
    */
   private static parseTimeToHour(timeStr: string): number {
-    const hours = parseInt(timeStr.split(":")[0], 10)
-    return hours
+    const hours = parseInt(timeStr.split(":")[0], 10);
+    return hours;
   }
 
   /**
    * Generate available slots for a vigil in a date range
    */
   static generateAvailableSlots(params: {
-    availabilityRules: VigilAvailabilityRuleI[]
-    unavailabilities: VigilUnavailabilityI[]
-    bookings: BookingI[]
-    startDate: Date
-    endDate: Date
-    serviceDurationHours: number
+    availabilityRules: VigilAvailabilityRuleI[];
+    unavailabilities: VigilUnavailabilityI[];
+    bookings: BookingI[];
+    startDate: Date;
+    endDate: Date;
+    serviceDurationHours: number;
   }): TimeSlotI[] {
     const {
       availabilityRules,
@@ -66,31 +69,31 @@ export class AvailabilityEngine {
       startDate,
       endDate,
       serviceDurationHours,
-    } = params
+    } = params;
 
     // Step 1: Generate all potential slots from availability rules
     const potentialSlots = this.expandAvailabilityRules(
       availabilityRules,
       startDate,
       endDate,
-    )
+    );
 
     // Step 2: Build conflict map (bookings + unavailabilities)
-    const conflicts = this.buildConflictMap(bookings, unavailabilities)
+    const conflicts = this.buildConflictMap(bookings, unavailabilities);
 
     // Step 3: Filter out conflicting slots
     const availableSlots = this.filterConflictingSlots(
       potentialSlots,
       conflicts,
-    )
+    );
 
     // Step 4: Aggregate consecutive slots for multi-hour services
     const aggregatedSlots = this.aggregateConsecutiveSlots(
       availableSlots,
       serviceDurationHours,
-    )
+    );
 
-    return aggregatedSlots
+    return aggregatedSlots;
   }
 
   /**
@@ -101,33 +104,33 @@ export class AvailabilityEngine {
     startDate: Date,
     endDate: Date,
   ): TimeSlotI[] {
-    const slots: TimeSlotI[] = []
-    const currentDate = new Date(startDate)
+    const slots: TimeSlotI[] = [];
+    const currentDate = new Date(startDate);
 
     // Iterate through each day in the range
     while (currentDate <= endDate) {
-      const weekday = currentDate.getDay() // 0=Sunday, 6=Saturday
-      const dateStr = this.formatDate(currentDate)
+      const weekday = currentDate.getDay(); // 0=Sunday, 6=Saturday
+      const dateStr = this.formatDate(currentDate);
 
       // Find applicable rules for this weekday
       const applicableRules = rules.filter((rule) => {
-        if (rule.weekday !== weekday) return false
+        if (rule.weekday !== weekday) return false;
 
         // Check if rule is valid for this date
-        const validFrom = new Date(rule.valid_from)
-        const validTo = rule.valid_to ? new Date(rule.valid_to) : null
+        const validFrom = new Date(rule.valid_from);
+        const validTo = rule.valid_to ? new Date(rule.valid_to) : null;
 
-        if (currentDate < validFrom) return false
-        if (validTo && currentDate > validTo) return false
+        if (currentDate < validFrom) return false;
+        if (validTo && currentDate > validTo) return false;
 
-        return true
-      })
+        return true;
+      });
 
       // Generate hourly slots for each applicable rule
       for (const rule of applicableRules) {
         // Parse TIME format strings (HH:MM:SS) to hour numbers
-        const startHour = this.parseTimeToHour(rule.start_time)
-        const endHour = this.parseTimeToHour(rule.end_time)
+        const startHour = this.parseTimeToHour(rule.start_time);
+        const endHour = this.parseTimeToHour(rule.end_time);
 
         for (let time = startHour; time < endHour; time++) {
           slots.push({
@@ -136,15 +139,15 @@ export class AvailabilityEngine {
             end_time: time + 1,
             available: true,
             duration_hours: 1,
-          })
+          });
         }
       }
 
       // Move to next day
-      currentDate.setDate(currentDate.getDate() + 1)
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return slots
+    return slots;
   }
 
   /**
@@ -154,7 +157,7 @@ export class AvailabilityEngine {
     bookings: BookingI[],
     unavailabilities: VigilUnavailabilityI[],
   ): SlotConflictI[] {
-    const conflicts: SlotConflictI[] = []
+    const conflicts: SlotConflictI[] = [];
 
     // Add bookings as conflicts
     for (const booking of bookings) {
@@ -168,7 +171,7 @@ export class AvailabilityEngine {
           start: new Date(booking.startDate),
           end: new Date(booking.endDate),
           id: booking.id,
-        })
+        });
       }
     }
 
@@ -179,10 +182,10 @@ export class AvailabilityEngine {
         start: new Date(unavailability.start_at),
         end: new Date(unavailability.end_at),
         id: unavailability.id,
-      })
+      });
     }
 
-    return conflicts
+    return conflicts;
   }
 
   /**
@@ -193,8 +196,8 @@ export class AvailabilityEngine {
     conflicts: SlotConflictI[],
   ): TimeSlotI[] {
     return slots.filter((slot) => {
-      const slotStart = this.slotToDateTime(slot, slot.start_time)
-      const slotEnd = this.slotToDateTime(slot, slot.end_time)
+      const slotStart = this.slotToDateTime(slot, slot.start_time);
+      const slotEnd = this.slotToDateTime(slot, slot.end_time);
 
       // Check if slot conflicts with any booking or unavailability
       for (const conflict of conflicts) {
@@ -206,12 +209,12 @@ export class AvailabilityEngine {
             conflict.end,
           )
         ) {
-          return false
+          return false;
         }
       }
 
-      return true
-    })
+      return true;
+    });
   }
 
   /**
@@ -223,34 +226,34 @@ export class AvailabilityEngine {
     serviceDurationHours: number,
   ): TimeSlotI[] {
     if (serviceDurationHours <= 1) {
-      return slots // No aggregation needed for 1-hour services
+      return slots; // No aggregation needed for 1-hour services
     }
 
-    const aggregated: TimeSlotI[] = []
+    const aggregated: TimeSlotI[] = [];
 
     // Group slots by date
-    const slotsByDate = new Map<string, TimeSlotI[]>()
+    const slotsByDate = new Map<string, TimeSlotI[]>();
     for (const slot of slots) {
       if (!slotsByDate.has(slot.date)) {
-        slotsByDate.set(slot.date, [])
+        slotsByDate.set(slot.date, []);
       }
-      slotsByDate.get(slot.date)!.push(slot)
+      slotsByDate.get(slot.date)!.push(slot);
     }
 
     // For each date, find consecutive slot sequences
     for (const [date, dateSlots] of Array.from(slotsByDate)) {
       // Sort by start_time
-      dateSlots.sort((a, b) => a.start_time - b.start_time)
+      dateSlots.sort((a, b) => a.start_time - b.start_time);
 
       // Find consecutive sequences of required length
       for (let i = 0; i <= dateSlots.length - serviceDurationHours; i++) {
-        let isConsecutive = true
+        let isConsecutive = true;
 
         // Check if next N slots are consecutive
         for (let j = 0; j < serviceDurationHours - 1; j++) {
           if (dateSlots[i + j].end_time !== dateSlots[i + j + 1].start_time) {
-            isConsecutive = false
-            break
+            isConsecutive = false;
+            break;
           }
         }
 
@@ -262,12 +265,12 @@ export class AvailabilityEngine {
             end_time: dateSlots[i + serviceDurationHours - 1].end_time,
             available: true,
             duration_hours: serviceDurationHours,
-          })
+          });
         }
       }
     }
 
-    return aggregated
+    return aggregated;
   }
 
   /**
@@ -279,26 +282,26 @@ export class AvailabilityEngine {
     start2: Date,
     end2: Date,
   ): boolean {
-    return start1 < end2 && end1 > start2
+    return start1 < end2 && end1 > start2;
   }
 
   /**
    * Convert a slot and hour to a Date object
    */
   private static slotToDateTime(slot: TimeSlotI, time: number): Date {
-    const date = new Date(slot.date)
-    date.setHours(time, 0, 0, 0)
-    return date
+    const date = new Date(slot.date);
+    date.setHours(time, 0, 0, 0);
+    return date;
   }
 
   /**
    * Format date as YYYY-MM-DD
    */
   private static formatDate(date: Date): string {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    return `${year}-${month}-${day}`
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
 }
 
@@ -327,11 +330,11 @@ export const CalendarService = {
 
       const response = (await ApiService.get(
         `${apiCalendar.CONSUMER()}?${query}`,
-      )) as any
-      return response.data
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.getConsumerCalendar error", error)
-      throw error
+      console.error("CalendarService.getConsumerCalendar error", error);
+      throw error;
     }
   },
 
@@ -342,45 +345,58 @@ export const CalendarService = {
   /**
    * Get vigil availability rules
    */
-  getVigilAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
+  getCustomerAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
     try {
       const response = (await ApiService.get(
-        apiCalendar.AVAILABILITY_RULES(),
-      )) as any
-      return response.data
+        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.getVigilAvailabilityRules error", error)
-      throw error
+      console.error("CalendarService.getVigilAvailabilityRules error", error);
+      throw error;
     }
   },
-
-  /**
-   * Create vigil availability rule
-   */
   createVigilAvailabilityRule: async (
     rule: VigilAvailabilityRuleFormI,
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.AVAILABILITY_RULES(),
+        apiCalendar.VIGIL_AVAILABILITY_RULES(),
         rule,
-      )) as any
-      return response.data
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.createVigilAvailabilityRule error", error)
-      throw error
+      console.error("CalendarService.createVigilAvailabilityRule error", error);
+      throw error;
+    }
+  },
+  /**
+   * Create vigil availability rule
+   */
+  createCustomerAvailabilityRule: async (
+    rule: VigilAvailabilityRuleFormI,
+  ): Promise<VigilAvailabilityRuleI> => {
+    try {
+      const response = (await ApiService.post(
+        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
+        rule,
+      )) as any;
+      return response.data;
+    } catch (error) {
+      console.error("CalendarService.createVigilAvailabilityRule error", error);
+      throw error;
     }
   },
 
   /**
    * Delete vigil availability rule
    */
-  deleteVigilAvailabilityRule: async (ruleId: string): Promise<void> => {
+  deleteCustomerAvailabilityRule: async (ruleId: string): Promise<void> => {
     try {
-      await ApiService.delete(apiCalendar.AVAILABILITY_RULE(ruleId))
+      await ApiService.delete(apiCalendar.CONSUMER_AVAILABILITY_RULE(ruleId));
     } catch (error) {
-      console.error("CalendarService.deleteVigilAvailabilityRule error", error)
-      throw error
+      console.error("CalendarService.deleteVigilAvailabilityRule error", error);
+      throw error;
     }
   },
 
@@ -394,12 +410,12 @@ export const CalendarService = {
   getVigilUnavailabilities: async (): Promise<VigilUnavailabilityI[]> => {
     try {
       const response = (await ApiService.get(
-        apiCalendar.UNAVAILABILITIES(),
-      )) as any
-      return response.data
+        apiCalendar.VIGIL_UNAVAILABILITIES(),
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.getVigilUnavailabilities error", error)
-      throw error
+      console.error("CalendarService.getVigilUnavailabilities error", error);
+      throw error;
     }
   },
 
@@ -411,25 +427,29 @@ export const CalendarService = {
   ): Promise<VigilUnavailabilityI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.UNAVAILABILITIES(),
+        apiCalendar.VIGIL_UNAVAILABILITIES(),
         unavailability,
-      )) as any
-      return response.data
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.createVigilUnavailability error", error)
-      throw error
+      console.error("CalendarService.createVigilUnavailability error", error);
+      throw error;
     }
   },
 
   /**
    * Delete vigil unavailability
    */
-  deleteVigilUnavailability: async (unavailabilityId: string): Promise<void> => {
+  deleteVigilUnavailability: async (
+    unavailabilityId: string,
+  ): Promise<void> => {
     try {
-      await ApiService.delete(apiCalendar.UNAVAILABILITY(unavailabilityId))
+      await ApiService.delete(
+        apiCalendar.VIGIL_UNAVAILABILITY(unavailabilityId),
+      );
     } catch (error) {
-      console.error("CalendarService.deleteVigilUnavailability error", error)
-      throw error
+      console.error("CalendarService.deleteVigilUnavailability error", error);
+      throw error;
     }
   },
 
@@ -449,14 +469,14 @@ export const CalendarService = {
         from: formatDateToISO(startDate),
         to: formatDateToISO(endDate),
       }).toString();
-      
+
       const response = (await ApiService.get(
         `${apiCalendar.VIGIL_BOOKINGS()}?${query}`,
-      )) as any
-      return response.data
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.getVigilCalendar error", error)
-      throw error
+      console.error("CalendarService.getVigilCalendar error", error);
+      throw error;
     }
   },
 
@@ -471,15 +491,15 @@ export const CalendarService = {
     params: AvailableSlotsRequestI,
   ): Promise<AvailableSlotsResponseI> => {
     try {
-      const { vigil_id, ...queryParams } = params
-      const query = new URLSearchParams(queryParams as any).toString()
+      const { vigil_id, ...queryParams } = params;
+      const query = new URLSearchParams(queryParams as any).toString();
       const response = (await ApiService.get(
-        `${apiCalendar.AVAILABLE_SLOTS(vigil_id)}?${query}`,
-      )) as any
-      return response.data
+        `${apiCalendar.VIGIL_AVAILABLE_SLOTS(vigil_id)}?${query}`,
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.getAvailableSlots error", error)
-      throw error
+      console.error("CalendarService.getAvailableSlots error", error);
+      throw error;
     }
   },
 
@@ -492,13 +512,13 @@ export const CalendarService = {
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.put(
-        apiCalendar.AVAILABILITY_RULE(ruleId),
+        apiCalendar.VIGIL_AVAILABILITY_RULE(ruleId),
         rule,
-      )) as any
-      return response.data
+      )) as any;
+      return response.data;
     } catch (error) {
-      console.error("CalendarService.updateVigilAvailabilityRule error", error)
-      throw error
+      console.error("CalendarService.updateVigilAvailabilityRule error", error);
+      throw error;
     }
   },
-}
+};
