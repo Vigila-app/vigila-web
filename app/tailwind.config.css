@@ -44,3 +44,13 @@
     @apply border-gray-200;
   }
 }
+
+@layer base {
+  :root {
+    --font-sans: "Poppins", system-ui, sans-serif;
+  }
+}
+
+@theme {
+  --font-sans: "Poppins", system-ui, sans-serif;
+}
