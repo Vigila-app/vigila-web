@@ -265,7 +265,7 @@ export const createConsumerOnboardingConfig = (
     },
     {
       id: "experience",
-      title: "È necessaria esperienza specifica ?",
+      title: "È necessaria esperienza specifica?",
       description:
         "Indica se il vigil deve avere esperienza specifica con patologie o esigenze particolari.",
       questions: [

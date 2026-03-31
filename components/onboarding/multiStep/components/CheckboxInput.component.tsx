@@ -65,7 +65,7 @@ export const MulticheckboxInput = ({
               key={option.value}
               className={clsx(
                 option.icon ? "border-2 " : "border-1 ",
-                "p-2 border-grey-200 rounded-4xl",
+                "p-2 border-grey-200 rounded-3xl",
                 isChecked &&
                   role === RolesEnum.VIGIL &&
                   "border-vigil-orange bg-vigil-light-orange",

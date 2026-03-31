@@ -34,7 +34,7 @@ export const RadioInput = ({
             <div
               key={option.value}
               className={clsx(
-                "cursor-pointer p-2 w-full border-2 border-grey-200 rounded-4xl py-3 flex-1 min-w-28 ",
+                "cursor-pointer p-2 w-full border-2 border-grey-200 rounded-3xl py-3 flex-1 min-w-28 ",
                 isLastOdd && "max-w-full flex-[0_0_100%]",
                 isChecked &&
                   role === RolesEnum.VIGIL &&

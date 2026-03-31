@@ -60,7 +60,7 @@ export const VigilTransportationLabels: Record<
   [VigilTransportationEnum.AUTO]: "Auto",
   [VigilTransportationEnum.MOTO]: "Moto",
   [VigilTransportationEnum.BIKE]: "Bicicletta",
-  [VigilTransportationEnum.PUBLIC]: "Trasporto pubblico",
+  [VigilTransportationEnum.PUBLIC]: "Mezzi pubblici",
   [VigilTransportationEnum.NONE]: "Nessuno",
   [VigilTransportationEnum.OTHER]: "Altro",
 };
