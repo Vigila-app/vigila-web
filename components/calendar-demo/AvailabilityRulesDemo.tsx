@@ -228,41 +228,61 @@ export const AvailabilityRulesDemo = ({
         )}
 
         <div className="mt-6 divide-y divide-slate-200">
-          {weekdays.map((day) => {
-            const dayRules = rulesByWeekday[day.value] || []
-            const isActive = activeDays[day.value]
-            const draft = draftSlots[day.value]
-            return (
-              <div key={day.value} className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        className="peer sr-only"
-                        checked={isActive}
-                        onChange={() =>
-                          setActiveDays((prev) => ({
-                            ...prev,
-                            [day.value]: !prev[day.value],
-                          }))
-                        }
-                      />
-                      <span className="h-5 w-9 rounded-full bg-slate-200 transition peer-checked:bg-rose-500" />
-                      <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
-                    </label>
-                    <span className="text-sm font-semibold text-slate-900">
-                      {day.labelIT}
-                    </span>
+          {weekdays.map(
+            (day: { value: WeekdayEnum; label: string; labelIT: string }) => {
+              const dayRules = rulesByWeekday[day.value] || [];
+              const isActive = activeDays[day.value];
+              const draft = draftSlots[day.value];
+              return (
+                <div key={day.value} className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          checked={isActive}
+                          onChange={() => {
+                            setActiveDays((prev) => ({
+                              ...prev,
+                              [day.value]: !prev[day.value],
+                            }));
+                          }}
+                        />
+                        <span
+                          className={clsx(
+                            "h-5 w-9 rounded-full bg-slate-200 transition",
+                            colorClasses.peerCheckedBg,
+                          )}
+                        />
+                        <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+                      </label>
+                      <span
+                        className="text-sm font-semibold text-slate-900 cursor-pointer"
+                        onClick={() => setSelectedDay(day.value)}
+                      >
+                        {day.labelIT}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setCreatingSlots((prev) => ({
+                          ...prev,
+                          [day.value]: true,
+                        }))
+                      }
+                      disabled={
+                        loading || !isActive || creatingSlots[day.value]
+                      }
+                      className={clsx(
+                        "text-xs font-semibold disabled:opacity-40",
+                        colorClasses.text,
+                        colorClasses.hoverText,
+                      )}
+                    >
+                      + Aggiungi fascia
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleCreate(day.value as WeekdayEnum)}
-                    disabled={loading || !isActive}
-                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-40"
-                  >
-                    + Aggiungi fascia
-                  </button>
-                </div>
 
                 {isActive && (
                   <div className="mt-4 space-y-4">
