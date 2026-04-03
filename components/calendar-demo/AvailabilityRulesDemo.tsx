@@ -333,7 +333,7 @@ export const AvailabilityRulesDemo = ({
                             colorClasses.peerCheckedBg,
                           )}
                         />
-                        <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+                        <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
                       </label>
                       <span
                         className="text-sm font-semibold text-slate-900 cursor-pointer"
