@@ -1,5 +1,4 @@
 import "@/app/globals.css";
-import dynamic from "next/dynamic";
 import { Metadata } from "next";
 import { AppConstants } from "@/src/constants";
 import HtmlDocument from "@/components/@core/htmlDocument/htmlDocument.component";
@@ -7,11 +6,7 @@ import { isMocked } from "@/src/utils/envs.utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import CommonScript from "@/components/@core/commonScript/common-script.component";
-
-const CookieBannerComponent = dynamic(
-  () => import("@/components/@core/cookieBanner/cookie-banner.component"),
-  { ssr: false }
-);
+import PartnerCookieBanner from "@/components/partner/PartnerCookieBanner";
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +37,7 @@ export default function PartnerLayout({
       }
       otherBody={
         <>
-          <CookieBannerComponent />
+          <PartnerCookieBanner />
           {!isMocked ? (
             <>
               <SpeedInsights />
