@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
-type CliniqueFormData = {
+type ClinicheFormData = {
   fullName: string;
   role: string;
   email: string;
@@ -41,7 +41,7 @@ const serviceOptions = [
 ];
 
 const PartnerWaitlistFormCliniche = () => {
-  const [form, setForm] = useState<CliniqueFormData>({
+  const [form, setForm] = useState<ClinicheFormData>({
     fullName: "",
     role: "",
     email: "",
@@ -75,11 +75,12 @@ const PartnerWaitlistFormCliniche = () => {
     e.preventDefault();
     setState("submitting");
     try {
-      await fetch("/api/v1/partner/waitlist", {
+      const res = await fetch("/api/v1/partner/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "cliniche", ...form }),
       });
+      if (!res.ok) throw new Error("Server error");
       setState("success");
     } catch {
       setState("error");

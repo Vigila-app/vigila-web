@@ -10,7 +10,7 @@ import CommonScript from "@/components/@core/commonScript/common-script.componen
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
-  { ssr: !!false }
+  { ssr: false }
 );
 
 export const metadata: Metadata = {

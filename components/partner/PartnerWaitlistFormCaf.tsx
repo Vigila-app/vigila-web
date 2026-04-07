@@ -75,11 +75,12 @@ const PartnerWaitlistFormCaf = () => {
     e.preventDefault();
     setState("submitting");
     try {
-      await fetch("/api/v1/partner/waitlist", {
+      const res = await fetch("/api/v1/partner/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "caf", ...form }),
       });
+      if (!res.ok) throw new Error("Server error");
       setState("success");
     } catch {
       setState("error");
