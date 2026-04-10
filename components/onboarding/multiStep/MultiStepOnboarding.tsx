@@ -7,14 +7,11 @@ import { Button, ProgressBar } from "@/components";
 import Card from "@/components/card/card";
 import {
   MultiStepOnboardingProps,
-  OnboardingFlowState,
-  OnboardingStep,
   OnboardingQuestion,
 } from "@/src/types/multiStepOnboard.types";
 import QuestionRenderer from "./QuestionRenderer";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { RolesEnum } from "@/src/enums/roles.enums";
 
 /**
  * Main component that manages the multi-step onboarding flow
@@ -103,12 +100,12 @@ const MultiStepOnboarding = ({
         <div className="p-4 ">
           {/* Step header */}
           {currentStep.title && (
-            <section className="flex flex-col items-center gap-2 mb-8">
-              <h1 className={clsx("font-semibold text-2xl")}>
+            <section className="flex flex-col items-center gap-2 mb-6">
+              <h1 className={clsx("font-semibold text-2xl  text-center ")}>
                 {currentStep.title}
               </h1>
               {currentStep.description && (
-                <span className="font-normal text-lg text-center">
+                <span className="font-normal text-lg  text-center">
                   {currentStep.description}
                 </span>
               )}
@@ -125,7 +122,7 @@ const MultiStepOnboarding = ({
           {/* Questions form */}
           <form
             onSubmit={handleSubmit(handleNext)}
-            className="max-w-lg mx-auto space-y-6"
+            className="max-w-lg mx-auto space-y-4"
           >
             {currentStep.component
               ? // Render custom step component (backwards-compatible)
@@ -193,7 +190,7 @@ const MultiStepOnboarding = ({
                 <Button
                   type="button"
                   action={back}
-                  role={role}
+                  onboard
                   label="Indietro"
                   icon={<ArrowLeftIcon className="size-5" />}
                   disabled={state.isLoading}
@@ -203,7 +200,7 @@ const MultiStepOnboarding = ({
                   <Button
                     type="button"
                     action={onCancel}
-                    role={role}
+                    onboard
                     label="Annulla"
                     disabled={state.isLoading}
                   />
@@ -212,13 +209,13 @@ const MultiStepOnboarding = ({
 
               <Button
                 type="submit"
-                primary
-                role={role}
+                onboard
                 label={isLastStep ? "Completa" : "Avanti "}
                 icon={<ArrowRightIcon className="size-5" />}
                 iconPosition="right"
                 isLoading={state.isLoading}
                 disabled={state.isLoading}
+                customClass="ml-auto"
               />
             </div>
           </form>

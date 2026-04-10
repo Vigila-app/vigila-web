@@ -65,7 +65,7 @@ export const createVigilOnboardingConfig = (
               .toISOString()
               .split("T")[0],
           },
-          autoFocus: true,
+          autoFocus: false,
         },
         {
           id: "gender", //anagrafica
@@ -147,7 +147,7 @@ export const createVigilOnboardingConfig = (
         {
           id: "occupation",
           label: "",
-          type: QuestionType.RADIO,
+          type: QuestionType.CARD,
           options: Object.values(OccupationEnum).map((value) => ({
             value,
             label: OccupationLabels[value],
@@ -234,7 +234,7 @@ export const createVigilOnboardingConfig = (
       id: "about",
       title: "Raccontaci brevemente la tua esperienza",
       description:
-        "3-4 righe che appariranno sul tuo profilo. Massimo 400 caratteri. ",
+        "Presentati, raccontaci un po' di te e della tua esperienza. Massimo 400 caratteri.",
       questions: [
         {
           id: "bio", //anagrafica
@@ -447,15 +447,16 @@ export const createVigilOnboardingConfig = (
       nextStep: "languages",
     },
     {
-      title: "Parli italiano fluentemente?",
-      description: "",
+      title: "Qual è il tuo livello di conoscenza della lingua italiana?",
+      description:
+        "Per garantire uno standard qualitativo, richiediamo una buona conoscenza della lingua.",
       id: "languages",
       questions: [
         {
           id: "language_confirmation",
           // type: QuestionType.SELECT_MULTI,
-          type: QuestionType.CHECKBOX,
-          label: "Confermo di saper parlare italiano fluentemente.",
+          type: QuestionType.CARD,
+          label: "",
           // options: [
           //   { label: "Italiano", value: "italian", icon: HomeIcon }, //TODO: add flags
           //   { label: "Inglese", value: "english" },
@@ -479,10 +480,23 @@ export const createVigilOnboardingConfig = (
           //   { label: "Persiano (Farsi)", value: "persian" },
           //   { label: "Altri", value: "other" },
           // ],
+          options: [
+            {
+              label: "Conosco l'italiano come madre lingua",
+              value: "native",
+            },
+            {
+              label: "Parlo italiano fluentemente",
+              value: "fluent",
+            },
+            {
+              label:
+                "Sto imparando l'italiano ma posso comunicare efficacemente",
+              value: "intermediate",
+            },
+          ],
           validation: {
             required: true,
-            validate: (value) =>
-              value === true || "Devi confermare per continuare",
           },
         },
       ],
