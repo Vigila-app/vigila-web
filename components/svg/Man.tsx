@@ -1,7 +1,7 @@
-import React from "react";
+import type { SVGProps } from "react";
 import { IconShell } from "./IconShell";
 
-export const Man = (props: React.SVGProps<SVGSVGElement>) => (
+export const Man = (props: SVGProps<SVGSVGElement>) => (
   <IconShell viewBox="0 0 24 24" {...props}>
     <path
       d="M11.6667 18.6667V24.5"
