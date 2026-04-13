@@ -75,6 +75,9 @@ export const createVigilOnboardingConfig = (
             value,
             label: GenderLabels[value],
           })),
+          validation: {
+            required: true,
+          },
         },
       ],
       nextStep: "address",
@@ -101,7 +104,7 @@ export const createVigilOnboardingConfig = (
       id: "zones", //non salvare per ora
       title: "In quali zone sei disponibile a lavorare?",
       description:
-        "Seelzione tutte le zone di Napoli in cui puoi offrire i tuoi servizi",
+        "Seleziona tutte le zone di Napoli in cui puoi offrire i tuoi servizi",
       questions: [
         {
           id: "zones",

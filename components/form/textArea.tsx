@@ -38,7 +38,6 @@ const TextArea = (props: TextAreaI) => {
         )}
       >
         {label}
-        {required}
       </span>
       <label
         htmlFor={name || label}

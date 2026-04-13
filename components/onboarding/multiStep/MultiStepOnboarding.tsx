@@ -12,6 +12,7 @@ import {
 import QuestionRenderer from "./QuestionRenderer";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { QuestionType } from "@/src/types/multiStepOnboard.types";
 
 /**
  * Main component that manages the multi-step onboarding flow
@@ -103,6 +104,11 @@ const MultiStepOnboarding = ({
             <section className="flex flex-col items-center gap-2 mb-6">
               <h1 className={clsx("font-semibold text-2xl  text-center ")}>
                 {currentStep.title}
+                {currentStep.questions &&
+                  currentStep.questions.every((q) => q.validation?.required) &&
+                  !currentStep.questions.some((q) =>
+                    [QuestionType.DATE, QuestionType.FILE].includes(q.type),
+                  ) && <span className="text-red-500 ml-2">*</span>}
               </h1>
               {currentStep.description && (
                 <span className="font-normal text-lg  text-center">
