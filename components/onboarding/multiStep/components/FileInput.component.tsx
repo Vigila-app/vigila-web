@@ -72,7 +72,6 @@ export const FileInput = ({
         )}
       >
         {question.label}
-        {question.validation?.required && "*"}
       </label>
 
       <div className="flex flex-col gap-3 items-center">
@@ -82,8 +81,8 @@ export const FileInput = ({
             error || fileError
               ? "border-red-400 bg-red-50"
               : role === RolesEnum.VIGIL
-                ? "border-vigil-orange/60 hover:border-vigil-orange/90 bg-vigil-light-orange/30"
-                : "border-consumer-blue/60 hover:border-consumer-blue/90 bg-consumer-light-blue/30",
+                ? "border-vigil-orange bg-vigil-light-orange/30"
+                : "border-consumer-blue  bg-consumer-light-blue/30",
           )}
           onClick={() => inputRef.current?.click()}
         >
@@ -115,11 +114,12 @@ export const FileInput = ({
         <div className="text-sm text-gray-400">JPG, PNG, max 5mb</div>
         {file && (
           <div
-            className="flex items-center justify-between w-full max-w-xs p-3 rounded-lg border-2 mt-2"
-            style={{
-              borderColor: role === RolesEnum.VIGIL ? "#ff9800" : "#3b82f6",
-              background: role === RolesEnum.VIGIL ? "#fff7ed" : "#e0f2fe",
-            }}
+            className={clsx(
+              "flex items-center justify-between w-full max-w-xs p-3 rounded-lg border-2 mt-2",
+              role === RolesEnum.VIGIL
+                ? "border-vigil-orange bg-vigil-light-orange/30"
+                : "border-consumer-blue bg-consumer-light-blue/30",
+            )}
           >
             <span className="text-sm font-medium truncate">{file.name}</span>
             <button
