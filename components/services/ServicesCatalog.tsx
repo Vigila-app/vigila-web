@@ -11,8 +11,6 @@ import clsx from "clsx";
 import {
   XCircleIcon,
   ShieldCheckIcon,
-  // PlusIcon,
-  // MinusIcon,
   ShoppingCartIcon,
   UsersIcon,
   UserIcon,
@@ -51,7 +49,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
     SelectedService[]
   >([]);
   const [servicesCatalog, setServicesCatalog] = useState<ServiceCatalogItem[]>(
-    []
+    [],
   );
   const iconMap: Record<string, React.ReactNode> = {
     "Compagnia e conversazione": (
@@ -95,7 +93,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           extras: service.selectedExtras,
         },
         type: service.type,
-      })
+      }),
     );
     onServicesChange(convertedServices as ServiceI[]);
   }, [internalSelectedServices, onServicesChange]);
@@ -119,21 +117,21 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
 
   const removeService = (catalogId: SelectedService["catalogId"]) => {
     setInternalSelectedServices((prev) =>
-      prev.filter((service) => service.catalogId !== catalogId)
+      prev.filter((service) => service.catalogId !== catalogId),
     );
   };
 
   const updateServicePrice = (index: number, newPrice: number) => {
     setInternalSelectedServices((prev) =>
       prev.map((service, i) =>
-        i === index ? { ...service, unit_price: newPrice } : service
-      )
+        i === index ? { ...service, unit_price: newPrice } : service,
+      ),
     );
   };
 
   const toggleExtra = (
     catalogId: SelectedService["catalogId"],
-    extraId: string
+    extraId: string,
   ) => {
     setInternalSelectedServices((prev) =>
       prev.map((service, i) => {
@@ -144,19 +142,19 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           return { ...service, selectedExtras };
         }
         return service;
-      })
+      }),
     );
   };
 
   const isServiceSelected = (catalogId: number) => {
     return internalSelectedServices.some(
-      (service) => service.catalogId === catalogId
+      (service) => service.catalogId === catalogId,
     );
   };
 
   const getCatalogService = (catalogId: number) => {
     return servicesCatalog.find(
-      (service: ServiceCatalogItem) => service.id === catalogId
+      (service: ServiceCatalogItem) => service.id === catalogId,
     );
   };
 
@@ -185,7 +183,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           className={clsx(
             "block font-semibold mb- text-xl mb-4",
             role === RolesEnum.VIGIL && "text-vigil-orange",
-            role === RolesEnum.CONSUMER && "text-consumer-blue"
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
           )}
         >
           Scegli i servizi che vuoi offrire
@@ -216,7 +214,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                 key={catalogService.id}
                 customClass={clsx(
                   isServiceSelected(catalogService.id) &&
-                    "!bg-green-50 !border-green-300"
+                    "!bg-green-50 !border-green-300",
                 )}
               >
                 <div className="relative flex flex-col justify-between">
@@ -290,7 +288,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                                       .find(
                                         (service) =>
                                           service.catalogId ===
-                                          catalogService.id
+                                          catalogService.id,
                                       )
                                       ?.selectedExtras.includes(extra.id)}
                                     onChange={() =>
@@ -315,7 +313,8 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                             Opzioni extra disponibili:&nbsp;
                             {catalogService.extra
                               .map(
-                                (extra) => `${extra.name} €${extra.fixed_price}`
+                                (extra) =>
+                                  `${extra.name} €${extra.fixed_price}`,
                               )
                               .join(", ")}
                           </span>

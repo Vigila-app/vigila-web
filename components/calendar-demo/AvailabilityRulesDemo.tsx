@@ -32,8 +32,8 @@ export const AvailabilityRulesDemo = ({
 } = {}) => {
   const weekdays = getWeekdaysArray();
   const times = getTimeSlots(15); // 15-minute intervals
-  const user = UserService.getUser() 
-   const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(
+  const user = UserService.getUser();
+  const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(
     () => availabilityRules ?? [],
   );
   const [loading, setLoading] = useState(false);
@@ -333,7 +333,7 @@ export const AvailabilityRulesDemo = ({
                             colorClasses.peerCheckedBg,
                           )}
                         />
-                        <span className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+                        <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
                       </label>
                       <span
                         className="text-sm font-semibold text-slate-900 cursor-pointer"
@@ -622,8 +622,8 @@ export const AvailabilityRulesDemo = ({
                         </div>
                       ) : (
                         <div className="mt-2 text-xs text-slate-400">
-                          Clicca "+ Aggiungi fascia" per creare una nuova
-                          fascia.
+                          Clicca &quot;+ Aggiungi fascia&quot; per creare una
+                          nuova fascia.
                         </div>
                       )}
                     </div>

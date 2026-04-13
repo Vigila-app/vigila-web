@@ -1,5 +1,5 @@
 const baseBtnStyle =
-  "flex justify-center items-center rounded-4xl border px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition active:scale-95";
+  "flex justify-center items-center rounded-4xl border px-4 md:px-12 py-3 text-sm font-medium focus-within:border-primary-600 focus-within:ring-1 focus-within:ring-primary-600 transition active:scale-95";
 const primaryBtnStyle =
   "shadow border-primary-600 bg-primary-600 text-white hover:bg-white hover:text-primary-600";
 const secondaryBtnStyle =
@@ -22,6 +22,8 @@ const consumerBtnStyle =
 
 const walletBtnStyle =
   "bg-white text-consumer-blue border-transparent hover:bg-gray-50 focus:ring-white/50 shadow-sm font-semibold py-2.5";
+const onboardingBtnStyle =
+  "bg-white text-vigil-orange border-consumer-blue hover:bg-consumer-blue hover:text-white font-semibold";
 export const ButtonStyle = {
   baseBtnStyle,
   primaryBtnStyle,
@@ -36,4 +38,5 @@ export const ButtonStyle = {
   fullBtnStyle,
   tabBtnStyle,
   smallBtnStyle,
+  onboardingBtnStyle,
 };

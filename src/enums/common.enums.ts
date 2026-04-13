@@ -1,3 +1,6 @@
+import { Asterisk, Couple, Man, NonBinary, Woman } from "@/components/svg";
+import { ComponentType, SVGProps } from "react";
+
 export enum GenderEnum {
   MALE = "male",
   FEMALE = "female",
@@ -11,8 +14,25 @@ export const GenderLabels: Record<GenderEnum, string> = {
   [GenderEnum.NB]: "Non Binario",
   [GenderEnum.OTHER]: "Altro",
   [GenderEnum.NA]: "Preferisco non specificare",
-}
+};
 
+export const GenderDescriptions: Record<GenderEnum, string> = {
+  [GenderEnum.FEMALE]: "Preferibilmente una donna",
+  [GenderEnum.MALE]: "Preferibilmente un uomo",
+  [GenderEnum.NB]: "Preferibilmente non binario",
+  [GenderEnum.OTHER]: "Preferibilmente altro",
+  [GenderEnum.NA]: "Preferisco non specificare",
+};
+export const GenderIcons: Record<
+  GenderEnum,
+  ComponentType<SVGProps<SVGSVGElement>>
+> = {
+  [GenderEnum.FEMALE]: Woman,
+  [GenderEnum.MALE]: Man,
+  [GenderEnum.NB]: NonBinary,
+  [GenderEnum.OTHER]: Asterisk,
+  [GenderEnum.NA]: Couple,
+};
 export enum FrequencyEnum {
   SECONDS = "seconds",
   MINUTES = "minutes",
@@ -38,4 +58,3 @@ export enum CurrencyEnum {
   US_DOLLAR = "$",
   GB_POUND = "£",
 }
-
