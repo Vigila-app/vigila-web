@@ -81,8 +81,8 @@ export const FileInput = ({
             error || fileError
               ? "border-red-400 bg-red-50"
               : role === RolesEnum.VIGIL
-                ? "border-vigil-orange bg-vigil-light-orange/30"
-                : "border-consumer-blue  bg-consumer-light-blue/30",
+                ? "border-vigil-orange/60 hover:border-vigil-orange/90 bg-vigil-light-orange/30"
+                : "border-consumer-blue/60 hover:border-consumer-blue/90 bg-consumer-light-blue/30",
           )}
           onClick={() => inputRef.current?.click()}
         >
