@@ -172,6 +172,10 @@ export const apiOnboard = {
   ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
 };
+
+export const apiMatching = {
+  MATCH: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
+};
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
   LIST: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
@@ -307,7 +311,5 @@ export const apiCalendar = {
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
 };
 
-export const apiMatching = {
-  MATCH: (isMock?: boolean): string => apiControllers.MATCHING(isMock),
-};
+
 

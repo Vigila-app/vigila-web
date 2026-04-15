@@ -20,7 +20,7 @@ import { apiConsumer, apiVigil } from "@/src/constants/api.constants";
 export default function AvailabilityFlow({
   onComplete,
 }: Readonly<{
-  onComplete: () => void;
+  onComplete?: (answers: Record<string, any>) => void;
 }>) {
   const config: MultiStepOnboardingProps["config"] = {
     role: RolesEnum.CONSUMER,
@@ -121,16 +121,16 @@ export default function AvailabilityFlow({
       },
     ],
     initialStepId: "welcome",
-    onComplete: async () => {
-      console.log("Availability flow completed");
-      onComplete();
-    },
+      onComplete: async (answers: Record<string, any>) => {
+        console.log("Availability flow completed");
+        if (onComplete) onComplete(answers);
+      },
   };
   const { setAnswers, state, currentStep, next, back } = useMultiStepFlow({
     role: config.role,
     steps: config.steps,
     initialStepId: config.initialStepId,
-    onComplete,
+    onComplete: config.onComplete,
   } as any);
   const [address, setAddress] = useState<any>(undefined);
   const { handleSubmit, reset, getValues } = useForm({
