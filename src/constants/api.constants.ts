@@ -1,5 +1,6 @@
 import { isServer } from "@/src/utils/common.utils";
 import { isMocked, isReleased } from "@/src/utils/envs.utils";
+import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
@@ -17,9 +18,7 @@ const apiRoot = {
     ? isMocked
       ? "http://localhost:3000"
       : AppConstants.hostUrl
-    : typeof window !== "undefined"
-      ? window.location.origin
-      : AppConstants.hostUrl,
+    : `${window.location.origin}`,
 };
 
 const getEnv = (isMock: boolean) => {
@@ -77,7 +76,7 @@ const apiControllers = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean,
+    isMock?: boolean
   ): string => `${apiBase.V1(isMock)}/cms/${contentType}/${contentId}`,
   // endregion CMS
 
@@ -141,20 +140,19 @@ const apiControllers = {
   // region CALENDAR
   CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
   // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
+  // endregion MATCHING
 };
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
-  COMPLETE_GOOGLE: (isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/completeGoogle`,
+  COMPLETE_GOOGLE: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/completeGoogle`,
   DETAILS: (id: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
       isMock ? "user" : id
     }`,
-  DATA: (id: string, role: RolesEnum, isMock?: boolean): string =>
-    `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
-      isMock ? "user" : id
-    }/data`,
   DELETE: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${isMock ? "user" : id}`,
   DEVICES: (id: string, isMock?: boolean): string =>
@@ -221,7 +219,7 @@ export const apiCms = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean,
+    isMock?: boolean
   ): string => apiControllers.CONTENT(contentType, contentId, isMock),
 };
 
@@ -240,15 +238,11 @@ export const apiCheckout = {
 export const apiConsumer = {
   DETAILS: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}`,
-  DATA: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
-    `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}/data`,
 };
 
 export const apiVigil = {
   DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
-  DATA: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/data`,
 };
 
 export const apiAdmin = {
@@ -289,45 +283,31 @@ export const apiEmail = {
 
 export const apiCalendar = {
   // Consumer APIs
-  CONSUMER: (isMock?: boolean): string =>
+  CONSUMER: (isMock?: boolean): string => 
     `${apiControllers.CALENDAR(isMock)}/consumer`,
-
+  
   // Vigil Calendar APIs
-  VIGIL_BOOKINGS: (isMock?: boolean): string =>
+  VIGIL_BOOKINGS: (isMock?: boolean): string => 
     `${apiControllers.CALENDAR(isMock)}/vigil/bookings`,
+  
   // Availability Rules APIs
-  VIGIL_AVAILABILITY_RULES: (isMock?: boolean): string =>
+  AVAILABILITY_RULES: (isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/availability-rules`,
-  VIGIL_AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
+  AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
-
-  CONSUMER_AVAILABILITY_RULES: (isMock?: boolean): string =>
-    `${apiControllers.CALENDAR(isMock)}/consumer/availability-rules`,
-  CONSUMER_AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
-    `${apiControllers.CALENDAR(isMock)}/consumer/availability-rules/${isMock ? "rule" : ruleId}`,
-
+  
   // Unavailabilities APIs
-  VIGIL_UNAVAILABILITIES: (isMock?: boolean): string =>
+  UNAVAILABILITIES: (isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/unavailabilities`,
-  VIGIL_UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string =>
+  UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
-
+  
   // Available Slots API
-  VIGIL_AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
-  // Availability Rules APIs
-  AVAILABILITY_RULES: (isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/availability-rules`,
-  AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
-
-  // Unavailabilities APIs
-  UNAVAILABILITIES: (isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/unavailabilities`,
-  UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
-
-  // Available Slots API
-  AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string =>
+  AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string => 
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
 };
+
+export const apiMatching = {
+  MATCH: (isMock?: boolean): string => apiControllers.MATCHING(isMock),
+};
+

@@ -516,24 +516,6 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   CONSUMER_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7806,
   },
-  CONSUMER_DATA_SUCCESS: {
-    code: 7811,
-  },
-  CONSUMER_DATA_ERROR: {
-    code: 7812,
-  },
-  CONSUMER_DATA_BAD_REQUEST: {
-    code: 7813,
-  },
-  CONSUMER_DATA_UNAUTHORIZED: {
-    code: 7814,
-  },
-  CONSUMER_DATA_FORBIDDEN: {
-    code: 7815,
-  },
-  CONSUMER_DATA_NOT_FOUND: {
-    code: 7816,
-  },
   // endregion CONSUMER
 
   // region VIGIL
@@ -554,24 +536,6 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   VIGIL_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7906,
-  },
-  VIGIL_DATA_SUCCESS: {
-    code: 7911,
-  },
-  VIGIL_DATA_ERROR: {
-    code: 7912,
-  },
-  VIGIL_DATA_BAD_REQUEST: {
-    code: 7913,
-  },
-  VIGIL_DATA_UNAUTHORIZED: {
-    code: 7914,
-  },
-  VIGIL_DATA_FORBIDDEN: {
-    code: 7915,
-  },
-  VIGIL_DATA_NOT_FOUND: {
-    code: 7916,
   },
   // endregion VIGIL
 
@@ -743,4 +707,22 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 10404,
   },
   // endregion CALENDAR
-};
+
+  // region MATCHING
+  MATCHING_SUCCESS: {
+    code: 11001,
+  },
+  MATCHING_ERROR: {
+    code: 11002,
+  },
+  MATCHING_BAD_REQUEST: {
+    code: 11003,
+  },
+  MATCHING_UNAUTHORIZED: {
+    code: 11004,
+  },
+  MATCHING_FORBIDDEN: {
+    code: 11005,
+  },
+  // endregion MATCHING
+}
