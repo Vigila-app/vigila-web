@@ -35,7 +35,6 @@ export type ServiceCatalog = {
 // Existing Service Types
 export type ServiceI = {
   active: boolean;
-  type: string;
   id: string;
   created_at: Date;
   updated_at?: Date;

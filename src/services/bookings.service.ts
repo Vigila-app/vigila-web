@@ -71,6 +71,22 @@ export const BookingsService = {
       }
     }),
 
+  updateBooking: async (booking: BookingI) =>
+    new Promise<BookingI>(async (resolve, reject) => {
+      try {
+        if (!booking.id) reject();
+        const { data: result } = (await ApiService.put(
+          apiBookings.DETAILS(booking.id),
+          booking,
+        )) as { data: BookingI };
+        useBookingsStore.getState().getBookingDetails(booking.id);
+        resolve(result);
+      } catch (error) {
+        console.error("BookingsService updateBookingConsumer error", error);
+        reject(error);
+      }
+    }),
+
   cancelBooking: async (bookingId: BookingI["id"]) =>
     new Promise<boolean>(async (resolve, reject) => {
       try {
