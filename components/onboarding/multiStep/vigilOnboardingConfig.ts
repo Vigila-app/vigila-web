@@ -65,6 +65,12 @@ export const createVigilOnboardingConfig = (
               .toISOString()
               .split("T")[0],
           },
+          min: new Date(new Date().setFullYear(new Date().getFullYear() - 80))
+            .toISOString()
+            .split("T")[0],
+          max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+            .toISOString()
+            .split("T")[0],
           autoFocus: false,
         },
         {
@@ -373,7 +379,7 @@ export const createVigilOnboardingConfig = (
     {
       id: "hours",
       title: "Quante ore a settimana vorresti lavorare?",
-      description: "Questo ci aiuta a proporti offerte adatte?",
+      description: "Questo ci aiuta a proporti offerte adatte",
       questions: [
         {
           id: "time_committment",

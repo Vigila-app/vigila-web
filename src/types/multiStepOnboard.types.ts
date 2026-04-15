@@ -1,5 +1,10 @@
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { ComponentType, ForwardRefExoticComponent, ReactElement, SVGProps } from "react";
+import {
+  ComponentType,
+  ForwardRefExoticComponent,
+  ReactElement,
+  SVGProps,
+} from "react";
 import { FieldError } from "react-hook-form";
 
 /**
@@ -28,32 +33,32 @@ export enum QuestionType {
  * File validation rules for file upload questions
  */
 export interface FileValidation {
-  maxSize?: number // in bytes
-  allowedMimes?: string[] // e.g., ['image/jpeg', 'image/png']
+  maxSize?: number; // in bytes
+  allowedMimes?: string[]; // e.g., ['image/jpeg', 'image/png']
 }
 
 /**
  * Validation rules for a question
  */
 export interface ValidationRules {
-  required?: boolean
-  minLength?: number
-  maxLength?: number
-  min?: number | string
-  max?: number | string
-  pattern?: RegExp
-  validate?: (value: any) => boolean | string
-  file?: FileValidation
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number | string;
+  max?: number | string;
+  pattern?: RegExp;
+  validate?: (value: any) => boolean | string;
+  file?: FileValidation;
 }
 
 /**
  * Option for select, radio, or checkbox questions
  */
 export interface QuestionOption {
-  label: string
-  value: string | number
-  icon?: ComponentType<SVGProps<SVGSVGElement> & { className?: string }> 
-  description?: string
+  label: string;
+  value: string | number;
+  icon?: ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
+  description?: string;
 }
 
 /**
@@ -67,7 +72,8 @@ export interface OnboardingQuestion {
   description?: string;
   options?: QuestionOption[];
   validation?: ValidationRules;
-  max?: number
+  max?: number | string;
+  min?: number | string;
   nextStep?:
     | string
     | ((answer: any, allAnswers: Record<string, any>) => string | null);
@@ -78,10 +84,10 @@ export interface OnboardingQuestion {
  * Represents a step in the onboarding flow
  */
 export interface OnboardingStep {
-  id: string
-  title?: string
-  description?: string
-  questions?: OnboardingQuestion[]
+  id: string;
+  title?: string;
+  description?: string;
+  questions?: OnboardingQuestion[];
   /**
    * Optional custom component to render for this step. If provided, the
    * `MultiStepOnboarding` will render this component instead of the
@@ -91,9 +97,9 @@ export interface OnboardingStep {
    * for form integration, then let the parent handle submission validation
    * and navigation (or call the provided callbacks).
    */
-  component?: any
-  note?: string
-  nextStep?: string | ((answers: Record<string, any>) => string | null)
+  component?: any;
+  note?: string;
+  nextStep?: string | ((answers: Record<string, any>) => string | null);
 }
 
 /**

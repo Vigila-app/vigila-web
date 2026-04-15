@@ -12,7 +12,6 @@ import { AuthService, CalendarService, ServicesService } from "@/src/services";
 import MultiStepOnboarding from "../multiStep/MultiStepOnboarding";
 import { createVigilOnboardingConfig } from "../multiStep/vigilOnboardingConfig";
 import { StorageUtils } from "@/src/utils/storage.utils";
-import ServicesCatalog from "@/components/services/ServicesCatalog";
 import services_catalog from "../../../mock/cms/services-catalog.json" with { type: "json" };
 import { ServiceI } from "@/src/types/services.types";
 /**
@@ -24,7 +23,6 @@ const VigilMultiStepOnboarding = () => {
   const router = useRouter();
 
   const handleComplete = useCallback(
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     async (data: Record<string, any>) => {
       try {
         const { addresses, propic } = data;
@@ -75,7 +73,7 @@ const VigilMultiStepOnboarding = () => {
           const srv = {
             active: true,
             postalCode: caps,
-            type:service,
+            type: service,
             min_unit: srvRaw?.minimum_duration_hours,
             currency: "€",
             name: service,
@@ -120,6 +118,7 @@ const VigilMultiStepOnboarding = () => {
         throw err;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [showToast, getUserDetails, router],
   );
 

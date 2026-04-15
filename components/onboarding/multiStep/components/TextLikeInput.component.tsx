@@ -1,6 +1,6 @@
-import { Input, TextArea } from "@/components/form"
-import { getInputType } from "@/src/utils/questionType.utils"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
+import { Input, TextArea } from "@/components/form";
+import { getInputType } from "@/src/utils/questionType.utils";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
 
 export const TextLikeInput = ({
   question,
@@ -10,6 +10,7 @@ export const TextLikeInput = ({
   value,
 }: QuestionRendererProps) => (
   <Input
+    {...question}
     label={question.label}
     placeholder={question.placeholder}
     value={value || ""}
@@ -22,7 +23,7 @@ export const TextLikeInput = ({
     error={error}
     autoFocus={question.autoFocus}
   />
-)
+);
 
 export const TextAreaInput = ({
   question,
@@ -32,6 +33,7 @@ export const TextAreaInput = ({
   value,
 }: QuestionRendererProps) => (
   <TextArea
+    {...question}
     label={question.label}
     placeholder={question.placeholder}
     value={value || ""}
@@ -42,4 +44,4 @@ export const TextAreaInput = ({
     role={role}
     error={error}
   />
-)
+);
