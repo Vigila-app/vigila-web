@@ -9,12 +9,7 @@ import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
-import {
-  BookingsService,
-  PaymentService,
-  ServicesService,
-} from "@/src/services";
-import { PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { PaymentService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
@@ -139,7 +134,11 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   };
 
   useEffect(() => {
-    if (booking?.id && (service?.id || booking?.notice_id) && paymentMethod === "stripe") {
+    if (
+      booking?.id &&
+      (service?.id || booking?.notice_id) &&
+      paymentMethod === "stripe"
+    ) {
       loadBookingAndCreatePayment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,28 +163,11 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   }, [booking?.id]);
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
-    try {
-      showLoader();
-      const paymentVerification =
-        await PaymentService.verifyPaymentIntent(paymentIntentId);
-      if (
-        paymentVerification.success &&
-        paymentVerification.data.status === "succeeded"
-      ) {
-        await BookingsService.updateBookingPaymentStatus(booking!.id, {
-          payment_id: paymentIntentId,
-          payment_status: PaymentStatusEnum.PAID,
-        });
-        router.push(`${Routes.bookings.url}?success=true`);
-      }
-    } catch (e) {
-      console.error(e);
-      router.push(
-        `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_intent=${paymentIntentId}`,
-      );
-    } finally {
-      hideLoader();
-    }
+    // Payment status update is handled server-side by the Stripe webhook.
+    // Client just redirects to the result page which polls for confirmation.
+    router.push(
+      `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_intent=${paymentIntentId}`,
+    );
   };
 
   const handleWalletPayment = async () => {

@@ -1,6 +1,10 @@
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { BookingsService } from "@/src/services";
-import { BookingI, BookingStoreType, BookingFormI } from "@/src/types/booking.types";
+import {
+  BookingI,
+  BookingStoreType,
+  BookingFormI,
+} from "@/src/types/booking.types";
 import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
@@ -10,114 +14,138 @@ import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 const initBookingsStore: {
   bookings: BookingStoreType["bookings"];
+  totalCount: BookingStoreType["totalCount"];
   lastUpdate: BookingStoreType["lastUpdate"];
 } = {
   bookings: [],
+  totalCount: 0,
   lastUpdate: undefined,
 };
 
 // Creazione del debouncer per lo store bookings
-const { createDebouncedAction } = createStoreDebouncer('bookings', 300);
+const { createDebouncedAction } = createStoreDebouncer("bookings", 300);
 
 export const useBookingsStore = create<BookingStoreType>()(
   devtools(
     persist(
       (set, get) => ({
         ...initBookingsStore,
-        
+
         getBookings: async (force: boolean = false) => {
-          return createDebouncedAction('getBookings', async () => {
-            try {
-              const lastUpdate = get().lastUpdate;
-              if (
-                force ||
-                !lastUpdate ||
-                dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
-              ) {
-                const response = await BookingsService.getBookings();
-                if (response) {
-                  set(
-                    () => ({
-                      bookings: response,
-                      lastUpdate: new Date(),
-                    }),
-                    false,
-                    { type: "getBookings" }
-                  );
+          return createDebouncedAction(
+            "getBookings",
+            async () => {
+              try {
+                const lastUpdate = get().lastUpdate;
+                if (
+                  force ||
+                  !lastUpdate ||
+                  dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 1
+                ) {
+                  const response = await BookingsService.getBookings();
+                  if (response) {
+                    set(
+                      () => ({
+                        bookings: response.data,
+                        totalCount: response.count,
+                        lastUpdate: new Date(),
+                      }),
+                      false,
+                      { type: "getBookings" },
+                    );
+                  }
                 }
+              } catch (error) {
+                console.error("useBookingsStore getBookings error:", error);
               }
-            } catch (error) {
-              console.error("useBookingsStore getBookings error:", error);
-            }
-          }, force);
+            },
+            force,
+          );
         },
 
         getBookingDetails: async (bookingId: BookingI["id"], force = false) =>
           new Promise<BookingI>(async (resolve, reject) => {
-            return createDebouncedAction('getBookingDetails', async () => {
-              try {
-                const getBookingDetailsBE = async () => {
-                  try {
-                    const bookingStoreBE = await BookingsService.getBookingDetails(bookingId);
-                    if (get().bookings.some((b) => b.id === bookingStoreBE.id)) {
-                      set(
-                        () => ({
-                          bookings: get().bookings.map((booking) => {
-                            if (booking.id === bookingId) {
-                              return bookingStoreBE;
-                            }
-                            return booking;
+            return createDebouncedAction(
+              "getBookingDetails",
+              async () => {
+                try {
+                  const getBookingDetailsBE = async () => {
+                    try {
+                      const bookingStoreBE =
+                        await BookingsService.getBookingDetails(bookingId);
+                      if (
+                        get().bookings.some((b) => b.id === bookingStoreBE.id)
+                      ) {
+                        set(
+                          () => ({
+                            bookings: get().bookings.map((booking) => {
+                              if (booking.id === bookingId) {
+                                return bookingStoreBE;
+                              }
+                              return booking;
+                            }),
+                            lastUpdate: new Date(),
                           }),
-                          lastUpdate: new Date(),
-                        }),
-                        false,
-                        { type: "getBookingDetails", bookingId }
-                      );
-                    } else {
-                      set(
-                        () => ({
-                          bookings: [...get().bookings, bookingStoreBE],
-                          lastUpdate: new Date(),
-                        }),
-                        false,
-                        { type: "getBookingDetails", bookingId }
-                      );
+                          false,
+                          { type: "getBookingDetails", bookingId },
+                        );
+                      } else {
+                        set(
+                          () => ({
+                            bookings: [...get().bookings, bookingStoreBE],
+                            lastUpdate: new Date(),
+                          }),
+                          false,
+                          { type: "getBookingDetails", bookingId },
+                        );
+                      }
+                      return bookingStoreBE;
+                    } catch (error) {
+                      reject(error);
                     }
-                    return(bookingStoreBE);
-                  } catch (error) {
-                    reject(error);
-                  }
-                };
+                  };
 
-                if (
-                  force ||
-                  !get().lastUpdate ||
-                  dateDiff(new Date(), get().lastUpdate, FrequencyEnum.MINUTES) > 1
-                ) {
-                  const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
-                  if (bookingStoreBE?.id) {
-                    resolve(bookingStoreBE);
-                  }
-                  reject();
-                } else {
-                  const bookingStore = get().bookings.find(
-                    (booking) => booking.id === bookingId
-                  );
-                  if (bookingStore?.id) {
-                    resolve(bookingStore);
-                  } else {
-                    const bookingStoreBE = await getBookingDetailsBE() as unknown as BookingI;
+                  if (
+                    force ||
+                    !get().lastUpdate ||
+                    dateDiff(
+                      new Date(),
+                      get().lastUpdate,
+                      FrequencyEnum.MINUTES,
+                    ) > 1
+                  ) {
+                    const bookingStoreBE =
+                      (await getBookingDetailsBE()) as unknown as BookingI;
                     if (bookingStoreBE?.id) {
                       resolve(bookingStoreBE);
                     }
                     reject();
+                  } else {
+                    const bookingStore = get().bookings.find(
+                      (booking) => booking.id === bookingId,
+                    );
+                    if (bookingStore?.id) {
+                      resolve(bookingStore);
+                    } else {
+                      const bookingStoreBE =
+                        (await getBookingDetailsBE()) as unknown as BookingI;
+                      if (bookingStoreBE?.id) {
+                        resolve(bookingStoreBE);
+                      }
+                      reject();
+                    }
                   }
+                } catch (error) {
+                  console.error(
+                    "useBookingsStore getBookingDetails error:",
+                    error,
+                  );
+                  reject(error);
                 }
-              } catch (error) {
-                console.error("useBookingsStore getBookingDetails error:", error);
-                reject(error);
-              }
-            }, force, bookingId).catch(reject);
+              },
+              force,
+              bookingId,
+            ).catch(reject);
           }),
 
         createBooking: async (booking: BookingFormI) =>
@@ -130,7 +158,7 @@ export const useBookingsStore = create<BookingStoreType>()(
                   lastUpdate: new Date(),
                 }),
                 false,
-                { type: "createBooking", booking }
+                { type: "createBooking", booking },
               );
               resolve(newBooking);
             } catch (error) {
@@ -139,10 +167,16 @@ export const useBookingsStore = create<BookingStoreType>()(
             }
           }),
 
-        updateBookingStatus: async (bookingId: BookingI["id"], status: BookingStatusEnum) =>
+        updateBookingStatus: async (
+          bookingId: BookingI["id"],
+          status: BookingStatusEnum,
+        ) =>
           new Promise<BookingI>(async (resolve, reject) => {
             try {
-              const updatedBooking = await BookingsService.updateBookingStatus(bookingId, status);
+              const updatedBooking = await BookingsService.updateBookingStatus(
+                bookingId,
+                status,
+              );
               set(
                 () => ({
                   bookings: get().bookings.map((booking) => {
@@ -154,11 +188,14 @@ export const useBookingsStore = create<BookingStoreType>()(
                   lastUpdate: new Date(),
                 }),
                 false,
-                { type: "updateBookingStatus", bookingId, status }
+                { type: "updateBookingStatus", bookingId, status },
               );
               resolve(updatedBooking);
             } catch (error) {
-              console.error("useBookingsStore updateBookingStatus error:", error);
+              console.error(
+                "useBookingsStore updateBookingStatus error:",
+                error,
+              );
               reject(error);
             }
           }),
@@ -169,11 +206,13 @@ export const useBookingsStore = create<BookingStoreType>()(
               await BookingsService.cancelBooking(bookingId);
               set(
                 () => ({
-                  bookings: get().bookings.filter((booking) => booking.id !== bookingId),
+                  bookings: get().bookings.filter(
+                    (booking) => booking.id !== bookingId,
+                  ),
                   lastUpdate: new Date(),
                 }),
                 false,
-                { type: "cancelBooking", bookingId }
+                { type: "cancelBooking", bookingId },
               );
               resolve(true);
             } catch (error) {
@@ -197,8 +236,8 @@ export const useBookingsStore = create<BookingStoreType>()(
       {
         name: "bookings",
         storage: createJSONStorage(() => sessionStorage),
-      }
+      },
     ),
-    { enabled: isDev, anonymousActionType: "bookings" }
-  )
+    { enabled: isDev, anonymousActionType: "bookings" },
+  ),
 );

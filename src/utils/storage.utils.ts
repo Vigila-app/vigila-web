@@ -1,4 +1,5 @@
 import { AppInstance } from "@/src/utils/supabase.utils";
+import { time } from "console";
 
 const errorHanlder = (error: any) => {
   switch (error?.code) {
@@ -23,9 +24,29 @@ export const StorageUtils = {
   getURL: async (bucket: string, pathToFile: string) => {
     try {
       if (!(bucket && pathToFile)) return pathToFile;
+      const cached = JSON.parse(
+        sessionStorage.getItem(`${bucket}_${pathToFile}`) || "null",
+      );
+      if (
+        cached?.signedUrl &&
+        cached?.time &&
+        new Date().getTime() - cached.time < 60 * 60 * 1000
+      )
+        return cached.signedUrl;
+
       const { data } = await AppInstance.storage
         .from(bucket)
         .createSignedUrl(pathToFile, 60 * 60); // 1 hour
+
+      if (data?.signedUrl) {
+        sessionStorage.setItem(
+          `${bucket}_${pathToFile}`,
+          JSON.stringify({
+            signedUrl: data.signedUrl,
+            time: new Date().getTime(),
+          }),
+        );
+      }
 
       return data?.signedUrl;
     } catch (error) {
@@ -36,7 +57,7 @@ export const StorageUtils = {
     bucket: string,
     file: string | ArrayBuffer | File,
     pathToFile: string,
-    metadata = {}
+    metadata = {},
   ) =>
     new Promise<{
       id: string;
@@ -62,7 +83,7 @@ export const StorageUtils = {
             id: string;
             path: string;
             fullPath: string;
-          }
+          },
         );
       } catch (error) {
         reject(error);

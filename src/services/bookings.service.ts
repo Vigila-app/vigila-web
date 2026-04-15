@@ -1,17 +1,8 @@
 import { ApiService } from "@/src/services";
 import { apiBookings } from "@/src/constants/api.constants";
 import { BookingI, BookingFormI } from "@/src/types/booking.types";
-import {
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from "@/src/enums/booking.enums";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
-
-export type UpdateBookingPaymentRequest = {
-  payment_id: string;
-  payment_status: PaymentStatusEnum;
-  status?: BookingStatusEnum;
-};
 
 export const BookingsService = {
   createBooking: async (newBooking: BookingFormI) =>
@@ -29,18 +20,24 @@ export const BookingsService = {
     }),
 
   getBookings: async () =>
-    new Promise<BookingI[]>(async (resolve, reject) => {
-      try {
-        const result = (await ApiService.get(apiBookings.LIST())) as {
-          data: BookingI[];
-        };
-        const { data: response = [] } = result;
-        resolve(response);
-      } catch (error) {
-        console.error("BookingsService getBookings error", error);
-        reject(error);
-      }
-    }),
+    new Promise<{ data: BookingI[]; count: number }>(
+      async (resolve, reject) => {
+        try {
+          const result = (await ApiService.get(apiBookings.LIST())) as {
+            data: BookingI[];
+            pagination?: { count?: number };
+          };
+          const { data: response = [], pagination } = result;
+          resolve({
+            data: response,
+            count: pagination?.count ?? response.length,
+          });
+        } catch (error) {
+          console.error("BookingsService getBookings error", error);
+          reject(error);
+        }
+      },
+    ),
 
   getBookingDetails: async (bookingId: BookingI["id"]) =>
     new Promise<BookingI>(async (resolve, reject) => {
@@ -82,43 +79,6 @@ export const BookingsService = {
         resolve(true);
       } catch (error) {
         console.error("BookingsService cancelBooking error", error);
-        reject(error);
-      }
-    }),
-
-  updateBookingPaymentStatus: async (
-    bookingId: BookingI["id"],
-    paymentData: UpdateBookingPaymentRequest,
-  ) =>
-    new Promise<BookingI>(async (resolve, reject) => {
-      try {
-        if (!bookingId) reject();
-        const { data: result } = (await ApiService.put(
-          apiBookings.UPDATE_PAYMENT(bookingId),
-          paymentData,
-        )) as { data: BookingI };
-        resolve(result);
-      } catch (error) {
-        console.error(
-          "BookingsService updateBookingPaymentStatus error",
-          error,
-        );
-        reject(error);
-      }
-    }),
-
-  updateBooking: async (booking: BookingI) =>
-    new Promise<BookingI>(async (resolve, reject) => {
-      try {
-        if (!booking.id) reject();
-        const { data: result } = (await ApiService.put(
-          apiBookings.DETAILS(booking.id),
-          booking,
-        )) as { data: BookingI };
-        useBookingsStore.getState().getBookingDetails(booking.id);
-        resolve(result);
-      } catch (error) {
-        console.error("BookingsService updateBookingConsumer error", error);
         reject(error);
       }
     }),

@@ -48,7 +48,7 @@ const ServiceCard = (props: ServiceCardI) => {
   const { user } = useUserStore();
   const role = useMemo(
     () => user?.user_metadata?.role,
-    [user?.user_metadata?.role]
+    [user?.user_metadata?.role],
   );
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
   const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
@@ -56,7 +56,7 @@ const ServiceCard = (props: ServiceCardI) => {
   const goToBooking = () => {
     if (service?.id && service?.vigil_id) {
       router.push(
-        `${Routes.createBooking.url}?serviceId=${service.id}&vigilId=${service.vigil_id}`
+        `${Routes.createBooking.url}?serviceId=${service.id}&vigilId=${service.vigil_id}`,
       );
     }
   };
@@ -68,12 +68,13 @@ const ServiceCard = (props: ServiceCardI) => {
     );
   }, [vigilDetails?.averageRating, vigilDetails?.reviews]);
 
-  const serviceCatalog: ServiceCatalogItem = useMemo(
+  const serviceCatalog: ServiceCatalogItem | undefined = useMemo(
     // eslint-disable-next-line react-hooks/preserve-manual-memoization
     () =>
-      service?.info?.catalog_id &&
-      ServicesService.getServiceCatalogById(service.info.catalog_id),
-    [service?.info?.catalog_id]
+      service?.info?.catalog_id
+        ? ServicesService.getServiceCatalogById(service.info.catalog_id)
+        : undefined,
+    [service?.info?.catalog_id],
   );
 
   return (
@@ -138,7 +139,7 @@ const ServiceCard = (props: ServiceCardI) => {
                     <span className="capitalize">
                       {dateDisplay(
                         service.vigil?.created_at,
-                        "monthYearLiteral"
+                        "monthYearLiteral",
                       )}
                     </span>
                   </span>
@@ -182,9 +183,9 @@ const ServiceCard = (props: ServiceCardI) => {
                 {service.info?.extras?.length ? (
                   <p className="font-normal my-2">
                     Extra attivi: &nbsp;
-                    {serviceCatalog.extra
-                      .filter((extra) =>
-                        service.info?.extras?.includes(extra.id)
+                    {serviceCatalog?.extra
+                      ?.filter((extra) =>
+                        service.info?.extras?.includes(extra.id),
                       )
                       .map((extra) => `${extra.name} €${extra.fixed_price}`)
                       .join(", ")}
@@ -219,8 +220,10 @@ const ServiceCard = (props: ServiceCardI) => {
             <span className="text-consumer-blue font-bold">
               {amountDisplay(
                 service?.unit_price +
-                  (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
-                service?.currency
+                  (role === RolesEnum.CONSUMER
+                    ? (serviceCatalog?.fee ?? 0)
+                    : 0),
+                service?.currency,
               )}
             </span>
             <span>/</span>
@@ -240,8 +243,8 @@ const ServiceCard = (props: ServiceCardI) => {
             />
           )} */}
           {onToggleStatus &&
-            (!serviceCatalog.professional ||
-              (serviceCatalog.professional && service.active)) && (
+            (!serviceCatalog?.professional ||
+              (serviceCatalog?.professional && service.active)) && (
               <Button
                 small
                 label={service.active ? "Disattiva" : "Attiva"}
@@ -250,15 +253,17 @@ const ServiceCard = (props: ServiceCardI) => {
                 action={onToggleStatus}
               />
             )}
-          {onToggleStatus && serviceCatalog.professional && !service.active && (
-            <div className="flex gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-amber-700 w-full items-center mb-2">
-              <ExclamationTriangleIcon className="size-4 min-w-4 text-amber-800" />
-              <div className="text-sm">
-                I servizi professionali verrano attivati solo dopo la verifica
-                della documentazione da parte del nostro team.
+          {onToggleStatus &&
+            serviceCatalog?.professional &&
+            !service.active && (
+              <div className="flex gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-amber-700 w-full items-center mb-2">
+                <ExclamationTriangleIcon className="size-4 min-w-4 text-amber-800" />
+                <div className="text-sm">
+                  I servizi professionali verrano attivati solo dopo la verifica
+                  della documentazione da parte del nostro team.
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {onDelete && (
             <Button
               label="Rimuovi"
@@ -308,7 +313,7 @@ const ServiceCard = (props: ServiceCardI) => {
             href={replaceDynamicUrl(
               Routes.vigilDetails.url,
               ":vigilId",
-              service.vigil_id
+              service.vigil_id,
             )}
             icon={<EyeIcon className="size-6" />}
             customClass="!p-3"

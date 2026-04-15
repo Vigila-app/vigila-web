@@ -1,14 +1,17 @@
 /* eslint-disable @next/next/no-head-element */
 /* eslint-disable @next/next/no-sync-scripts */
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+});
 
 const SkipContentComponent = dynamic(
   () => import("@/components/@core/skipContent/skipContent.component"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 
 type HtmlDocumentI = {
@@ -29,7 +32,7 @@ const HtmlDocument = (props: HtmlDocumentI) => {
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
-          <link rel="manifest" href="/manifest.json"/>
+          <link rel="manifest" href="/manifest.json" />
           <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -43,7 +46,7 @@ const HtmlDocument = (props: HtmlDocumentI) => {
           ></script>
           {otherHead}
         </head>
-        <body className={clsx(inter.className, "overflow-x-hidden")}>
+        <body className={clsx(poppins.className, "overflow-x-hidden")}>
           <SkipContentComponent />
           {header}
           <main id="MainContent" className="min-h-screen">

@@ -19,14 +19,16 @@ import {
 export const AvailableSlotsDemo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [slotsData, setSlotsData] = useState<AvailableSlotsResponseI | null>(null);
+  const [slotsData, setSlotsData] = useState<AvailableSlotsResponseI | null>(
+    null,
+  );
 
   // Form state
   const [formData, setFormData] = useState<AvailableSlotsRequestI>({
-    vigil_id: "demo-vigil-id", // In real scenario, this would be selected from a list
+    vigil_id: "", // In real scenario, this would be selected from a list
     start_date: formatDateToISO(new Date()),
     end_date: getDateRange(30).endDate, // 30 days from now
-    service_id: "demo-service-id", // In real scenario, this would be selected from a list
+    service_id: "", // In real scenario, this would be selected from a list
   });
 
   const handleFetchSlots = async (e: React.FormEvent) => {
@@ -34,21 +36,26 @@ export const AvailableSlotsDemo = () => {
     setLoading(true);
     setError(null);
     setSlotsData(null);
-    
+
     // Validate date range
     if (formData.end_date < formData.start_date) {
       setError("End date must be after or equal to start date");
       setLoading(false);
       return;
     }
-    
+
     try {
       const data = await CalendarService.getAvailableSlots(formData);
       setSlotsData(data);
     } catch (err: any) {
       // Provide helpful error messages for demo
-      if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("Authentication required. This is expected in demo mode - in production, you would be authenticated.");
+      if (
+        err.message?.includes("401") ||
+        err.message?.includes("Unauthorized")
+      ) {
+        setError(
+          "Authentication required. This is expected in demo mode - in production, you would be authenticated.",
+        );
       } else {
         setError(err.message || "Failed to fetch available slots");
       }
@@ -60,13 +67,18 @@ export const AvailableSlotsDemo = () => {
 
   // Group slots by date for better display - memoized for performance
   const groupedSlotsByDate = useMemo(() => {
-    return slotsData?.slots.reduce((acc, slot) => {
-      if (!acc[slot.date]) {
-        acc[slot.date] = [];
-      }
-      acc[slot.date].push(slot);
-      return acc;
-    }, {} as Record<string, TimeSlotI[]>) || {};
+    return (
+      slotsData?.slots.reduce(
+        (acc, slot) => {
+          if (!acc[slot.date]) {
+            acc[slot.date] = [];
+          }
+          acc[slot.date].push(slot);
+          return acc;
+        },
+        {} as Record<string, TimeSlotI[]>,
+      ) || {}
+    );
   }, [slotsData]);
 
   return (
@@ -84,9 +96,12 @@ export const AvailableSlotsDemo = () => {
         )}
 
         {/* Search Form */}
-        <form onSubmit={handleFetchSlots} className="space-y-4 mb-6 p-4 bg-gray-50 rounded">
+        <form
+          onSubmit={handleFetchSlots}
+          className="space-y-4 mb-6 p-4 bg-gray-50 rounded"
+        >
           <h3 className="text-lg font-semibold">Search Available Slots</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -192,7 +207,10 @@ export const AvailableSlotsDemo = () => {
             ) : (
               <div className="space-y-4">
                 {Object.entries(groupedSlotsByDate).map(([date, slots]) => (
-                  <div key={date} className="border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={date}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
                     <h4 className="font-semibold text-lg mb-2">
                       {new Date(date).toLocaleDateString("en-US", {
                         weekday: "long",
@@ -215,7 +233,9 @@ export const AvailableSlotsDemo = () => {
                             {formatTimeRange(slot.start_time, slot.end_time)}
                           </div>
                           {slot.duration_hours > 1 && (
-                            <div className="text-xs">({slot.duration_hours}h)</div>
+                            <div className="text-xs">
+                              ({slot.duration_hours}h)
+                            </div>
                           )}
                           <div className="text-xs mt-1">
                             {slot.available ? "✓ Available" : "✗ Unavailable"}
@@ -232,7 +252,8 @@ export const AvailableSlotsDemo = () => {
 
         {!slotsData && !loading && (
           <p className="text-gray-500 text-center py-8">
-            Enter search criteria and click "Search Available Slots" to see results
+            Enter search criteria and click &quot;Search Available Slots&quot;
+            to see results
           </p>
         )}
       </div>

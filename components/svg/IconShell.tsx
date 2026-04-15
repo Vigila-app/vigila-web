@@ -1,11 +1,10 @@
-// src/components/icons/IconShell.tsx
-import React from "react";
+import type { SVGProps } from "react";
 
 export const IconShell = ({
   children,
   viewBox = "0 0 24 24",
   ...props
-}: React.SVGProps<SVGSVGElement>) => {
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

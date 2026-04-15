@@ -34,22 +34,23 @@ const TextArea = (props: TextAreaI) => {
           role === RolesEnum.CONSUMER && " text-consumer-blue",
           role === RolesEnum.VIGIL && " text-vigil-orange",
           error && "text-red-500",
-          disabled && "!bg-gray-100"
-        )}>
+          disabled && "!bg-gray-100",
+        )}
+      >
         {label}
-        {required && <>*</>}
       </span>
       <label
         htmlFor={name || label}
         className={clsx(
-          "relative block p-3 rounded-2xl border border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
+          "relative block p-3 rounded-2xl border text-balance border-gray-200 bg-white shadow-sm focus-within:border-gray focus-within:ring-1 focus-within:ring-gray-200",
           role === RolesEnum.CONSUMER &&
             "text-gray-700 placeholder:text-consumer-orange  border-consumer-blue focus-within:border-consumer-blue focus-within:ring-consumer-blue ",
           role === RolesEnum.VIGIL &&
             " text-gray-700 placeholder:text-vigil-orange focus-within:border-vigil-orange  focus-within:ring-vigil-orange border-vigil-orange",
           error && "border-red-500",
-          disabled && "!bg-gray-100 cursor-not-allowed"
-        )}>
+          disabled && "!bg-gray-100 cursor-not-allowed",
+        )}
+      >
         <textarea
           {...{
             ...props,
@@ -64,7 +65,7 @@ const TextArea = (props: TextAreaI) => {
             "w-full whitespace-pre-wrap  border-none rounded bg-transparent focus:border-transparent focus:outline-none focus:ring-0",
             disabled && "cursor-not-allowed",
             role === RolesEnum.CONSUMER && " border-consumer-blue",
-            role === RolesEnum.VIGIL && " border-vigil-orange"
+            role === RolesEnum.VIGIL && " border-vigil-orange",
           )}
           style={{ resize: resize ? "block" : "none" }}
         />
@@ -72,7 +73,8 @@ const TextArea = (props: TextAreaI) => {
         {error ? (
           <p
             role="alert"
-            className="absolute start-2.5 -bottom-5 text-sm text-red-500">
+            className="absolute start-2.5 -bottom-5 text-sm text-red-500"
+          >
             {FormUtils.getErrorByType(error)}
           </p>
         ) : null}

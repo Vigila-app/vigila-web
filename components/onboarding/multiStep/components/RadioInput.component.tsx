@@ -17,7 +17,8 @@ export const RadioInput = ({
           "block font-medium mb-2 text-center text-xl",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
-        )}>
+        )}
+      >
         {question.label}
       </label>
 
@@ -33,7 +34,7 @@ export const RadioInput = ({
             <div
               key={option.value}
               className={clsx(
-                "cursor-pointer p-2 w-full border-2 border-grey-200 rounded-3xl py-3 flex-1 min-w-[45%] ]",
+                "cursor-pointer p-2 w-full border-2 border-grey-200 rounded-3xl py-3 flex-1 min-w-28 ",
                 isLastOdd && "max-w-full flex-[0_0_100%]",
                 isChecked &&
                   role === RolesEnum.VIGIL &&
@@ -41,11 +42,13 @@ export const RadioInput = ({
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
                   "border-consumer-blue bg-consumer-light-blue text-consumer-blue",
-              )}>
+              )}
+            >
               <label
                 key={option.value}
                 htmlFor={option.label}
-                className="cursor-pointer flex flex-col items-center gap-2 w-full">
+                className="cursor-pointer flex flex-col items-center text-center gap-2 w-full"
+              >
                 {option.icon && (
                   <option.icon
                     className={`text-gray-400 max-w-1/15 ${

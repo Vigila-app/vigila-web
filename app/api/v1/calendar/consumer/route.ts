@@ -10,7 +10,6 @@ import {
   CalendarEventI,
 } from "@/src/types/calendar.types";
 import { NextRequest, NextResponse } from "next/server";
-import { BookingI } from "@/src/types/booking.types";
 
 /**
  * GET /api/calendar/consumer
@@ -61,11 +60,12 @@ export async function GET(req: NextRequest) {
       )
       .eq("consumer_id", userObject.id);
 
-    if (from) bookingsQuery = bookingsQuery.gte("startDate", `${from}T00:00:00`);
+    if (from)
+      bookingsQuery = bookingsQuery.gte("startDate", `${from}T00:00:00`);
     if (to) {
       const toDate = new Date(to);
       toDate.setDate(toDate.getDate() + 1);
-      const toISO = toDate.toISOString().split('T')[0];
+      const toISO = toDate.toISOString().split("T")[0];
       bookingsQuery = bookingsQuery.lt("startDate", `${toISO}T00:00:00`);
     }
 

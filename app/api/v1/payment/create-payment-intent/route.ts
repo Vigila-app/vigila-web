@@ -8,6 +8,7 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
@@ -18,11 +19,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { bookingId, amount, currency = "eur" } = body;
 
-    console.log(`API POST payment/create-payment-intent`, { bookingId, amount, currency });
+    console.log(`API POST payment/create-payment-intent`, {
+      bookingId,
+      amount,
+      currency,
+    });
 
     // Verifica autenticazione utente
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    ) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.PAYMENT_INTENT_UNAUTHORIZED.code,
         success: false,
@@ -70,7 +78,8 @@ export async function POST(req: NextRequest) {
       },
       metadata: {
         bookingId,
-        userId: userObject.id,
+        user_id: userObject.id,
+        transaction_type: TRANSACTION_TYPE.BOOKING_PAYMENT,
       },
       description: `Pagamento per prenotazione ${bookingId}`,
     });
@@ -90,7 +99,7 @@ export async function POST(req: NextRequest) {
         clientSecret: paymentIntent.client_secret,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error creating payment intent:", error);

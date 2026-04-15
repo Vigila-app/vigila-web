@@ -1,7 +1,7 @@
-import { Checkbox } from "@/components/form"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
-import clsx from "clsx"
+import { Checkbox } from "@/components/form";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
+import clsx from "clsx";
 
 export const CheckboxInput = ({
   question,
@@ -18,10 +18,8 @@ export const CheckboxInput = ({
       onChange={(checked) => onChange(checked)}
       error={error}
     />
-  )
-}
-
-
+  );
+};
 
 export const MulticheckboxInput = ({
   question,
@@ -29,24 +27,24 @@ export const MulticheckboxInput = ({
   role,
   error,
   value,
-  
 }: QuestionRendererProps) => {
   const currentValues = Array.isArray(value) ? value : [];
   const noneValue = question.options?.find(
     (option) => String(option.value).toLowerCase() === "none",
   )?.value;
-  const reachedMax = question.max && currentValues.length >= question.max;
+  const reachedMax =
+    question.max && currentValues.length >= Number(question.max);
   return (
     <div>
       <label
         className={clsx(
-          "block font-medium mb-2",
+          "block font-semibold mb-2 text-center ",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
         )}
       >
         {question.label}
-        {question.validation?.required }
+        {question.validation?.required}
       </label>
       {question.description && (
         <p className="text-sm text-gray-600 mb-3">{question.description}</p>
@@ -67,25 +65,25 @@ export const MulticheckboxInput = ({
             <div
               key={option.value}
               className={clsx(
-                option.icon ? "border-3 rounded-xl" : "border-1 rounded-3xl",
-                "p-2 border-grey-200",
+                option.icon ? "border-2 " : "border-1 ",
+                "p-2 border-grey-200 rounded-3xl",
                 isChecked &&
                   role === RolesEnum.VIGIL &&
                   "border-vigil-orange bg-vigil-light-orange",
                 isChecked &&
                   role === RolesEnum.CONSUMER &&
                   "border-consumer-blue bg-consumer-light-blue text-consumer-blue",
-                isDisabled && "opacity-50 pointer-events-none"
+                isDisabled && "opacity-50 pointer-events-none",
               )}
             >
               <label
                 key={option.value}
                 htmlFor={option.label}
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-2 text-center text-balance font-normal text-lg"
               >
                 {option.icon && (
                   <option.icon
-                    className={`text-gray-400 max-w-1/15 ${
+                    className={`text-gray-400 w-7 h-7 ${
                       isChecked
                         ? clsx(
                             role === RolesEnum.VIGIL && "text-vigil-orange",
@@ -95,7 +93,11 @@ export const MulticheckboxInput = ({
                     }`}
                   />
                 )}
-                {option.label}
+                <span className="text-xl text-center font-normal">
+                  {" "}
+                  {option.label}
+                </span>
+
                 <div className="hidden">
                   <Checkbox
                     id={option.label}
@@ -141,9 +143,9 @@ export const MulticheckboxInput = ({
           );
         })}
       </div>
-      {typeof question.max === 'number' && (
-        <p className="text-xs text-gray-500 mt-1">{`Max selezionabili: ${question.max}`}</p>
+      {typeof question.max === "number" && (
+        <p className="text-xs text-gray-500 mt-2">{`Max selezionabili: ${question.max}`}</p>
       )}
     </div>
   );
-}
+};

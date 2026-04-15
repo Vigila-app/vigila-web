@@ -1,167 +1,297 @@
-import { ComponentType, useEffect, useState } from "react"
-import { SingleService } from "./SingleService"
-import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline"
-import Caffe from "@/components/svg/Caffe"
-import Vasca from "@/components/svg/Vasca"
-import { Car } from "@/components/svg"
+import { ComponentType, useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { SingleService } from "./SingleService";
+import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import Caffe from "@/components/svg/Caffe";
+import Vasca from "@/components/svg/Vasca";
+import { Car } from "@/components/svg";
+import { CurrentDay } from "./CurrentDay";
+import { SelectedDays } from "./SelectedDays";
+export const dayNames = [
+  "Domenica",
+  "Lunedì",
+  "Martedì",
+  "Mercoledì",
+  "Giovedì",
+  "Venerdì",
+  "Sabato",
+];
 
-export const Services = ({
-  answers,
-  setAnswers,
-}: {
-  answers?: Record<string, any>
-  setAnswers?: (
-    updater:
-      | Record<string, any>
-      | ((prev: Record<string, any>) => Record<string, any>),
-  ) => void
-}) => {
-  console.log(answers)
-  const ServiceIcons = [
-    () => <span className="inline-block w-5 h-5 bg-blue-200 rounded-full" />, // Replace with real icons
-    () => <span className="inline-block w-5 h-5 bg-green-200 rounded-full" />,
-    () => <span className="inline-block w-5 h-5 bg-yellow-200 rounded-full" />,
-    () => <span className="inline-block w-5 h-5 bg-pink-200 rounded-full" />,
-  ]
+const SERVICES = [
+  {
+    name: "Compagnia e conversazione",
+    desc: "Presenza, dialogo e supporto emotivo",
+    Icon: Caffe as ComponentType<{ className?: string }>,
+    price: 12,
+  },
+  {
+    name: "Assistenza leggera",
+    desc: "Supervisione, promemoria farmaci, piccole commissioni",
+    Icon: HeartIcon as ComponentType<{ className?: string }>,
+    price: 14,
+  },
+  {
+    name: "Assistenza alla persona",
+    desc: "Mobiiltà, pasti, vestizione",
+    Icon: UserGroupIcon as ComponentType<{ className?: string }>,
+    price: 16,
+  },
+  {
+    name: "Igiene personale",
+    desc: "Bagno, cambio, cura personale",
+    Icon: Vasca as ComponentType<{ className?: string }>,
+    price: 18,
+  },
+];
 
-  const SERVICES = [
-    {
-      name: "Compagnia e conversazione",
-      desc: "Presenza, dialogo e supporto emotivo",
-      Icon: Caffe as ComponentType<{ className?: string | undefined }>,
-      price: 12,
-    },
-    {
-      name: "Assistenza leggera",
-      desc: "Supervisione, promemoria farmaci, piccole commissioni",
-      Icon: HeartIcon as ComponentType<{ className?: string | undefined }>,
-      price: 14,
-    },
-    {
-      name: "Assistenza alla persona",
-      desc: "Mobiiltà, pasti, vestizione",
-      Icon: UserGroupIcon as ComponentType<{ className?: string | undefined }>,
-      price: 16,
-    },
-    {
-      name: "Igiene personale",
-      desc: "Bagno, cambio, cura personale",
-      Icon: Vasca as ComponentType<{ className?: string | undefined }>,
-      price: 18,
-    },
-  ]
-  const MANSIONI_LABELS = [
+const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
+  "Compagnia e conversazione": [
     "Conversazione e ascolto",
     "Lettura libri / giornali",
     "Giochi di società / carte",
     "Guardare TV insieme",
     "Passeggiata leggera",
-  ]
-  // Fetch availability rules from API using vigil_id from answers
-  const [rules, setRules] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  ],
+  "Assistenza leggera": [
+    "Promemoria farmaci",
+    "Spesa e commissioni",
+    "Preparazione pasti semplici",
+    "Accompagnamento Visite",
+    "Rassetto e pulizia leggera",
+  ],
+  "Assistenza alla persona": [
+    "Aiuto mobilità",
+    "Vestizione / svestizione",
+    "Somministrazione pasti",
+    "Trasferimento letto / poltrona",
+  ],
+  "Igiene personale": [
+    "Bagno completo",
+    "Spugnature a letto",
+    "Cambio pannolone",
+    "Igiene orale",
+    "Cura capelli e barba",
+  ],
+};
 
-  const dayNames = [
-    "Domenica",
-    "Lunedì",
-    "Martedì",
-    "Mercoledì",
-    "Giovedì",
-    "Venerdì",
-    "Sabato",
-  ]
+const getVisibleMansioni = (service: string | null): string[] =>
+  service ? SERVICE_MANSIONI_MAP[service] || [] : [];
 
-  // derive unique ordered weekdays from answers.availabilities
-  const selectedDays: number[] = Array.from(
-    new Set((answers?.availabilities || []).map((r: any) => Number(r.weekday))),
-  )
+const normalizeMansioniByService = (
+  services: string[],
+  saved: Record<string, any> | undefined,
+): Record<string, string[]> => {
+  const savedByService: Record<string, string[]> =
+    saved?.mansioniByService && typeof saved.mansioniByService === "object"
+      ? saved.mansioniByService
+      : {};
 
-  const [currentDayIdx, setCurrentDayIdx] = useState(0)
+  const normalized: Record<string, string[]> = {};
+  services.forEach((service) => {
+    const allowed = new Set(SERVICE_MANSIONI_MAP[service] || []);
+    const fromByService = Array.isArray(savedByService[service])
+      ? savedByService[service]
+      : [];
+    const fromFlat = Array.isArray(saved?.mansioni)
+      ? saved.mansioni.filter((m: string) => allowed.has(m))
+      : [];
+    normalized[service] = Array.from(new Set([...fromByService, ...fromFlat]));
+  });
+
+  return normalized;
+};
+
+export const Services = ({
+  answers,
+  setAnswers,
+  role,
+}: {
+  answers?: Record<string, any>;
+  setAnswers?: (
+    updater:
+      | Record<string, any>
+      | ((prev: Record<string, any>) => Record<string, any>),
+  ) => void;
+  role?: RolesEnum;
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // derive unique ordered weekdays from answers.availabilityRules
+  const selectedDays = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (answers?.availabilityRules || []).map((r: any) => Number(r.weekday)),
+        ),
+      ),
+    [answers?.availabilityRules],
+  ) as number[];
+
+  const [currentDayIdx, setCurrentDayIdx] = useState(0);
 
   useEffect(() => {
     // reset to first day when availabilities change
-    setCurrentDayIdx(0)
-  }, [selectedDays.length])
+
+    setCurrentDayIdx(0);
+  }, [selectedDays.length]);
 
   // per-day local selections
-  const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [selectedMansioni, setSelectedMansioni] = useState<string[]>([])
-  const [car, setCar] = useState(false)
-  const [notes, setNotes] = useState("")
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [activeService, setActiveService] = useState<string | null>(null);
+  const [selectedMansioniByService, setSelectedMansioniByService] = useState<
+    Record<string, string[]>
+  >({});
+  const [car, setCar] = useState(false);
+  const [notes, setNotes] = useState("");
+
+  const colorClasses = useMemo(() => {
+    const vigil = {
+      bg: "bg-vigil-orange",
+      bgLight: "bg-vigil-light-orange",
+      text: "text-vigil-orange",
+      border: "border-vigil-orange",
+      hoverBorder: "hover:border-vigil-light-orange",
+      hoverText: "hover:text-vigil-orange",
+    };
+    const consumer = {
+      bg: "bg-consumer-blue",
+      bgLight: "bg-consumer-light-blue",
+      text: "text-consumer-blue",
+      border: "border-consumer-light-blue",
+      hoverBorder: "hover:border-consumer-light-blue",
+      hoverText: "hover:text-consumer-blue",
+    };
+    return role === RolesEnum.CONSUMER ? consumer : vigil;
+  }, [role]);
 
   // load per-day values when current day changes
   useEffect(() => {
-    const day = selectedDays[currentDayIdx]
-    const saved = answers?.services?.[day]
+    const day = selectedDays[currentDayIdx];
+    const saved = answers?.services?.[day];
     if (saved) {
-      setSelectedServices(Array.isArray(saved.services) ? saved.services : [])
-      setSelectedMansioni(Array.isArray(saved.mansioni) ? saved.mansioni : [])
-      setCar(!!saved.car)
-      setNotes(saved.notes || "")
+      const loadedServices = Array.isArray(saved.services)
+        ? saved.services
+        : [];
+      setSelectedServices(loadedServices);
+      setSelectedMansioniByService(
+        normalizeMansioniByService(loadedServices, saved),
+      );
+      setActiveService((prev) =>
+        loadedServices.includes(prev || "")
+          ? (prev as string)
+          : loadedServices[0] || null,
+      );
+      setCar(!!saved.car);
+      setNotes(saved.notes || "");
     } else {
-      setSelectedServices([])
-      setSelectedMansioni([])
-      setCar(false)
-      setNotes("")
+      setSelectedServices([]);
+      setActiveService(null);
+      setSelectedMansioniByService({});
+      setCar(false);
+      setNotes("");
     }
-  }, [currentDayIdx, selectedDays.join("-")])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDayIdx, selectedDays.join("-")]);
 
   if (loading)
     return (
       <div className="text-zinc-500 text-sm">Caricamento disponibilità…</div>
-    )
-  if (error) return <div className="text-red-500 text-sm">{error}</div>
+    );
+  if (error) return <div className="text-red-500 text-sm">{error}</div>;
+
+  const handleServiceToggle = (serviceName: string, next: boolean) => {
+    setSelectedServices((prev) => {
+      if (next) {
+        const nextServices = Array.from(new Set([...prev, serviceName]));
+        setActiveService(serviceName);
+        return nextServices;
+      }
+      const remaining = prev.filter((s) => s !== serviceName);
+      if (activeService === serviceName) {
+        setActiveService(remaining[0] || null);
+      }
+      return remaining;
+    });
+  };
+
+  const toggleMansione = (serviceName: string, label: string) => {
+    if (!serviceName) return;
+    setSelectedMansioniByService((prev) => {
+      const existing = prev[serviceName] || [];
+      const nextMansioni = existing.includes(label)
+        ? existing.filter((p) => p !== label)
+        : [...existing, label];
+      return { ...prev, [serviceName]: nextMansioni };
+    });
+  };
+
+  const saveCurrentDaySelections = () => {
+    const day = selectedDays[currentDayIdx];
+    if (!setAnswers) return;
+
+    setAnswers((prev: Record<string, any>) => {
+      const next = { ...prev };
+      next.services = { ...next.services };
+
+      const mansioniAll = Array.from(
+        new Set(
+          selectedServices.flatMap(
+            (service) => selectedMansioniByService[service] || [],
+          ),
+        ),
+      );
+
+      next.services[day] = {
+        weekday: Number(day),
+        services: selectedServices,
+        mansioni: mansioniAll,
+        mansioniByService: selectedMansioniByService,
+        car: !!car,
+        notes: notes || "",
+      };
+      return next;
+    });
+  };
+
+  const loadDaySelections = (saved: Record<string, any> | undefined) => {
+    const nextServices = Array.isArray(saved?.services) ? saved.services : [];
+    setSelectedServices(nextServices);
+    setSelectedMansioniByService(
+      normalizeMansioniByService(nextServices, saved),
+    );
+    setActiveService(nextServices[0] || null);
+    setCar(!!saved?.car);
+    setNotes(saved?.notes || "");
+  };
+
+  const bookingType = answers?.["booking-type"];
+  const isSingleDate = bookingType === "occasional" || bookingType === "trial";
 
   return (
     <div className="bg-zinc-200 p-4">
-      <div className="bg-white rounded-full mb-4">
-        <div className="flex gap-2 flex-wrap p-3">
-          {selectedDays.map((day, idx) => {
-            const isActive = idx === currentDayIdx
-            const dayServices = answers?.services?.[day]
-            const hasEdited = !!dayServices
-            return (
-              <div key={"rule_" + day} className="flex items-center">
-                <button
-                  onClick={() => setCurrentDayIdx(idx)}
-                  className={
-                    "font-bold text-sm px-4 py-2 rounded-full " +
-                    (isActive || hasEdited
-                      ? "text-white bg-vigil-orange"
-                      : "text-zinc-700 bg-white border")
-                  }
-                >
-                  {dayNames[Number(day)]}
-                </button>
-              </div>
-            )
-          })}
+      {!isSingleDate && (
+        <div className="bg-white rounded-full mb-4">
+          <div className="flex gap-2 flex-wrap p-3">
+            <SelectedDays
+              answers={answers}
+              selectedDays={selectedDays}
+              currentDayIdx={currentDayIdx}
+              setCurrentDayIdx={setCurrentDayIdx}
+              classes={colorClasses}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Service checkboxes with icons */}
       <div className="bg-white p-4 rounded-2xl">
-        {selectedDays.length === 0 ? (
-          <div className="text-sm text-zinc-500">Nessun giorno selezionato</div>
-        ) : (
-          <>
-            <h2>{dayNames[Number(selectedDays[currentDayIdx])]}</h2>
-            <span className="ml-2 text-zinc-600 text-sm">
-              {(answers?.availabilities || [])
-                .filter(
-                  (r: any) =>
-                    Number(r.weekday) === Number(selectedDays[currentDayIdx]),
-                )
-                .map(
-                  (r: any) =>
-                    `${r.start_time.slice(0, 5)} - ${r.end_time.slice(0, 5)}`,
-                )
-                .join(", ")}
-            </span>
-          </>
-        )}
-        {/* TODO: add how many hours is each slot in this format (2h) */}
+        <CurrentDay
+          answers={answers}
+          selectedDays={selectedDays}
+          currentDayIdx={currentDayIdx}
+        />
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
           <div className="grid grid-cols-2 gap-3">
@@ -170,12 +300,9 @@ export const Services = ({
                 key={srv.name}
                 {...srv}
                 checked={selectedServices.includes(srv.name)}
-                onChange={(next: boolean) => {
-                  setSelectedServices((prev) => {
-                    if (next) return Array.from(new Set([...prev, srv.name]))
-                    return prev.filter((s) => s !== srv.name)
-                  })
-                }}
+                onChange={(next: boolean) =>
+                  handleServiceToggle(srv.name, next)
+                }
               />
             ))}
           </div>
@@ -184,47 +311,54 @@ export const Services = ({
         {/* Mansioni checkboxes without icons */}
         <div className="mb-4">
           <div className="font-semibold mb-2">Mansioni</div>
-          <div className="flex flex-col gap-2">
-            {MANSIONI_LABELS.map((label) => {
-              const isChecked = selectedMansioni.includes(label)
-              return (
-                <label
-                  key={label}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    setSelectedMansioni((prev) =>
-                      prev.includes(label)
-                        ? prev.filter((p) => p !== label)
-                        : [...prev, label],
-                    )
-                  }}
-                  className={`cursor-pointer w-full py-3 text-center rounded-full border ${
-                    isChecked
-                      ? "border-vigil-orange bg-vigil-light-orange"
-                      : "border-zinc-200 bg-white"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    readOnly
-                    className="hidden"
-                  />
-                  <span>{label}</span>
-                </label>
-              )
-            })}
-          </div>
+          {selectedServices.length === 0 ? (
+            <div className="text-sm text-zinc-500">
+              Seleziona almeno un servizio per visualizzare le mansioni
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {getVisibleMansioni(activeService).map((label) => {
+                const currentService = activeService || "";
+                const serviceMansioni =
+                  selectedMansioniByService[currentService] || [];
+                const isChecked = serviceMansioni.includes(label);
+                return (
+                  <label
+                    key={label}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      toggleMansione(currentService, label);
+                    }}
+                    className={clsx(
+                      "cursor-pointer w-full py-3 text-center rounded-full border-zinc-200 border-1",
+                      isChecked
+                        ? clsx(colorClasses.border, colorClasses.bgLight)
+                        : "border-zinc-200 bg-white",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      readOnly
+                      className="hidden"
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Accompagnamento in auto */}
         <div className="mb-4">
           <label
-            className={`block cursor-pointer w-full p-3 rounded-2xl border ${
+            className={clsx(
+              "block cursor-pointer w-full p-3 rounded-2xl",
               car
-                ? "border-vigil-orange bg-vigil-light-orange"
-                : "border-zinc-200 bg-white"
-            }`}
+                ? clsx(colorClasses.border, colorClasses.bgLight)
+                : "border-zinc-200 bg-white",
+            )}
           >
             <input
               type="checkbox"
@@ -233,13 +367,13 @@ export const Services = ({
               className="hidden"
             />
             <h3 className="flex items-center gap-2 w-full font-bold text-lg">
-              <Car className="w-5 h-5 text-vigil-orange " />
+              <Car className={clsx("w-5 h-5", colorClasses.text)} />
               <span>Accompagnamento in auto</span>
             </h3>
             <p className="text-md text-zinc-400">
-              L'operatore accompagna con la sua propria auto
+              L&apos;operatore accompagna con la sua propria auto
             </p>
-            <p className="text-xs text-vigil-orange">
+            <p className={clsx("text-xs", colorClasses.text)}>
               +5 EUR rimborso carburante per visita
             </p>
           </label>
@@ -259,59 +393,30 @@ export const Services = ({
 
         {/* Navigation */}
         <div className="flex justify-between mt-6">
-          <div />
           <div className="flex gap-2">
             <button
               type="button"
               onClick={async () => {
-                const day = selectedDays[currentDayIdx]
-                // Save current day selections into answers
-                if (setAnswers) {
-                  setAnswers((prev: Record<string, any>) => {
-                    const next = { ...(prev || {}) }
-                    next.services = { ...(next.services || {}) }
-                    // Save actual selections for the day
-                    next.services[day] = {
-                      weekday: Number(day),
-                      services: selectedServices,
-                      mansioni: selectedMansioni,
-                      car: !!car,
-                      notes: notes || "",
-                    }
-                    return next
-                  })
-
-                  // TODO: POST to API to save services for this day
-                  // const payload = { services: selectedServices, mansioni: selectedMansioni, car, notes }
-                  // await ApiService.post(`/api/vigil/availability-rules/${day}/services`, payload)
-                }
+                saveCurrentDaySelections();
 
                 // move to next day or finalize
                 if (currentDayIdx < selectedDays.length - 1) {
-                  const nextIdx = currentDayIdx + 1
-                  const nextDay = selectedDays[nextIdx]
+                  const nextIdx = currentDayIdx + 1;
+                  const nextDay = selectedDays[nextIdx];
                   // load saved values for next day (if any) so UI reflects them immediately
-                  const savedNext = answers?.services?.[nextDay]
-                  setSelectedServices(
-                    Array.isArray(savedNext?.services)
-                      ? savedNext.services
-                      : [],
-                  )
-                  setSelectedMansioni(
-                    Array.isArray(savedNext?.mansioni)
-                      ? savedNext.mansioni
-                      : [],
-                  )
-                  setCar(!!savedNext?.car)
-                  setNotes(savedNext?.notes || "")
-                  setCurrentDayIdx(nextIdx)
+                  const savedNext = answers?.services?.[nextDay];
+                  loadDaySelections(savedNext);
+                  setCurrentDayIdx(nextIdx);
                 } else {
                   // last day: finalize / salva ricorrenza
-                  // TODO: trigger final save/API call for whole recurrence
-                  console.log("All days filled, salva ricorrenza")
+                  console.log("All days filled, salva ricorrenza");
+                  console.log(answers);
                 }
               }}
-              className="px-4 py-2 rounded bg-rose-500 text-white disabled:opacity-50"
+              className={clsx(
+                "px-4 py-2 rounded text-white disabled:opacity-50",
+                colorClasses.bg,
+              )}
             >
               {currentDayIdx === selectedDays.length - 1
                 ? "Salva ricorrenza"
@@ -321,5 +426,5 @@ export const Services = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

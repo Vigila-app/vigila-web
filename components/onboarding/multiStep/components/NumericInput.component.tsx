@@ -9,6 +9,7 @@ export const NumericInput = ({
   value,
 }: QuestionRendererProps) => (
   <Input
+    {...question}
     label={question.label}
     placeholder={question.placeholder}
     value={value || ""}

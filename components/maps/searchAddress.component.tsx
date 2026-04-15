@@ -55,7 +55,7 @@ const SearchAddress = (props: {
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
     "",
     debounce,
-    "searchAddress"
+    "searchAddress",
   );
 
   const { currentLocation } = useCurrentLocation({
@@ -94,7 +94,7 @@ const SearchAddress = (props: {
       throw new Error(
         `Error validating address: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setIsLoading(false);
@@ -144,7 +144,7 @@ const SearchAddress = (props: {
         setIsLoading(true);
         const results = await MapsService.autocompleteAddress(
           debouncedSearchTerm,
-          addressTypes
+          addressTypes,
         );
         setAutocompleteResults(results);
         if (results.length > 1) {
@@ -232,7 +232,7 @@ const SearchAddress = (props: {
         />
       </form>
       {!submitted && autocompleteResults?.length > 1 ? (
-        <div className="absolute left-1/2 -translate-x-1/2 top-12 w-[90%] bg-white p-2 border border-gray-200 shadow-sm rounded-2xl z-10 max-h-60 overflow-y-auto">
+        <div className="absolute left-1/2 -translate-x-1/2 top-18 w-[90%] bg-white p-2 border border-gray-200 shadow-sm rounded-2xl z-10 max-h-60 overflow-y-auto">
           <h6 className="text-black font-semibold mb-2">
             Seleziona un indirizzo
           </h6>
@@ -240,7 +240,8 @@ const SearchAddress = (props: {
             {autocompleteResults.map((result, index) => (
               <li
                 key={index}
-                className="bg-transparent hover:bg-gray-100 transition rounded">
+                className="bg-transparent hover:bg-gray-100 transition rounded"
+              >
                 <button
                   type="button"
                   onClick={() => {
@@ -251,7 +252,8 @@ const SearchAddress = (props: {
                     setSubmitted(true);
                     submit(result);
                   }}
-                  className="text-consumer-blue border-b-1 text-sm px-1 w-full">
+                  className="text-consumer-blue border-b-1 text-sm px-1 w-full"
+                >
                   {result.address
                     ? [
                         result.address.road,
@@ -270,7 +272,8 @@ const SearchAddress = (props: {
       ) : null}
       {error && (
         <div className="text-red-500">
-          {error.message || "Si è verificato un errore durante la ricerca dell'indirizzo. Per favore riprova."}
+          {error.message ||
+            "Si è verificato un errore durante la ricerca dell'indirizzo. Per favore riprova."}
         </div>
       )}
       {submitted && !autocompleteResults.length ? (
