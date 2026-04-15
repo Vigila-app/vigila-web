@@ -17,6 +17,8 @@ import { Input, Select, TextArea, Checkbox } from "@/components/form";
 import { Button, ButtonLink } from "@/components";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { AltchaService } from "@/src/services/altcha.service";
+import { useAppStore } from "@/src/store/app/app.store";
+import { ToastStatusEnum } from "@/src/enums/toast.enum";
 
 const SearchAddress = dynamic(
   () => import("@/components/maps/searchAddress.component"),
@@ -191,10 +193,7 @@ const LandingSearchSection = () => {
             </div>
           </div>
         ) : searchState === "not_found" ? (
-          <NotFoundSection
-            address={selectedAddress}
-            onReset={resetSearch}
-          />
+          <NotFoundSection address={selectedAddress} onReset={resetSearch} />
         ) : null}
       </div>
     </Section>
@@ -208,6 +207,7 @@ const NotFoundSection = ({
   address: AddressI | null;
   onReset: () => void;
 }) => {
+  const { showToast } = useAppStore();
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -240,9 +240,8 @@ const NotFoundSection = ({
       return;
     try {
       setIsLoading(true);
-      const { NoticeBoardService } = await import(
-        "@/src/services/notice-board.service"
-      );
+      const { NoticeBoardService } =
+        await import("@/src/services/notice-board.service");
       await NoticeBoardService.createNotice({
         name: form.name,
         email: form.email,
@@ -255,7 +254,10 @@ const NotFoundSection = ({
       setSubmitted(true);
     } catch {
       setIsLoading(false);
-      alert("Si è verificato un errore nell'invio dell'annuncio. Riprova.");
+      showToast({
+        message: "Si è verificato un errore nell'invio dell'annuncio. Riprova.",
+        type: ToastStatusEnum.ERROR,
+      });
     } finally {
       setIsLoading(false);
     }
