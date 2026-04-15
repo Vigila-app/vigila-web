@@ -133,6 +133,7 @@ export const Services = ({
 
   useEffect(() => {
     // reset to first day when availabilities change
+
     setCurrentDayIdx(0);
   }, [selectedDays.length]);
 
@@ -191,6 +192,7 @@ export const Services = ({
       setCar(false);
       setNotes("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDayIdx, selectedDays.join("-")]);
 
   if (loading)
@@ -265,8 +267,7 @@ export const Services = ({
   };
 
   const bookingType = answers?.["booking-type"];
-  const isSingleDate =
-    bookingType === "occasional" || bookingType === "trial";
+  const isSingleDate = bookingType === "occasional" || bookingType === "trial";
 
   return (
     <div className="bg-zinc-200 p-4">
@@ -370,7 +371,7 @@ export const Services = ({
               <span>Accompagnamento in auto</span>
             </h3>
             <p className="text-md text-zinc-400">
-              L'operatore accompagna con la sua propria auto
+              L&apos;operatore accompagna con la sua propria auto
             </p>
             <p className={clsx("text-xs", colorClasses.text)}>
               +5 EUR rimborso carburante per visita

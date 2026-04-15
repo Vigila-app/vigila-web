@@ -69,9 +69,7 @@ export const ServicesService = {
         reject(error);
       }
     }),
-  getActiveServices: (
-    vigil_id: ServiceI["vigil_id"],
-  ) =>
+  getActiveServices: (vigil_id: ServiceI["vigil_id"]) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
@@ -105,8 +103,10 @@ export const ServicesService = {
     return servicesCatalogData.find((service) => service.id === id);
   },
 
-  getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem[] => {
-    return servicesCatalogData.filter((service) => service.type === type);
+  getServicesByType: (
+    type: ServiceCatalogTypeEnum,
+  ): ServiceCatalogItem | undefined => {
+    return servicesCatalogData.find((service) => service.type === type);
   },
 
   searchServicesByTag: (tag: string): ServiceCatalogItem[] => {

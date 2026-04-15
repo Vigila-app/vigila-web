@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import Link from "next/link";
 import LoginPhoto from "@/components/svg/LoginPhoto";
+import { StorageUtils } from "@/src/utils/storage.utils";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -31,6 +32,7 @@ type LoginFormI = {
 
 const LoginComponent = (props: { title?: string; text?: string }) => {
   const { title, text } = props;
+  const [showPassword, setShowPassword] = useState(false);
   const { showLoader, hideLoader, showToast } = useAppStore();
   const router = useRouter();
   const { challenge, isVerified, onStateChange } = useAltcha();
@@ -43,9 +45,12 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
   } = useForm<LoginFormI>();
 
   const redirectHome = () => {
-    router.replace(Routes.home.url);
+    if (StorageUtils.getSessionValues("redirectAuthTo")) {
+      router.replace(StorageUtils.getSessionValues("redirectAuthTo") as string);
+    } else {
+      router.replace(Routes.home.url);
+    }
   };
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (formData: LoginFormI) => {
     if (isValid) {
@@ -143,7 +148,8 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
                 icon={
                   <button
                     onClick={() => setShowPassword(!showPassword)}
-                    type="button">
+                    type="button"
+                  >
                     <EyeIcon className="size-4 text-gray-500" />
                   </button>
                 }
@@ -153,7 +159,8 @@ const LoginComponent = (props: { title?: string; text?: string }) => {
           <div className="text-right my-2">
             <Link
               href={Routes.resetPassword.url}
-              className="text-consumer-blue text-xs">
+              className="text-consumer-blue text-xs"
+            >
               Password dimenticata?
             </Link>
           </div>

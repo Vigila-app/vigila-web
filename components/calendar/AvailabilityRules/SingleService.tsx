@@ -53,7 +53,13 @@ export const SingleService = ({
       )}
       onMouseDown={(e) => toggle(e)}
     >
-      <input type="radio" checked={selected} readOnly className="hidden" name="services" />
+      <input
+        type="radio"
+        checked={selected}
+        readOnly
+        className="hidden"
+        name="services"
+      />
       <Icon
         className={clsx("w-10", selected ? colorClasses.text : "text-zinc-400")}
       />

@@ -17,6 +17,7 @@ import {
   ExclamationTriangleIcon,
   CheckIcon,
 } from "@heroicons/react/24/outline";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
 type SelectedService = {
   active: boolean;
@@ -29,7 +30,7 @@ type SelectedService = {
   max_unit?: number;
   currency: CurrencyEnum;
   selectedExtras: string[];
-  type: string;
+  type: ServiceCatalogTypeEnum;
 };
 
 interface ServicesCatalogProps {
@@ -92,7 +93,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           catalog_id: service.catalogId,
           extras: service.selectedExtras,
         },
-        type: service.type,
+        type: service.type as ServiceCatalogTypeEnum,
       }),
     );
     onServicesChange(convertedServices as ServiceI[]);

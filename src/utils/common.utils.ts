@@ -204,6 +204,14 @@ export const formatBookingDate = (dateString: string): string => {
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
+export const toPascalCase = (text: string): string => {
+  return text
+    .replace(/(\w)(\w*)/g, (_, firstChar, rest) => 
+      firstChar.toUpperCase() + rest.toLowerCase()
+    )
+    .replace(/\s+/g, "");
+};
+
 export const capitalize = (text: string) =>
   text ? text[0].toUpperCase() + text.slice(1).toLowerCase() : text;
 

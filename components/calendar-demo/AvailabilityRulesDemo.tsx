@@ -52,6 +52,7 @@ export const AvailabilityRulesDemo = ({
     if (availabilityRules) {
       setRules(availabilityRules);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availabilityRules?.length]);
 
   const [activeDays, setActiveDays] = useState<Record<number, boolean>>(() => {

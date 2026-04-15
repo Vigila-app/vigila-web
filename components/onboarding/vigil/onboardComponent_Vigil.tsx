@@ -110,7 +110,6 @@ const VigilOnboardComponent = () => {
         ),
       );
 
-
       const servicesWithCaps = services.map((service) => ({
         ...service,
         postalCode: caps,

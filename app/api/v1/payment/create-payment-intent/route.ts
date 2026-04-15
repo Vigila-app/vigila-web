@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId);
-   
+
     return NextResponse.json(
       {
         code: ResponseCodesConstants.PAYMENT_INTENT_SUCCESS.code,

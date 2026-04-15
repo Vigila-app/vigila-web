@@ -424,6 +424,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "editBooking": {
+    "url": "/booking/edit",
+    "label": "Modifica Prenotazione",
+    "title": "Modifica Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "paymentBooking": {
     "url": "/booking/payment",
     "label": "Paga Prenotazione",
@@ -461,6 +474,13 @@
     "url": "/vigil/user/profile",
     "label": "Profilo",
     "title": "Profilo",
+    "private": true,
+    "roles": ["VIGIL"]
+  },
+  "noticeBoardVigil": {
+    "url": "/vigil/user/bacheca",
+    "label": "Bacheca annunci",
+    "title": "Bacheca annunci",
     "private": true,
     "roles": ["VIGIL"]
   },
