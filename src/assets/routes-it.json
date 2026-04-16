@@ -153,6 +153,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "matchingNoMatch": {
+    "url": "/matching/no-match",
+    "label": "Nessun vigil corrispondente trovato",
+    "title": "Nessun vigil corrispondente trovato",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "resetPassword": {
     "url": "/auth/reset-password",
     "label": "Reset password",

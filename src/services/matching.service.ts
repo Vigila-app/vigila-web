@@ -7,7 +7,7 @@ import { BookingTypeEnum } from "@/src/enums/booking.enums";
  * Build the MatchingRequestI payload expected by the server from the
  * answers object produced by the Availability flow.
  */
-function buildMatchingRequestFromAnswers(answers: Record<string, any>) {
+export function buildMatchingRequestFromAnswers(answers: Record<string, any>) {
   if (!answers) throw new Error("No answers provided to build matching request");
 
   const raw = answers;

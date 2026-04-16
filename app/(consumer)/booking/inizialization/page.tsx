@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { MatchingService, UserService } from "@/src/services";
+import { UserService } from "@/src/services";
 
 const AvailabilityFlow = dynamic(
   () => import("@/components/calendar/AvailabilityRules/AvailabilityFlow"),
@@ -16,16 +16,16 @@ const FirstBookingSelection = () => {
 
   const handleComplete = async (answers: Record<string, any>) => {
     try {
-      const user = await UserService.getUser();
-      if (!user?.id) return console.warn("No user id available for matching");
-
-      const resp = await MatchingService.match(user.id, {
-        role: "CONSUMER",
-        data: answers,
-      });
-      console.log("Matching response (from parent onComplete)", resp);
+      // Persist answers briefly and redirect to the loading page which will
+      // perform the matching request and show progress.
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("matching_answers", JSON.stringify(answers));
+      }
+      // use Routes constant so navigation respects app standards
+      const { Routes } = await import("@/src/routes");
+      router.push(Routes.matchingLoading?.url || "/matching/loading");
     } catch (err) {
-      console.error("Matching call failed in onComplete", err);
+      console.error("Failed to start matching flow", err);
     }
   };
 
