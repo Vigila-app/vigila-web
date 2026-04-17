@@ -52,16 +52,24 @@ export default function MatchingLoadingPage() {
         }
         console.log("Matching response (loading page)", resp);
 
-        // If no vigils found, persist response and redirect to the no-match page
+        // persist response for downstream pages
+        sessionStorage.setItem("matching_response", JSON.stringify(resp));
+
+        // If no vigils found, redirect to the no-match page
         if (resp && Array.isArray(resp.data) && resp.data.length === 0) {
-          sessionStorage.setItem("matching_response", JSON.stringify(resp));
           // keep the original answers available for the no-match page
           sessionStorage.setItem("matching_answers", JSON.stringify(answers));
           router.replace(Routes.matchingNoMatch?.url || "/matching/no-match");
           return;
         }
 
-        // TODO: navigate to success / failure pages when available.
+        // If we have matches, redirect to the success page
+        if (resp && Array.isArray(resp.data) && resp.data.length > 0) {
+          // ensure answers are also available
+          sessionStorage.setItem("matching_answers", JSON.stringify(answers));
+          router.replace(Routes.matchingSuccess?.url || "/matching/success");
+          return;
+        }
       } catch (err: any) {
         console.error("Matching call failed in loading page", err);
         if (mounted) setError(err?.message || String(err));
