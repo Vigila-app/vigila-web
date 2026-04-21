@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -14,8 +14,8 @@ import { Services } from "./Services";
 import { BookingTypeEnum } from "@/src/enums/booking.enums";
 import clsx from "clsx";
 import Button from "@/components/button/button";
-import { ApiService, AuthService, UserService } from "@/src/services";
-import { apiConsumer, apiVigil } from "@/src/constants/api.constants";
+import { ApiService, UserService } from "@/src/services";
+import { apiConsumer } from "@/src/constants/api.constants";
 
 export default function AvailabilityFlow({
   onComplete,
@@ -132,35 +132,38 @@ export default function AvailabilityFlow({
     initialStepId: config.initialStepId,
     onComplete: config.onComplete,
   } as any);
-  const [address, setAddress] = useState<any>(undefined);
-  const { handleSubmit, reset, getValues } = useForm({
-    defaultValues: { ...state.answers },
-  });
+  const { handleSubmit, reset, getValues } = useForm();
 
-  const getAddress = useCallback(async () => {
-    try {
-      const id = (await UserService.getUser())?.id;
-      if (!id) throw new Error("User is not logged in or id is not available");
-      const { data: details } = (await ApiService.get(
-        apiConsumer.DETAILS(id),
-      )) as {
-        data: any;
-      };
-      const addr = details?.address;
-      setAddress(addr);
-      // Preserve any current form values (so user input like date isn't overwritten)
-      const current = getValues();
-      reset({ ...(current || {}), address: addr });
-      // Keep the multi-step flow answers in sync using current values
-      setAnswers({ ...(current || {}), address: addr });
-    } catch (error) {
-      console.error(error);
-    }
-  }, [reset, setAnswers, getValues]);
+  // Keep the form in sync when answers change externally
+  useEffect(() => {
+    reset({ ...state.answers });
+  }, [reset, state.answers]);
 
   useEffect(() => {
-    getAddress();
-  }, [getAddress]);
+    const bootstrapAddress = async () => {
+      try {
+        const id = (await UserService.getUser())?.id;
+        if (!id) throw new Error("User is not logged in or id is not available");
+        const { data: details } = (await ApiService.get(
+          apiConsumer.DETAILS(id),
+        )) as {
+          data: any;
+        };
+        const addr = details?.address;
+        // Preserve any current form values (so user input like date isn't overwritten)
+        const current = getValues ? getValues() : {};
+        reset({ ...current, address: addr });
+        // Keep the multi-step flow answers in sync using current values
+        setAnswers((prev) => ({ ...prev, ...current, address: addr }));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    bootstrapAddress();
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!currentStep) return null;
   const onNext = async (values: { [key: string]: unknown }) => {
