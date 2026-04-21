@@ -179,6 +179,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "matchingTrialConfirmed": {
+    "url": "/matching/trial-confirmed",
+    "label": "Trial confermato",
+    "title": "Il tuo trial e confermato",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "resetPassword": {
     "url": "/auth/reset-password",
     "label": "Reset password",

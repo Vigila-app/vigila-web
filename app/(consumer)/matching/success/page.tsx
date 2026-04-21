@@ -22,7 +22,7 @@ export default function MatchingSuccessPage() {
   const [response, setResponse] = useState<any>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (globalThis.window === undefined) return;
     try {
       const rawAns = sessionStorage.getItem("matching_answers");
       const rawResp = sessionStorage.getItem("matching_response");
@@ -181,7 +181,12 @@ export default function MatchingSuccessPage() {
 
           <div className="mt-6">
             <button
-              onClick={() => router.push(Routes.matchingSuccess?.url || "#")}
+              onClick={() =>
+                router.push(
+                  Routes.matchingTrialConfirmed?.url ||
+                    "/matching/trial-confirmed",
+                )
+              }
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-consumer-blue text-white font-semibold"
             >
               Procedi con questo caregiver <ArrowRightIcon className="w-4"/>
