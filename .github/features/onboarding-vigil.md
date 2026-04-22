@@ -13,6 +13,7 @@
 ---
 
 ## Table of Contents
+
 - [Requisiti Funzionali](#requisiti-funzionali)
 - [Architettura Implementativa](#architettura-implementativa)
 - [Sequenza Step](#sequenza-step)
@@ -25,9 +26,11 @@
 ## Functional Requirements
 
 ### Objective
+
 Collect complete caregiver profile: personal information, qualifications, services offered, experiences, availability and character, to facilitate matching with families.
 
 ### User Flow
+
 1. **Anagrafica**: Data di nascita e genere
 2. **Localizzazione**: Indirizzo di residenza (privato, non visibile alle famiglie)
 3. **Zone Operative**: Aree di Napoli dove si è disponibili a lavorare
@@ -48,12 +51,14 @@ Collect complete caregiver profile: personal information, qualifications, servic
 18. **Foto Profilo**: Upload immagine per profilo pubblico
 
 ### User Stories
+
 - **Come caregiver**, voglio creare un profilo completo per essere trovato dalle famiglie giuste
 - **Come caregiver professionale**, devo confermare che fornirò documentazione certificata
 - **Come caregiver**, voglio specificare zone e disponibilità per ricevere proposte compatibili
 - **Come caregiver**, voglio evidenziare le mie competenze specifiche per distinguermi
 
 ### Non-Functional Requirements
+
 - ✅ Flow with conditional branches (based on qualification and services)
 - ✅ Profile photo upload with preview
 - ✅ Multi-level validation (required, maxLength, custom)
@@ -65,6 +70,7 @@ Collect complete caregiver profile: personal information, qualifications, servic
 ## Implementation Architecture
 
 ### Technology Stack
+
 - **Framework**: Next.js 14 (App Router)
 - **Form Management**: React Hook Form
 - **File Upload**: Supabase Storage
@@ -74,6 +80,7 @@ Collect complete caregiver profile: personal information, qualifications, servic
 - **Type Safety**: Full TypeScript
 
 ### Architectural Pattern
+
 ```
 Page Component
     ↓
@@ -87,6 +94,7 @@ QuestionRenderer (question-specific rendering)
 ```
 
 ### File Structure
+
 ```
 components/onboarding/
 ├── multiStep/
@@ -110,9 +118,11 @@ app/vigil/
 ### Complete Flow (20 Steps with 3 Branches)
 
 **Base Path**:
+
 1. WELCOME → 2. ADDRESS → 3. ZONES → 4. TRANSPORTATION → 5. OCCUPATION → [6?] → 7. COURSES → 8. YEARS_EXPERIENCE → 9. ABOUT → 10. DAILY_ACTIVITIES → 11. HYGIENE → 12. OUTSIDE → 13. PAST_EXP → 14. SERVICE_TYPE → 15. HOURS → 16. AVAILABILITIES → 17. URGENT → 18. CHARACTER → 19. LANGUAGES → 20. PROPIC → COMPLETE
 
 **Conditional Branches**:
+
 1. **After OCCUPATION**: If Professional/Nurse → step 6 (PROFESSIONAL_DOCS_INFO), otherwise skip
 2. **After HYGIENE**: If "none" selected → removes other selections
 3. **After OUTSIDE**: If "none" selected → removes other selections
@@ -198,7 +208,7 @@ app/vigil/
 
 ### Step 4: TRANSPORTATION
 
-**Purpose**: Transportation method
+**Purpose**: Transportation method (vehicle type: auto, moto, bici, etc.). Saved as `transportation_mode` in `vigil_data`. Does not affect service extras — extras are determined by `outdoor_services`.
 
 ```typescript
 {
@@ -381,7 +391,9 @@ app/vigil/
 }
 ```
 
-**Conditional Logic**: If "none" is selected, removes all other selections
+**Conditional Logic**: If "none" is selected, removes all other selections.  
+**Side effect**: `hygene_services` determines which hygiene extras (`bed_help`, `bathroom_help`, `diaper_help`) are available on services.  
+**Note**: field name has a typo in code — `hygene_services` (not `hygiene_services`).
 
 ---
 
@@ -412,7 +424,8 @@ app/vigil/
 }
 ```
 
-**Conditional Logic**: If "none" is selected, removes all other selections
+**Conditional Logic**: If "none" is selected, removes all other selections.  
+**Side effect**: `outdoor_services` determines whether the `transport` extra is available on services. Any value other than `NONE` enables the transport extra.
 
 ---
 
@@ -608,10 +621,11 @@ nextStep: (answers) => {
     return "professional_docs_info";
   }
   return "courses";
-}
+};
 ```
 
 **Paths**:
+
 - Professional/Nurse → step 6 (professional_docs_info) → step 7
 - Other occupations → skip to step 7 (courses)
 
@@ -623,11 +637,11 @@ nextStep: (answers) => {
 nextStep: (answers) => {
   if (answers.services?.includes(VigilHygieneServiceEnum.NONE)) {
     answers.services = answers.services.filter(
-      (s: string) => s == VigilHygieneServiceEnum.NONE
+      (s: string) => s == VigilHygieneServiceEnum.NONE,
     );
   }
   return "outside";
-}
+};
 ```
 
 **Logic**: If user selects "none", automatically deselects all other hygiene service options.
@@ -640,11 +654,11 @@ nextStep: (answers) => {
 nextStep: (answers) => {
   if (answers.outside?.includes(VigilOutdoorServiceEnum.NONE)) {
     answers.outside = answers.outside.filter(
-      (s: string) => s == VigilOutdoorServiceEnum.NONE
+      (s: string) => s == VigilOutdoorServiceEnum.NONE,
     );
   }
   return "past_exp";
-}
+};
 ```
 
 **Logic**: If user selects "none", automatically deselects all other outdoor service options.
@@ -655,79 +669,105 @@ nextStep: (answers) => {
 
 ### Wrapper Transformation
 
+All logic lives in `VigilMultiStepOnboarding.tsx → handleComplete`. On completion it runs in parallel:
+
+1. **Profile photo upload** → Supabase Storage
+2. **Availability rules** → `CalendarService.createVigilAvailabilityRule`
+3. **Service creation** → see Service Generation Logic below
+4. **Profile data save** → `OnboardService.update`
+
 ```typescript
-// VigilMultiStepOnboarding.tsx
+// Simplified flow
 const handleComplete = async (data: Record<string, any>) => {
-  const { address, propic } = data;
-
-  // Extract postal code
-  const cap = address?.address?.postcode || address?.address?.postalCode || "";
-
-  // Prepare addresses array
-  const addresses = address ? [address] : [];
-  const caps = cap ? [cap] : [];
-
-  // Prepare data for API
-  const onboardData: any = {
-    addresses,
-    cap: caps,
-    ...data
-  };
-
-  // Remove fields not stored in database
-  delete onboardData.language_confirmation;
-  delete onboardData.understandsDocRequirement;
-  delete onboardData.availabilities;
-
-  // Upload profile photo separately
-  if (propic && user?.id) {
-    await StorageUtils.uploadFile("profile-pics", propic, user.id, {
-      contentType: propic.type || "image/png"
-    });
-  }
-  delete onboardData.propic;
-
-  await OnboardService.update({
-    role: RolesEnum.VIGIL,
-    data: onboardData
-  });
-
-  // Post-submission
-  await AuthService.renewAuthentication();
-  await getUserDetails(true);
+  const caps = addresses?.map((a) => a.address.postcode);
+  // ... parallel execution of all side effects
+  await Promise.all([
+    uploadPhoto,
+    createAvailabilities,
+    createServices,
+    saveProfile,
+  ]);
   router.replace(Routes.onBoardVigilComplete.url);
 };
 ```
 
-### Fields Sent to API
+---
 
-| Question ID | Sent to API | Notes |
-|------------|-------------|-------|
-| `birthday` | ✅ Yes | - |
-| `gender` | ✅ Yes | - |
-| `addresses` | ✅ Yes | Wrapped in array |
-| `zones` | ✅ Yes | - |
-| `transportation_mode` | ✅ Yes | - |
-| `occupation` | ✅ Yes | - |
-| `understandsDocRequirement` | ❌ No | Deleted before API call |
-| `courses` | ✅ Yes | - |
-| `experience_years` | ✅ Yes | - |
-| `bio` | ✅ Yes | - |
-| `services` | ✅ Yes | - |
-| `hygene_services` | ✅ Yes | - |
-| `outdoor_services` | ✅ Yes | - |
-| `past_experience` | ✅ Yes | - |
-| `type` | ✅ Yes | - |
-| `time_committment` | ✅ Yes | - |
-| `availabilities` | ❌ No | Deleted before API call |
-| `urgent_requests` | ✅ Yes | - |
-| `character` | ✅ Yes | - |
-| `language_confirmation` | ❌ No | Deleted before API call |
-| `propic` | ❌ No | Uploaded separately to storage |
+### Service Generation Logic
+
+Services are automatically created from activity selections. The flow:
+
+```
+onboarding answers (hygene_services, outdoor_services, services)
+    ↓
+match against activities_catalog by activity.type
+    ↓
+collect unique service_id from matched activities
+    ↓
+create one ServiceI per unique service_id from services_catalog
+```
+
+**Example**: vigile selects `bathroom_help` (hygiene) + `walks` (outdoor) + `meal_prep` (daily)
+
+- `bathroom_help` → activity with `service_id: 3` → creates "Assistenza alla persona"
+- `walks` → activity with `service_id: 2` → creates "Assistenza leggera"
+- `meal_prep` → activity with `service_id: 2` → already covered, no duplicate
+
+**Key**: each `service_id` is created only once (`Array.from(new Set(...))`).
 
 ---
 
-## Testing Guide
+### Extras — Derived from Profile, Not Stored on Service
+
+Extras (transport, igiene) are **not saved on the service record**. They are derived at display time from `vigil_data`:
+
+| Extra           | Required capability                     | Source field                  |
+| --------------- | --------------------------------------- | ----------------------------- |
+| `transport`     | any `outdoor_services` value ≠ NONE     | `vigil_data.outdoor_services` |
+| `bed_help`      | `VigilHygieneServiceEnum.BED_HELP`      | `vigil_data.hygene_services`  |
+| `bathroom_help` | `VigilHygieneServiceEnum.BATHROOM_HELP` | `vigil_data.hygene_services`  |
+| `diaper_help`   | `VigilHygieneServiceEnum.DIAPER_HELP`   | `vigil_data.hygene_services`  |
+
+This means `service.info.extras` is unused — do not rely on it.
+
+### Fields Sent to API
+
+| Question ID                 | Sent to API | Notes                                              |
+| --------------------------- | ----------- | -------------------------------------------------- |
+| `birthday`                  | ✅          | -                                                  |
+| `gender`                    | ✅          | -                                                  |
+| `addresses`                 | ✅          | Wrapped in array                                   |
+| `zones`                     | ✅          | -                                                  |
+| `transportation_mode`       | ✅          | Vehicle type only (auto/moto/etc.)                 |
+| `occupation`                | ✅          | -                                                  |
+| `understandsDocRequirement` | ❌          | Deleted before API call                            |
+| `courses`                   | ✅          | -                                                  |
+| `experience_years`          | ✅          | -                                                  |
+| `bio`                       | ✅          | -                                                  |
+| `services`                  | ✅          | Also used for service generation                   |
+| `hygene_services`           | ✅          | Also used for service generation + hygiene extras  |
+| `outdoor_services`          | ✅          | Also used for service generation + transport extra |
+| `past_experience`           | ✅          | -                                                  |
+| `type`                      | ✅          | -                                                  |
+| `time_committment`          | ✅          | -                                                  |
+| `availabilities`            | ❌          | Saved via CalendarService, deleted before API call |
+| `urgent_requests`           | ✅          | -                                                  |
+| `character`                 | ✅          | -                                                  |
+| `language_confirmation`     | ❌          | Deleted before API call                            |
+| `propic`                    | ❌          | Uploaded separately to storage                     |
+
+### 4. Activity Selections → Service & Extras Generation
+
+```typescript
+// Fields that drive service creation
+const activityKeys = ["hygene_services", "outdoor_services", "services"];
+
+// Fields that drive extras availability (at display time, not stored)
+// transport extra  → outdoor_services.some(s => s !== NONE)
+// hygiene extras   → hygene_services.includes(BED_HELP | BATHROOM_HELP | DIAPER_HELP)
+```
+
+**Effect**: choices in steps 10, 11, 12 determine both which services are created AND which extras appear on those services.
 
 ### Complete Test Path
 
