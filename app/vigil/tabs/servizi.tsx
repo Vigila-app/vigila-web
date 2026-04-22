@@ -17,31 +17,39 @@ const ServiziTab = () => {
   const vigilIdFromParams = params?.vigilId as string | undefined;
   const { user } = useUserStore();
   const { vigils } = useVigilStore();
+  const { vigilsData, getVigilData } = useVigilStore();
   const vigilId =
     user?.user_metadata?.role === RolesEnum.VIGIL
       ? user?.id
       : vigilIdFromParams;
+
   const { services, getServices, deleteService } = useServicesStore();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newServiceMode, setNewServiceMode] = useState(false);
   const [newService, setNewService] = useState<Partial<ServiceI>>({});
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [pendingStatusIndex, setPendingStatusIndex] = useState<number | null>(
-    null
+    null,
   );
   const [pendingStatusValue, setPendingStatusValue] = useState<boolean | null>(
-    null
+    null,
   );
+  //caricamento infomazioni da tabella vigil
   const vigil = useMemo(
     () => vigils.find((v) => v.id === vigilId),
-    [vigils, vigilId]
+    [vigils, vigilId],
   );
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
+  //caricamento informazioni da tabella vigil_data
+  const vigilData = useMemo(
+    () => vigilsData.find((v) => v.vigil_id === vigilId),
+    [vigilsData, vigilId],
+  );
   const reloadServices = (fullReload = true) => {
     if (vigilId) getServices(true, vigilId, { active: fullReload && "*" });
   };
   const personalServices = services.filter(
-    (service) => service.vigil_id === vigilId
+    (service) => service.vigil_id === vigilId,
   );
   useEffect(() => {
     reloadServices();
@@ -58,6 +66,11 @@ const ServiziTab = () => {
       document.body.style.overflow = "";
     };
   }, [showStatusModal]);
+
+  useEffect(() => {
+    if (!vigilId) return;
+    getVigilData(vigilId);
+  }, [vigilId]);
 
   const handleSaveService = async (updatedService: ServiceI) => {
     await ServicesService.editService(updatedService);
@@ -112,9 +125,8 @@ const ServiziTab = () => {
     },
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vigilId]
+    [vigilId],
   );
-
   return (
     <div className="w-full mx-auto mt-4">
       <>
@@ -128,6 +140,7 @@ const ServiziTab = () => {
                 <ServiceCard
                   service={service}
                   showActions
+                  vigilData={vigilData}
                   onEdit={() => setEditingIndex(i)}
                   onToggleStatus={() => handleChangeStatus(i, !service.active)}
                   onDelete={() => handleRemoveService(i)}
@@ -181,7 +194,8 @@ const ServiziTab = () => {
                   <ServicesCatalog
                     role={user?.user_metadata?.role as RolesEnum}
                     selectedServices={services}
-                    occupation={vigil?.occupation}
+                    vigilData={vigilData}
+                    occupation={vigilData?.occupation}
                     onServicesChange={(services) => {
                       if (services.length) {
                         setNewService((prev) => {
