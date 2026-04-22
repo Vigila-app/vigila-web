@@ -35,12 +35,12 @@ export const trackSignupCompleted = (userId: string, role: RolesEnum) => {
 };
 
 /**
- * Utente inizia il processo di booking
- * QUANDO: click su "Prenota" o ingresso nel flusso booking
+ * Utente inizia il processo di booking singolo
+ * QUANDO: click su "Una volta" o ingresso nel flusso prenotaione singola
  */
-export const trackOdBookingStarted = (userId: string, serviceType: string) => {
+export const trackOdBookingStarted = (userId: string, serviceType?: string) => {
   track("od_booking_started", {
-    segment: "ondemand",
+    segment: "single",
     user_id: userId,
     service_type: serviceType, // 'accompagnamento' | 'compagnia' | 'igiene'
   });
@@ -48,13 +48,17 @@ export const trackOdBookingStarted = (userId: string, serviceType: string) => {
 
 /**
  * Utente arriva alla schermata di pagamento
- * QUANDO: useEffect della pagina checkout
+ * QUANDO: useEffect della pagina pagamento
  */
-export const trackOdPaymentStarted = (userId: string, value: number) => {
+export const trackPaymentStarted = (
+  userId: string,
+  amount: number,
+  segment: "single" | "recurring",
+) => {
   track("od_payment_started", {
-    segment: "ondemand",
+    segment,
     user_id: userId,
-    value: value,
+    amount,
     currency: "EUR",
   });
 };
@@ -65,13 +69,13 @@ export const trackOdPaymentStarted = (userId: string, value: number) => {
  */
 export const trackOdBookingCompleted = (
   userId: string,
-  value: number,
+  amount: number,
   serviceType: string,
 ) => {
   track("od_booking_completed", {
-    segment: "ondemand",
+    segment: "single",
     user_id: userId,
-    value: value,
+    amount,
     currency: "EUR",
     service_type: serviceType,
   });
@@ -145,19 +149,36 @@ export const trackRecPaymentStarted = (userId: string, value: number) => {
 };
 
 /**
- * Pagamento trial completato
- * QUANDO: dopo conferma positiva dal payment provider
+ * Utente inizia il processo di booking ricorrente (trial)
+ * QUANDO: click su "Ricorrente" o ingresso nel flusso prenotaione ricorrente
  */
 export const trackRecTrialStarted = (
   userId: string,
-  value: number,
-  caregiverId: string,
+  amount?: number,
+  vigilId?: string,
 ) => {
   track("rec_trial_started", {
     segment: "recurring",
     user_id: userId,
-    value: value,
+    amount,
     currency: "EUR",
-    caregiver_id: caregiverId,
+    vigil_id: vigilId,
+  });
+};
+/**
+ * Pagamento trial completato
+ * QUANDO: dopo conferma positiva dal payment provider
+ */
+export const trackRecTrialCompleted = (
+  userId: string,
+  amount: number,
+  vigilId: string,
+) => {
+  track("rec_trial_completed", {
+    segment: "recurring",
+    user_id: userId,
+    amount,
+    currency: "EUR",
+    vigil_id: vigilId,
   });
 };
