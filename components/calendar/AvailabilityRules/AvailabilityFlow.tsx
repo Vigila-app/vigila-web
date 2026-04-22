@@ -16,12 +16,17 @@ import clsx from "clsx";
 import Button from "@/components/button/button";
 import { ApiService, UserService } from "@/src/services";
 import { apiConsumer } from "@/src/constants/api.constants";
+import { useUserStore } from "@/src/store/user/user.store";
+import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
+
+let gtmTracked = false; // Global variable to track if GTM event has been sent
 
 export default function AvailabilityFlow({
   onComplete,
 }: Readonly<{
   onComplete: () => void;
 }>) {
+  const { user } = useUserStore();
   const config: MultiStepOnboardingProps["config"] = {
     role: RolesEnum.CONSUMER,
     steps: [
@@ -190,6 +195,20 @@ export default function AvailabilityFlow({
     getAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (user?.id && currentStep?.id === "single-booking" && !gtmTracked) {
+      trackOdBookingStarted(user.id);
+      gtmTracked = true;
+    } else if (
+      user?.id &&
+      currentStep?.id === "availabilities" &&
+      !gtmTracked
+    ) {
+      trackRecTrialStarted(user.id);
+      gtmTracked = true;
+    }
+  }, [currentStep, user?.id]);
 
   if (!currentStep) return null;
   const onNext = async (values: { [key: string]: unknown }) => {
