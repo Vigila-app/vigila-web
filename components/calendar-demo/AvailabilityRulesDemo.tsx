@@ -14,7 +14,7 @@ import {
   formatDateToISO,
 } from "@/src/utils/calendar.utils";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { AuthService, UserService } from "@/src/services";
+import { UserService } from "@/src/services";
 
 /**
  * Demo component for Availability Rules CRUD operations
@@ -45,7 +45,8 @@ export const AvailabilityRulesDemo = ({
     if (setAnswers) {
       setAnswers((prev) => ({ ...prev, availabilityRules: rules }));
     }
-  }, [rules, setAnswers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rules]);
 
   // If parent provides availabilityRules (e.g. from answers object), keep local state in sync
   useEffect(() => {
@@ -69,7 +70,7 @@ export const AvailabilityRulesDemo = ({
     const initial: Record<number, { start: string; durationHours: number }> =
       {};
     weekdays.forEach((day) => {
-      initial[day.value] = { start: "12:00", durationHours: 3 };
+      initial[day.value] = { start: "08:00", durationHours: 4 };
     });
     return initial;
   });
@@ -579,8 +580,8 @@ export const AvailabilityRulesDemo = ({
                                   setDraftSlots((prev) => ({
                                     ...prev,
                                     [day.value]: {
-                                      start: "12:00",
-                                      durationHours: 3,
+                                      start: "08:00",
+                                      durationHours: 4,
                                     },
                                   }));
                                 } catch (err: any) {
@@ -609,8 +610,8 @@ export const AvailabilityRulesDemo = ({
                                 setDraftSlots((prev) => ({
                                   ...prev,
                                   [day.value]: {
-                                    start: "12:00",
-                                    durationHours: 3,
+                                    start: "08:00",
+                                    durationHours: 4,
                                   },
                                 }));
                                 setError(null);
