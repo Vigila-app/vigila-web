@@ -18,6 +18,7 @@ export const AddressInput = ({
   error,
   setAddress,
   address,
+  onChange,
 }: QuestionRendererProps & AddressInputI) => (
   <div>
     <SearchAddress
@@ -25,6 +26,7 @@ export const AddressInput = ({
       role={role}
       onSubmit={(selectedAddress) => {
         setAddress(selectedAddress);
+        onChange(selectedAddress);
       }}
       placeholder={question.placeholder}
       label={question.label}
