@@ -157,7 +157,7 @@ export const MatchingDemo = () => {
 
     try {
       const payload = buildPayload();
-      const result = await MatchingService.findMatches(payload);
+      const result = await MatchingService.match(payload);
       setResponse(result);
     } catch (err: unknown) {
       const message =

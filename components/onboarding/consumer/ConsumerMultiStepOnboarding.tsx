@@ -26,7 +26,7 @@ const ConsumerMultiStepOnboarding = () => {
       try {
         const {
           lovedOneName,
-            // lovedOneAge,
+          // lovedOneAge,
           birthday,
           // lovedOnePhone,
           relationship,
@@ -55,7 +55,6 @@ const ConsumerMultiStepOnboarding = () => {
           information,
         };
 
-
         await OnboardService.update({
           role: RolesEnum.CONSUMER,
           data: onboardData,
@@ -65,12 +64,18 @@ const ConsumerMultiStepOnboarding = () => {
           const user = await UserService.getUser();
           if (user?.id) {
             // Fire-and-forget matching call; do not block onboarding completion
-            MatchingService.match(user.id, { role: RolesEnum.CONSUMER, data: onboardData }).catch((e) =>
+            MatchingService.match({
+              role: RolesEnum.CONSUMER,
+              data: onboardData,
+            }).catch((e) =>
               console.warn("Matching API failed (non-blocking)", e),
             );
           }
         } catch (e) {
-          console.warn("Unable to call matching API: could not retrieve user", e);
+          console.warn(
+            "Unable to call matching API: could not retrieve user",
+            e,
+          );
         }
 
         showToast({

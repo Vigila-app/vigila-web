@@ -17,6 +17,7 @@ import {
   VigilUnavailabilityI,
 } from "@/src/types/calendar.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { ServicesService } from "@/src/services";
 
 /**
  * Parse a time string "HH:MM" or an integer hour to a numeric hour (0-23).
@@ -125,6 +126,10 @@ function buildMatchedVigil(
   averageRating = 0,
   reviewCount = 0,
 ): MatchedVigilI {
+  const totalPrice = calculateTotalPriceFromCompatibleSlots(
+    compatibleSlotDetails,
+  );
+
   return {
     id: vigil.id,
     displayName: vigil.displayName,
@@ -132,12 +137,37 @@ function buildMatchedVigil(
     status: vigil.status,
     cap: vigil.cap,
     compatibleSlots,
+    activeFrom: vigil.created_at,
     totalSlots,
     partialMatch: compatibleSlots < totalSlots,
     compatibleSlotDetails,
+    totalPrice,
     averageRating,
     reviewCount,
   };
+}
+
+/**
+ * Calculate the minimum estimated total price for all compatible slot occurrences.
+ * For each slot: service min_hourly_rate * slot duration in hours.
+ */
+function calculateTotalPriceFromCompatibleSlots(
+  compatibleSlotDetails: CompatibleSlotI[],
+): number {
+  const total = compatibleSlotDetails.reduce((acc, slot) => {
+    const serviceCatalogItem = ServicesService.getServicesByType(
+      slot.service,
+    )[0];
+    const minHourlyRate = serviceCatalogItem?.min_hourly_rate ?? 0;
+    const slotDurationHours = Math.max(
+      8,
+      parseTimeToHour(slot.endTime) - parseTimeToHour(slot.startTime),
+    );
+
+    return acc + minHourlyRate * slotDurationHours;
+  }, 0);
+
+  return Number(total.toFixed(2));
 }
 
 /**

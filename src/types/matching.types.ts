@@ -72,9 +72,12 @@ export interface MatchedVigilI {
   status: string;
   cap?: string[];
   averageRating: number;
+  activeFrom?: string; // ISO datetime when vigil became active
   reviewCount: number;
   compatibleSlots: number;
   totalSlots: number;
+  /** Minimum estimated total price for all compatible slot occurrences. */
+  totalPrice: number;
   /** Whether this vigil covers fewer than totalSlots (i.e. is a partial match). */
   partialMatch: boolean;
   /** Detailed list of slot occurrences this vigil is compatible with. */

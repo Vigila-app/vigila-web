@@ -15,7 +15,10 @@ export default function MatchingLoadingPage() {
     let mounted = true;
     const run = async () => {
       try {
-        const raw = typeof window !== "undefined" ? sessionStorage.getItem("matching_answers") : null;
+        const raw =
+          typeof window !== "undefined"
+            ? sessionStorage.getItem("matching_answers")
+            : null;
         if (!raw) {
           console.warn("No matching answers found in sessionStorage");
           return;
@@ -48,7 +51,10 @@ export default function MatchingLoadingPage() {
         if (matchingRequest) {
           resp = await ApiService.post(apiMatching.MATCH(), matchingRequest);
         } else {
-          resp = await MatchingService.match(user.id, { role: "CONSUMER", data: answers });
+          resp = await MatchingService.match({
+            role: "CONSUMER",
+            data: answers,
+          });
         }
         console.log("Matching response (loading page)", resp);
 
@@ -86,7 +92,13 @@ export default function MatchingLoadingPage() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-md ring-1 ring-slate-200">
         <div className="p-6 flex flex-col items-center gap-6">
           <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center">
-            <svg className="w-10 h-10 text-consumer-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg
+              className="w-10 h-10 text-consumer-blue"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
               <path d="M6 20c0-3.3137 2.6863-6 6-6s6 2.6863 6 6" />
             </svg>
@@ -109,9 +121,7 @@ export default function MatchingLoadingPage() {
             </button>
           </div>
 
-          {error && (
-            <div className="text-sm text-red-500">Errore: {error}</div>
-          )}
+          {error && <div className="text-sm text-red-500">Errore: {error}</div>}
         </div>
       </div>
     </div>
