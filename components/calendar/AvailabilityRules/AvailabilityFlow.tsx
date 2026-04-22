@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -14,8 +14,8 @@ import { Services } from "./Services";
 import { BookingTypeEnum } from "@/src/enums/booking.enums";
 import clsx from "clsx";
 import Button from "@/components/button/button";
-import { ApiService, AuthService, UserService } from "@/src/services";
-import { apiConsumer, apiVigil } from "@/src/constants/api.constants";
+import { ApiService, UserService } from "@/src/services";
+import { apiConsumer } from "@/src/constants/api.constants";
 
 export default function AvailabilityFlow({
   onComplete,
@@ -107,7 +107,20 @@ export default function AvailabilityFlow({
             description: "La ricorrenza durerà 4 settimane",
             validation: {
               required: true,
+              min: new Date(new Date().setDate(new Date().getDate() + 1))
+                .toISOString()
+                .split("T")[0],
+              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+                .toISOString()
+                .split("T")[0],
             },
+            min: new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0],
+            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+              .toISOString()
+              .split("T")[0],
+            autoFocus: true,
           },
           {
             id: "address",
@@ -118,6 +131,7 @@ export default function AvailabilityFlow({
             validation: {
               required: true,
             },
+            autoFocus: false,
           },
         ],
         component: AvailabilityRulesDemo,
