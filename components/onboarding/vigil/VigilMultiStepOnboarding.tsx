@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { OnboardService } from "@/src/services/onboard.service";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -15,6 +15,10 @@ import { StorageUtils } from "@/src/utils/storage.utils";
 import services_catalog from "@/mock/cms/services-catalog.json" with { type: "json" };
 import activities_catalog from "@/mock/cms/activities-catalog.json" with { type: "json" };
 import { ServiceI } from "@/src/types/services.types";
+import {
+  trackQuestionnaireCompleted,
+  trackQuestionnaireStarted,
+} from "@/lib/tracking";
 /**
  * New multi-step onboarding component for VIGIL users
  */
@@ -22,6 +26,10 @@ const VigilMultiStepOnboarding = () => {
   const { showToast } = useAppStore();
   const { getUserDetails, user } = useUserStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user?.id) trackQuestionnaireStarted(user?.id, RolesEnum.VIGIL);
+  }, [user?.id]);
 
   const handleComplete = useCallback(
     async (data: Record<string, any>) => {
@@ -116,6 +124,8 @@ const VigilMultiStepOnboarding = () => {
         );
 
         await Promise.all(ps);
+
+        if (user?.id) trackQuestionnaireCompleted(user?.id, RolesEnum.VIGIL);
 
         showToast({
           message: "Profilo aggiornato con successo",
