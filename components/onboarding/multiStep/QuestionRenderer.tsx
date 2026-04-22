@@ -37,12 +37,12 @@ const QuestionRenderer = (props: QuestionRendererProps) => {
   const [searchInput, setSearchInput] = useState("");
   const [fileError, setFileError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (props.question.type === QuestionType.ADDRESS && address) {
-      props.onChange(address);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, props.onChange, props.question.type]);
+  // useEffect(() => {
+  //   if (props.question.type === QuestionType.ADDRESS && address) {
+  //     props.onChange(address);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [address, props.onChange, props.question.type]);
 
   // Helper to get HTML input type from question type
   // console.log(

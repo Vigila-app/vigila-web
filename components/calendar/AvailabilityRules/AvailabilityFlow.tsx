@@ -65,7 +65,20 @@ export default function AvailabilityFlow({
             placeholder: "",
             validation: {
               required: true,
+              min: new Date(new Date().setDate(new Date().getDate() + 1))
+                .toISOString()
+                .split("T")[0],
+              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+                .toISOString()
+                .split("T")[0],
             },
+            min: new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0],
+            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+              .toISOString()
+              .split("T")[0],
+            autoFocus: true,
           },
           {
             id: "address",
@@ -73,6 +86,7 @@ export default function AvailabilityFlow({
             label: "Indirizzo",
             placeholder: "Via Napoli 123",
             description: "Dove si svolgerà l'assistenza",
+            autoFocus: false,
             validation: {
               required: true,
             },
@@ -137,7 +151,7 @@ export default function AvailabilityFlow({
     defaultValues: { ...state.answers },
   });
 
-  const getAddress = useCallback(async () => {
+  const getAddress = async () => {
     try {
       const id = (await UserService.getUser())?.id;
       if (!id) throw new Error("User is not logged in or id is not available");
@@ -156,11 +170,12 @@ export default function AvailabilityFlow({
     } catch (error) {
       console.error(error);
     }
-  }, [reset, setAnswers, getValues]);
+  };
 
   useEffect(() => {
     getAddress();
-  }, [getAddress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!currentStep) return null;
   const onNext = async (values: { [key: string]: unknown }) => {
@@ -174,7 +189,9 @@ export default function AvailabilityFlow({
           currentStep={currentStep}
           state={state}
           config={config}
-          setAnswers={setAnswers}
+          setAnswers={(...args) => {
+            setAnswers(...args);
+          }}
         />
         {currentStep.note && (
           <div className="text-zinc-500  text-sm flex items-start gap-3">
