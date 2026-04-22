@@ -45,13 +45,13 @@ const QuestionRenderer = (props: QuestionRendererProps) => {
   }, [address, props.onChange, props.question.type]);
 
   // Helper to get HTML input type from question type
-  console.log(
-    "Rendering question:",
-    props.question.id,
-    "of type:",
-    props.question.type,
-    props,
-  );
+  // console.log(
+  //   "Rendering question:",
+  //   props.question.id,
+  //   "of type:",
+  //   props.question.type,
+  //   props,
+  // );
 
   // Render based on question type
   switch (props.question.type) {

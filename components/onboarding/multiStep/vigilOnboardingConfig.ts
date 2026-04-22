@@ -34,6 +34,7 @@ import {
 } from "@/src/enums/onboarding.enums";
 import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 import { AvailabilityRulesDemo } from "@/components/calendar-demo";
+import { ServicesService } from "@/src/services";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -271,11 +272,18 @@ export const createVigilOnboardingConfig = (
           validation: {
             required: true,
           },
-          options: Object.values(VigilDailyServiceEnum).map((value) => ({
-            value,
-            label: VigilDailyServiceLabels[value],
-            icon: VigilDailyServiceIcons[value],
+          options: ServicesService.getServicesCatalog().map((service) => ({
+            value: service.type,
+            label: service.name,
+            icon: VigilDailyServiceIcons[
+              service.type.toUpperCase() as VigilDailyServiceEnum
+            ],
           })),
+          // options: Object.values(VigilDailyServiceEnum).map((value) => ({
+          //   value,
+          //   label: VigilDailyServiceLabels[value],
+          //   icon: VigilDailyServiceIcons[value],
+          // })),
         },
       ],
       nextStep: "hygene",
