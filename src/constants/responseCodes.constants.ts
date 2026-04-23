@@ -538,4 +538,43 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
     code: 7906,
   },
   // endregion VIGIL
+
+  // region VIGIL CANDIDATI
+  VIGIL_CANDIDATI_LIST_SUCCESS: {
+    code: 7951,
+  },
+  VIGIL_CANDIDATI_LIST_ERROR: {
+    code: 7952,
+  },
+  VIGIL_CANDIDATI_LIST_FORBIDDEN: {
+    code: 7953,
+  },
+  VIGIL_CANDIDATI_CREATE_SUCCESS: {
+    code: 7961,
+  },
+  VIGIL_CANDIDATI_CREATE_ERROR: {
+    code: 7962,
+  },
+  VIGIL_CANDIDATI_CREATE_BAD_REQUEST: {
+    code: 7963,
+  },
+  VIGIL_CANDIDATI_CREATE_FORBIDDEN: {
+    code: 7964,
+  },
+  VIGIL_CANDIDATI_INVITE_SUCCESS: {
+    code: 7971,
+  },
+  VIGIL_CANDIDATI_INVITE_ERROR: {
+    code: 7972,
+  },
+  VIGIL_CANDIDATI_INVITE_BAD_REQUEST: {
+    code: 7973,
+  },
+  VIGIL_CANDIDATI_INVITE_FORBIDDEN: {
+    code: 7974,
+  },
+  VIGIL_CANDIDATI_INVITE_NOT_FOUND: {
+    code: 7975,
+  },
+  // endregion VIGIL CANDIDATI
 }

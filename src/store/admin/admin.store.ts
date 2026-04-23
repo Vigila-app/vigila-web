@@ -1,6 +1,6 @@
 import { FrequencyEnum } from "@/src/enums/common.enums";
 import { AdminService } from "@/src/services/admin.service";
-import { AdminStoreType } from "@/src/types/admin.types";
+import { AdminStoreType, VigilCandidatoI } from "@/src/types/admin.types";
 import { dateDiff } from "@/src/utils/date.utils";
 import { isDev } from "@/src/utils/envs.utils";
 import { createStoreDebouncer } from "@/src/utils/store-debounce.utils";
@@ -15,6 +15,7 @@ const initAdminStore: {
   consumers: AdminStoreType["consumers"];
   services: AdminStoreType["services"];
   payments: AdminStoreType["payments"];
+  vigilCandidati: AdminStoreType["vigilCandidati"];
   lastUpdate: AdminStoreType["lastUpdate"];
   dashboardLoading: AdminStoreType["dashboardLoading"];
   analyticsLoading: AdminStoreType["analyticsLoading"];
@@ -23,6 +24,7 @@ const initAdminStore: {
   consumersLoading: AdminStoreType["consumersLoading"];
   servicesLoading: AdminStoreType["servicesLoading"];
   paymentsLoading: AdminStoreType["paymentsLoading"];
+  vigilCandidatiLoading: AdminStoreType["vigilCandidatiLoading"];
 } = {
   dashboardStats: null,
   analytics: null,
@@ -31,6 +33,7 @@ const initAdminStore: {
   consumers: [],
   services: [],
   payments: [],
+  vigilCandidati: [],
   lastUpdate: {
     dashboardStats: undefined,
     analytics: undefined,
@@ -39,6 +42,7 @@ const initAdminStore: {
     consumers: undefined,
     services: undefined,
     payments: undefined,
+    vigilCandidati: undefined,
   },
   dashboardLoading: false,
   analyticsLoading: false,
@@ -47,6 +51,7 @@ const initAdminStore: {
   consumersLoading: false,
   servicesLoading: false,
   paymentsLoading: false,
+  vigilCandidatiLoading: false,
 };
 
 // Crea il debouncer per lo store admin
@@ -318,6 +323,72 @@ export const useAdminStore = create<AdminStoreType>()(
           }
         },
 
+        getVigilCandidati: async (force: boolean = false) => {
+          try {
+            const lastUpdate = get().lastUpdate.vigilCandidati;
+            if (
+              force ||
+              !lastUpdate ||
+              dateDiff(new Date(), lastUpdate, FrequencyEnum.MINUTES) > 5
+            ) {
+              set({ vigilCandidatiLoading: true });
+              const vigilCandidati = await AdminService.getVigilCandidati();
+              set({
+                vigilCandidati,
+                lastUpdate: {
+                  ...get().lastUpdate,
+                  vigilCandidati: new Date(),
+                },
+                vigilCandidatiLoading: false,
+              });
+            }
+          } catch (error) {
+            console.error("useAdminStore getVigilCandidati error:", error);
+            set({ vigilCandidatiLoading: false });
+          }
+        },
+
+        createVigilCandidato: async (candidato) => {
+          try {
+            const created = await AdminService.createVigilCandidato(candidato);
+            set({ vigilCandidati: [created, ...get().vigilCandidati] });
+            return created;
+          } catch (error) {
+            console.error("useAdminStore createVigilCandidato error:", error);
+            throw error;
+          }
+        },
+
+        importVigilCandidati: async (candidati) => {
+          try {
+            const result = await AdminService.importVigilCandidati(candidati);
+            // Reload the full list after import
+            await get().getVigilCandidati(true);
+            return result;
+          } catch (error) {
+            console.error("useAdminStore importVigilCandidati error:", error);
+            throw error;
+          }
+        },
+
+        inviteVigilCandidato: async (candidatoId: string) => {
+          try {
+            const result = await AdminService.inviteVigilCandidato(candidatoId);
+            // Update local status to "invited"
+            set({
+              vigilCandidati: get().vigilCandidati.map((c) =>
+                c.id === candidatoId
+                  ? { ...c, status: "invited" as const, invited_at: new Date().toISOString() }
+                  : c
+              ),
+            });
+            return result;
+          } catch (error) {
+            console.error("useAdminStore inviteVigilCandidato error:", error);
+            throw error;
+          }
+        },
+
         clearCache: (cacheKey?: keyof AdminStoreType["lastUpdate"]) => {
           if (cacheKey) {
             set({
@@ -336,6 +407,7 @@ export const useAdminStore = create<AdminStoreType>()(
                 consumers: undefined,
                 services: undefined,
                 payments: undefined,
+                vigilCandidati: undefined,
               },
             });
           }
@@ -356,6 +428,7 @@ export const useAdminStore = create<AdminStoreType>()(
           consumers: state.consumers,
           services: state.services,
           payments: state.payments,
+          vigilCandidati: state.vigilCandidati,
           lastUpdate: state.lastUpdate,
         }),
       }

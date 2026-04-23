@@ -551,6 +551,34 @@
       "priority": 0.8
     }
   },
+  "adminVigilCandidati": {
+    "url": "/dashboard-admin/vigil-candidati",
+    "label": "Candidati Vigil",
+    "title": "Gestione Candidati Vigil",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": [
+      "ADMIN"
+    ]
+  },
+  "vigilActivate": {
+    "url": "/vigil/activate",
+    "label": "Attiva Profilo Vigil",
+    "title": "Attiva Profilo Vigil",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
   "playground": {
     "url": "/playground",
     "label": "Playground",

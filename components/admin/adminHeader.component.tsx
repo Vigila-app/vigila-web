@@ -16,6 +16,7 @@ export const AdminHeader = (props: AdminHeaderProps) => {
     { href: Routes.adminBookings.url, label: "Prenotazioni", icon: "📅" },
     { href: Routes.adminPayments.url, label: "Pagamenti", icon: "💳" },
     { href: Routes.adminVigils.url, label: "Vigils", icon: "👮" },
+    { href: Routes.adminVigilCandidati.url, label: "Candidati Vigil", icon: "📋" },
     { href: Routes.adminConsumers.url, label: "Utenti", icon: "👥" },
     { href: Routes.adminServices.url, label: "Servizi", icon: "🛠️" },
     { href: Routes.adminReviews.url, label: "Recensioni", icon: "📝" },

@@ -19,6 +19,16 @@ import { ProfileActiveEmailTemplate } from "@/components/email/ProfileActiveEmai
 import { isReleased } from "@/src/utils/envs.utils";
 import { BookingCancellationEmailTemplate } from "@/components/email/BookingCancellationEmailTemplate";
 import { BookingRejectEmailTemplate } from "@/components/email/BookingRejectEmailTemplate";
+import { VigilInvitationEmailTemplate } from "@/components/email/VigilInvitationEmailTemplate";
+
+export interface VigilInvitationEmailDataI {
+  to: string;
+  subject: string;
+  nome: string;
+  cognome: string;
+  activationLink: string;
+  appUrl?: string;
+}
 
 const SEND_EMAIL_ACTIVE = isReleased;
 
@@ -238,6 +248,29 @@ export const EmailService = {
         resolve(result);
       } catch (error) {
         console.error("EmailService sendNotificationEmail error:", error);
+        reject(error);
+      }
+    }),
+
+  sendVigilInvitationEmail: async (data: VigilInvitationEmailDataI) =>
+    new Promise<EmailResponseI>(async (resolve, reject) => {
+      try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
+        const result = await ResendService.sendEmailWithTemplate({
+          to: data.to,
+          subject: data.subject,
+          react: VigilInvitationEmailTemplate({
+            nome: data.nome,
+            cognome: data.cognome,
+            activationLink: data.activationLink,
+            appUrl: data.appUrl || AppConstants.hostUrl,
+          }),
+        });
+        resolve(result);
+      } catch (error) {
+        console.error("EmailService sendVigilInvitationEmail error:", error);
         reject(error);
       }
     }),

@@ -238,6 +238,34 @@ Represents money movements within wallets.
 
 ---
 
+### 8. `vigil_candidati`
+
+Stores pre-screened Vigil candidates before they complete self-registration.
+
+**Primary Key**: `id`
+
+**Fields**:
+
+* `id` (uuid, PK)
+* `created_at` (timestamptz)
+* `updated_at` (timestamptz)
+* `nome` (text, required)
+* `cognome` (text, required)
+* `email` (text, unique, required)
+* `telefono` (text, nullable)
+* `citta` (text, nullable)
+* `cap` (text, nullable)
+* `note` (text, nullable)
+* `status` (text, default: `pending`) — values: `pending`, `invited`, `registered`, `active`
+* `invited_at` (timestamptz, nullable)
+* `registered_at` (timestamptz, nullable)
+
+**Relationships**:
+
+* No foreign keys; used as a staging table before a Vigil creates their Supabase auth account.
+
+---
+
 ## Key Relationships Summary
 
 * **Consumer → Booking**: one-to-many

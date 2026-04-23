@@ -252,6 +252,10 @@ export const apiAdmin = {
     `${apiControllers.ADMIN(isMock)}/payments`,
   PROMOTE_USER: (userId: string, isMock?: boolean): string =>
     `${apiControllers.ADMIN(isMock)}/users/${userId}/promote`,
+  VIGIL_CANDIDATI: (isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/vigil-candidati`,
+  VIGIL_CANDIDATO_INVITE: (candidatoId: string, isMock?: boolean): string =>
+    `${apiControllers.ADMIN(isMock)}/vigil-candidati/${candidatoId}/invite`,
 };
 
 export const apiReviews = {

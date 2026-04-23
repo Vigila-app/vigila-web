@@ -169,6 +169,24 @@ export interface AdminPaymentI {
   net_amount: number;
 }
 
+export type VigilCandidatoStatusEnum = "pending" | "invited" | "registered" | "active";
+
+export interface VigilCandidatoI {
+  id: string;
+  nome: string;
+  cognome: string;
+  email: string;
+  telefono?: string;
+  citta?: string;
+  cap?: string;
+  note?: string;
+  status: VigilCandidatoStatusEnum;
+  invited_at?: string;
+  registered_at?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
 export interface AdminStoreType {
   // Dashboard
   dashboardStats: AdminDashboardStatsI | null;
@@ -198,6 +216,10 @@ export interface AdminStoreType {
   payments: AdminPaymentI[];
   paymentsLoading: boolean;
 
+  // Vigil Candidati
+  vigilCandidati: VigilCandidatoI[];
+  vigilCandidatiLoading: boolean;
+
   // Cache
   lastUpdate: {
     dashboardStats?: Date;
@@ -207,6 +229,7 @@ export interface AdminStoreType {
     consumers?: Date;
     services?: Date;
     payments?: Date;
+    vigilCandidati?: Date;
   };
 
   // Actions
@@ -238,6 +261,10 @@ export interface AdminStoreType {
   promoteUser: (
     userId: string
   ) => Promise<{ success: boolean; message: string; data?: any }>;
+  getVigilCandidati: (force?: boolean) => Promise<void>;
+  inviteVigilCandidato: (candidatoId: string) => Promise<{ success: boolean }>;
+  createVigilCandidato: (candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at">) => Promise<VigilCandidatoI>;
+  importVigilCandidati: (candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at">[]) => Promise<{ imported: number; errors: number }>;
 
   // Utility
   clearCache: (cacheKey?: keyof AdminStoreType["lastUpdate"]) => void;

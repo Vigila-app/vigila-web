@@ -8,6 +8,7 @@ import {
   AdminConsumerI,
   AdminServiceI,
   AdminPaymentI,
+  VigilCandidatoI,
 } from "@/src/types/admin.types";
 
 export const AdminService = {
@@ -173,4 +174,65 @@ export const AdminService = {
         }
       }
     ),
+
+  // Vigil Candidati
+  getVigilCandidati: async () =>
+    new Promise<VigilCandidatoI[]>(async (resolve, reject) => {
+      try {
+        const { data } = (await ApiService.get(
+          apiAdmin.VIGIL_CANDIDATI()
+        )) as { data: VigilCandidatoI[] };
+        resolve(data || []);
+      } catch (error) {
+        console.error("AdminService getVigilCandidati error", error);
+        reject(error);
+      }
+    }),
+
+  createVigilCandidato: async (
+    candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at">
+  ) =>
+    new Promise<VigilCandidatoI>(async (resolve, reject) => {
+      try {
+        const { data } = (await ApiService.post(
+          apiAdmin.VIGIL_CANDIDATI(),
+          candidato
+        )) as { data: VigilCandidatoI[] };
+        resolve(data[0]);
+      } catch (error) {
+        console.error("AdminService createVigilCandidato error", error);
+        reject(error);
+      }
+    }),
+
+  importVigilCandidati: async (
+    candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at">[]
+  ) =>
+    new Promise<{ imported: number; errors: number }>(
+      async (resolve, reject) => {
+        try {
+          const response = (await ApiService.post(
+            apiAdmin.VIGIL_CANDIDATI(),
+            candidati
+          )) as { imported: number };
+          resolve({ imported: response.imported ?? 0, errors: 0 });
+        } catch (error) {
+          console.error("AdminService importVigilCandidati error", error);
+          reject(error);
+        }
+      }
+    ),
+
+  inviteVigilCandidato: async (candidatoId: string) =>
+    new Promise<{ success: boolean }>(async (resolve, reject) => {
+      try {
+        const response = (await ApiService.post(
+          apiAdmin.VIGIL_CANDIDATO_INVITE(candidatoId)
+        )) as { success: boolean };
+        resolve(response);
+      } catch (error) {
+        console.error("AdminService inviteVigilCandidato error", error);
+        reject(error);
+      }
+    }),
 };
