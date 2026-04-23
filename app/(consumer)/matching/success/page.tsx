@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
+import {
+  BookingsService,
+  PaymentService,
+  UserService,
+  ServicesService,
+} from "@/src/services";
+import { BookingI } from "@/src/types/booking.types";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { CheckCircleIcon, StarIcon } from "@heroicons/react/24/solid";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { CheckoutForm } from "@/components/checkout";
@@ -24,15 +32,138 @@ export default function MatchingSuccessPage() {
   const [answers, setAnswers] = useState<any>(null);
   const [response, setResponse] = useState<any>(null);
   const [clientSecret, setClientSecret] = useState<string>("");
-  const [bookingIds] = useState<string[]>([]);
+  const [bookingIds, setBookingIds] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
 
   const handlePaymentSuccess = async (_paymentIntentId: string) => {
-    // Payment status update is handled server-side by the Stripe webhook.
-    // Redirect to trial confirmed page
-    router.push(
-      `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
-    );
+    try {
+      // Verify payment intent server-side and update bookings locally
+      const verification =
+        await PaymentService.verifyPaymentIntent(_paymentIntentId);
+
+      if (verification?.success && verification.data?.succeeded) {
+        // mark all bookings as confirmed
+        for (const id of bookingIds) {
+          try {
+            await BookingsService.updateBookingStatus(
+              id,
+              BookingStatusEnum.CONFIRMED,
+            );
+          } catch (e) {
+            console.error("Failed to confirm booking", id, e);
+          }
+        }
+      }
+
+      router.push(
+        `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
+      );
+    } catch (e) {
+      console.error("Error verifying payment", e);
+      router.push(
+        `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
+      );
+    }
+  };
+
+  const handleConfirm = async () => {
+    setError("");
+    try {
+      // gather slots
+      const vigilSlots = response?.data?.[0];
+      const slotDetails = Array.isArray(vigilSlots?.compatibleSlotDetails)
+        ? vigilSlots.compatibleSlotDetails
+        : [];
+
+      const user = await UserService.getUser();
+      if (!user?.id) throw new Error("User not authenticated");
+
+      const createdBookings: BookingI[] = [];
+
+      const totalPrice = vigilSlots?.totalPrice || 0;
+      const perSlotPrice =
+        slotDetails.length > 0 ? totalPrice / slotDetails.length : totalPrice;
+
+      // fetch services for this vigil to resolve a concrete service_id per slot
+      let vigilServices: any[] = [];
+      try {
+        vigilServices = await ServicesService.getServices(vigilSlots.id);
+      } catch (e) {
+        console.warn("Could not fetch vigil services", e);
+      }
+
+      for (const slot of slotDetails) {
+        const startIso = `${slot.date}T${slot.startTime}:00Z`;
+        const endIso = `${slot.date}T${slot.endTime}:00Z`;
+        // try to find a service offered by this vigil matching the slot service type
+        const serviceMatch = (vigilServices || []).find(
+          (s: any) => s.type === slot.service,
+        );
+
+        // minimal payload expected by POST /api/v1/bookings
+        const bookingPayload: any = {
+          service_id: serviceMatch?.id,
+          startDate: startIso,
+          endDate: endIso,
+          quantity: 1,
+          // address is required by the DB schema — include consumer-provided address
+          address:
+            answers?.matchingRequest?.address?.address ||
+            answers?.matchingRequest?.address?.formatted ||
+            "",
+          // extras: array of extra ids (empty if none)
+          extras: [],
+        };
+
+        if (!bookingPayload.service_id) {
+          console.warn("No service_id found for slot, skipping booking", slot);
+          continue;
+        }
+
+        try {
+          const created = await BookingsService.createBooking(bookingPayload);
+          if (created?.id) createdBookings.push(created);
+        } catch (e) {
+          console.error("Failed to create booking for slot", slot, e);
+        }
+      }
+      if (createdBookings.length === 0) {
+        setError("Impossibile creare le prenotazioni");
+        return;
+      }
+
+      const createdIds = createdBookings.map((b) => b.id);
+      setBookingIds(createdIds);
+
+      // sum server-calculated prices to get a reliable amount
+      const sumCents = createdBookings.reduce((acc, b) => {
+        // booking.price is numeric in euros (e.g. 12.34) — convert to cents
+        const p = typeof b.price === "number" ? b.price : Number(b.price || 0);
+        return acc + Math.round(p * 100);
+      }, 0);
+
+      if (!sumCents || sumCents <= 0) {
+        setError("Importo non valido per il pagamento");
+        return;
+      }
+
+      const paymentReq = {
+        bookingIds: createdIds,
+        user: user.id,
+        amount: sumCents,
+        currency: (vigilSlots?.currency || "eur").toLowerCase(),
+      };
+
+      const resp = await PaymentService.createPaymentIntent(paymentReq as any);
+      if (resp?.success) {
+        setClientSecret(resp.clientSecret || "");
+      } else {
+        setError("Errore durante l'inizializzazione del pagamento");
+      }
+    } catch (e: any) {
+      console.error(e);
+      setError(e?.message || "Errore conferma vigil");
+    }
   };
 
   useEffect(() => {
@@ -46,7 +177,7 @@ export default function MatchingSuccessPage() {
         if (parsed?.matchingRequest) {
           payload.matchingRequest = parsed.matchingRequest;
         }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+
         setAnswers(payload);
       }
       if (rawResp) setResponse(JSON.parse(rawResp));
@@ -151,20 +282,6 @@ export default function MatchingSuccessPage() {
             </h3>
             {metaContent}
             <div className="flex items-center gap-2 mt-2"></div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {/* service tags: try to show a few examples from answers */}
-              {answers?.matchingRequest?.schedule &&
-                Object.entries(answers.matchingRequest.schedule).map(
-                  ([key, s]: [string, any]) => (
-                    <span
-                      key={key}
-                      className="text-xs bg-blue-50 text-consumer-blue px-2 py-1 rounded-full"
-                    >
-                      {s.service}
-                    </span>
-                  ),
-                )}
-            </div>
           </div>
         </div>
 
@@ -272,12 +389,7 @@ export default function MatchingSuccessPage() {
 
           <div className="mt-6">
             <button
-              onClick={() =>
-                router.push(
-                  Routes.matchingTrialConfirmed?.url ||
-                    "/matching/trial-confirmed",
-                )
-              }
+              onClick={() => handleConfirm()}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-consumer-blue text-white font-semibold"
             >
               Procedi con questo caregiver <ArrowRightIcon className="w-4" />

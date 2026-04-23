@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import clsx from "clsx";
@@ -126,6 +127,14 @@ export const Services = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDayIdx, selectedDays.join("-")]);
 
+  // avoid repeated auto-saving when component re-renders
+  const hasAutoSavedRef = useRef(false);
+
+  // reset auto-save flag when entering/leaving the services step or when selected days change
+  useEffect(() => {
+    hasAutoSavedRef.current = false;
+  }, [isLastStep, selectedDays.join("-")]);
+
   const saveCurrentDaySelections = useCallback(() => {
     const day = selectedDays[currentDayIdx];
     if (!setAnswers || day === undefined) return;
@@ -152,6 +161,8 @@ export const Services = ({
 
   useEffect(() => {
     if (!isLastStep || !isLastDay) return;
+    if (hasAutoSavedRef.current) return;
+    hasAutoSavedRef.current = true;
     saveCurrentDaySelections();
   }, [isLastDay, isLastStep, saveCurrentDaySelections]);
 
