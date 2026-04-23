@@ -15,6 +15,38 @@ export function buildMatchingRequestFromAnswers(answers: Record<string, any>) {
 
   const raw = answers;
 
+  // If the caller already passed a built matching request (e.g. from the demo
+  // UI or a persisted request), accept it as-is to avoid rebuilding and
+  // losing fields like `selectedDays` or `schedule`.
+  if (
+    Array.isArray(raw?.selectedDays) ||
+    (raw?.schedule && typeof raw.schedule === "object")
+  ) {
+    const sd = raw.selectedDays ?? [];
+    const sched = raw.schedule ?? {};
+    const startIso =
+      raw?.dates?.startDate ||
+      raw?.dates?.start_date ||
+      raw.startDate ||
+      raw["start-date"];
+    const endIso =
+      raw?.dates?.endDate ||
+      raw?.dates?.end_date ||
+      raw.endDate ||
+      raw["end-date"] ||
+      startIso;
+    const address = raw.address || {};
+    return {
+      selectedDays: sd,
+      schedule: sched,
+      dates: {
+        startDate: String(startIso).slice(0, 10),
+        endDate: String(endIso).slice(0, 10),
+      },
+      address,
+    };
+  }
+
   // selectedDays: prefer availabilityRules weekdays, fallback to services keys or single booking day
   const availabilityRules = Array.isArray(raw.availabilityRules)
     ? raw.availabilityRules
@@ -35,16 +67,23 @@ export function buildMatchingRequestFromAnswers(answers: Record<string, any>) {
   }
 
   // dates: startDate from answers, endDate either explicit or 4 weeks later for recurrence
+  // accept several common keys where a start date might be stored
   const startRaw =
     raw["start-date"] ||
     raw.startDate ||
+    raw.date ||
+    raw?.dates?.startDate ||
+    raw?.dates?.start_date ||
     (availabilityRules[0] && availabilityRules[0].valid_from);
   const startDate = startRaw ? new Date(String(startRaw)) : null;
-  if (!startDate) throw new Error("startDate not available in answers");
+  if (!startDate || isNaN(startDate.getTime()))
+    throw new Error("startDate not available in answers");
   const startIso = startDate.toISOString().slice(0, 10);
   let endIso = startIso;
-  if (raw["end-date"] || raw.endDate) {
-    endIso = (raw["end-date"] || raw.endDate).toString().slice(0, 10);
+  if (raw["end-date"] || raw.endDate || raw?.dates?.endDate) {
+    endIso = (raw["end-date"] || raw.endDate || raw?.dates?.endDate)
+      .toString()
+      .slice(0, 10);
   } else {
     // default recurrence: 2 weeks
     const d = new Date(startDate);

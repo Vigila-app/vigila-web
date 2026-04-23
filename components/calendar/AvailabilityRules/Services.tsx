@@ -1,4 +1,10 @@
-import { ComponentType, useEffect, useMemo, useState } from "react";
+import {
+  ComponentType,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { SingleService } from "./SingleService";
@@ -8,6 +14,7 @@ import Vasca from "@/components/svg/Vasca";
 import { Car } from "@/components/svg";
 import { CurrentDay } from "./CurrentDay";
 import { SelectedDays } from "./SelectedDays";
+import { ServicesService } from "@/src/services";
 export const dayNames = [
   "Domenica",
   "Lunedì",
@@ -18,39 +25,23 @@ export const dayNames = [
   "Sabato",
 ];
 
-
-
-const SERVICES = [
-  {
-    name: "Compagnia e conversazione",
-    desc: "Presenza, dialogo e supporto emotivo",
-    Icon: Caffe as ComponentType<{ className?: string }>,
-    price: 12,
-  },
-  {
-    name: "Assistenza leggera",
-    desc: "Supervisione, promemoria farmaci, piccole commissioni",
-    Icon: HeartIcon as ComponentType<{ className?: string }>,
-    price: 14,
-  },
-  {
-    name: "Assistenza alla persona",
-    desc: "Mobiiltà, pasti, vestizione",
-    Icon: UserGroupIcon as ComponentType<{ className?: string }>,
-    price: 16,
-  },
-  {
-    name: "Igiene personale",
-    desc: "Bagno, cambio, cura personale",
-    Icon: Vasca as ComponentType<{ className?: string }>,
-    price: 18,
-  },
-];
+const SERVICE_ICON_MAP: Record<
+  string,
+  ComponentType<{ className?: string }>
+> = {
+  "Compagnia e conversazione": Caffe as ComponentType<{ className?: string }>,
+  "Assistenza leggera": HeartIcon as ComponentType<{ className?: string }>,
+  "Assistenza alla persona": UserGroupIcon as ComponentType<{
+    className?: string;
+  }>,
+  "Igiene personale": Vasca as ComponentType<{ className?: string }>,
+};
 
 export const Services = ({
   answers,
   setAnswers,
   role,
+  isLastStep,
 }: {
   answers?: Record<string, any>;
   setAnswers?: (
@@ -59,6 +50,7 @@ export const Services = ({
       | ((prev: Record<string, any>) => Record<string, any>),
   ) => void;
   role?: RolesEnum;
+  isLastStep?: boolean;
 }) => {
   // derive unique ordered weekdays from answers.availabilityRules
   const selectedDays = useMemo(
@@ -72,6 +64,7 @@ export const Services = ({
   ) as number[];
 
   const [currentDayIdx, setCurrentDayIdx] = useState(0);
+  const isLastDay = currentDayIdx === selectedDays.length - 1;
 
   useEffect(() => {
     // reset to first day when availabilities change
@@ -83,6 +76,19 @@ export const Services = ({
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [car, setCar] = useState(false);
   const [notes, setNotes] = useState("");
+
+  const services = useMemo(() => {
+    return ServicesService.getServicesCatalog().map((service) => ({
+      name: service.name,
+      desc: service.description,
+      price:
+        service.recommended_hourly_rate ??
+        service.min_hourly_rate ??
+        service.max_hourly_rate ??
+        0,
+      Icon: SERVICE_ICON_MAP[service.name] || HeartIcon,
+    }));
+  }, []);
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -120,9 +126,9 @@ export const Services = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDayIdx, selectedDays.join("-")]);
 
-  const saveCurrentDaySelections = () => {
+  const saveCurrentDaySelections = useCallback(() => {
     const day = selectedDays[currentDayIdx];
-    if (!setAnswers) return;
+    if (!setAnswers || day === undefined) return;
 
     setAnswers((prev: Record<string, any>) => {
       const next = { ...prev };
@@ -136,13 +142,18 @@ export const Services = ({
       };
       return next;
     });
-  };
+  }, [car, currentDayIdx, notes, selectedDays, selectedService, setAnswers]);
 
   const loadDaySelections = (saved: Record<string, any> | undefined) => {
     setSelectedService(saved?.services);
     setCar(!!saved?.car);
     setNotes(saved?.notes || "");
   };
+
+  useEffect(() => {
+    if (!isLastStep || !isLastDay) return;
+    saveCurrentDaySelections();
+  }, [isLastDay, isLastStep, saveCurrentDaySelections]);
 
   const bookingType = answers?.["booking-type"];
   const isSingleDate = bookingType === "occasional" || bookingType === "trial";
@@ -173,7 +184,7 @@ export const Services = ({
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
           <div className="grid grid-cols-2 gap-3">
-            {SERVICES.map((srv) => (
+            {services.map((srv) => (
               <SingleService
                 key={srv.name}
                 {...srv}
@@ -231,34 +242,34 @@ export const Services = ({
         {/* Navigation */}
         <div className="flex justify-between mt-6">
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={async () => {
-                saveCurrentDaySelections();
+            {(!isLastStep || !isLastDay) && (
+              <button
+                type="button"
+                onClick={async () => {
+                  saveCurrentDaySelections();
 
-                // move to next day or finalize
-                if (currentDayIdx < selectedDays.length - 1) {
-                  const nextIdx = currentDayIdx + 1;
-                  const nextDay = selectedDays[nextIdx];
-                  // load saved values for next day (if any) so UI reflects them immediately
-                  const savedNext = answers?.services?.[nextDay];
-                  loadDaySelections(savedNext);
-                  setCurrentDayIdx(nextIdx);
-                } else {
-                  // last day: finalize / salva ricorrenza
-                  console.log("All days filled, salva ricorrenza");
-                  console.log(answers);
-                }
-              }}
-              className={clsx(
-                "px-4 py-2 rounded text-white disabled:opacity-50",
-                colorClasses.bg,
-              )}
-            >
-              {currentDayIdx === selectedDays.length - 1
-                ? "Salva ricorrenza"
-                : "Prossimo giorno"}
-            </button>
+                  // move to next day or finalize
+                  if (currentDayIdx < selectedDays.length - 1) {
+                    const nextIdx = currentDayIdx + 1;
+                    const nextDay = selectedDays[nextIdx];
+                    // load saved values for next day (if any) so UI reflects them immediately
+                    const savedNext = answers?.services?.[nextDay];
+                    loadDaySelections(savedNext);
+                    setCurrentDayIdx(nextIdx);
+                  } else {
+                    // last day: finalize / salva ricorrenza
+                    console.log("All days filled, salva ricorrenza");
+                    console.log(answers);
+                  }
+                }}
+                className={clsx(
+                  "px-4 py-2 rounded text-white disabled:opacity-50",
+                  colorClasses.bg,
+                )}
+              >
+                {isLastDay ? "Salva ricorrenza" : "Prossimo giorno"}
+              </button>
+            )}
           </div>
         </div>
       </div>

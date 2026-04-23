@@ -27,42 +27,39 @@ const WEEKDAYS: { label: string; value: WeekdayEnum }[] = [
 const SERVICE_OPTIONS: { label: string; value: string }[] = [
   {
     label:
-      ServicesService.getServicesByType(ServiceCatalogTypeEnum.COMPANIONSHIP)[0]
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.COMPANIONSHIP)
         ?.name || ServiceCatalogTypeEnum.COMPANIONSHIP,
     value: ServiceCatalogTypeEnum.COMPANIONSHIP,
   },
   {
     label:
-      ServicesService.getServicesByType(
-        ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
-      )[0]?.name || ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.LIGHT_ASSISTANCE)
+        ?.name || ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
     value: ServiceCatalogTypeEnum.LIGHT_ASSISTANCE,
   },
   {
     label:
       ServicesService.getServicesByType(
         ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
-      )[0]?.name || ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
+      )?.name || ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
     value: ServiceCatalogTypeEnum.MEDICAL_ASSISTANCE,
   },
   {
     label:
-      ServicesService.getServicesByType(ServiceCatalogTypeEnum.HOUSE_KEEPING)[0]
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.HOUSE_KEEPING)
         ?.name || ServiceCatalogTypeEnum.HOUSE_KEEPING,
     value: ServiceCatalogTypeEnum.HOUSE_KEEPING,
   },
   {
     label:
-      ServicesService.getServicesByType(
-        ServiceCatalogTypeEnum.TRANSPORTATION,
-      )[0]?.name || ServiceCatalogTypeEnum.TRANSPORTATION,
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.TRANSPORTATION)
+        ?.name || ServiceCatalogTypeEnum.TRANSPORTATION,
     value: ServiceCatalogTypeEnum.TRANSPORTATION,
   },
   {
     label:
-      ServicesService.getServicesByType(
-        ServiceCatalogTypeEnum.SPECIALIZED_CARE,
-      )[0]?.name || ServiceCatalogTypeEnum.SPECIALIZED_CARE,
+      ServicesService.getServicesByType(ServiceCatalogTypeEnum.SPECIALIZED_CARE)
+        ?.name || ServiceCatalogTypeEnum.SPECIALIZED_CARE,
     value: ServiceCatalogTypeEnum.SPECIALIZED_CARE,
   },
 ];

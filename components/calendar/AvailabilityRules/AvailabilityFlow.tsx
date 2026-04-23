@@ -159,12 +159,13 @@ export default function AvailabilityFlow({
       if (onComplete) onComplete(answers);
     },
   };
-  const { setAnswers, state, currentStep, next, back } = useMultiStepFlow({
-    role: config.role,
-    steps: config.steps,
-    initialStepId: config.initialStepId,
-    onComplete: config.onComplete,
-  } as any);
+  const { setAnswers, state, currentStep, next, back, isLastStep } =
+    useMultiStepFlow({
+      role: config.role,
+      steps: config.steps,
+      initialStepId: config.initialStepId,
+      onComplete: config.onComplete,
+    } as any);
   const { handleSubmit } = useForm();
   const getAddress = async () => {
     try {
@@ -215,6 +216,7 @@ export default function AvailabilityFlow({
           currentStep={currentStep}
           state={state}
           config={config}
+          isLastStep={isLastStep}
           setAnswers={(...args) => {
             setAnswers(...args);
           }}
