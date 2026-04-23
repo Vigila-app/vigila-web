@@ -263,8 +263,8 @@ export interface AdminStoreType {
   ) => Promise<{ success: boolean; message: string; data?: any }>;
   getVigilCandidati: (force?: boolean) => Promise<void>;
   inviteVigilCandidato: (candidatoId: string) => Promise<{ success: boolean }>;
-  createVigilCandidato: (candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at">) => Promise<VigilCandidatoI>;
-  importVigilCandidati: (candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at">[]) => Promise<{ imported: number; errors: number }>;
+  createVigilCandidato: (candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at" | "updated_at">) => Promise<VigilCandidatoI>;
+  importVigilCandidati: (candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at" | "updated_at">[]) => Promise<{ imported: number; errors: number }>;
 
   // Utility
   clearCache: (cacheKey?: keyof AdminStoreType["lastUpdate"]) => void;

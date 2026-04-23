@@ -66,6 +66,14 @@ export async function POST(
     const linkProperties = (linkData as { properties?: { action_link?: string } } | null)?.properties;
     const activationLink = linkProperties?.action_link ?? "";
 
+    if (!activationLink) {
+      return jsonErrorResponse(500, {
+        code: ResponseCodesConstants.VIGIL_CANDIDATI_INVITE_ERROR.code,
+        success: false,
+        error: "Failed to generate activation link",
+      });
+    }
+
     // Send invitation email
     await EmailService.sendVigilInvitationEmail({
       to: candidato.email,

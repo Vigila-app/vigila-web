@@ -190,7 +190,7 @@ export const AdminService = {
     }),
 
   createVigilCandidato: async (
-    candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at">
+    candidato: Omit<VigilCandidatoI, "id" | "status" | "created_at" | "updated_at">
   ) =>
     new Promise<VigilCandidatoI>(async (resolve, reject) => {
       try {
@@ -206,7 +206,7 @@ export const AdminService = {
     }),
 
   importVigilCandidati: async (
-    candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at">[]
+    candidati: Omit<VigilCandidatoI, "id" | "status" | "created_at" | "updated_at">[]
   ) =>
     new Promise<{ imported: number; errors: number }>(
       async (resolve, reject) => {
