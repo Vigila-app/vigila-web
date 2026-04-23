@@ -61,8 +61,10 @@ export async function POST(
 
     if (linkError) throw linkError;
 
-    const activationLink =
-      (linkData as any)?.properties?.action_link ?? linkData?.user?.email ?? "";
+    // The Supabase admin generateLink response includes `properties.action_link`
+    // for the actual magic link URL. We use type-safe optional chaining here.
+    const linkProperties = (linkData as { properties?: { action_link?: string } } | null)?.properties;
+    const activationLink = linkProperties?.action_link ?? "";
 
     // Send invitation email
     await EmailService.sendVigilInvitationEmail({

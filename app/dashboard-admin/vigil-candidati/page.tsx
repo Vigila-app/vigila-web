@@ -200,7 +200,7 @@ export default function AdminVigilCandidatiPage() {
           Candidati Vigil
         </h1>
         <p className="text-gray-600">
-          Gestisci i candidati Vigil e invia gli inviti per l&apos;attivazione
+          Gestisci i candidati Vigil e invia gli inviti per l'attivazione
           del profilo
         </p>
       </div>

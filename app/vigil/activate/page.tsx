@@ -34,7 +34,9 @@ export default function VigilActivatePage() {
   } = useForm<ActivateFormI>();
 
   useEffect(() => {
-    // Parse the URL hash for Supabase auth tokens
+    // Parse the URL hash for Supabase auth tokens.
+    // Supabase uses snake_case parameter names (access_token, refresh_token) as
+    // per the OAuth 2.0 / Supabase Auth spec - this is intentional.
     const hash = window.location.hash;
     if (!hash) {
       setPageState("error");
