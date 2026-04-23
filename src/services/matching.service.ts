@@ -46,9 +46,9 @@ export function buildMatchingRequestFromAnswers(answers: Record<string, any>) {
   if (raw["end-date"] || raw.endDate) {
     endIso = (raw["end-date"] || raw.endDate).toString().slice(0, 10);
   } else {
-    // default recurrence: 4 weeks
+    // default recurrence: 2 weeks
     const d = new Date(startDate);
-    d.setUTCDate(d.getUTCDate() + 28);
+    d.setUTCDate(d.getUTCDate() + 14);
     endIso = d.toISOString().slice(0, 10);
   }
 

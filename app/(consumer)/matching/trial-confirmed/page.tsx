@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import {
   CheckCircleIcon,
-  ExclamationTriangleIcon,
 } from "@heroicons/react/24/solid";
 import { ClockIcon, CalendarIcon, BellAlertIcon } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { dayNames } from "@/components/calendar/AvailabilityRules/Services";
+import { Avatar } from "@/components";
 
 type MatchingResponse = {
   data?: Array<any>;
@@ -79,11 +79,7 @@ export default function MatchingTrialConfirmedPage() {
         <div className="bg-white rounded-3xl shadow ring-1 ring-slate-200 p-5">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-consumer-light-blue text-consumer-blue flex items-center justify-center font-semibold text-2xl">
-              {best.avatar ? (
-                <img src={best.avatar} alt="" />
-              ) : (
-                (best.displayName || "-").slice(0, 2).toUpperCase()
-              )}
+              <Avatar/>
             </div>
             <div>
               <h2 className="text-lg font-semibold text-slate-900 leading-tight">

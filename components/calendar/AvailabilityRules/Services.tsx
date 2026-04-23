@@ -19,6 +19,7 @@ export const dayNames = [
 ];
 
 const SERVICES = [
+  //TODO fetch or get from file
   {
     name: "Compagnia e conversazione",
     desc: "Presenza, dialogo e supporto emotivo",
@@ -45,62 +46,62 @@ const SERVICES = [
   },
 ];
 
-const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
-  "Compagnia e conversazione": [
-    "Conversazione e ascolto",
-    "Lettura libri / giornali",
-    "Giochi di società / carte",
-    "Guardare TV insieme",
-    "Passeggiata leggera",
-  ],
-  "Assistenza leggera": [
-    "Promemoria farmaci",
-    "Spesa e commissioni",
-    "Preparazione pasti semplici",
-    "Accompagnamento Visite",
-    "Rassetto e pulizia leggera",
-  ],
-  "Assistenza alla persona": [
-    "Aiuto mobilità",
-    "Vestizione / svestizione",
-    "Somministrazione pasti",
-    "Trasferimento letto / poltrona",
-  ],
-  "Igiene personale": [
-    "Bagno completo",
-    "Spugnature a letto",
-    "Cambio pannolone",
-    "Igiene orale",
-    "Cura capelli e barba",
-  ],
-};
+// const SERVICE_MANSIONI_MAP: Record<string, string[]> = {
+//   "Compagnia e conversazione": [
+//     "Conversazione e ascolto",
+//     "Lettura libri / giornali",
+//     "Giochi di società / carte",
+//     "Guardare TV insieme",
+//     "Passeggiata leggera",
+//   ],
+//   "Assistenza leggera": [
+//     "Promemoria farmaci",
+//     "Spesa e commissioni",
+//     "Preparazione pasti semplici",
+//     "Accompagnamento Visite",
+//     "Rassetto e pulizia leggera",
+//   ],
+//   "Assistenza alla persona": [
+//     "Aiuto mobilità",
+//     "Vestizione / svestizione",
+//     "Somministrazione pasti",
+//     "Trasferimento letto / poltrona",
+//   ],
+//   "Igiene personale": [
+//     "Bagno completo",
+//     "Spugnature a letto",
+//     "Cambio pannolone",
+//     "Igiene orale",
+//     "Cura capelli e barba",
+//   ],
+// };
 
-const getVisibleMansioni = (service: string | null): string[] =>
-  service ? SERVICE_MANSIONI_MAP[service] || [] : [];
+// const getVisibleMansioni = (service: string | null): string[] =>
+//   service ? SERVICE_MANSIONI_MAP[service] || [] : [];
 
-const normalizeMansioniByService = (
-  services: string[],
-  saved: Record<string, any> | undefined,
-): Record<string, string[]> => {
-  const savedByService: Record<string, string[]> =
-    saved?.mansioniByService && typeof saved.mansioniByService === "object"
-      ? saved.mansioniByService
-      : {};
+// const normalizeMansioniByService = (
+//   services: string[],
+//   saved: Record<string, any> | undefined,
+// ): Record<string, string[]> => {
+//   const savedByService: Record<string, string[]> =
+//     saved?.mansioniByService && typeof saved.mansioniByService === "object"
+//       ? saved.mansioniByService
+//       : {};
 
-  const normalized: Record<string, string[]> = {};
-  services.forEach((service) => {
-    const allowed = new Set(SERVICE_MANSIONI_MAP[service] || []);
-    const fromByService = Array.isArray(savedByService[service])
-      ? savedByService[service]
-      : [];
-    const fromFlat = Array.isArray(saved?.mansioni)
-      ? saved.mansioni.filter((m: string) => allowed.has(m))
-      : [];
-    normalized[service] = Array.from(new Set([...fromByService, ...fromFlat]));
-  });
+//   const normalized: Record<string, string[]> = {};
+//   services.forEach((service) => {
+//     const allowed = new Set(SERVICE_MANSIONI_MAP[service] || []);
+//     const fromByService = Array.isArray(savedByService[service])
+//       ? savedByService[service]
+//       : [];
+//     const fromFlat = Array.isArray(saved?.mansioni)
+//       ? saved.mansioni.filter((m: string) => allowed.has(m))
+//       : [];
+//     normalized[service] = Array.from(new Set([...fromByService, ...fromFlat]));
+//   });
 
-  return normalized;
-};
+//   return normalized;
+// };
 
 export const Services = ({
   answers,
@@ -137,11 +138,11 @@ export const Services = ({
   }, [selectedDays.length]);
 
   // per-day local selections
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
   const [activeService, setActiveService] = useState<string | null>(null);
-  const [selectedMansioniByService, setSelectedMansioniByService] = useState<
-    Record<string, string[]>
-  >({});
+  // const [selectedMansioniByService, setSelectedMansioniByService] = useState<
+  //   Record<string, string[]>
+  // >({});
   const [car, setCar] = useState(false);
   const [notes, setNotes] = useState("");
 
@@ -170,24 +171,21 @@ export const Services = ({
     const day = selectedDays[currentDayIdx];
     const saved = answers?.services?.[day];
     if (saved) {
-      const loadedServices = Array.isArray(saved.services)
-        ? saved.services
-        : [];
-      setSelectedServices(loadedServices);
-      setSelectedMansioniByService(
-        normalizeMansioniByService(loadedServices, saved),
-      );
-      setActiveService((prev) =>
-        loadedServices.includes(prev || "")
-          ? (prev as string)
-          : loadedServices[0] || null,
-      );
+      setSelectedService(saved.services);
+      // setSelectedMansioniByService(
+      //   normalizeMansioniByService(loadedServices, saved),
+      // );
+      // setActiveService((prev) =>
+      //   loadedServices.includes(prev || "")
+      //     ? (prev as string)
+      //     : loadedServices[0] || null,
+      // );
       setCar(!!saved.car);
       setNotes(saved.notes || "");
     } else {
-      setSelectedServices([]);
+      setSelectedService(null);
       setActiveService(null);
-      setSelectedMansioniByService({});
+      // setSelectedMansioniByService({});
       setCar(false);
       setNotes("");
     }
@@ -199,31 +197,31 @@ export const Services = ({
     );
   if (error) return <div className="text-red-500 text-sm">{error}</div>;
 
-  const handleServiceToggle = (serviceName: string, next: boolean) => {
-    setSelectedServices((prev) => {
-      if (next) {
-        const nextServices = Array.from(new Set([...prev, serviceName]));
-        setActiveService(serviceName);
-        return nextServices;
-      }
-      const remaining = prev.filter((s) => s !== serviceName);
-      if (activeService === serviceName) {
-        setActiveService(remaining[0] || null);
-      }
-      return remaining;
-    });
-  };
+  // const handleServiceToggle = (serviceName: string, next: boolean) => {
+  //   setSelectedServices((prev) => {
+  //     if (next) {
+  //       const nextServices = Array.from(new Set([...prev, serviceName]));
+  //       setActiveService(serviceName);
+  //       return nextServices;
+  //     }
+  //     const remaining = prev.filter((s) => s !== serviceName);
+  //     if (activeService === serviceName) {
+  //       setActiveService(remaining[0] || null);
+  //     }
+  //     return remaining;
+  //   });
+  // };
 
-  const toggleMansione = (serviceName: string, label: string) => {
-    if (!serviceName) return;
-    setSelectedMansioniByService((prev) => {
-      const existing = prev[serviceName] || [];
-      const nextMansioni = existing.includes(label)
-        ? existing.filter((p) => p !== label)
-        : [...existing, label];
-      return { ...prev, [serviceName]: nextMansioni };
-    });
-  };
+  // const toggleMansione = (serviceName: string, label: string) => {
+  //   if (!serviceName) return;
+  //   setSelectedMansioniByService((prev) => {
+  //     const existing = prev[serviceName] || [];
+  //     const nextMansioni = existing.includes(label)
+  //       ? existing.filter((p) => p !== label)
+  //       : [...existing, label];
+  //     return { ...prev, [serviceName]: nextMansioni };
+  //   });
+  // };
 
   const saveCurrentDaySelections = () => {
     const day = selectedDays[currentDayIdx];
@@ -233,19 +231,19 @@ export const Services = ({
       const next = { ...prev };
       next.services = { ...next.services };
 
-      const mansioniAll = Array.from(
-        new Set(
-          selectedServices.flatMap(
-            (service) => selectedMansioniByService[service] || [],
-          ),
-        ),
-      );
+      // const mansioniAll = Array.from(
+      //   new Set(
+      //     selectedServices.flatMap(
+      //       (service) => selectedMansioniByService[service] || [],
+      //     ),
+      //   ),
+      // );
 
       next.services[day] = {
         weekday: Number(day),
-        services: selectedServices,
-        mansioni: mansioniAll,
-        mansioniByService: selectedMansioniByService,
+        services: selectedService,
+        // mansioni: mansioniAll,
+        // mansioniByService: selectedMansioniByService,
         car: !!car,
         notes: notes || "",
       };
@@ -254,19 +252,17 @@ export const Services = ({
   };
 
   const loadDaySelections = (saved: Record<string, any> | undefined) => {
-    const nextServices = Array.isArray(saved?.services) ? saved.services : [];
-    setSelectedServices(nextServices);
-    setSelectedMansioniByService(
-      normalizeMansioniByService(nextServices, saved),
-    );
-    setActiveService(nextServices[0] || null);
+    setSelectedService(saved?.services);
+    // setSelectedMansioniByService(
+    //   normalizeMansioniByService(nextServices, saved),
+    // );
+    setActiveService(saved?.services);
     setCar(!!saved?.car);
     setNotes(saved?.notes || "");
   };
 
   const bookingType = answers?.["booking-type"];
-  const isSingleDate =
-    bookingType === "occasional" || bookingType === "trial";
+  const isSingleDate = bookingType === "occasional" || bookingType === "trial";
 
   return (
     <div className="bg-zinc-200 p-4">
@@ -298,9 +294,9 @@ export const Services = ({
               <SingleService
                 key={srv.name}
                 {...srv}
-                checked={selectedServices.includes(srv.name)}
+                checked={selectedService === srv.name}
                 onChange={(next: boolean) =>
-                  handleServiceToggle(srv.name, next)
+                  setSelectedService(srv.name)
                 }
               />
             ))}
@@ -310,7 +306,7 @@ export const Services = ({
         {/* Mansioni checkboxes without icons */}
         <div className="mb-4">
           <div className="font-semibold mb-2">Mansioni</div>
-          {selectedServices.length === 0 ? (
+          {/* {selectedServices.length === 0 ? (
             <div className="text-sm text-zinc-500">
               Seleziona almeno un servizio per visualizzare le mansioni
             </div>
@@ -346,7 +342,7 @@ export const Services = ({
                 );
               })}
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Accompagnamento in auto */}
