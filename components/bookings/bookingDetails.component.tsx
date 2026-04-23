@@ -39,6 +39,7 @@ import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation"; // CORRETTO (era next/router)
 import { ServiceCatalogItem } from "@/src/types/services.types";
 import { ServicesService } from "@/src/services";
+import { StorageUtils } from "@/src/utils/storage.utils";
 
 type BookingDetailsComponentI = {
   bookingId: BookingI["id"];
@@ -104,6 +105,22 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     }
   }, [booking]);
 
+  const retrieveBookingDetails = async (force = false) => {
+    if (!bookingId) return;
+
+    try {
+      showLoader();
+      await getBookingDetails(bookingId, force);
+    } catch (error) {
+      console.error(
+        "Errore nel recupero dei dettagli della prenotazione:",
+        error,
+      );
+    } finally {
+      hideLoader();
+    }
+  };
+
   useEffect(() => {
     if (bookingId) getBookingDetails(bookingId);
   }, [bookingId, getBookingDetails]);
@@ -112,14 +129,40 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
     checkCancellation();
   }, [checkCancellation]);
 
+  useEffect(() => {
+    const noticeProposal = async () => {
+      if (
+        booking?.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
+        !(booking.consumer || booking.consumer_id)
+      ) {
+        try {
+          await BookingUtils.noticeProposalAssociateConsumer(booking);
+          StorageUtils.clearSessionValues("redirectAuthTo");
+          router.replace(`${Routes.editBooking.url}?bookingId=${booking.id}`);
+        } catch (error) {
+          console.error(
+            "Errore nell'associare la proposta di prenotazione al consumer:",
+            error,
+          );
+        }
+      }
+    };
+    noticeProposal();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking]);
+
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
     if (!booking) return;
     try {
       showLoader();
-      const updated = await BookingUtils.handleStatusUpdate(booking, status);
-      if (updated) {
-        await getBookingDetails(bookingId, true);
-        onUpdate(updated);
+      const updatedBooking = await BookingUtils.handleStatusUpdate(
+        booking,
+        status,
+      );
+      if (updatedBooking) {
+        retrieveBookingDetails(true);
+        onUpdate(updatedBooking);
+
         showToast({
           message: "Stato aggiornato",
           type: ToastStatusEnum.SUCCESS,
@@ -321,7 +364,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           {isConsumer && (
             <div className="mt-2 text-sm text-gray-600">
               <p>
-                L'operatore confermerà la disponibilità dopo la tua richiesta.
+                L&apos;operatore confermerà la disponibilità dopo la tua richiesta.
                 Ti avviseremo non appena sarà confermata.
               </p>
             </div>
@@ -335,7 +378,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             <p className="text-xs text-yellow-800 leading-relaxed font-normal">
               <span className="font-bold">Policy:</span> Cancellazione gratuita
               entro 24 ore prima. Dopo tale termine verrà applicata una penale
-              del 50% a conpenso dell'operatore. Hai sempre il controllo!
+              del 50% a conpenso dell&apos;operatore. Hai sempre il controllo!
             </p>
           </div>
         )}

@@ -1,5 +1,9 @@
 import { ReviewI } from "@/src/types/review.types";
 import { AddressI } from "./maps.types";
+import {
+  VigilHygieneServiceEnum,
+  VigilOutdoorServiceEnum,
+} from "../enums/onboarding.enums";
 
 export type VigilDataType = {
   id: string;
@@ -7,6 +11,8 @@ export type VigilDataType = {
   created_at?: string;
   updated_at?: string;
   transportation_mode?: string;
+  hygene_services?: VigilHygieneServiceEnum[];
+  outdoor_services?: VigilOutdoorServiceEnum[];
   occupation?: string;
   courses?: string;
   experience_years?: string;
@@ -58,4 +64,8 @@ export type ViglStoreType = {
     vigilId: VigilDetailsType["id"],
     force?: boolean,
   ) => Promise<VigilDataType | null>;
+};
+export type VigilCapabilities = {
+  hasTransport: boolean;
+  hygieneServices: VigilHygieneServiceEnum[];
 };

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -16,12 +16,17 @@ import clsx from "clsx";
 import Button from "@/components/button/button";
 import { ApiService, UserService } from "@/src/services";
 import { apiConsumer } from "@/src/constants/api.constants";
+import { useUserStore } from "@/src/store/user/user.store";
+import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
+
+let gtmTracked = false; // Global variable to track if GTM event has been sent
 
 export default function AvailabilityFlow({
   onComplete,
 }: Readonly<{
   onComplete?: (answers: Record<string, any>) => void;
 }>) {
+  const { user } = useUserStore();
   const config: MultiStepOnboardingProps["config"] = {
     role: RolesEnum.CONSUMER,
     steps: [
@@ -65,7 +70,20 @@ export default function AvailabilityFlow({
             placeholder: "",
             validation: {
               required: true,
+              min: new Date(new Date().setDate(new Date().getDate() + 1))
+                .toISOString()
+                .split("T")[0],
+              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+                .toISOString()
+                .split("T")[0],
             },
+            min: new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0],
+            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+              .toISOString()
+              .split("T")[0],
+            autoFocus: true,
           },
           {
             id: "address",
@@ -73,6 +91,7 @@ export default function AvailabilityFlow({
             label: "Indirizzo",
             placeholder: "Via Napoli 123",
             description: "Dove si svolgerà l'assistenza",
+            autoFocus: false,
             validation: {
               required: true,
             },
@@ -93,7 +112,20 @@ export default function AvailabilityFlow({
             description: "La ricorrenza durerà 4 settimane",
             validation: {
               required: true,
+              min: new Date(new Date().setDate(new Date().getDate() + 1))
+                .toISOString()
+                .split("T")[0],
+              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+                .toISOString()
+                .split("T")[0],
             },
+            min: new Date(new Date().setDate(new Date().getDate() + 1))
+              .toISOString()
+              .split("T")[0],
+            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
+              .toISOString()
+              .split("T")[0],
+            autoFocus: true,
           },
           {
             id: "address",
@@ -104,6 +136,7 @@ export default function AvailabilityFlow({
             validation: {
               required: true,
             },
+            autoFocus: false,
           },
         ],
         component: AvailabilityRulesDemo,
@@ -121,10 +154,10 @@ export default function AvailabilityFlow({
       },
     ],
     initialStepId: "welcome",
-      onComplete: async (answers: Record<string, any>) => {
-        console.log("Availability flow completed");
-        if (onComplete) onComplete(answers);
-      },
+    onComplete: async (answers: Record<string, any>) => {
+      console.log("Availability flow completed");
+      if (onComplete) onComplete(answers);
+    },
   };
   const { setAnswers, state, currentStep, next, back } = useMultiStepFlow({
     role: config.role,
@@ -133,37 +166,46 @@ export default function AvailabilityFlow({
     onComplete: config.onComplete,
   } as any);
   const { handleSubmit, reset, getValues } = useForm();
+  const [address, setAddress] = useState();
+  const getAddress = async () => {
+    try {
+      const id = (await UserService.getUser())?.id;
+      if (!id) throw new Error("User is not logged in or id is not available");
+      const { data: details } = (await ApiService.get(
+        apiConsumer.DETAILS(id),
+      )) as {
+        data: any;
+      };
+      const addr = details?.address;
+      setAddress(addr);
+      // Preserve any current form values (so user input like date isn't overwritten)
+      const current = getValues();
+      reset({ ...(current || {}), address: addr });
+      // Keep the multi-step flow answers in sync using current values
+      setAnswers({ ...(current || {}), address: addr });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // Keep the form in sync when answers change externally
   useEffect(() => {
-    reset({ ...state.answers });
-  }, [reset, state.answers]);
-
-  useEffect(() => {
-    const bootstrapAddress = async () => {
-      try {
-        const id = (await UserService.getUser())?.id;
-        if (!id) throw new Error("User is not logged in or id is not available");
-        const { data: details } = (await ApiService.get(
-          apiConsumer.DETAILS(id),
-        )) as {
-          data: any;
-        };
-        const addr = details?.address;
-        // Preserve any current form values (so user input like date isn't overwritten)
-        const current = getValues ? getValues() : {};
-        reset({ ...current, address: addr });
-        // Keep the multi-step flow answers in sync using current values
-        setAnswers((prev) => ({ ...prev, ...current, address: addr }));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    bootstrapAddress();
-    // run once on mount
+    getAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (user?.id && currentStep?.id === "single-booking" && !gtmTracked) {
+      trackOdBookingStarted(user.id);
+      gtmTracked = true;
+    } else if (
+      user?.id &&
+      currentStep?.id === "availabilities" &&
+      !gtmTracked
+    ) {
+      trackRecTrialStarted(user.id);
+      gtmTracked = true;
+    }
+  }, [currentStep, user?.id]);
 
   if (!currentStep) return null;
   const onNext = async (values: { [key: string]: unknown }) => {
@@ -177,7 +219,9 @@ export default function AvailabilityFlow({
           currentStep={currentStep}
           state={state}
           config={config}
-          setAnswers={setAnswers}
+          setAnswers={(...args) => {
+            setAnswers(...args);
+          }}
         />
         {currentStep.note && (
           <div className="text-zinc-500  text-sm flex items-start gap-3">

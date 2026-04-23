@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
 import {
@@ -29,7 +30,6 @@ export const FileInput = ({
   ];
   useEffect(() => {
     if (!file) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreviewUrl(null);
       onChange(null);
       return;
@@ -60,6 +60,7 @@ export const FileInput = ({
       setPreviewUrl(null);
     }
     onChange(file);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
   return (

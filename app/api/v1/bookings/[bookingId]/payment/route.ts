@@ -15,7 +15,7 @@ import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const { bookingId } = await context.params;
@@ -54,7 +54,7 @@ export async function PUT(
         consumer:consumers(*),
         vigil:vigils(*),
         service:services(*)
-      `
+      `,
       )
       .eq("id", bookingId)
       .eq("consumer_id", userObject.id)
@@ -74,7 +74,8 @@ export async function PUT(
       return jsonErrorResponse(403, {
         code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
         success: false,
-        error: "Payment status can only be updated via webhook after Stripe payment confirmation",
+        error:
+          "Payment status can only be updated via webhook after Stripe payment confirmation",
       });
     }
 
@@ -95,16 +96,18 @@ export async function PUT(
     }
 
     // Validate allowed status transitions
+    const pendingTransitions = [
+      BookingStatusEnum.CONFIRMED,
+      BookingStatusEnum.CANCELLED_USER,
+      BookingStatusEnum.CANCELLED_VIGIL,
+      BookingStatusEnum.REJECTED,
+    ];
     const allowedStatusTransitions: Record<
       BookingStatusEnum,
       BookingStatusEnum[]
     > = {
-      [BookingStatusEnum.PENDING]: [
-        BookingStatusEnum.CONFIRMED,
-        BookingStatusEnum.CANCELLED_USER,
-        BookingStatusEnum.CANCELLED_VIGIL,
-        BookingStatusEnum.REJECTED,
-      ],
+      [BookingStatusEnum.PENDING]: pendingTransitions,
+      [BookingStatusEnum.PENDING_NOTICE_PROPOSAL]: pendingTransitions,
       [BookingStatusEnum.CONFIRMED]: [
         BookingStatusEnum.COMPLETED,
         BookingStatusEnum.CANCELLED_USER,
@@ -144,7 +147,10 @@ export async function PUT(
     }
 
     // Invia email di aggiornamento stato se lo stato è cambiato
-    if (status !== existingBooking.status || payment_status !== existingBooking.payment_status) {
+    if (
+      status !== existingBooking.status ||
+      payment_status !== existingBooking.payment_status
+    ) {
       try {
         const consumer = {
           ...userObject,
@@ -168,7 +174,7 @@ export async function PUT(
                 vigil: updatedBooking.vigil || existingBooking.vigil,
                 consumer: updatedBooking.consumer || existingBooking.consumer,
               }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
-              vigil
+              vigil,
             );
           } else {
             console.error("Vigil email not found");
@@ -184,7 +190,7 @@ export async function PUT(
               consumer: updatedBooking.consumer || existingBooking.consumer,
             }, // per sicurezza, in quanto la select sopra non garantisce che il service sia sempre presente
             consumer,
-            vigil
+            vigil,
           );
         } else {
           console.error("Consumer email not found");
@@ -201,7 +207,7 @@ export async function PUT(
         data: updatedBooking,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating booking payment:", error);

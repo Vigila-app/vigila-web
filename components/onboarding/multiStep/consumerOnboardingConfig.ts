@@ -94,6 +94,12 @@ export const createConsumerOnboardingConfig = (
               .toISOString()
               .split("T")[0],
           },
+          min: new Date(new Date().setFullYear(new Date().getFullYear() - 110))
+            .toISOString()
+            .split("T")[0],
+          max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+            .toISOString()
+            .split("T")[0],
         },
       ],
       nextStep: "address",

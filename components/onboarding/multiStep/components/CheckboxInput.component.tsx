@@ -32,7 +32,8 @@ export const MulticheckboxInput = ({
   const noneValue = question.options?.find(
     (option) => String(option.value).toLowerCase() === "none",
   )?.value;
-  const reachedMax = question.max && currentValues.length >= question.max;
+  const reachedMax =
+    question.max && currentValues.length >= Number(question.max);
   return (
     <div>
       <label

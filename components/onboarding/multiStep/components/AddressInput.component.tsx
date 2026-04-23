@@ -1,16 +1,16 @@
-import { SearchAddress } from "@/components/maps"
-import { RolesEnum } from "@/src/enums/roles.enums"
-import { AddressI } from "@/src/types/maps.types"
-import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types"
+import { SearchAddress } from "@/components/maps";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { AddressI } from "@/src/types/maps.types";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
 import {
   ExclamationTriangleIcon,
   XCircleIcon,
-} from "@heroicons/react/24/outline"
-import clsx from "clsx"
-import { Dispatch, SetStateAction } from "react"
+} from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { Dispatch, SetStateAction } from "react";
 interface AddressInputI {
-  setAddress: Dispatch<SetStateAction<AddressI | null>>
-  address: AddressI | null
+  setAddress: Dispatch<SetStateAction<AddressI | null>>;
+  address: AddressI | null;
 }
 export const AddressInput = ({
   question,
@@ -18,12 +18,15 @@ export const AddressInput = ({
   error,
   setAddress,
   address,
+  onChange,
 }: QuestionRendererProps & AddressInputI) => (
   <div>
     <SearchAddress
+      {...question}
       role={role}
       onSubmit={(selectedAddress) => {
-        setAddress(selectedAddress)
+        setAddress(selectedAddress);
+        onChange(selectedAddress);
       }}
       placeholder={question.placeholder}
       label={question.label}
@@ -47,7 +50,7 @@ export const AddressInput = ({
       </p>
     )}
   </div>
-)
+);
 
 export const MultiAddressInput = ({
   question,
@@ -56,27 +59,27 @@ export const MultiAddressInput = ({
   value,
   onChange,
 }: QuestionRendererProps) => {
-  const selectedAddresses = (value as AddressI[]) || []
+  const selectedAddresses = (value as AddressI[]) || [];
 
   const formatAddressDisplay = (addr: AddressI) => {
-    if (!addr.address) return addr.display_name
+    if (!addr.address) return addr.display_name;
     const { neighbourhood, suburb, city, town, village, county, postcode } =
-      addr.address
+      addr.address;
 
-    const mainLocation = city || town || village || ""
+    const mainLocation = city || town || village || "";
     const district =
-      neighbourhood || suburb ? `${neighbourhood || suburb}, ` : ""
-    const province = city !== county ? ` (${county})` : ""
+      neighbourhood || suburb ? `${neighbourhood || suburb}, ` : "";
+    const province = city !== county ? ` (${county})` : "";
 
-    return `${district}${mainLocation}${province}, ${postcode || ""}`
-  }
+    return `${district}${mainLocation}${province}, ${postcode || ""}`;
+  };
 
   return (
     <div
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          e.preventDefault()
-          e.stopPropagation()
+          e.preventDefault();
+          e.stopPropagation();
         }
       }}
     >
@@ -100,10 +103,10 @@ export const MultiAddressInput = ({
         onSubmit={(newAddress) => {
           const exists = selectedAddresses.some(
             (a) => a.display_name === newAddress.display_name,
-          )
+          );
 
           if (!exists) {
-            onChange([...selectedAddresses, newAddress])
+            onChange([...selectedAddresses, newAddress]);
           }
         }}
       />
@@ -133,8 +136,8 @@ export const MultiAddressInput = ({
                     onClick={() => {
                       const newDetails = selectedAddresses.filter(
                         (_, i) => i !== index,
-                      )
-                      onChange(newDetails)
+                      );
+                      onChange(newDetails);
                     }}
                     className="text-red-500 hover:text-red-700 ml-1"
                     aria-label="Rimuovi zona"
@@ -161,5 +164,5 @@ export const MultiAddressInput = ({
         </p>
       )}
     </div>
-  )
-}
+  );
+};

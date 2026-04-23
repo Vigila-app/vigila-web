@@ -1,64 +1,68 @@
-import { getAdminClient, getUserByIdAdmin, jsonErrorResponse } from "@/server/api.utils.server"
-import { ResponseCodesConstants } from "@/src/constants"
+import {
+  getAdminClient,
+  getUserByIdAdmin,
+  jsonErrorResponse,
+} from "@/server/api.utils.server";
+import { ResponseCodesConstants } from "@/src/constants";
 import {
   TRANSACTION_STATUS,
   TRANSACTION_TYPE,
-} from "@/src/types/transactions.types"
+} from "@/src/types/transactions.types";
 import {
   BookingStatusEnum,
   PaymentStatusEnum,
-} from "@/src/enums/booking.enums"
-import { BookingUtilsServer } from "@/server/utils/booking.utils.server"
-import { NextResponse } from "next/server"
-import Stripe from "stripe"
+} from "@/src/enums/booking.enums";
+import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
 
 export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
   const { user_id, wallet_id, transaction_type, credit_amount } =
-    paymentIntent.metadata
+    paymentIntent.metadata;
   // Validate required metadata
   if (!user_id || !wallet_id) {
     console.error(
       "Missing required metadata in PaymentIntent:",
-      paymentIntent.metadata
-    )
+      paymentIntent.metadata,
+    );
     return jsonErrorResponse(400, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
       success: false,
       message: "Missing required metadata: user_id or wallet_id",
-    })
+    });
   }
 
-  const _admin = getAdminClient()
+  const _admin = getAdminClient();
 
   // Idempotency Logic: Check if transaction already exists
   const { data: existingTransaction, error: checkError } = await _admin
     .from("wallet_transactions")
     .select("id")
     .eq("stripe_payment_id", paymentIntent.id)
-    .maybeSingle()
+    .maybeSingle();
 
   if (checkError) {
-    console.error("Error checking for existing transaction:", checkError)
+    console.error("Error checking for existing transaction:", checkError);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,
       success: false,
       message: "Database error while checking for duplicate",
-    })
+    });
   }
 
   // CASE EXISTS: Duplicate event - return 200 OK and terminate
   if (existingTransaction) {
     console.log(
-      `Duplicate event detected for payment ${paymentIntent.id}, ignoring`
-    )
+      `Duplicate event detected for payment ${paymentIntent.id}, ignoring`,
+    );
     return NextResponse.json(
       {
         code: ResponseCodesConstants.WALLET_WEBHOOK_DUPLICATE.code,
         success: true,
         message: "Duplicate event: transaction already processed",
       },
-      { status: 200 }
-    )
+      { status: 200 },
+    );
   }
 
   // CASE NEW: Process the top-up
@@ -67,8 +71,8 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
   // Determine the amount to credit: use credit_amount from metadata if available (for bundles), otherwise use paid amount
   const amountToCredit = credit_amount
     ? Math.round(parseFloat(credit_amount) * 100)
-    : paymentIntent.amount
-  const currency = paymentIntent.currency.toUpperCase()
+    : paymentIntent.amount;
+  const currency = paymentIntent.currency.toUpperCase();
 
   // Start atomic database transaction
   // Step 1: Create the Transaction record with status 'COMPLETED'
@@ -86,16 +90,16 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
       created_at: new Date().toISOString(),
     })
     .select()
-    .single()
+    .single();
 
   if (transactionError) {
-    console.error("Error creating transaction:", transactionError)
+    console.error("Error creating transaction:", transactionError);
 
     // Check if this is a unique constraint violation (race condition)
     if (transactionError.code === "23505") {
       console.log(
-        `Race condition: transaction already exists for ${paymentIntent.id}`
-      )
+        `Race condition: transaction already exists for ${paymentIntent.id}`,
+      );
       return NextResponse.json(
         {
           code: ResponseCodesConstants.WALLET_WEBHOOK_DUPLICATE.code,
@@ -103,15 +107,15 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
           message:
             "Duplicate event: transaction already processed (race condition)",
         },
-        { status: 200 }
-      )
+        { status: 200 },
+      );
     }
 
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,
       success: false,
       message: "Failed to create transaction record",
-    })
+    });
   }
 
   // Step 2: Atomically update the Wallet balance
@@ -119,17 +123,17 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
   const { error: walletError } = await _admin.rpc("update_wallet_balance", {
     wallet_id: wallet_id,
     amount: amountToCredit,
-  })
+  });
 
   if (walletError) {
-    console.error("Error updating wallet balance:", walletError)
+    console.error("Error updating wallet balance:", walletError);
 
     // Attempt to rollback by deleting the transaction (best effort)
     // Log errors to aid in manual reconciliation if rollback fails
     const { error: rollbackError } = await _admin
       .from("wallet_transactions")
       .delete()
-      .eq("id", transaction.id)
+      .eq("id", transaction.id);
 
     if (rollbackError) {
       console.error(
@@ -140,20 +144,20 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
           wallet_id,
           amount: amountToCredit,
           rollbackError,
-        }
-      )
+        },
+      );
     }
 
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,
       success: false,
       message: "Failed to update wallet balance",
-    })
+    });
   }
 
   console.log(
-    `Successfully processed top-up: ${amountToCredit} ${currency} for wallet ${wallet_id}`
-  )
+    `Successfully processed top-up: ${amountToCredit} ${currency} for wallet ${wallet_id}`,
+  );
 
   return NextResponse.json(
     {
@@ -166,9 +170,9 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
         currency: currency,
       },
     },
-    { status: 200 }
-  )
-}
+    { status: 200 },
+  );
+};
 
 /**
  * Handles the payment_intent.succeeded event for booking payments.
@@ -179,43 +183,50 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
  * - If new, updates booking to PAID + CONFIRMED atomically
  * - Sends email notifications to consumer and vigil
  */
-export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) => {
-  const { bookingId, user_id } = paymentIntent.metadata
+export const handleBookingPayment = async (
+  paymentIntent: Stripe.PaymentIntent,
+) => {
+  const { bookingId, user_id } = paymentIntent.metadata;
 
   // Validate required metadata
   if (!bookingId || !user_id) {
     console.error(
       "Missing required metadata in PaymentIntent for booking payment:",
-      paymentIntent.metadata
-    )
+      paymentIntent.metadata,
+    );
     return jsonErrorResponse(400, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
       success: false,
       message: "Missing required metadata: bookingId or user_id",
-    })
+    });
   }
 
-  const _admin = getAdminClient()
+  const _admin = getAdminClient();
 
   // Idempotency: Check if booking is already marked as paid with this payment_id
   const { data: existingBooking, error: checkError } = await _admin
     .from("bookings")
-    .select(`
+    .select(
+      `
       *,
       consumer:consumers(*),
       vigil:vigils(*),
       service:services(*)
-    `)
+    `,
+    )
     .eq("id", bookingId)
-    .single()
+    .single();
 
   if (checkError || !existingBooking) {
-    console.error("Booking not found for payment webhook:", { bookingId, checkError })
+    console.error("Booking not found for payment webhook:", {
+      bookingId,
+      checkError,
+    });
     return jsonErrorResponse(404, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_METHOD_NOT_FOUND.code,
       success: false,
       message: `Booking ${bookingId} not found`,
-    })
+    });
   }
 
   // Idempotency: If already paid with this payment_id, return 200 OK
@@ -223,15 +234,17 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
     existingBooking.payment_status === PaymentStatusEnum.PAID &&
     existingBooking.payment_id === paymentIntent.id
   ) {
-    console.log(`Duplicate event: booking ${bookingId} already paid with payment ${paymentIntent.id}`)
+    console.log(
+      `Duplicate event: booking ${bookingId} already paid with payment ${paymentIntent.id}`,
+    );
     return NextResponse.json(
       {
         code: ResponseCodesConstants.PAYMENT_WEBHOOK_SUCCESS.code,
         success: true,
         message: "Duplicate event: booking payment already processed",
       },
-      { status: 200 }
-    )
+      { status: 200 },
+    );
   }
 
   // Verify the booking belongs to the user from metadata
@@ -240,12 +253,12 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
       bookingId,
       expected: user_id,
       actual: existingBooking.consumer_id,
-    })
+    });
     return jsonErrorResponse(400, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
       success: false,
       message: "Booking does not belong to the user in payment metadata",
-    })
+    });
   }
 
   // Update booking: payment_status → PAID, status → CONFIRMED (if currently PENDING)
@@ -253,10 +266,10 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
     payment_id: paymentIntent.id,
     payment_status: PaymentStatusEnum.PAID,
     updated_at: new Date().toISOString(),
-  }
+  };
 
   if (existingBooking.status === BookingStatusEnum.PENDING) {
-    updateData.status = BookingStatusEnum.CONFIRMED
+    updateData.status = BookingStatusEnum.CONFIRMED;
   }
 
   const { data: updatedBooking, error: updateError } = await _admin
@@ -264,22 +277,24 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
     .update(updateData)
     .eq("id", bookingId)
     .select()
-    .single()
+    .single();
 
   if (updateError) {
-    console.error("Error updating booking payment status:", updateError)
+    console.error("Error updating booking payment status:", updateError);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,
       success: false,
       message: "Failed to update booking payment status",
-    })
+    });
   }
 
-  console.log(`Successfully processed booking payment: booking ${bookingId} marked as PAID`)
+  console.log(
+    `Successfully processed booking payment: booking ${bookingId} marked as PAID`,
+  );
 
   // Send email notifications (best effort — don't fail the webhook)
   try {
-    const consumer = await getUserByIdAdmin(user_id)
+    const consumer = await getUserByIdAdmin(user_id);
     if (consumer?.email) {
       await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
         {
@@ -288,12 +303,12 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
           vigil: existingBooking.vigil,
           consumer: existingBooking.consumer,
         },
-        consumer
-      )
+        consumer,
+      );
     }
 
     if (existingBooking.vigil_id) {
-      const vigil = await getUserByIdAdmin(existingBooking.vigil_id)
+      const vigil = await getUserByIdAdmin(existingBooking.vigil_id);
       if (vigil?.email) {
         await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
           {
@@ -302,12 +317,15 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
             vigil: existingBooking.vigil,
             consumer: existingBooking.consumer,
           },
-          vigil
-        )
+          vigil,
+        );
       }
     }
   } catch (emailError) {
-    console.error("Error sending booking payment email notifications:", emailError)
+    console.error(
+      "Error sending booking payment email notifications:",
+      emailError,
+    );
   }
 
   return NextResponse.json(
@@ -322,6 +340,6 @@ export const handleBookingPayment = async (paymentIntent: Stripe.PaymentIntent) 
         paymentStatus: updatedBooking.payment_status,
       },
     },
-    { status: 200 }
-  )
-}
+    { status: 200 },
+  );
+};

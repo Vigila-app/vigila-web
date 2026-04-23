@@ -539,6 +539,39 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   },
   // endregion VIGIL
 
+  // region PUBLIC SEARCH
+  PUBLIC_SEARCH_SUCCESS: {
+    code: 8101,
+  },
+  PUBLIC_SEARCH_ERROR: {
+    code: 8102,
+  },
+  PUBLIC_SEARCH_BAD_REQUEST: {
+    code: 8103,
+  },
+  PUBLIC_SEARCH_METHOD_NOT_ALLOWED: {
+    code: 8106,
+  },
+  // endregion PUBLIC SEARCH
+
+  // region NOTICE BOARD
+  NOTICE_BOARD_SUCCESS: {
+    code: 8201,
+  },
+  NOTICE_BOARD_ERROR: {
+    code: 8202,
+  },
+  NOTICE_BOARD_BAD_REQUEST: {
+    code: 8203,
+  },
+  NOTICE_BOARD_UNAUTHORIZED: {
+    code: 8204,
+  },
+  NOTICE_BOARD_METHOD_NOT_ALLOWED: {
+    code: 8206,
+  },
+  // endregion NOTICE BOARD
+
   // region CALENDAR
   // Consumer Calendar
   CONSUMER_CALENDAR_SUCCESS: {

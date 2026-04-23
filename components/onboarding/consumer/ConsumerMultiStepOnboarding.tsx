@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { OnboardService } from "@/src/services/onboard.service";
 import { MatchingService, UserService } from "@/src/services";
@@ -12,14 +12,22 @@ import { Routes } from "@/src/routes";
 import { AuthService } from "@/src/services";
 import MultiStepOnboarding from "../multiStep/MultiStepOnboarding";
 import { createConsumerOnboardingConfig } from "../multiStep/consumerOnboardingConfig";
+import {
+  trackQuestionnaireCompleted,
+  trackQuestionnaireStarted,
+} from "@/lib/tracking";
 
 /**
  * New multi-step onboarding component for CONSUMER users
  */
 const ConsumerMultiStepOnboarding = () => {
   const { showToast } = useAppStore();
-  const { getUserDetails } = useUserStore();
+  const { getUserDetails, user } = useUserStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user?.id) trackQuestionnaireStarted(user?.id, RolesEnum.CONSUMER);
+  }, [user?.id]);
 
   const handleComplete = useCallback(
     async (data: Record<string, any>) => {
@@ -77,6 +85,7 @@ const ConsumerMultiStepOnboarding = () => {
             e,
           );
         }
+        if (user?.id) trackQuestionnaireCompleted(user?.id, RolesEnum.CONSUMER);
 
         showToast({
           message: "Profilo aggiornato con successo",
@@ -95,6 +104,7 @@ const ConsumerMultiStepOnboarding = () => {
         throw err;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [showToast, getUserDetails, router],
   );
 

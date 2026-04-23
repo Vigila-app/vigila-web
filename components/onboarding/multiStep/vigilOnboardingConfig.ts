@@ -34,6 +34,7 @@ import {
 } from "@/src/enums/onboarding.enums";
 import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 import { AvailabilityRulesDemo } from "@/components/calendar-demo";
+import { ServicesService } from "@/src/services";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -65,6 +66,12 @@ export const createVigilOnboardingConfig = (
               .toISOString()
               .split("T")[0],
           },
+          min: new Date(new Date().setFullYear(new Date().getFullYear() - 80))
+            .toISOString()
+            .split("T")[0],
+          max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+            .toISOString()
+            .split("T")[0],
           autoFocus: false,
         },
         {
@@ -265,11 +272,18 @@ export const createVigilOnboardingConfig = (
           validation: {
             required: true,
           },
-          options: Object.values(VigilDailyServiceEnum).map((value) => ({
-            value,
-            label: VigilDailyServiceLabels[value],
-            icon: VigilDailyServiceIcons[value],
+          options: ServicesService.getServicesCatalog().map((service) => ({
+            value: service.type,
+            label: service.name,
+            icon: VigilDailyServiceIcons[
+              service.type.toUpperCase() as VigilDailyServiceEnum
+            ],
           })),
+          // options: Object.values(VigilDailyServiceEnum).map((value) => ({
+          //   value,
+          //   label: VigilDailyServiceLabels[value],
+          //   icon: VigilDailyServiceIcons[value],
+          // })),
         },
       ],
       nextStep: "hygene",
@@ -373,7 +387,7 @@ export const createVigilOnboardingConfig = (
     {
       id: "hours",
       title: "Quante ore a settimana vorresti lavorare?",
-      description: "Questo ci aiuta a proporti offerte adatte?",
+      description: "Questo ci aiuta a proporti offerte adatte",
       questions: [
         {
           id: "time_committment",

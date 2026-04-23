@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useConsumerStore } from "@/src/store/consumer/consumer.store";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import { useServicesStore } from "@/src/store/services/services.store";
+import { CurrencyEnum } from "@/src/enums/common.enums";
 
 const BookingListComponent = () => {
   const router = useRouter();
@@ -43,20 +44,22 @@ const BookingListComponent = () => {
     if (bookings?.length) {
       if (user?.user_metadata?.role === RolesEnum.VIGIL) {
         const uniqueConsumerIds = Array.from(
-          new Set(bookings.map((b) => b.consumer_id))
+          new Set(bookings.map((b) => b.consumer_id)),
         );
         getConsumersDetails(uniqueConsumerIds);
       }
 
       if (user?.user_metadata?.role === RolesEnum.CONSUMER) {
         const uniqueVigilIds = Array.from(
-          new Set(bookings.map((b) => b.vigil_id))
+          new Set(bookings.map((b) => b.vigil_id)),
         );
         getVigilsDetails(uniqueVigilIds);
       }
 
       Array.from(new Set(bookings.map((b) => b.service_id))).forEach(
-        (serviceId) => getServiceDetails(serviceId)
+        (serviceId) => {
+          if (serviceId) getServiceDetails(serviceId);
+        },
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,13 +166,15 @@ const BookingListComponent = () => {
 
   const rows = bookings.map((booking: BookingI) => ({
     id: booking.id,
-    service_name: getService(booking.service_id)?.name || "Unknown Service",
+    service_name:
+      (booking.service_id && getService(booking.service_id)?.name) ||
+      "Unknown Service",
     service_date: dateDisplay(booking.startDate, "date"),
     service_dateValue: new Date(booking.startDate).getTime(),
     duration_hours: booking.quantity,
     duration_hoursValue: booking.quantity,
-    total_amount: `${getService(booking.service_id)?.currency} ${amountDisplay(
-      booking.price
+    total_amount: `${(booking.service_id && getService(booking.service_id)?.currency) || CurrencyEnum.EURO} ${amountDisplay(
+      booking.price,
     )}`,
     total_amountValue: booking.price,
     status: (
@@ -198,7 +203,7 @@ const BookingListComponent = () => {
                 label="Paga ora"
                 action={() =>
                   router.push(
-                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`
+                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`,
                   )
                 }
               />

@@ -9,10 +9,7 @@ import { amountDisplay, getCurrency } from "@/src/utils/common.utils";
 import { Routes } from "@/src/routes";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/user/user.store";
-import {
-  PaymentService,
-  ServicesService,
-} from "@/src/services";
+import { PaymentService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
@@ -21,7 +18,11 @@ import { AppConstants } from "@/src/constants";
 import Card from "@/components/card/card";
 import { ServiceCatalogItem } from "@/src/types/services.types";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
-import { PlusIcon, CheckCircleIcon, CreditCardIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  CheckCircleIcon,
+  CreditCardIcon,
+} from "@heroicons/react/24/outline";
 import { WalletIcon as WalletSolidIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import Button from "@/components/button/button";
@@ -43,12 +44,13 @@ const ToggleSwitch = ({
     className={clsx(
       "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
       checked ? "bg-orange-500" : "bg-gray-200",
-      disabled && "opacity-50 cursor-not-allowed"
-    )}>
+      disabled && "opacity-50 cursor-not-allowed",
+    )}
+  >
     <span
       className={clsx(
         "pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
-        checked ? "translate-x-5" : "translate-x-0"
+        checked ? "translate-x-5" : "translate-x-0",
       )}
     />
   </button>
@@ -65,7 +67,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "wallet">(
-    "stripe"
+    "stripe",
   );
 
   const { user } = useUserStore();
@@ -78,7 +80,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
   const booking = useMemo(
     () => bookings.find((b) => b.id === bookingId),
-    [bookings, bookingId]
+    [bookings, bookingId],
   );
 
   const canPayWithWallet = useMemo(() => {
@@ -88,17 +90,17 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
 
   const service = useMemo(
     () => services.find((s) => s.id === booking?.service_id),
-    [services, booking?.service_id]
+    [services, booking?.service_id],
   );
   const vigil = useMemo(
     () => vigils.find((v) => v.id === booking?.vigil_id),
-    [vigils, booking?.vigil_id]
+    [vigils, booking?.vigil_id],
   );
   const serviceCatalog: ServiceCatalogItem = useMemo(
     () =>
       service?.info?.catalog_id &&
       ServicesService.getServiceCatalogById(service.info.catalog_id),
-    [service]
+    [service],
   );
 
   // Logica Toggle Wallet
@@ -132,35 +134,39 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
   };
 
   useEffect(() => {
-    if (booking?.id && service?.id && paymentMethod === "stripe") {
+    if (
+      booking?.id &&
+      (service?.id || booking?.notice_id) &&
+      paymentMethod === "stripe"
+    ) {
       loadBookingAndCreatePayment();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.id, service?.id, paymentMethod]);
 
   useEffect(() => {
     if (bookingId) getBookingDetails(bookingId, true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
   useEffect(() => {
     if (user?.id) getTransactions(user.id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {
     if (booking?.id) {
-      getServiceDetails(booking.service_id);
+      if (booking.service_id) getServiceDetails(booking.service_id);
       getVigilsDetails([booking.vigil_id]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.id]);
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     // Payment status update is handled server-side by the Stripe webhook.
     // Client just redirects to the result page which polls for confirmation.
     router.push(
-      `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_intent=${paymentIntentId}`
+      `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_intent=${paymentIntentId}`,
     );
   };
 
@@ -171,7 +177,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
       if (response.success) {
         if (user?.id) getTransactions(user.id, true);
         router.push(
-          `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_method=wallet&status=success`
+          `${Routes.paymentBookingConfirm.url}?bookingId=${booking!.id}&payment_method=wallet&status=success`,
         );
       } else setError("Pagamento con wallet fallito");
     } catch (err) {
@@ -243,7 +249,7 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                 <span>
                   {serviceCatalog.extra
                     .filter((extra) =>
-                      (booking.extras || []).includes(extra.id)
+                      (booking.extras || []).includes(extra.id),
                     )
                     .map((extra) => extra.name)
                     .join(", ")}
@@ -294,8 +300,9 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
             "transition-all duration-300 mb-6",
             paymentMethod === "wallet"
               ? "opacity-50 pointer-events-none grayscale"
-              : "opacity-100"
-          )}>
+              : "opacity-100",
+          )}
+        >
           <h3 className="font-bold text-md text-gray-900 mb-3 px-2">
             Seleziona metodo
           </h3>
@@ -308,8 +315,9 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                 "flex items-center justify-between p-4 rounded-2xl border cursor-pointer bg-white transition-all",
                 paymentMethod === "stripe"
                   ? "border-gray-900 shadow-sm"
-                  : "border-gray-200"
-              )}>
+                  : "border-gray-200",
+              )}
+            >
               <div className="flex items-center gap-3">
                 <CreditCardIcon className="w-6 h-6 text-vigil-orange" />
                 <span className="font-semibold text-gray-700 text-sm">
@@ -362,11 +370,13 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
               <Button
                 label="Annulla"
                 primary={false}
-                action={() => router.back()}></Button>
+                action={() => router.back()}
+              ></Button>
               <Button
                 label="Paga con Wallet"
                 role={RolesEnum.VIGIL}
-                action={handleWalletPayment}></Button>
+                action={handleWalletPayment}
+              ></Button>
             </div>
           ) : (
             clientSecret && (
@@ -380,7 +390,8 @@ const BookingPaymentComponent = (props: PaymentBookingI) => {
                 />
                 <button
                   onClick={() => router.back()}
-                  className="w-full mt-3 py-3 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700">
+                  className="w-full mt-3 py-3 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700"
+                >
                   Annulla operazione
                 </button>
               </div>

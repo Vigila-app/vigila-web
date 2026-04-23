@@ -16,6 +16,7 @@ export const SelectInput = ({
   value,
 }: QuestionRendererProps) => (
   <Select
+    {...question}
     label={question.label}
     placeholder={question.placeholder}
     value={value || ""}
@@ -53,7 +54,8 @@ export const SelectMultiInput = ({
           "block font-medium mb-2",
           role === RolesEnum.VIGIL && "text-vigil-orange",
           role === RolesEnum.CONSUMER && "text-consumer-blue",
-        )}>
+        )}
+      >
         {question.label}
         {question.validation?.required && "*"}
       </label>
@@ -75,7 +77,8 @@ export const SelectMultiInput = ({
                     role === RolesEnum.VIGIL
                       ? "bg-orange-50 border-orange-200 text-orange-800"
                       : "bg-blue-50 border-blue-200 text-blue-800",
-                  )}>
+                  )}
+                >
                   {option?.icon && <option.icon className="w-4 h-4" />}
                   <span>{option?.label || selectedValue}</span>
                   <button
@@ -86,7 +89,8 @@ export const SelectMultiInput = ({
                       );
                     }}
                     className="text-red-500 hover:text-red-700 ml-1"
-                    aria-label="Remove">
+                    aria-label="Remove"
+                  >
                     <XCircleIcon className="w-4 h-4" />
                   </button>
                 </li>
@@ -131,7 +135,8 @@ export const SelectMultiInput = ({
                     isChecked &&
                       role === RolesEnum.CONSUMER &&
                       "bg-consumer-light-blue",
-                  )}>
+                  )}
+                >
                   {/* Icon on the left */}
                   {option.icon && (
                     <option.icon className="w-5 h-5 text-gray-600 mr-2" />
@@ -139,7 +144,8 @@ export const SelectMultiInput = ({
                   {/* Label in the middle */}
                   <label
                     htmlFor={`option-${option.value}`}
-                    className="flex-1 cursor-pointer flex items-center gap-2">
+                    className="flex-1 cursor-pointer flex items-center gap-2"
+                  >
                     <span>{option.label}</span>
                   </label>
                   {/* Checkbox on the right */}

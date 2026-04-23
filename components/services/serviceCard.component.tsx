@@ -15,13 +15,22 @@ import {
   ExclamationTriangleIcon,
   EyeIcon,
   MapPinIcon,
+  UserIcon,
+  ChatBubbleBottomCenterIcon,
+  UserPlusIcon,
 } from "@heroicons/react/24/outline";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import clsx from "clsx";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesService } from "@/src/services";
-import { OccupationEnum, OccupationLabels } from "@/src/enums/onboarding.enums";
+import {
+  OccupationEnum,
+  OccupationLabels,
+  VigilHygieneServiceEnum,
+  VigilOutdoorServiceEnum,
+} from "@/src/enums/onboarding.enums";
+import { VigilDataType } from "@/src/types/vigil.types";
 
 type ServiceCardI = {
   service: ServiceI;
@@ -30,6 +39,7 @@ type ServiceCardI = {
   onToggleStatus?: () => void;
   onDelete?: () => void;
   simplified?: boolean;
+  vigilData?: VigilDataType;
 };
 
 const ServiceCard = (props: ServiceCardI) => {
@@ -40,6 +50,7 @@ const ServiceCard = (props: ServiceCardI) => {
     onToggleStatus,
     onDelete,
     simplified = false,
+    vigilData,
   } = props;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
@@ -52,6 +63,24 @@ const ServiceCard = (props: ServiceCardI) => {
   );
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
   const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
+
+  const iconMap: Record<string, React.ReactNode> = {
+    "Compagnia e conversazione": (
+      <div className="bg-red-300 w-14 h-14 rounded-full p-1 flex items-center justify-center flex-shrink-0">
+        <ChatBubbleBottomCenterIcon className="w-10 h-10 text-red-800" />
+      </div>
+    ),
+    "Assistenza leggera": (
+      <div className="bg-yellow-200 w-14 h-14 rounded-full p-1 flex items-center justify-center flex-shrink-0">
+        <UserIcon className="w-10 h-10 text-yellow-700" />
+      </div>
+    ),
+    "Assistenza alla persona": (
+      <div className="bg-green-200 w-14 h-14 rounded-full p-1 flex items-center justify-center flex-shrink-0">
+        <UserPlusIcon className="w-10 h-10 text-green-700" />
+      </div>
+    ),
+  };
 
   const goToBooking = () => {
     if (service?.id && service?.vigil_id) {
@@ -76,7 +105,35 @@ const ServiceCard = (props: ServiceCardI) => {
         : undefined,
     [service?.info?.catalog_id],
   );
+  console.log("ServiceCard render", { service, serviceCatalog });
+  const activeExtras = useMemo(() => {
+    if (!vigilData || !serviceCatalog?.extra?.length) return [];
 
+    const hasTransport =
+      !!vigilData.outdoor_services?.length &&
+      !vigilData.outdoor_services.every(
+        (s) => s === VigilOutdoorServiceEnum.NONE,
+      );
+
+    const hygieneServices =
+      vigilData.hygene_services?.filter(
+        (s) => s !== VigilHygieneServiceEnum.NONE,
+      ) ?? [];
+
+    return serviceCatalog.extra.filter((extra) => {
+      const map: Record<string, boolean> = {
+        transport: hasTransport,
+        bed_help: hygieneServices.includes(VigilHygieneServiceEnum.BED_HELP),
+        bathroom_help: hygieneServices.includes(
+          VigilHygieneServiceEnum.BATHROOM_HELP,
+        ),
+        diaper_help: hygieneServices.includes(
+          VigilHygieneServiceEnum.DIAPER_HELP,
+        ),
+      };
+      return map[extra.id] ?? false;
+    });
+  }, [vigilData, serviceCatalog]);
   return (
     <Card
       customClass={clsx("py-4", !service.active && "!bg-gray-100")}
@@ -162,40 +219,66 @@ const ServiceCard = (props: ServiceCardI) => {
         </div>
       ) : null}
       {service?.name ? (
-        <div className="flex-flexcol items-start gap-6">
-          <div className="flex justify-between">
-            <p className="text-[17px] font-semibold text-consumer-blue">
-              {service?.name}
-            </p>
-            {simplified && role === RolesEnum.VIGIL ? (
-              <div>
-                <Badge
-                  label={service.active ? "Attivo" : "Non attivo"}
-                  color={service.active ? "green" : "red"}
-                />
-              </div>
-            ) : null}
+        <div className="flex flex-col items-start gap-2 w-full">
+          <div
+            className={clsx(
+              "flex justify-between",
+              simplified && "items-center gap-4",
+            )}
+          >
+            {simplified && iconMap[service?.name]}
+            <div className="flex-1 ">
+              <p className="text-lg font-semibold">{service?.name}</p>
+              {simplified && role === RolesEnum.VIGIL ? (
+                <div className="mt-2">
+                  <Badge
+                    label={service.active ? "Attivo" : "Non attivo"}
+                    color={service.active ? "green" : "red"}
+                  />
+                </div>
+              ) : null}
+            </div>
           </div>
-          <div className="text-sm font-light text-gray-600 ">
-            <p>{serviceCatalog?.description}</p>
+
+          <div className="text-sm mt-1 font-base text-gray-800 w-full ">
+            <p>{service?.description}</p>
             {simplified && role === RolesEnum.VIGIL && (
               <>
-                {service.info?.extras?.length ? (
+                {activeExtras.length > 0 && (
                   <p className="font-normal my-2">
-                    Extra attivi: &nbsp;
-                    {serviceCatalog?.extra
-                      ?.filter((extra) =>
-                        service.info?.extras?.includes(extra.id),
-                      )
+                    Extra attivi:&nbsp;
+                    {activeExtras
                       .map((extra) => `${extra.name} €${extra.fixed_price}`)
                       .join(", ")}
                   </p>
-                ) : null}
-                <p className="font-normal my-2">
-                  Tariffa: &nbsp;
-                  {service?.currency}
-                  {service?.unit_price}/h
-                </p>
+                )}
+                <div className="flex items-center  mt-4 justify-between">
+                  <div className="flex gap-5  justify-center items-center">
+                    {onToggleStatus &&
+                      (!serviceCatalog?.professional ||
+                        (serviceCatalog?.professional && service.active)) && (
+                        <Button
+                          label={service.active ? "Disattiva" : "Attiva"}
+                          type="button"
+                          role={RolesEnum.CONSUMER}
+                          action={onToggleStatus}
+                        />
+                      )}
+                    {onDelete && (
+                      <Button
+                        label="Rimuovi"
+                        type="button"
+                        danger
+                        action={() => setShowDeleteModal(true)}
+                      />
+                    )}
+                  </div>
+                  <p className=" flex justify-end font-medium text-lg my-1 text-black ">
+                    Tariffa: &nbsp;
+                    {service?.currency}
+                    {service?.unit_price}/h
+                  </p>
+                </div>
               </>
             )}
           </div>
@@ -242,17 +325,7 @@ const ServiceCard = (props: ServiceCardI) => {
               action={onEdit}
             />
           )} */}
-          {onToggleStatus &&
-            (!serviceCatalog?.professional ||
-              (serviceCatalog?.professional && service.active)) && (
-              <Button
-                small
-                label={service.active ? "Disattiva" : "Attiva"}
-                type="button"
-                role={RolesEnum.CONSUMER}
-                action={onToggleStatus}
-              />
-            )}
+
           {onToggleStatus &&
             serviceCatalog?.professional &&
             !service.active && (
@@ -264,15 +337,6 @@ const ServiceCard = (props: ServiceCardI) => {
                 </div>
               </div>
             )}
-          {onDelete && (
-            <Button
-              label="Rimuovi"
-              type="button"
-              small
-              danger
-              action={() => setShowDeleteModal(true)}
-            />
-          )}
         </div>
       ) : null}
       {showDeleteModal && onDelete && (
