@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
-import { UserIcon } from "@heroicons/react/24/outline";
 
 const dayNames = [
   "Domenica",
@@ -16,15 +16,12 @@ const dayNames = [
 ];
 
 export default function NoMatchPage() {
-  const router = useRouter();
   const [answers, setAnswers] = useState<any>(null);
-  const [response, setResponse] = useState<any>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (globalThis.window === undefined) return;
     try {
       const rawAns = sessionStorage.getItem("matching_answers");
-      const rawResp = sessionStorage.getItem("matching_response");
       if (rawAns) {
         const parsed = JSON.parse(rawAns);
         const payload = parsed?.answers ?? parsed;
@@ -34,41 +31,32 @@ export default function NoMatchPage() {
         }
         setAnswers(payload);
       }
-      if (rawResp) setResponse(JSON.parse(rawResp));
     } catch (e) {
       console.error(e);
     }
   }, []);
 
-  const serviceLabel = () => {
-    try {
-      const a = answers || {};
-      // derive service and mansioni from services object
-      const s = a.services;
-      if (s && typeof s === "object") {
-        const keys = Object.keys(s);
-        if (keys.length > 0) {
-          const first = s[keys[0]];
-          const svc = first?.services && first.services ? first.services : null;
-          if (svc) {
-            return svc;
-          }
-        }
-      }
+  const getServiceFromServices = (services: any) => {
+    if (!services || typeof services !== "object") return null;
+    const key = Object.keys(services)[0];
+    if (!key) return null;
+    return services[key]?.services ?? null;
+  };
 
-      // fallback: schedule (may live in matchingRequest when built earlier)
-      const schedule = a.matchingRequest?.schedule ?? a.schedule;
-      if (schedule && typeof schedule === "object") {
-        const k = Object.keys(schedule)[0];
-        if (k) {
-          const svc = schedule[k]?.service;
-          return svc ? svc : "Assistenza";
-        }
-      }
-    } catch (e) {
-      /* ignore */
-    }
-    return "Assistenza";
+  const getServiceFromSchedule = (schedule: any) => {
+    if (!schedule || typeof schedule !== "object") return null;
+    const key = Object.keys(schedule)[0];
+    if (!key) return null;
+    return schedule[key]?.service ?? null;
+  };
+
+  const serviceLabel = () => {
+    const payload = answers || {};
+    const fromServices = getServiceFromServices(payload.services);
+    if (fromServices) return fromServices;
+
+    const schedule = payload.matchingRequest?.schedule ?? payload.schedule;
+    return getServiceFromSchedule(schedule) || "Assistenza";
   };
 
   const zoneLabel = () => {
@@ -80,31 +68,31 @@ export default function NoMatchPage() {
   };
 
   const daysLabel = () => {
-    try {
-      const sel =
-        answers?.selectedDays ||
-        answers?.availabilityRules?.map((r: any) => Number(r.weekday));
-      if (Array.isArray(sel) && sel.length > 0) {
-        const mapped = sel
-          .map((d: number) => dayNames[Number(d)])
-          .slice(0, 3)
-          .join(" - ");
-        return mapped;
-      }
-    } catch (e) {}
+    const sel =
+      answers?.selectedDays ??
+      answers?.availabilityRules?.map((r: any) => Number(r.weekday));
+    if (Array.isArray(sel) && sel.length > 0) {
+      return sel
+        .map((d: number) => dayNames[Number(d)])
+        .slice(0, 3)
+        .join(" - ");
+    }
     return "—";
   };
 
   const timeLabel = () => {
-    return (
-      answers?.availabilityRules
-        .map(
-          (rule: { start_time: string; end_time: string }) =>
-            rule.start_time.slice(0, 5) + " - " + rule.end_time.slice(0, 5),
-        )
-        .join("; ") || " - "
-    );
+    const rules = Array.isArray(answers?.availabilityRules)
+      ? answers.availabilityRules
+      : [];
+    const label = rules
+      .map(
+        (rule: { start_time: string; end_time: string }) =>
+          `${rule.start_time.slice(0, 5)} - ${rule.end_time.slice(0, 5)}`,
+      )
+      .join("; ");
+    return label || " - ";
   };
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center px-4 py-8">
@@ -169,8 +157,14 @@ export default function NoMatchPage() {
               </li>
             </ul>
           </div>
-
-          
+          <div className="text-center mt-3">
+            <button
+              onClick={() => router.push(Routes.inizializationBooking.url)}
+              className="text-sm text-consumer-blue underline"
+            >
+              Nuova ricerca
+            </button>
+          </div>
         </div>
       </div>
     </div>

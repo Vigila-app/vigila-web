@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -165,8 +165,7 @@ export default function AvailabilityFlow({
     initialStepId: config.initialStepId,
     onComplete: config.onComplete,
   } as any);
-  const { handleSubmit, reset, getValues } = useForm();
-  const [address, setAddress] = useState();
+  const { handleSubmit } = useForm();
   const getAddress = async () => {
     try {
       const id = (await UserService.getUser())?.id;
@@ -177,12 +176,9 @@ export default function AvailabilityFlow({
         data: any;
       };
       const addr = details?.address;
-      setAddress(addr);
-      // Preserve any current form values (so user input like date isn't overwritten)
-      const current = getValues();
-      reset({ ...(current || {}), address: addr });
-      // Keep the multi-step flow answers in sync using current values
-      setAnswers({ ...(current || {}), address: addr });
+      if (!addr) return;
+      // Merge address into existing answers to avoid clearing user selections
+      setAnswers((prev) => ({ ...prev, address: addr }));
     } catch (error) {
       console.error(error);
     }
@@ -238,7 +234,7 @@ export default function AvailabilityFlow({
                 : "border-consumer-blue",
             )}
             type="button"
-            onClick={back}
+            action={back}
             label="Indietro"
           ></Button>
           <Button

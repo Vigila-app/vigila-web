@@ -5,16 +5,9 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import { CheckCircleIcon, StarIcon } from "@heroicons/react/24/solid";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import { BookingsService, PaymentService } from "@/src/services";
-import { useAppStore } from "@/src/store/app/app.store";
-import { useUserStore } from "@/src/store/user/user.store";
 import { CheckoutForm } from "@/components/checkout";
-import { getCurrency } from "@/src/utils/common.utils";
-import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
-import { CurrencyEnum } from "@/src/enums/common.enums";
-import { BookingFormI } from "@/src/types/booking.types";
-import { Avatar, ButtonLink } from "@/components";
-import MatchedVigil from "@/components/matching/MatchedVigil";
+import { Avatar } from "@/components";
+import { dateDisplay } from "@/src/utils/date.utils";
 
 const dayNames = [
   "Domenica",
@@ -28,132 +21,13 @@ const dayNames = [
 
 export default function MatchingSuccessPage() {
   const router = useRouter();
-  const { user } = useUserStore();
-  const { showLoader, hideLoader } = useAppStore();
-
   const [answers, setAnswers] = useState<any>(null);
   const [response, setResponse] = useState<any>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>("");
-  const [bookingIds, setBookingIds] = useState<string[]>([]);
+  const [bookingIds] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
 
-  // Helper: Create a single trial booking for the first 2 weeks
-  const createTrialBooking = async (
-    compatibleSlots: any[],
-    vigil: any,
-    answer: any,
-    matchPrice: number,
-  ) => {
-    try {
-      if (!user?.id) throw new Error("User not authenticated");
-      if (compatibleSlots.length === 0)
-        throw new Error("No compatible slots found");
-
-      // Get first 14 days of slots
-      const now = new Date();
-      const twoWeeksLater = new Date(now);
-      twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
-
-      const slotsInRange = compatibleSlots.filter((slot: any) => {
-        const slotDate = new Date(slot.date);
-        return slotDate >= now && slotDate <= twoWeeksLater;
-      });
-
-      if (slotsInRange.length === 0) {
-        throw new Error("No slots available in the first 2 weeks");
-      }
-
-      const schedule =
-        answer?.matchingRequest?.schedule || answer?.schedule || {};
-
-      // Extract service info from schedule (use first available service)
-      const scheduleEntries = Object.entries(schedule);
-      const firstService =
-        (scheduleEntries[0]?.[1] as any)?.service ||
-        ServiceCatalogTypeEnum.LIGHT_ASSISTANCE;
-
-      // Get address info
-      const address = answer?.address || {};
-      const postalCode = address?.postal_code || address?.postalCode || [""];
-      const addressStr =
-        `${address?.street || ""} ${address?.house_number || ""}, ${address?.city || ""}, ${address?.postal_code || address?.postalCode || ""}`.trim();
-
-      // Create single trial booking covering F2 weeks with number of slots as quantity
-      const bookingStartDate = new Date(now);
-      bookingStartDate.setHours(0, 0, 0, 0);
-
-      const bookingEndDate = new Date(twoWeeksLater);
-      bookingEndDate.setHours(23, 59, 59, 999);
-
-      const booking: BookingFormI = {
-        consumer_id: user.id,
-        vigil_id: vigil?.id,
-        service_id: firstService,
-        startDate: bookingStartDate,
-        endDate: bookingEndDate,
-        quantity: slotsInRange.length,
-        min_unit: 1,
-        price: matchPrice,
-        fee: 0,
-        currency: "EUR",
-        address: addressStr,
-        postalCode: Array.isArray(postalCode) ? postalCode : [postalCode],
-        status: "pending" as any,
-        note: `Trial booking - ${slotsInRange.length} slots covered in 2 weeks`,
-      } as BookingFormI;
-
-      const createdBooking = await BookingsService.createBooking(booking);
-      return createdBooking.id;
-    } catch (err) {
-      console.error("Error creating trial booking:", err);
-      throw err;
-    }
-  };
-
-  // Handler for "Proceed with this caregiver" button
-  const handleProceedWithMatch = async () => {
-    try {
-      setError("");
-      setIsProcessing(true);
-      showLoader();
-
-      if (!user?.id || !response) {
-        throw new Error("Missing required data");
-      }
-
-      // Step 1: Create trial booking for first 2 weeks
-      // const bookingId = await createTrialBooking(
-      //   best.compatibleSlotDetails || [],
-      //   best,
-      //   answers,
-      //   response.price,
-      // );
-      // setBookingIds([bookingId]);
-
-      // // Step 2: Create payment intent for the booking
-      // const paymentResponse = await PaymentService.createPaymentIntent({
-      //   bookingId: bookingId, //
-      //   user: user.id,
-      //   amount: Math.round((response.price / 2) * 100),
-      //   currency: getCurrency(CurrencyEnum.EURO),
-      // });
-
-      // if (!paymentResponse.success) {
-      //   throw new Error("Failed to create payment intent");
-      // }
-
-      // setClientSecret(paymentResponse.clientSecret);
-      hideLoader();
-    } catch (err: any) {
-      console.error("Error in handleProceedWithMatch:", err);
-      setError(err.message || "An error occurred");
-      hideLoader();
-      setIsProcessing(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  const handlePaymentSuccess = async (_paymentIntentId: string) => {
     // Payment status update is handled server-side by the Stripe webhook.
     // Redirect to trial confirmed page
     router.push(
@@ -168,8 +42,12 @@ export default function MatchingSuccessPage() {
       const rawResp = sessionStorage.getItem("matching_response");
       if (rawAns) {
         const parsed = JSON.parse(rawAns);
+        const payload = parsed?.answers ?? parsed;
+        if (parsed?.matchingRequest) {
+          payload.matchingRequest = parsed.matchingRequest;
+        }
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setAnswers(parsed);
+        setAnswers(payload);
       }
       if (rawResp) setResponse(JSON.parse(rawResp));
     } catch (e) {
@@ -206,11 +84,9 @@ export default function MatchingSuccessPage() {
               onError={(err) => {
                 console.error("Payment error:", err);
                 setError("Errore durante il pagamento");
-                setIsProcessing(false);
               }}
               onCancel={() => {
                 setClientSecret("");
-                setIsProcessing(false);
               }}
             />
           </div>
@@ -219,20 +95,50 @@ export default function MatchingSuccessPage() {
     );
   }
 
-  // build covered slots grouped by weekday
-  const coveredByDay: Record<string, string[]> = {};
-  (best.compatibleSlotDetails || []).forEach((slot: any) => {
-    const d = new Date(slot.date).getUTCDay();
-    const label = `${slot.startTime} - ${slot.endTime}`;
-    const dayName = dayNames[d] || slot.date;
-    coveredByDay[dayName] = coveredByDay[dayName] || [];
-    if (!coveredByDay[dayName].includes(label))
-      coveredByDay[dayName].push(label);
-  });
+  const best = response?.data?.[0];
+  if (!best) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
+        <div className="text-slate-600">Nessun risultato disponibile.</div>
+      </div>
+    );
+  }
 
   const uncovered = response.unmatchedSlots || [];
 
   const vigilBlock = (vigilSlots: any) => {
+    const slotDetails = Array.isArray(vigilSlots.compatibleSlotDetails)
+      ? vigilSlots.compatibleSlotDetails
+      : [];
+    const coveredByDay: Record<string, string[]> = {};
+    slotDetails.forEach((slot: any) => {
+      const d = new Date(slot.date).getUTCDay();
+      const label = `${slot.startTime} - ${slot.endTime}`;
+      const dayName = dayNames[d] || slot.date;
+      coveredByDay[dayName] = coveredByDay[dayName] || [];
+      if (!coveredByDay[dayName].includes(label))
+        coveredByDay[dayName].push(label);
+    });
+    let metaContent = null;
+    if (vigilSlots.reviewCount) {
+      metaContent = (
+        <div className="text-sm text-slate-500 flex items-center gap-1">
+          <StarIcon className="w-4 inline text-[#fbbf24]" />
+          <span className="font-bold text-black">
+            {vigilSlots.averageRating}{" "}
+          </span>{" "}
+          | {vigilSlots.reviewCount} recensioni
+        </div>
+      );
+    } else if (vigilSlots.activeFrom) {
+      metaContent = (
+        <div className="text-sm text-slate-400">
+          Attivo da{" "}
+          {dateDisplay(vigilSlots.activeFrom || "", "monthYearLiteral")}
+        </div>
+      );
+    }
+
     return (
       <>
         <div className="flex items-center gap-4 bg-white rounded-xl shadow ring-1 ring-slate-200 overflow-hidden p-5">
@@ -243,28 +149,15 @@ export default function MatchingSuccessPage() {
             <h3 className="text-lg font-semibold">
               {vigilSlots.displayName || "-"}
             </h3>
-            {vigilSlots.reviewCount ? (
-              <div className="text-sm text-slate-500 flex items-center gap-1">
-                <StarIcon className="w-4 inline text-[#fbbf24]" />
-                <span className="font-bold text-black">
-                  {vigilSlots.averageRating}{" "}
-                </span>{" "}
-                | {vigilSlots.reviewCount} recensioni
-              </div>
-            ) : vigilSlots.activeFrom ? (
-              <div className="text-sm text-slate-400">
-                Attivo da{" "}
-                {dateDisplay(vigilSlots.activeFrom || "", "monthYearLiteral")}
-              </div>
-            ) : null}
+            {metaContent}
             <div className="flex items-center gap-2 mt-2"></div>
             <div className="mt-3 flex flex-wrap gap-2">
               {/* service tags: try to show a few examples from answers */}
               {answers?.matchingRequest?.schedule &&
-                Object.values(answers.matchingRequest.schedule).map(
-                  (s: any, idx: number) => (
+                Object.entries(answers.matchingRequest.schedule).map(
+                  ([key, s]: [string, any]) => (
                     <span
-                      key={idx}
+                      key={key}
                       className="text-xs bg-blue-50 text-consumer-blue px-2 py-1 rounded-full"
                     >
                       {s.service}
@@ -292,9 +185,9 @@ export default function MatchingSuccessPage() {
             {Object.keys(coveredByDay).length === 0 && (
               <div className="text-sm text-slate-500">Nessuno slot coperto</div>
             )}
-            {vigilSlots.compatibleSlotDetails.map((slot: any, idx: number) => (
+            {slotDetails.map((slot: any) => (
               <div
-                key={idx}
+                key={`${slot.date}-${slot.startTime}-${slot.endTime}`}
                 className="flex items-center gap-3 bg-green-50 rounded p-3"
               >
                 <CheckCircleIcon className="w-8 h-8 text-[#22c55e]" />
@@ -308,28 +201,15 @@ export default function MatchingSuccessPage() {
                 </div>
               </div>
             ))}
-            {/* {Object.entries(coveredByDay).map(([day, ranges]) => (
-              <div
-                key={day}
-                className="flex items-center justify-between bg-consumer-light-blue rounded p-3"
-              >
-                <div className="flex items-center gap-3">
-                  <CheckCircleIcon className="w-8 h-8 text-[#22c55e]" />
-                  <div className="text-sm">
-                    {day} — {ranges.join(" • ")}
-                  </div>
-                </div>
-              </div>
-            ))} */}
           </div>
 
           {uncovered.length > 0 && (
             <div className="mt-4">
               <div className="text-sm font-bold mb-2">Slot non coperti</div>
               <div className="space-y-2">
-                {uncovered.map((u: any, i: number) => (
+                {uncovered.map((u: any) => (
                   <div
-                    key={i}
+                    key={`${u.date}-${u.startTime || ""}-${u.endTime || ""}`}
                     className="flex items-center gap-3 bg-red-50 rounded p-3"
                   >
                     <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -363,8 +243,11 @@ export default function MatchingSuccessPage() {
                 Altri Vigil compatibili
               </h2>
               <div className="space-y-4">
-                {response.data.slice(1).map((vigil: any, idx: number) => (
-                  <div key={idx} className="p-4 bg-white rounded-lg shadow">
+                {response.data.slice(1).map((vigil: any) => (
+                  <div
+                    key={`${vigil.id || vigil.displayName || "vigil"}-${vigil.activeFrom || ""}`}
+                    className="p-4 bg-white rounded-lg shadow"
+                  >
                     {vigilBlock(vigil)}
                   </div>
                 ))}
@@ -378,7 +261,6 @@ export default function MatchingSuccessPage() {
                 <div className="text-xs text-slate-500">Prezzo del trial</div>
                 <div className="font-semibold text-consumer-blue text-2xl">
                   €{response.data[0].totalPrice || "-"}
-                  {/* TODO: add to response */}
                 </div>
               </div>
               {/* <div className="text-sm text-slate-400">
@@ -402,14 +284,10 @@ export default function MatchingSuccessPage() {
             </button>
             <div className="text-center mt-3">
               <button
-                onClick={() =>
-                  router.push(
-                    Routes.matchingNoMatch?.url || "/matching/no-match",
-                  )
-                }
+                onClick={() => router.push(Routes.inizializationBooking.url)}
                 className="text-sm text-consumer-blue underline"
               >
-                Cerco una copertura completa
+                Nuova ricerca
               </button>
             </div>
           </div>

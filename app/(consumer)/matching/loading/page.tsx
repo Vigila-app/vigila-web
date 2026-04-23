@@ -13,34 +13,49 @@ export default function MatchingLoadingPage() {
 
   useEffect(() => {
     let mounted = true;
+    const readStoredAnswers = () => {
+      if (globalThis.window === undefined) return null;
+      const raw = sessionStorage.getItem("matching_answers");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const answers = parsed.answers ?? parsed;
+      return { answers, matchingRequest: parsed.matchingRequest };
+    };
+
+    const persistStoredAnswers = (
+      answers: Record<string, any>,
+      matchingRequest?: Record<string, any>,
+    ) => {
+      const payload = matchingRequest ? { answers, matchingRequest } : answers;
+      sessionStorage.setItem("matching_answers", JSON.stringify(payload));
+    };
+
+    const isMatchResponse = (resp: any) => Array.isArray(resp?.data);
+    const hasNoMatches = (resp: any) =>
+      isMatchResponse(resp) && resp.data.length === 0;
+    const hasMatches = (resp: any) =>
+      isMatchResponse(resp) && resp.data.length > 0;
+
     const run = async () => {
       try {
-        const raw =
-          typeof window !== "undefined"
-            ? sessionStorage.getItem("matching_answers")
-            : null;
-        if (!raw) {
+        const stored = readStoredAnswers();
+        if (!stored) {
           console.warn("No matching answers found in sessionStorage");
           return;
         }
-        const parsed = JSON.parse(raw);
-        // stored shape is raw answers object; ensure we accept both legacy and { answers, matchingRequest }
-        const answers = parsed.answers ?? parsed;
+        const { answers } = stored;
         const user = await UserService.getUser();
         if (!user?.id) {
           console.warn("No authenticated user for matching");
           return;
         }
         // Ensure we have a built matchingRequest (includes `schedule`) and persist it.
-        let matchingRequest = parsed.matchingRequest;
+        let matchingRequest = stored.matchingRequest;
         if (!matchingRequest) {
           try {
             matchingRequest = buildMatchingRequestFromAnswers(answers);
             // persist the built request alongside answers so no-match page can read it
-            sessionStorage.setItem(
-              "matching_answers",
-              JSON.stringify({ answers, matchingRequest }),
-            );
+            persistStoredAnswers(answers, matchingRequest);
           } catch (e) {
             console.warn("Failed to build matchingRequest in loading page", e);
           }
@@ -62,17 +77,17 @@ export default function MatchingLoadingPage() {
         sessionStorage.setItem("matching_response", JSON.stringify(resp));
 
         // If no vigils found, redirect to the no-match page
-        if (resp && Array.isArray(resp.data) && resp.data.length === 0) {
-          // keep the original answers available for the no-match page
-          sessionStorage.setItem("matching_answers", JSON.stringify(answers));
+        if (hasNoMatches(resp)) {
+          // keep the original answers (and request) available for the no-match page
+          persistStoredAnswers(answers, matchingRequest);
           router.replace(Routes.matchingNoMatch?.url || "/matching/no-match");
           return;
         }
 
         // If we have matches, redirect to the success page
-        if (resp && Array.isArray(resp.data) && resp.data.length > 0) {
-          // ensure answers are also available
-          sessionStorage.setItem("matching_answers", JSON.stringify(answers));
+        if (hasMatches(resp)) {
+          // ensure answers (and request) are also available
+          persistStoredAnswers(answers, matchingRequest);
           router.replace(Routes.matchingSuccess?.url || "/matching/success");
           return;
         }

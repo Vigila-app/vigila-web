@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import clsx from "clsx";
 import {
   VigilAvailabilityRuleI,
-  VigilAvailabilityRuleFormI,
   WeekdayEnum,
 } from "@/src/types/calendar.types";
 import {
@@ -75,7 +74,6 @@ export const AvailabilityRulesDemo = ({
     return initial;
   });
 
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [creatingSlots, setCreatingSlots] = useState<Record<number, boolean>>(
     () => {
       const initial: Record<number, boolean> = {};
@@ -179,67 +177,6 @@ export const AvailabilityRulesDemo = ({
     return role === RolesEnum.CONSUMER ? consumer : vigil;
   }, [role]);
 
-  const handleCreate = async (weekday: WeekdayEnum) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const draft = draftSlots[weekday];
-      const startMinutes = getMinutesFromTime(draft.start);
-      const endMinutes = startMinutes + draft.durationHours * 60;
-      if (endMinutes > 24 * 60) {
-        setError("La durata supera il limite giornaliero");
-        setLoading(false);
-        return;
-      }
-      if (endMinutes <= startMinutes) {
-        setError("Orario di fine non valido");
-        setLoading(false);
-        return;
-      }
-      const endTime = toTimeString(endMinutes);
-
-      // Note: In a real scenario, vigil_id would come from authenticated user
-      const ruleData: VigilAvailabilityRuleFormI = {
-        vigil_id: (await user)!.id, // This would be from auth context
-        weekday,
-        start_time: convertTimeToTimeFormat(draft.start),
-        end_time: convertTimeToTimeFormat(endTime),
-        valid_from: formatDateToISO(new Date()),
-        valid_to: null,
-      };
-      // Check client-side for overlapping rules and prevent adding if overlaps.
-      const newStartMinutes = getMinutesFromTime(draft.start);
-      const newEndMinutes = endMinutes;
-      if (isOverlapping(weekday, newStartMinutes, newEndMinutes)) {
-        setError("La fascia si sovrappone a una esistente");
-        setLoading(false);
-        return;
-      }
-      // For this flow: persist to local state only. Parent will persist to API
-      // when the user completes the flow — the parent reads `availabilityRules`
-      // from `setAnswers` (see useEffect above).
-      const now = new Date().toISOString();
-      const newRule: VigilAvailabilityRuleI = {
-        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        created_at: now,
-        updated_at: now,
-        vigil_id: ruleData.vigil_id,
-        weekday: ruleData.weekday,
-        start_time: ruleData.start_time,
-        end_time: ruleData.end_time,
-        valid_from: ruleData.valid_from,
-        valid_to: ruleData.valid_to ?? null,
-      };
-
-      setRules((prev) => [...prev, newRule]);
-    } catch (err: any) {
-      setError(err.message || "Failed to create availability rule");
-      console.error("Error creating rule:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async (ruleId: string) => {
     setLoading(true);
     setError(null);
@@ -317,11 +254,15 @@ export const AvailabilityRulesDemo = ({
                 <div key={day.value} className="py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <label className="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                      <label
+                        className="relative inline-flex h-6 w-11 cursor-pointer items-center"
+                        aria-label={`Attiva ${day.labelIT}`}
+                      >
                         <input
                           type="checkbox"
                           className="peer sr-only"
                           checked={isActive}
+                          aria-label={`Attiva ${day.labelIT}`}
                           onChange={() => {
                             setActiveDays((prev) => ({
                               ...prev,
@@ -337,14 +278,12 @@ export const AvailabilityRulesDemo = ({
                         />
                         <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
                       </label>
-                      <span
-                        className="text-sm font-semibold text-slate-900 cursor-pointer"
-                        onClick={() => setSelectedDay(day.value)}
-                      >
+                      <span className="text-sm font-semibold text-slate-900">
                         {day.labelIT}
                       </span>
                     </div>
                     <button
+                      type="button"
                       onClick={() =>
                         setCreatingSlots((prev) => ({
                           ...prev,
@@ -396,6 +335,7 @@ export const AvailabilityRulesDemo = ({
                                     Fascia {index + 1}
                                   </span>
                                   <button
+                                    type="button"
                                     onClick={() => handleDelete(rule.id)}
                                     disabled={loading}
                                     className={clsx(
@@ -531,6 +471,7 @@ export const AvailabilityRulesDemo = ({
                           </div>
                           <div className="mt-4 flex gap-2">
                             <button
+                              type="button"
                               onClick={async () => {
                                 // Save draft
                                 setLoading(true);
@@ -601,6 +542,7 @@ export const AvailabilityRulesDemo = ({
                               Salva
                             </button>
                             <button
+                              type="button"
                               onClick={() => {
                                 setCreatingSlots((prev) => ({
                                   ...prev,
