@@ -5,8 +5,16 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import { CheckCircleIcon, StarIcon } from "@heroicons/react/24/solid";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import { Avatar } from "@/components";
-import { dateDisplay } from "@/src/utils/date.utils";
+import { BookingsService, PaymentService } from "@/src/services";
+import { useAppStore } from "@/src/store/app/app.store";
+import { useUserStore } from "@/src/store/user/user.store";
+import { CheckoutForm } from "@/components/checkout";
+import { getCurrency } from "@/src/utils/common.utils";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { CurrencyEnum } from "@/src/enums/common.enums";
+import { BookingFormI } from "@/src/types/booking.types";
+import { Avatar, ButtonLink } from "@/components";
+import MatchedVigil from "@/components/matching/MatchedVigil";
 
 const dayNames = [
   "Domenica",
@@ -20,8 +28,138 @@ const dayNames = [
 
 export default function MatchingSuccessPage() {
   const router = useRouter();
+  const { user } = useUserStore();
+  const { showLoader, hideLoader } = useAppStore();
+
   const [answers, setAnswers] = useState<any>(null);
   const [response, setResponse] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [bookingIds, setBookingIds] = useState<string[]>([]);
+  const [error, setError] = useState<string>("");
+
+  // Helper: Create a single trial booking for the first 2 weeks
+  const createTrialBooking = async (
+    compatibleSlots: any[],
+    vigil: any,
+    answer: any,
+    matchPrice: number,
+  ) => {
+    try {
+      if (!user?.id) throw new Error("User not authenticated");
+      if (compatibleSlots.length === 0)
+        throw new Error("No compatible slots found");
+
+      // Get first 14 days of slots
+      const now = new Date();
+      const twoWeeksLater = new Date(now);
+      twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+
+      const slotsInRange = compatibleSlots.filter((slot: any) => {
+        const slotDate = new Date(slot.date);
+        return slotDate >= now && slotDate <= twoWeeksLater;
+      });
+
+      if (slotsInRange.length === 0) {
+        throw new Error("No slots available in the first 2 weeks");
+      }
+
+      const schedule =
+        answer?.matchingRequest?.schedule || answer?.schedule || {};
+
+      // Extract service info from schedule (use first available service)
+      const scheduleEntries = Object.entries(schedule);
+      const firstService =
+        (scheduleEntries[0]?.[1] as any)?.service ||
+        ServiceCatalogTypeEnum.LIGHT_ASSISTANCE;
+
+      // Get address info
+      const address = answer?.address || {};
+      const postalCode = address?.postal_code || address?.postalCode || [""];
+      const addressStr =
+        `${address?.street || ""} ${address?.house_number || ""}, ${address?.city || ""}, ${address?.postal_code || address?.postalCode || ""}`.trim();
+
+      // Create single trial booking covering F2 weeks with number of slots as quantity
+      const bookingStartDate = new Date(now);
+      bookingStartDate.setHours(0, 0, 0, 0);
+
+      const bookingEndDate = new Date(twoWeeksLater);
+      bookingEndDate.setHours(23, 59, 59, 999);
+
+      const booking: BookingFormI = {
+        consumer_id: user.id,
+        vigil_id: vigil?.id,
+        service_id: firstService,
+        startDate: bookingStartDate,
+        endDate: bookingEndDate,
+        quantity: slotsInRange.length,
+        min_unit: 1,
+        price: matchPrice,
+        fee: 0,
+        currency: "EUR",
+        address: addressStr,
+        postalCode: Array.isArray(postalCode) ? postalCode : [postalCode],
+        status: "pending" as any,
+        note: `Trial booking - ${slotsInRange.length} slots covered in 2 weeks`,
+      } as BookingFormI;
+
+      const createdBooking = await BookingsService.createBooking(booking);
+      return createdBooking.id;
+    } catch (err) {
+      console.error("Error creating trial booking:", err);
+      throw err;
+    }
+  };
+
+  // Handler for "Proceed with this caregiver" button
+  const handleProceedWithMatch = async () => {
+    try {
+      setError("");
+      setIsProcessing(true);
+      showLoader();
+
+      if (!user?.id || !response) {
+        throw new Error("Missing required data");
+      }
+
+      // Step 1: Create trial booking for first 2 weeks
+      // const bookingId = await createTrialBooking(
+      //   best.compatibleSlotDetails || [],
+      //   best,
+      //   answers,
+      //   response.price,
+      // );
+      // setBookingIds([bookingId]);
+
+      // // Step 2: Create payment intent for the booking
+      // const paymentResponse = await PaymentService.createPaymentIntent({
+      //   bookingId: bookingId, //
+      //   user: user.id,
+      //   amount: Math.round((response.price / 2) * 100),
+      //   currency: getCurrency(CurrencyEnum.EURO),
+      // });
+
+      // if (!paymentResponse.success) {
+      //   throw new Error("Failed to create payment intent");
+      // }
+
+      // setClientSecret(paymentResponse.clientSecret);
+      hideLoader();
+    } catch (err: any) {
+      console.error("Error in handleProceedWithMatch:", err);
+      setError(err.message || "An error occurred");
+      hideLoader();
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    // Payment status update is handled server-side by the Stripe webhook.
+    // Redirect to trial confirmed page
+    router.push(
+      `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
+    );
+  };
 
   useEffect(() => {
     if (globalThis.window === undefined) return;
@@ -47,12 +185,36 @@ export default function MatchingSuccessPage() {
     );
   }
 
-  const best =
-    response.data && response.data.length > 0 ? response.data[0] : null;
-  if (!best) {
+  // If checkout is in progress, show checkout form
+  if (clientSecret) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
-        <div className="text-slate-600">Nessun risultato disponibile.</div>
+      <div className="min-h-screen bg-gray-200 flex flex-col items-center px-4 py-8">
+        <div className="w-full max-w-lg">
+          <div className="p-6 bg-white rounded-lg shadow">
+            <h2 className="text-center font-semibold text-2xl mb-6">
+              Completa il pagamento
+            </h2>
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            <CheckoutForm
+              clientSecret={clientSecret}
+              returnUrl={`${globalThis.window?.location.origin || ""}/matching/trial-confirmed`}
+              onSuccess={handlePaymentSuccess}
+              onError={(err) => {
+                console.error("Payment error:", err);
+                setError("Errore durante il pagamento");
+                setIsProcessing(false);
+              }}
+              onCancel={() => {
+                setClientSecret("");
+                setIsProcessing(false);
+              }}
+            />
+          </div>
+        </div>
       </div>
     );
   }
