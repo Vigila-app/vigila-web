@@ -40,13 +40,22 @@ import { NoticeBoardI } from "@/src/types/notice-board.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
 const calcStartDate = (startDate?: Date | string, delta = 0) => {
+  const base = startDate ? new Date(startDate) : new Date();
+
+  // Guard against invalid dates
+  if (isNaN(base.getTime())) {
+    const fallback = new Date();
+    fallback.setMinutes(Math.round(fallback.getMinutes() / 5) * 5, 0, 0);
+    return fallback.toISOString() as unknown as Date;
+  }
+
   const date = new Date(
     Date.UTC(
-      new Date(startDate || "").getFullYear(),
-      new Date(startDate || "").getMonth(),
-      new Date(startDate || "").getDate(),
-      new Date(startDate || "").getHours() + delta,
-      new Date(startDate || "").getMinutes(),
+      base.getFullYear(),
+      base.getMonth(),
+      base.getDate(),
+      base.getHours() + delta,
+      base.getMinutes(),
     ),
   );
   const minutes = date.getMinutes();
@@ -54,7 +63,6 @@ const calcStartDate = (startDate?: Date | string, delta = 0) => {
   date.setMinutes(roundedMinutes);
   return date.toISOString() as unknown as Date;
 };
-
 type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
@@ -170,8 +178,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedExtras = watch("extras");
   const watchedStartDate = watch("startDate");
   const watchedEndDate = watch("endDate");
-
-  console.log("dates", watchedDuration, watchedStartDate, watchedEndDate);
 
   const selectedService = useMemo(() => {
     if (noticeProposal?.service_type) {
@@ -548,10 +554,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 // aggiorna endDate in base alla nuova quantity
                 setValue(
                   "endDate",
-                  calcStartDate(
-                    watchedStartDate,
-                    Math.max(1, Number(newQty)),
-                  ),
+                  calcStartDate(watchedStartDate, Math.max(1, Number(newQty))),
                 );
               }}
               max={(selectedService as ServiceI)?.max_unit || 24}
