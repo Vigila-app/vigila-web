@@ -155,9 +155,7 @@ function calculateTotalPriceFromCompatibleSlots(
   compatibleSlotDetails: CompatibleSlotI[],
 ): number {
   const total = compatibleSlotDetails.reduce((acc, slot) => {
-    const serviceCatalogItem = ServicesService.getServicesByType(
-      slot.service,
-    )[0];
+    const serviceCatalogItem = ServicesService?.getServicesByType(slot.service);
     const minHourlyRate = serviceCatalogItem?.min_hourly_rate ?? 0;
     const slotDurationHours = Math.max(
       8,
