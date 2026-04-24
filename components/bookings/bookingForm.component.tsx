@@ -11,6 +11,7 @@ import { BookingsService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import React, { useEffect, useMemo, useState } from "react";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
+import { AddressI } from "@/src/types/maps.types";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
@@ -66,6 +67,10 @@ const calcStartDate = (startDate?: Date | string, delta = 0) => {
 type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
+  onAddressSelect?: (address: AddressI) => void;
+  onFormChange?: (
+    values: Partial<BookingFormI> & { address_object?: AddressI | null },
+  ) => void;
   booking?: BookingI;
   bookingId?: BookingI["id"];
   text?: string;
@@ -79,6 +84,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const {
     isModal = false,
     onSubmit = () => ({}),
+    onAddressSelect,
+    onFormChange,
     booking: eBooking,
     text,
     title,
@@ -116,6 +123,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   }, [eBooking, bookingId, bookings]);
 
   const [noticeProposal, setNoticeProposal] = useState<NoticeBoardI>();
+  const [selectedAddressObj, setSelectedAddressObj] = useState<AddressI | null>(
+    null,
+  );
 
   useEffect(() => {
     if (booking?.notice_id) {
@@ -213,6 +223,33 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     vigilId,
     booking,
     noticeProposal?.service_type,
+  ]);
+
+  useEffect(() => {
+    if (!onFormChange) return;
+    const selectedServiceType =
+      (selectedService as ServiceI)?.type ||
+      (selectedService as ServiceCatalogItem)?.type;
+    onFormChange({
+      service_id: watchedServiceId,
+      service_type: selectedServiceType,
+      quantity: watchedDuration,
+      address: watchedAddress,
+      extras: watchedExtras,
+      startDate: watchedStartDate,
+      endDate: watchedEndDate,
+      address_object: selectedAddressObj,
+    });
+  }, [
+    onFormChange,
+    selectedAddressObj,
+    selectedService,
+    watchedAddress,
+    watchedDuration,
+    watchedEndDate,
+    watchedExtras,
+    watchedServiceId,
+    watchedStartDate,
   ]);
 
   useEffect(() => {
@@ -598,6 +635,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 } else {
                   clearErrors("address");
                 }
+                setSelectedAddressObj(address);
+                onAddressSelect?.(address);
                 field.onChange(address?.display_name || "");
               }}
               label="Indirizzo"

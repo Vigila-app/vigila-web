@@ -19,6 +19,7 @@ import { apiConsumer } from "@/src/constants/api.constants";
 import { useUserStore } from "@/src/store/user/user.store";
 import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
 import { BookingFormComponent } from "@/components/bookings";
+import { SingleBooking } from "./SingleBooking";
 
 let gtmTracked = false; // Global variable to track if GTM event has been sent
 
@@ -54,7 +55,7 @@ export default function AvailabilityFlow({
             options: [
               { label: "Una volta", value: BookingTypeEnum.OCCASIONAL },
               { label: "Ricorrente", value: BookingTypeEnum.RECURRING },
-              { label: "Non lo so", value: BookingTypeEnum.TRIAL },
+              // { label: "Non lo so", value: BookingTypeEnum.TRIAL },
             ],
           },
         ],
@@ -64,7 +65,7 @@ export default function AvailabilityFlow({
         title: "",
         description: "",
         questions: [],
-        component: BookingFormComponent,
+        component: SingleBooking,
       },
       {
         id: "availabilities",
