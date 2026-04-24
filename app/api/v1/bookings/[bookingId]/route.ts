@@ -279,12 +279,12 @@ export async function PUT(
               booking.service_type || updatedBooking.service_type,
             );
             const extrasTotal = updatedBooking.extras?.length
-              ? service?.extra
-                  .filter((extra) =>
+              ? (service?.extra
+                  ?.filter((extra) =>
                     (updatedBooking.extras || []).includes(extra.id),
                   )
                   .map((extra) => extra.fixed_price)
-                  .reduce((acc, price) => acc + price, 0)
+                  .reduce((acc, price) => acc + price, 0) ?? 0)
               : 0;
             const price = service
               ? (service?.min_hourly_rate + (service?.fee || 0)) *
