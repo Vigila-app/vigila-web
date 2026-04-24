@@ -18,6 +18,7 @@ import { ApiService, UserService } from "@/src/services";
 import { apiConsumer } from "@/src/constants/api.constants";
 import { useUserStore } from "@/src/store/user/user.store";
 import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
+import { BookingFormComponent } from "@/components/bookings";
 
 let gtmTracked = false; // Global variable to track if GTM event has been sent
 
@@ -62,42 +63,8 @@ export default function AvailabilityFlow({
         id: "single-booking",
         title: "",
         description: "",
-        questions: [
-          {
-            id: "start-date",
-            type: QuestionType.DATE,
-            label: "Data del servizio",
-            placeholder: "",
-            validation: {
-              required: true,
-              min: new Date(new Date().setDate(new Date().getDate() + 1))
-                .toISOString()
-                .split("T")[0],
-              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
-                .toISOString()
-                .split("T")[0],
-            },
-            min: new Date(new Date().setDate(new Date().getDate() + 1))
-              .toISOString()
-              .split("T")[0],
-            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
-              .toISOString()
-              .split("T")[0],
-            autoFocus: true,
-          },
-          {
-            id: "address",
-            type: QuestionType.ADDRESS,
-            label: "Indirizzo",
-            placeholder: "Via Napoli 123",
-            description: "Dove si svolgerà l'assistenza",
-            autoFocus: false,
-            validation: {
-              required: true,
-            },
-          },
-        ],
-        nextStep: "services",
+        questions: [],
+        component: BookingFormComponent,
       },
       {
         id: "availabilities",

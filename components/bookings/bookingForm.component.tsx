@@ -395,48 +395,58 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
         <div className="mb-4">
-          <h2 className="text-center font-medium text-xl">
-            {title || `Prenota con ${vigilDetails?.displayName}`}
-          </h2>
+          {vigilDetails ? (
+            <h2 className="text-center font-medium text-xl">
+              {title || `Prenota con ${vigilDetails?.displayName}`}
+            </h2>
+          ) : (
+            <h2 className="text-center font-medium text-xl">
+              {title || `Prenota`}
+            </h2>
+          )}
+
           <p className="text-center text-sm text-gray-500 mt-2">
             {text || "Compila i dettagli per la tua prenotazione"}
           </p>
         </div>
-
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange/60  p-3">
-          <Avatar
-            size="big"
-            userId={vigilDetails?.id}
-            value={vigilDetails?.displayName}
-          />
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-[15px] text-gray-800">
-                {vigilDetails?.displayName}
-              </p>
-              <p className="font-medium text-xs text-gray-600">({age} anni)</p>
-            </div>
-            <div className="font-medium text-[12px] text-gray-600">
-              <span>
-                🗓️ Su Vigila da:&nbsp;
-                <span className="capitalize">
-                  {dateDisplay(
-                    vigilDetails?.created_at || "",
-                    "monthYearLiteral",
-                  )}
-                </span>
-              </span>
-            </div>
-            {averageRating ? (
-              <div className="flex items-center gap-1">
-                <StarIcon className="w-4 h-4 text-yellow-300" />
-                <p className="text-xs font-medium text-gray-600">
-                  Valutazione media: {averageRating}
+        {vigilDetails && (
+          <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange/60  p-3">
+            <Avatar
+              size="big"
+              userId={vigilDetails?.id}
+              value={vigilDetails?.displayName}
+            />
+            <div className="flex-1 flex flex-col">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-[15px] text-gray-800">
+                  {vigilDetails?.displayName}
+                </p>
+                <p className="font-medium text-xs text-gray-600">
+                  ({age} anni)
                 </p>
               </div>
-            ) : null}
+              <div className="font-medium text-[12px] text-gray-600">
+                <span>
+                  🗓️ Su Vigila da:&nbsp;
+                  <span className="capitalize">
+                    {dateDisplay(
+                      vigilDetails?.created_at || "",
+                      "monthYearLiteral",
+                    )}
+                  </span>
+                </span>
+              </div>
+              {averageRating ? (
+                <div className="flex items-center gap-1">
+                  <StarIcon className="w-4 h-4 text-yellow-300" />
+                  <p className="text-xs font-medium text-gray-600">
+                    Valutazione media: {averageRating}
+                  </p>
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
 
         <Controller
           name="service_id"
@@ -751,27 +761,30 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             </div>
           </div>
         )}
-
-        <div className="flex gap-4">
-          {isModal && (
+        {vigilDetails && (
+          <div className="flex gap-4">
+            {isModal && (
+              <Button
+                type="button"
+                secondary
+                full
+                label="Annulla"
+                action={closeModal}
+              />
+            )}
             <Button
-              type="button"
-              secondary
+              type="submit"
+              role={RolesEnum.CONSUMER}
               full
-              label="Annulla"
-              action={closeModal}
+              label={
+                booking
+                  ? "Aggiorna Prenotazione"
+                  : "Conferma e vai al pagamento"
+              }
+              isLoading={isLoading}
             />
-          )}
-          <Button
-            type="submit"
-            role={RolesEnum.CONSUMER}
-            full
-            label={
-              booking ? "Aggiorna Prenotazione" : "Conferma e vai al pagamento"
-            }
-            isLoading={isLoading}
-          />
-        </div>
+          </div>
+        )}
       </form>
     </div>
   );
