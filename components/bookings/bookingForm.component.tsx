@@ -96,7 +96,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   } = props;
 
   const router = useRouter();
-  console.log("BookingFormComponent props:", props);
   const {
     loader: { isLoading },
     hideLoader,
@@ -259,52 +258,29 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId, booking?.vigil_id]);
 
-  // const serviceCatalog: ServiceCatalogItem = useMemo(() => {
-  //   if ((selectedService as ServiceI)?.info) {
-  //     return (
-  //       (selectedService as ServiceI)?.info?.catalog_id &&
-  //       ServicesService.getServiceCatalogById(
-  //         (selectedService as ServiceI).info?.catalog_id,
-  //       )
-  //     );
-  //   }
-  //   if (noticeProposal?.service_type) {
-  //     const service = ServicesService.getServicesByType(
-  //       noticeProposal.service_type as ServiceCatalogTypeEnum,
-  //     );
-  //     if (service) return service;
-  //   }
-  //   return;
-  // }, [selectedService, noticeProposal?.service_type]);
-  const serviceCatalog = useMemo(() => {
-    const service = selectedService as any; // Usiamo any per evitare errori di TS durante il debug
+  const serviceCatalog: ServiceCatalogItem | undefined = useMemo(() => {
+    const service = selectedService as
+      | (ServiceI & { catalog_id?: number })
+      | ServiceCatalogItem
+      | undefined;
 
     if (!service) return undefined;
 
-    // 1. TENTATIVO VIA TYPE (La tua Soluzione A)
-    // Usiamo il campo 'type' che abbiamo visto essere presente nel servizio del DB
     if (service.type) {
-      const foundByType = ServicesService.getServicesByType(service.type);
-      if (foundByType) {
-        console.log("✅ Catalogo trovato tramite TYPE:", service.type);
-        return foundByType;
-      }
+      const foundByType = ServicesService.getServicesByType(
+        service.type as ServiceCatalogTypeEnum,
+      );
+      if (foundByType) return foundByType;
     }
 
-    // 2. TENTATIVO VIA CATALOG_ID (Fallback)
-    const catId = service.info?.catalog_id || service.catalog_id;
+    const catId =
+      (service as ServiceI).info?.catalog_id ??
+      (service as { catalog_id?: number }).catalog_id;
     if (catId) {
       const foundById = ServicesService.getServiceCatalogById(Number(catId));
-      if (foundById) {
-        console.log("✅ Catalogo trovato tramite ID:", catId);
-        return foundById;
-      }
+      if (foundById) return foundById;
     }
 
-    console.warn(
-      "⚠️ Impossibile trovare il catalogo per questo servizio:",
-      service,
-    );
     return undefined;
   }, [selectedService]);
   useEffect(() => {
@@ -323,13 +299,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       );
     }
     if (selectedService && watchedDuration) {
-      setTotalAmount(
-        ((selectedService as ServiceI)?.unit_price ||
-          (selectedService as ServiceCatalogItem)?.min_hourly_rate) *
-          // +
-          // (role === RolesEnum.CONSUMER ? serviceCatalog?.fee : 0)
-          watchedDuration,
-      );
+      const unitPrice =
+        (selectedService as ServiceI)?.unit_price ||
+        (selectedService as ServiceCatalogItem)?.min_hourly_rate;
+      const consumerFee =
+        role === RolesEnum.CONSUMER ? (serviceCatalog?.fee ?? 0) : 0;
+      setTotalAmount((unitPrice + consumerFee) * watchedDuration);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService, watchedDuration, serviceCatalog, role]);
@@ -458,8 +433,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
     return undefined;
   }, [selectedService, serviceCatalog]);
-  console.log("aervice catalog", serviceCatalog);
-  console.log(typeof (selectedService as ServiceI).info?.catalog_id);
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
@@ -778,10 +751,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   :&nbsp;
                   {(selectedService as ServiceI)?.currency || CurrencyEnum.EURO}
                   {amountDisplay(
-                    (selectedService as ServiceI)?.unit_price ||
-                      (selectedService as ServiceCatalogItem)?.min_hourly_rate,
-                    // +
-                    // (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
+                    ((selectedService as ServiceI)?.unit_price ||
+                      (selectedService as ServiceCatalogItem)
+                        ?.min_hourly_rate) +
+                      (role === RolesEnum.CONSUMER
+                        ? (serviceCatalog?.fee ?? 0)
+                        : 0),
                   )}
                 </p>
                 <p>
@@ -794,7 +769,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 {extraOptions?.length ? (
                   <div>
                     Extra:&nbsp;
-                    {serviceCatalog.extra
+                    {(serviceCatalog?.extra ?? [])
                       .filter(
                         (extra) =>
                           Object.keys(watchedExtras || {}).includes(extra.id) &&
@@ -816,7 +791,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   {amountDisplay(
                     totalAmount +
                       (extraOptions?.length
-                        ? serviceCatalog.extra
+                        ? (serviceCatalog?.extra ?? [])
                             .filter(
                               (extra) =>
                                 Object.keys(watchedExtras || {}).includes(

@@ -5,7 +5,7 @@
       "name": "Compagnia e conversazione",
       "description": "Compagnia, dialogo, lettura, giochi e attività di socializzazione, ma senza igiene personale o aiuti alla mobilità.",
       "long_description": "<p>Il servizio di <strong>compagnia e conversazione</strong> offre una presenza rassicurante e coinvolgente per chi ha bisogno di socializzazione e supporto emotivo.</p><ul><li><em>Presenza attiva</em> e dialogo stimolante</li><li>Sorveglianza discreta e non invasiva</li><li>Supporto emotivo e ascolto attivo</li><li>Attività di intrattenimento leggero</li></ul><p>Ideale per persone anziane, convalescenti o chiunque abbia bisogno di compagnia qualificata.</p>",
-      "type": "company",
+      "type": "companionship",
       "recommended_hourly_rate": 9,
       "min_hourly_rate": 9,
       "max_hourly_rate": 9,
