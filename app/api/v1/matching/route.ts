@@ -446,6 +446,12 @@ export async function POST(req: NextRequest) {
       totalSlots += slotInfo.dates.length;
     });
 
+    if (totalSlots === 0) {
+      return jsonErrorResponse(
+        ResponseCodesConstants.MATCHING_BAD_REQUEST,
+        "The selected days do not produce any requested slots within the provided date range.",
+      );
+    }
     // Batch-fetch availability rules for all candidate vigils (filtered to date range)
     const { data: allRules, error: rulesError } = await _admin
       .from("vigil_availability_rules")
