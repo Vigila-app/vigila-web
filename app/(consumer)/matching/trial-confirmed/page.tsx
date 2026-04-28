@@ -72,7 +72,7 @@ export default function MatchingTrialConfirmedPage() {
             <CheckCircleIcon className="w-12 h-12" />
           </div>
           <h1 className="mt-6 text-2xl text-center font-semibold text-slate-900 tracking-tight">
-            Il tuo trial e confermato
+            Il tuo trial è confermato
           </h1>
         </div>
 

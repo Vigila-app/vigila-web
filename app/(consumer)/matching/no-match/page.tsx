@@ -60,11 +60,13 @@ export default function NoMatchPage() {
   };
 
   const zoneLabel = () => {
-    return (
-      answers?.address.display_name ||
-      answers?.address.address.postcode ||
-      "Zona"
-    );
+    const address = answers?.address;
+
+    if (typeof address === "string" && address.trim()) {
+      return address;
+    }
+
+    return address?.display_name || address?.address?.postcode || "Zona";
   };
 
   const daysLabel = () => {

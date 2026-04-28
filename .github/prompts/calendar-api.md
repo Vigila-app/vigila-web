@@ -1,4 +1,5 @@
-# AI AGENT PROMPT – Calendar & Availability System
+# AI AGENT PROMPT - Calendar & Availability System
+
 ## Project: Next.js + Supabase Booking Platform
 
 ---
@@ -6,6 +7,7 @@
 ## 🎯 Missione dell’Agente AI
 
 Sei un **Senior Full-Stack AI Agent** specializzato in:
+
 - Next.js (App Router)
 - Supabase (Postgres, Auth, RLS, Edge Functions)
 - Domain-driven design
@@ -14,6 +16,7 @@ Sei un **Senior Full-Stack AI Agent** specializzato in:
 Il tuo obiettivo è **progettare e implementare** una feature di **calendario e disponibilità** per una piattaforma che mette in contatto **Consumer** e **Vigil**.
 
 Devi:
+
 - Progettare database, API e logica core
 - Fornire SQL, policies RLS e pseudocodice
 - Prendere decisioni architetturali motivate
@@ -25,8 +28,7 @@ NON fare domande inutili: se mancano dettagli, scegli la soluzione migliore e do
 
 ## 🧠 Contesto di Dominio
 
-Recupera il contesto valutando `.github/copilot-instructions.md` e in generale tutta la documentazione presente in `.github/`.
----
+## Recupera il contesto valutando `.github/copilot-instructions.md` e in generale tutta la documentazione presente in `.github/`.
 
 ## ⏱️ Regole Temporali
 
@@ -44,19 +46,21 @@ Valuta l'attuale database schema documentato in `.github/database/schema.databas
 Devi implementare o rifinire le seguenti tabelle:
 
 ### vigil_availability_rules
+
 Disponibilità ricorrenti settimanali
 
 - id
 - vigil_id
-- weekday (0–6, domenica = 0)
-- start_time (0–23)
-- end_time (1–24)
+- weekday (0-6, domenica = 0)
+- start_time (0-23)
+- end_time (1-24)
 - valid_from (date)
 - valid_to (date | null)
 
 ---
 
 ### vigil_unavailabilities
+
 Assenze o blocchi manuali
 
 - id
@@ -67,9 +71,10 @@ Assenze o blocchi manuali
 
 ---
 
-## 🔐 Sicurezza (RLS – Obbligatorio)
+## 🔐 Sicurezza (RLS - Obbligatorio)
 
 Devi:
+
 - Scrivere le **Row Level Security policies**
 - Garantire che:
   - Consumer vedano solo le proprie prenotazioni
@@ -81,9 +86,11 @@ Devi:
 ## 🌐 API da Implementare
 
 ### Consumer
+
 - `GET /api/calendar/consumer`
 
 ### Vigil
+
 - `GET /api/calendar/vigil/bookings`
 - `POST /api/vigil/availability-rules`
 - `GET /api/vigil/availability-rules`
@@ -94,6 +101,7 @@ Devi:
 ---
 
 ### Availability Engine (CORE LOGIC)
+
 - `GET /api/vigil/:id/available-slots`
 - Input:
   - date range
@@ -103,7 +111,7 @@ Devi:
 
 ---
 
-## ⚙️ Availability Engine – Requisiti
+## ⚙️ Availability Engine - Requisiti
 
 Devi progettare e documentare un algoritmo che:
 
@@ -115,6 +123,7 @@ Devi progettare e documentare un algoritmo che:
 4. Restituisce solo slot prenotabili
 
 Fornisci:
+
 - Pseudocodice dettagliato
 - Eventuali query SQL critiche
 - Note su performance e caching
@@ -147,6 +156,7 @@ Devi produrre:
 ## 🧪 Definition of Done
 
 La feature è completa quando:
+
 - Consumer vede correttamente il proprio calendario
 - Vigil gestisce disponibilità e assenze
 - Nessuna prenotazione fuori slot disponibili è possibile

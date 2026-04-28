@@ -414,7 +414,7 @@ export const MatchingDemo = () => {
                                     {slot.date}
                                   </span>
                                   <span>
-                                    {slot.startTime}–{slot.endTime}
+                                    {slot.startTime}-{slot.endTime}
                                   </span>
                                   <span className="text-gray-400">
                                     {slot.service}
@@ -445,7 +445,7 @@ export const MatchingDemo = () => {
                         >
                           <span className="font-medium">{slot.date}</span>
                           <span>
-                            {slot.startTime}–{slot.endTime}
+                            {slot.startTime}-{slot.endTime}
                           </span>
                           <span className="text-gray-400">{slot.service}</span>
                         </li>

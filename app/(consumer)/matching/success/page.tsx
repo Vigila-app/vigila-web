@@ -57,8 +57,6 @@ export default function MatchingSuccessPage() {
       const createdBookings: BookingI[] = [];
 
       const totalPrice = vigilSlots?.totalPrice || 0;
-      const perSlotPrice =
-        slotDetails.length > 0 ? totalPrice / slotDetails.length : totalPrice;
 
       // fetch services for this vigil to resolve a concrete service_id per slot
       let vigilServices: any[] = [];

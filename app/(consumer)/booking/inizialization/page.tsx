@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { UserService } from "@/src/services";
 
 const AvailabilityFlow = dynamic(
   () => import("@/components/calendar/AvailabilityRules/AvailabilityFlow"),
