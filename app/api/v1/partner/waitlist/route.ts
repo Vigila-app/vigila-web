@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import altcha from "altcha-lib";
-import { getAdminClient, jsonErrorResponse } from "@/server/api.utils.server";
+import { getAdminClient } from "@/server/api.utils.server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,10 +51,10 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error("[Partner waitlist] DB error:", dbError);
-      return jsonErrorResponse(500, {
-        error: "Errore nel salvataggio dei dati.",
-        success: false,
-      } as any);
+      return NextResponse.json(
+        { error: "Errore nel salvataggio dei dati." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });
