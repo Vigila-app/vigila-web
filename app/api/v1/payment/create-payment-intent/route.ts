@@ -58,11 +58,13 @@ export async function POST(req: NextRequest) {
 
     const _admin = getAdminClient();
 
-    // Verifica che tutte le prenotazioni appartengano all'utente and are not already paid
+    // Fetch only bookings that belong to the authenticated user.
+    // Filtering by consumer_id at the DB level means a booking that exists
     const { data: bookings, error: bookingsError } = await _admin
       .from("bookings")
       .select("*")
-      .in("id", bookingIds as any);
+      .in("id", bookingIds as any)
+      .eq("consumer_id", userObject.id);
 
     if (bookingsError || !bookings || bookings.length !== bookingIds.length) {
       return jsonErrorResponse(404, {
@@ -71,14 +73,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ensure ownership and not already paid
     for (const b of bookings) {
-      if (b.consumer_id !== userObject.id) {
-        return jsonErrorResponse(403, {
-          code: ResponseCodesConstants.PAYMENT_INTENT_UNAUTHORIZED.code,
-          success: false,
-        });
-      }
       if (b.payment_status === PaymentStatusEnum.PAID) {
         return jsonErrorResponse(400, {
           code: ResponseCodesConstants.PAYMENT_INTENT_ALREADY_PAID.code,
