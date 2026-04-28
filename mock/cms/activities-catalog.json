@@ -30,7 +30,7 @@
       "active": false,
       "name": "Aiuto negli spostamenti",
       "description": "Supporto negli spostamenti in casa e assistenza nella mobilità quotidiana: aiuto nei trasferimenti non complessi, accompagnamenti a piedi e supporto durante gli spostamenti domestici.",
-      "long_description": "<p>Il servizio di <strong>aiuto negli spostamenti</strong> offre supporto pratico per migliorare la sicurezza e l'autonomia nei movimenti quotidiani.</p><ul><li>Assistenza nei trasferimenti letto–sedia semplici</li><li>Accompagnamento a piedi dentro e fuori casa</li><li>Supporto per prevenire cadute e garantire sicurezza</li></ul><p><em>Indicata per persone con mobilità ridotta ma parzialmente collaboranti.</em></p>",
+      "long_description": "<p>Il servizio di <strong>aiuto negli spostamenti</strong> offre supporto pratico per migliorare la sicurezza e l'autonomia nei movimenti quotidiani.</p><ul><li>Assistenza nei trasferimenti letto-sedia semplici</li><li>Accompagnamento a piedi dentro e fuori casa</li><li>Supporto per prevenire cadute e garantire sicurezza</li></ul><p><em>Indicata per persone con mobilità ridotta ma parzialmente collaboranti.</em></p>",
       "type": "moving",
       "service_id": 1,
       "recommended_hourly_rate": 10,

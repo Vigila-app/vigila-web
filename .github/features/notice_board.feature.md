@@ -52,12 +52,12 @@ Before submitting a notice, the consumer must check a consent checkbox authorizi
 | `created_at`   | timestamptz             | Auto-generated                                        |
 | `updated_at`   | timestamptz             | Auto-updated via trigger                              |
 | `name`         | text                    | **Required**                                          |
-| `email`        | text                    | **Required** – used to notify on proposal             |
+| `email`        | text                    | **Required** - used to notify on proposal             |
 | `phone`        | text                    | Optional                                              |
 | `message`      | text                    | Optional                                              |
 | `postal_code`  | text                    | **Required**                                          |
 | `city`         | text                    | Optional                                              |
-| `service_type` | text                    | **Required** – one of `ServiceCatalogTypeEnum` values |
+| `service_type` | text                    | **Required** - one of `ServiceCatalogTypeEnum` values |
 | `status`       | text                    | `active` / `proposed` / `closed` (default: `active`)  |
 | `vigil_id`     | uuid FK → `vigils.id`   | Set on proposal                                       |
 | `booking_id`   | uuid FK → `bookings.id` | Set on proposal                                       |

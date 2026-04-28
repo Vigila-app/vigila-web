@@ -101,7 +101,7 @@ function unavailabilityBlocksSlot(
   const slotStart = new Date(
     `${date}T${String(startHour).padStart(2, "0")}:00:00Z`,
   );
-  // endHour can be 24 (end of day) – represent as midnight of the next day
+  // endHour can be 24 (end of day) - represent as midnight of the next day
   let slotEnd: Date;
   if (endHour >= 24) {
     slotEnd = new Date(slotStart);
@@ -277,7 +277,7 @@ export async function POST(req: NextRequest) {
     const _admin = getAdminClient();
 
     // ══════════════════════════════════════════════════
-    // PHASE 1 – Basic filtering
+    // PHASE 1 - Basic filtering
     // ══════════════════════════════════════════════════
 
     // 1a. Fetch the consumer's preferences (gender preference lives in consumers_data)
@@ -302,7 +302,7 @@ export async function POST(req: NextRequest) {
       genderPreference !== "no_preference" &&
       genderPreference !== "none";
 
-    // 1b. Query active vigils in the requested CAP first – this is the most selective
+    // 1b. Query active vigils in the requested CAP first - this is the most selective
     // filter (few vigils operate in any given postcode), so we apply it before the
     // service filter to minimise work and enable an early exit.
     // First attempt: include gender preference when set.
@@ -415,7 +415,7 @@ export async function POST(req: NextRequest) {
     vigils = vigils.filter((v: any) => eligibleVigilIdSet.has(v.id));
 
     // ══════════════════════════════════════════════════
-    // PHASE 2 – Availability matching
+    // PHASE 2 - Availability matching
     // ══════════════════════════════════════════════════
 
     const vigilIds = vigils.map((v: any) => v.id);
@@ -447,10 +447,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (totalSlots === 0) {
-      return jsonErrorResponse(
-        ResponseCodesConstants.MATCHING_BAD_REQUEST,
-        "The selected days do not produce any requested slots within the provided date range.",
-      );
+      return jsonErrorResponse(400, {
+        error: "No slots available",
+        code: ResponseCodesConstants.MATCHING_BAD_REQUEST.code,
+        success: false,
+      });
     }
     // Batch-fetch availability rules for all candidate vigils (filtered to date range)
     const { data: allRules, error: rulesError } = await _admin
@@ -558,7 +559,7 @@ export async function POST(req: NextRequest) {
         if (compatibleSlots === totalSlots) {
           perfectMatch = vigil;
           perfectMatchDetails = compatibleSlotDetails;
-          break; // Stop processing remaining vigils – perfect match found
+          break; // Stop processing remaining vigils - perfect match found
         }
       }
     }
@@ -620,7 +621,7 @@ export async function POST(req: NextRequest) {
     // Sort candidates by compatible slots (descending)
     vigilScores.sort((a, b) => b.compatibleSlots - a.compatibleSlots);
 
-    // Early exit: 5 or fewer candidates – return sorted list without quality ranking
+    // Early exit: 5 or fewer candidates - return sorted list without quality ranking
     if (vigilScores.length <= 5) {
       const results: MatchedVigilI[] = vigilScores.map((s) =>
         buildMatchedVigil(
@@ -642,7 +643,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ══════════════════════════════════════════════════
-    // PHASE 3 – Quality ranking (reviews)
+    // PHASE 3 - Quality ranking (reviews)
     // ══════════════════════════════════════════════════
 
     const topVigilIds = vigilScores.map((s) => s.vigil.id);
