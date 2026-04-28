@@ -20,15 +20,6 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import dynamic from "next/dynamic";
 
-const SearchAddress = dynamic(
-  () => import("@/components/maps/searchAddress.component"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
-    ),
-  },
-);
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
@@ -40,29 +31,24 @@ import { NoticeBoardService } from "@/src/services/notice-board.service";
 import { NoticeBoardI } from "@/src/types/notice-board.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
+const SearchAddress = dynamic(
+  () => import("@/components/maps/searchAddress.component"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+    ),
+  },
+);
 const calcStartDate = (startDate?: Date | string, delta = 0) => {
   const base = startDate ? new Date(startDate) : new Date();
-
-  // Guard against invalid dates
   if (isNaN(base.getTime())) {
-    const fallback = new Date();
-    fallback.setMinutes(Math.round(fallback.getMinutes() / 5) * 5, 0, 0);
-    return fallback.toISOString() as unknown as Date;
+    const ms = Math.round(Date.now() / (5 * 60000)) * (5 * 60000);
+    return new Date(ms).toISOString() as unknown as Date;
   }
-
-  const date = new Date(
-    Date.UTC(
-      base.getFullYear(),
-      base.getMonth(),
-      base.getDate(),
-      base.getHours() + delta,
-      base.getMinutes(),
-    ),
-  );
-  const minutes = date.getMinutes();
-  const roundedMinutes = Math.round(minutes / 5) * 5;
-  date.setMinutes(roundedMinutes);
-  return date.toISOString() as unknown as Date;
+  const ms = base.getTime() + delta * 60 * 60 * 1000;
+  const rounded = Math.round(ms / (5 * 60000)) * (5 * 60000);
+  return new Date(rounded).toISOString() as unknown as Date;
 };
 type BookingFormComponentI = {
   isModal?: boolean;
@@ -532,30 +518,18 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               required
               role={RolesEnum.VIGIL}
               error={errors.startDate}
-              value={
-                field.value
-                  ? new Date(field.value).toISOString().slice(0, 16)
-                  : ""
-              }
+              value={(() => {
+                if (!field.value) return "";
+                const d = new Date(field.value);
+                const pad = (n: number) => String(n).padStart(2, "0");
+                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+              })()}
               onChange={(value) => {
-                const local = new Date(value as string);
-                const utc = new Date(
-                  Date.UTC(
-                    local.getFullYear(),
-                    local.getMonth(),
-                    local.getDate(),
-                    local.getHours(),
-                    local.getMinutes(),
-                  ),
-                );
-                field.onChange(utc.toISOString()); // salva in UTC
-                // aggiorna endDate in base alla nuova startDate
+                const utc = new Date(value as string).toISOString();
+                field.onChange(utc);
                 setValue(
                   "endDate",
-                  calcStartDate(
-                    utc.toISOString(),
-                    Math.max(1, Number(watchedDuration)),
-                  ),
+                  calcStartDate(utc, Math.max(1, Number(watchedDuration))),
                 );
               }}
               // set min to today and max to 3 months from today

@@ -10,7 +10,6 @@ import {
   ServicesService,
 } from "@/src/services";
 import { BookingI } from "@/src/types/booking.types";
-import { BookingStatusEnum } from "@/src/enums/booking.enums";
 import { CheckCircleIcon, StarIcon } from "@heroicons/react/24/solid";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { CheckoutForm } from "@/components/checkout";
@@ -36,34 +35,11 @@ export default function MatchingSuccessPage() {
   const [error, setError] = useState<string>("");
 
   const handlePaymentSuccess = async (_paymentIntentId: string) => {
-    try {
-      // Verify payment intent server-side and update bookings locally
-      const verification =
-        await PaymentService.verifyPaymentIntent(_paymentIntentId);
-
-      if (verification?.success && verification.data?.succeeded) {
-        // mark all bookings as confirmed
-        for (const id of bookingIds) {
-          try {
-            await BookingsService.updateBookingStatus(
-              id,
-              BookingStatusEnum.CONFIRMED,
-            );
-          } catch (e) {
-            console.error("Failed to confirm booking", id, e);
-          }
-        }
-      }
-
-      router.push(
-        `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
-      );
-    } catch (e) {
-      console.error("Error verifying payment", e);
-      router.push(
-        `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
-      );
-    }
+    // payment_status is updated exclusively by the Stripe webhook.
+    // booking status = CONFIRMED happens only when the vigil accepts.
+    router.push(
+      `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${bookingIds.join(",")}`,
+    );
   };
 
   const handleConfirm = async () => {

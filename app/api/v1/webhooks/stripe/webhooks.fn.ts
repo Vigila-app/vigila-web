@@ -8,10 +8,7 @@ import {
   TRANSACTION_STATUS,
   TRANSACTION_TYPE,
 } from "@/src/types/transactions.types";
-import {
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from "@/src/enums/booking.enums";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -186,10 +183,23 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
 export const handleBookingPayment = async (
   paymentIntent: Stripe.PaymentIntent,
 ) => {
-  const { bookingId, user_id } = paymentIntent.metadata;
+  const {
+    bookingIds: rawBookingIds,
+    bookingId,
+    user_id,
+  } = paymentIntent.metadata;
+
+  const bookingIds: string[] = rawBookingIds
+    ? rawBookingIds
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : bookingId
+      ? [bookingId]
+      : [];
 
   // Validate required metadata
-  if (!bookingId || !user_id) {
+  if (bookingIds.length === 0 || !user_id) {
     console.error(
       "Missing required metadata in PaymentIntent for booking payment:",
       paymentIntent.metadata,
@@ -197,14 +207,15 @@ export const handleBookingPayment = async (
     return jsonErrorResponse(400, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
       success: false,
-      message: "Missing required metadata: bookingId or user_id",
+      message:
+        "Missing required metadata: bookingIds (or bookingId) or user_id",
     });
   }
 
   const _admin = getAdminClient();
 
-  // Idempotency: Check if booking is already marked as paid with this payment_id
-  const { data: existingBooking, error: checkError } = await _admin
+  // Fetch all bookings referenced by the payment intent
+  const { data: existingBookings, error: checkError } = await _admin
     .from("bookings")
     .select(
       `
@@ -214,28 +225,34 @@ export const handleBookingPayment = async (
       service:services(*)
     `,
     )
-    .eq("id", bookingId)
-    .single();
+    .in("id", bookingIds as any);
 
-  if (checkError || !existingBooking) {
-    console.error("Booking not found for payment webhook:", {
-      bookingId,
+  if (
+    checkError ||
+    !existingBookings ||
+    existingBookings.length !== bookingIds.length
+  ) {
+    console.error("One or more bookings not found for payment webhook:", {
+      bookingIds,
+      foundCount: existingBookings?.length ?? 0,
       checkError,
     });
     return jsonErrorResponse(404, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_METHOD_NOT_FOUND.code,
       success: false,
-      message: `Booking ${bookingId} not found`,
+      message: `One or more bookings not found: ${bookingIds.join(",")}`,
     });
   }
 
-  // Idempotency: If already paid with this payment_id, return 200 OK
-  if (
-    existingBooking.payment_status === PaymentStatusEnum.PAID &&
-    existingBooking.payment_id === paymentIntent.id
-  ) {
+  // Idempotency: if all bookings are already paid with this payment_id, return 200 OK
+  const allAlreadyPaid = existingBookings.every(
+    (b) =>
+      b.payment_status === PaymentStatusEnum.PAID &&
+      b.payment_id === paymentIntent.id,
+  );
+  if (allAlreadyPaid) {
     console.log(
-      `Duplicate event: booking ${bookingId} already paid with payment ${paymentIntent.id}`,
+      `Duplicate event: bookings ${bookingIds.join(",")} already paid with payment ${paymentIntent.id}`,
     );
     return NextResponse.json(
       {
@@ -247,12 +264,13 @@ export const handleBookingPayment = async (
     );
   }
 
-  // Verify the booking belongs to the user from metadata
-  if (existingBooking.consumer_id !== user_id) {
+  // Verify every booking belongs to the user from metadata
+  const mismatched = existingBookings.find((b) => b.consumer_id !== user_id);
+  if (mismatched) {
     console.error("Booking consumer_id mismatch:", {
-      bookingId,
+      bookingId: mismatched.id,
       expected: user_id,
-      actual: existingBooking.consumer_id,
+      actual: mismatched.consumer_id,
     });
     return jsonErrorResponse(400, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_BAD_REQUEST.code,
@@ -261,26 +279,19 @@ export const handleBookingPayment = async (
     });
   }
 
-  // Update booking: payment_status → PAID, status → CONFIRMED (if currently PENDING)
-  const updateData: Record<string, unknown> = {
-    payment_id: paymentIntent.id,
-    payment_status: PaymentStatusEnum.PAID,
-    updated_at: new Date().toISOString(),
-  };
-
-  if (existingBooking.status === BookingStatusEnum.PENDING) {
-    updateData.status = BookingStatusEnum.CONFIRMED;
-  }
-
-  const { data: updatedBooking, error: updateError } = await _admin
+  // Update payment_status → PAID for all bookings
+  const { data: paidBookings, error: paymentUpdateError } = await _admin
     .from("bookings")
-    .update(updateData)
-    .eq("id", bookingId)
-    .select()
-    .single();
+    .update({
+      payment_id: paymentIntent.id,
+      payment_status: PaymentStatusEnum.PAID,
+      updated_at: new Date().toISOString(),
+    })
+    .in("id", bookingIds as any)
+    .select();
 
-  if (updateError) {
-    console.error("Error updating booking payment status:", updateError);
+  if (paymentUpdateError || !paidBookings) {
+    console.error("Error updating booking payment status:", paymentUpdateError);
     return jsonErrorResponse(500, {
       code: ResponseCodesConstants.PAYMENT_WEBHOOK_ERROR.code,
       success: false,
@@ -288,37 +299,51 @@ export const handleBookingPayment = async (
     });
   }
 
+  const updatedBookings = paidBookings;
+
   console.log(
-    `Successfully processed booking payment: booking ${bookingId} marked as PAID`,
+    `Successfully processed booking payment: bookings ${bookingIds.join(",")} marked as PAID`,
   );
 
   // Send email notifications (best effort — don't fail the webhook)
+  const existingById = new Map(existingBookings.map((b) => [b.id, b]));
   try {
     const consumer = await getUserByIdAdmin(user_id);
-    if (consumer?.email) {
-      await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
-        {
-          ...updatedBooking,
-          service: existingBooking.service,
-          vigil: existingBooking.vigil,
-          consumer: existingBooking.consumer,
-        },
-        consumer,
-      );
-    }
+    const vigilCache = new Map<
+      string,
+      Awaited<ReturnType<typeof getUserByIdAdmin>>
+    >();
 
-    if (existingBooking.vigil_id) {
-      const vigil = await getUserByIdAdmin(existingBooking.vigil_id);
-      if (vigil?.email) {
-        await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
-          {
-            ...updatedBooking,
-            service: existingBooking.service,
-            vigil: existingBooking.vigil,
-            consumer: existingBooking.consumer,
-          },
-          vigil,
+    for (const updatedBooking of updatedBookings) {
+      const existing = existingById.get(updatedBooking.id);
+      if (!existing) continue;
+
+      const enriched = {
+        ...updatedBooking,
+        service: existing.service,
+        vigil: existing.vigil,
+        consumer: existing.consumer,
+      };
+
+      if (consumer?.email) {
+        await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+          enriched,
+          consumer,
         );
+      }
+
+      if (existing.vigil_id) {
+        let vigil = vigilCache.get(existing.vigil_id);
+        if (!vigil) {
+          vigil = await getUserByIdAdmin(existing.vigil_id);
+          vigilCache.set(existing.vigil_id, vigil);
+        }
+        if (vigil?.email) {
+          await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+            enriched,
+            vigil,
+          );
+        }
       }
     }
   } catch (emailError) {
@@ -334,10 +359,13 @@ export const handleBookingPayment = async (
       success: true,
       message: "Booking payment processed successfully",
       data: {
-        bookingId,
+        bookingIds,
         paymentId: paymentIntent.id,
-        status: updatedBooking.status,
-        paymentStatus: updatedBooking.payment_status,
+        bookings: updatedBookings.map((b) => ({
+          id: b.id,
+          status: b.status,
+          paymentStatus: b.payment_status,
+        })),
       },
     },
     { status: 200 },
