@@ -4,6 +4,8 @@
 
 This document describes the complete end-to-end flow for paying a booking on the Vigila platform. There are two payment methods available to consumers: **Stripe card payment** and **wallet payment**.
 
+Stripe card payment supports both **single-booking payments** and **batch payments** (multiple bookings created during the matching trial flow) by passing `bookingId` or `bookingIds[]` plus the total `amount` in cents.
+
 > **Important security note:** As of March 2026, the booking payment status is updated exclusively server-side via Stripe webhooks. Clients have no ability to set a booking to `PAID`. This closes a security vulnerability where a crafted client request could mark an unpaid booking as paid.
 
 ---
@@ -39,17 +41,29 @@ The Stripe payment flow is split across three stages: intent creation, client-si
 ```
 Consumer → POST /api/v1/payment/create-payment-intent
   → Authenticate user (role must be CONSUMER)
-  → Verify booking exists and belongs to user
-  → Verify booking is not already PAID
+  → Validate request: bookingId or bookingIds[] + amount > 0
+  → Verify all bookings exist, belong to user, and are not already PAID
   → Call stripe.paymentIntents.create() with metadata:
       {
-        bookingId: "<uuid>",
+        bookingIds: "<id1,id2,...>",
         user_id: "<consumer-uuid>",
         transaction_type: "BOOKING_PAYMENT"
       }
-  → Update booking in DB: payment_id = paymentIntent.id
+  → Update bookings in DB: payment_id = paymentIntent.id, payment_status = PENDING
   → Return clientSecret to client
 ```
+
+Request body (example):
+
+```json
+{
+  "bookingIds": ["uuid-1", "uuid-2"],
+  "amount": 12000,
+  "currency": "eur"
+}
+```
+
+`bookingId` is accepted as a single-item shorthand. `amount` is expressed in cents and represents the **total** for all bookings in the request.
 
 The `transaction_type: BOOKING_PAYMENT` in the metadata is how the webhook knows which handler to invoke.
 
@@ -76,19 +90,18 @@ Stripe → POST /api/v1/webhooks/stripe
       case TOP_UP          → handleTopUp(paymentIntent)
 
 handleBookingPayment(paymentIntent):
-  → Validate metadata: bookingId, user_id
-  → Fetch booking from DB
-  → Idempotency check: if already PAID with same payment_id → return 200 OK (no-op)
-  → Verify booking.consumer_id === user_id from metadata
-  → Update booking:
-      payment_id = paymentIntent.id
-      payment_status = PAID
-      status = CONFIRMED (only if currently PENDING)
-  → Send email notifications (best effort):
-      - Consumer: booking confirmation email
-      - Vigil: new booking notification
+  → Validate metadata: bookingIds (or bookingId), user_id
+  → Fetch all referenced bookings from DB
+  → Idempotency check: if all bookings are already PAID with same payment_id → return 200 OK (no-op)
+  → Verify every booking.consumer_id === user_id from metadata
+  → Update all bookings: payment_id = paymentIntent.id, payment_status = PAID
+  → Send email notifications (best effort) per booking:
+    - Consumer: booking status update
+    - Vigil: booking status update
   → Return 200 OK
 ```
+
+**Note:** The webhook only updates `payment_status`. Booking status transitions are handled by the booking workflow (for example, when the Vigil accepts or rejects).
 
 #### Stage 4 — Result Page Polling
 
@@ -105,6 +118,8 @@ Result page mounts
 ```
 
 > **Store sync:** Both the Stripe polling path and the wallet path call `useBookingsStore.getBookingDetails(bookingId, force=true)` on the result page so the Zustand store reflects the updated `payment_status` before the user navigates back. This avoids stale cache issues when the booking detail modal is opened after payment.
+
+**Batch payments (matching trial):** The matching flow creates multiple bookings and a single PaymentIntent (`bookingIds`). On success it redirects to `/matching/trial-confirmed` and does not poll; the webhook still updates all referenced bookings to `PAID` in the background.
 
 ---
 
@@ -138,7 +153,7 @@ Consumer Browser          Your Server              Stripe
 
 | What                                      | Who can do it | How                                                              |
 | ----------------------------------------- | ------------- | ---------------------------------------------------------------- |
-| Create payment intent                     | Consumer only | Auth check + role check in API                                   |
+| Create payment intent (single or batch)   | Consumer only | Auth check + role check + booking ownership checks in API        |
 | Confirm payment (debit card)              | Consumer only | Via Stripe.js in browser                                         |
 | Set `payment_status = PAID`               | Server only   | Stripe webhook handler                                           |
 | Set `payment_status = PAID` from client   | **Nobody**    | PUT /bookings/:id/payment returns 403 if `payment_status = PAID` |
@@ -170,6 +185,7 @@ Stripe's webhook delivery has built-in retry logic. If your server is temporaril
 | `app/api/v1/webhooks/stripe/route.ts`               | Stage 3 entry point: verifies signature, routes by event type |
 | `app/api/v1/webhooks/stripe/webhooks.fn.ts`         | Stage 3 handlers: `handleBookingPayment()`, `handleTopUp()`   |
 | `app/(consumer)/booking/payment/result/page.tsx`    | Stage 4: Polls DB for payment confirmation                    |
+| `app/(consumer)/matching/success/page.tsx`          | Batch booking payment: creates bookings + Stripe intent       |
 | `app/api/v1/wallet/pay-booking/route.ts`            | Wallet payment: fully server-side, no webhook                 |
 | `app/api/v1/bookings/[bookingId]/payment/route.ts`  | Booking status updates (blocks PAID from client)              |
 | `src/types/transactions.types.ts`                   | `TRANSACTION_TYPE` enum including `BOOKING_PAYMENT`           |
