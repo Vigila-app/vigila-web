@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import clsx from "clsx";
+import useAltcha from "@/src/hooks/useAltcha";
+
+const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
+  ssr: false,
+});
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -42,6 +48,8 @@ const serviceOptions = [
 ];
 
 const PartnerWaitlistFormCaf = () => {
+  const altchaRef = useRef<{ value: string | null }>(null);
+  const { challenge, isVerified, onStateChange } = useAltcha();
   const [form, setForm] = useState<CafFormData>({
     fullName: "",
     email: "",
@@ -73,12 +81,13 @@ const PartnerWaitlistFormCaf = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isVerified) return;
     setState("submitting");
     try {
       const res = await fetch("/api/v1/partner/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "caf", ...form }),
+        body: JSON.stringify({ type: "caf", captcha: challenge, ...form }),
       });
       if (!res.ok) throw new Error("Server error");
       setState("success");
@@ -285,12 +294,14 @@ const PartnerWaitlistFormCaf = () => {
         </p>
       )}
 
+      <Altcha ref={altchaRef} onStateChange={onStateChange} />
+
       <button
         type="submit"
-        disabled={state === "submitting"}
+        disabled={state === "submitting" || !isVerified}
         className={clsx(
           "w-full rounded-full py-3 px-6 font-semibold text-white shadow transition",
-          state === "submitting"
+          state === "submitting" || !isVerified
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-consumer-blue hover:bg-consumer-blue/90"
         )}
