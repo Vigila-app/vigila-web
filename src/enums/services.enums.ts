@@ -1,3 +1,7 @@
+import Caffe from "@/components/svg/Caffe";
+import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { ComponentType, SVGProps } from "react";
+
 export enum ServiceCatalogTypeEnum {
   COMPANIONSHIP = "companionship",
   LIGHT_ASSISTANCE = "light_assistance",
@@ -16,3 +20,11 @@ export const ServiceCatalogTypeLabels: Record<ServiceCatalogTypeEnum, string> =
     [ServiceCatalogTypeEnum.TRANSPORTATION]: "Trasporto e accompagnamento",
     [ServiceCatalogTypeEnum.SPECIALIZED_CARE]: "Assistenza specializzata",
   };
+
+export const ServiceCatalogTypeIcons: Partial<
+  Record<string, ComponentType<SVGProps<SVGSVGElement>>>
+> = {
+  company: Caffe,
+  light_assistance: HeartIcon,
+  specialized_care: UserGroupIcon,
+};

@@ -25,6 +25,7 @@ export const MulticheckboxInput = ({
   question,
   onChange,
   role,
+  variation,
   error,
   value,
 }: QuestionRendererProps) => {
@@ -97,6 +98,23 @@ export const MulticheckboxInput = ({
                   {" "}
                   {option.label}
                 </span>
+                {variation === "service" && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-sm text-gray-500">
+                      {option.description}
+                    </span>
+                    <div>
+                      <span
+                        className={clsx(
+                          "text-lg font-bold rounded-4xl px-4 py-0.5 bg-gray-100 text-gray-700",
+                          isChecked && "bg-vigil-orange text-white",
+                        )}
+                      >
+                        {option.fee && `€${option.fee.toFixed(2)}/h`}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="hidden">
                   <Checkbox
