@@ -1,0 +1,325 @@
+"use client";
+
+import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import clsx from "clsx";
+import useAltcha from "@/src/hooks/useAltcha";
+
+const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
+  ssr: false,
+});
+
+type FormState = "idle" | "submitting" | "success" | "error";
+
+type ClinicheFormData = {
+  fullName: string;
+  role: string;
+  email: string;
+  phone: string;
+  structureName: string;
+  structureType: string;
+  city: string;
+  volume: string;
+  services: string[];
+  consent: boolean;
+};
+
+const structureTypeOptions = [
+  "Clinica privata",
+  "Centro diagnostico",
+  "Studio medico associato",
+  "Casa di cura",
+  "Altro",
+];
+
+const volumeOptions = ["Meno di 100", "100-500", "500-1.000", "Più di 1.000"];
+
+const serviceOptions = [
+  "Booking caregiver per i pazienti",
+  "Referral famiglie con commissioni",
+  "Assistenza post-dimissioni",
+  "Tutti e tre",
+];
+
+const PartnerWaitlistFormCliniche = () => {
+  const altchaRef = useRef<{ value: string | null }>(null);
+  const { challenge, isVerified, onStateChange } = useAltcha();
+  const [form, setForm] = useState<ClinicheFormData>({
+    fullName: "",
+    role: "",
+    email: "",
+    phone: "",
+    structureName: "",
+    structureType: "",
+    city: "",
+    volume: "",
+    services: [],
+    consent: false,
+  });
+  const [state, setState] = useState<FormState>("idle");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckbox = (service: string, checked: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      services: checked
+        ? [...prev.services, service]
+        : prev.services.filter((s) => s !== service),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isVerified) return;
+    setState("submitting");
+    try {
+      const res = await fetch("/api/v1/partner/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "cliniche", captcha: challenge, ...form }),
+      });
+      if (!res.ok) throw new Error("Server error");
+      setState("success");
+    } catch {
+      setState("error");
+    }
+  };
+
+  const inputClass =
+    "w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-800 focus:border-consumer-blue focus:outline-none focus:ring-1 focus:ring-consumer-blue transition";
+  const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+
+  if (state === "success") {
+    return (
+      <div className="rounded-2xl bg-consumer-light-blue border border-consumer-blue/20 p-8 text-center">
+        <div className="text-4xl mb-3">✅</div>
+        <h3 className="text-xl font-bold text-consumer-blue mb-2">Ricevuto.</h3>
+        <p className="text-gray-600">
+          Ti contatteremo entro 2-3 giorni lavorativi per una prima chiamata
+          conoscitiva.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5 rounded-2xl bg-white border border-gray-200 shadow-md p-6 md:p-8"
+    >
+      {/* Full name + Role */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="fullName" className={labelClass}>
+            Il tuo nome e cognome *
+          </label>
+          <input
+            id="fullName"
+            name="fullName"
+            type="text"
+            required
+            value={form.fullName}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="role" className={labelClass}>
+            Qual è il tuo ruolo?
+          </label>
+          <input
+            id="role"
+            name="role"
+            type="text"
+            placeholder="Es. Direttore sanitario, Responsabile amministrativo..."
+            value={form.role}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {/* Email + Phone */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="email" className={labelClass}>
+            Email di lavoro *
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="phone" className={labelClass}>
+            Telefono *
+          </label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            value={form.phone}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {/* Structure name */}
+      <div>
+        <label htmlFor="structureName" className={labelClass}>
+          Nome della struttura *
+        </label>
+        <input
+          id="structureName"
+          name="structureName"
+          type="text"
+          required
+          value={form.structureName}
+          onChange={handleChange}
+          className={inputClass}
+        />
+      </div>
+
+      {/* Structure type + City */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="structureType" className={labelClass}>
+            Che tipo di struttura sei? *
+          </label>
+          <select
+            id="structureType"
+            name="structureType"
+            required
+            value={form.structureType}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            <option value="" disabled>
+              Seleziona...
+            </option>
+            {structureTypeOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="city" className={labelClass}>
+            In quale città si trova la struttura?
+          </label>
+          <input
+            id="city"
+            name="city"
+            type="text"
+            value={form.city}
+            onChange={handleChange}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {/* Volume */}
+      <fieldset>
+        <legend className={clsx(labelClass, "mb-2")}>
+          Quante visite erogate mediamente ogni mese? *
+        </legend>
+        <div className="flex flex-col gap-2">
+          {volumeOptions.map((opt) => (
+            <label
+              key={opt}
+              className="flex items-center gap-2 cursor-pointer text-sm text-gray-700"
+            >
+              <input
+                type="radio"
+                name="volume"
+                value={opt}
+                required
+                checked={form.volume === opt}
+                onChange={handleChange}
+                className="accent-consumer-blue"
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {/* Services */}
+      <fieldset>
+        <legend className={clsx(labelClass, "mb-2")}>
+          Quali servizi ti interessano?
+        </legend>
+        <div className="flex flex-col gap-2">
+          {serviceOptions.map((svc) => (
+            <label
+              key={svc}
+              className="flex items-center gap-2 cursor-pointer text-sm text-gray-700"
+            >
+              <input
+                type="checkbox"
+                checked={form.services.includes(svc)}
+                onChange={(e) => handleCheckbox(svc, e.target.checked)}
+                className="accent-consumer-blue"
+              />
+              {svc}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {/* Consent */}
+      <label className="flex items-start gap-2 cursor-pointer text-sm text-gray-600">
+        <input
+          type="checkbox"
+          required
+          checked={form.consent}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, consent: e.target.checked }))
+          }
+          className="mt-0.5 accent-consumer-blue shrink-0"
+        />
+        <span>
+          Acconsento al trattamento dei dati personali per essere contattato da
+          Vigila. *
+        </span>
+      </label>
+
+      {state === "error" && (
+        <p className="text-sm text-red-600">
+          Si è verificato un errore. Riprova tra qualche istante.
+        </p>
+      )}
+
+      <Altcha ref={altchaRef} onStateChange={onStateChange} />
+
+      <button
+        type="submit"
+        disabled={state === "submitting" || !isVerified}
+        className={clsx(
+          "w-full rounded-full py-3 px-6 font-semibold text-white shadow transition",
+          state === "submitting" || !isVerified
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-consumer-blue hover:bg-consumer-blue/90",
+        )}
+      >
+        {state === "submitting" ? "Invio in corso..." : "Entra in lista"}
+      </button>
+    </form>
+  );
+};
+
+export default PartnerWaitlistFormCliniche;

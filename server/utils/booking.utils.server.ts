@@ -12,7 +12,7 @@ export const BookingUtilsServer = {
   sendConsumerBookingStatusUpdateNotification: async (
     booking: BookingI,
     consumer: User,
-    vigil?: User
+    vigil?: User,
   ) => {
     try {
       if (!isServer) {
@@ -58,7 +58,7 @@ export const BookingUtilsServer = {
                   quantity: booking.quantity,
                   unitType: booking.service?.unit_type,
                 },
-                false
+                false,
               );
               return; // Esci dalla funzione dopo aver inviato l'email di conferma
             } catch {
@@ -101,7 +101,7 @@ export const BookingUtilsServer = {
                 quantity: booking.quantity,
                 unitType: booking.service?.unit_type,
               },
-              false
+              false,
             );
             return; // Esci dalla funzione dopo aver inviato l'email di conferma
           } catch (error) {
@@ -157,7 +157,7 @@ export const BookingUtilsServer = {
               {
                 to: consumer.email,
                 subject:
-                  "Prenotazione annullata dal Vigil ❌ – troviamo una soluzione",
+                  "Prenotazione annullata dal Vigil ❌ - troviamo una soluzione",
                 customerName:
                   (consumer as any)?.user_metadata?.name ||
                   (consumer as any)?.user_metadata?.firstName ||
@@ -179,7 +179,7 @@ export const BookingUtilsServer = {
                     ? amountDisplay(booking.price, booking.currency as any)
                     : String(booking.price || ""),
               },
-              false
+              false,
             );
             return; // Esci dalla funzione dopo aver inviato l'email di cancellazione
           } catch (error) {
@@ -217,7 +217,7 @@ export const BookingUtilsServer = {
       });
 
       console.log(
-        `Email di aggiornamento stato inviata per prenotazione ${booking?.id}`
+        `Email di aggiornamento stato inviata per prenotazione ${booking?.id}`,
       );
     } catch (emailError) {
       // Log dell'errore ma non interrompe l'aggiornamento della prenotazione
@@ -226,7 +226,7 @@ export const BookingUtilsServer = {
   },
   sendVigilBookingStatusUpdateNotification: async (
     booking: BookingI,
-    vigil: User
+    vigil: User,
   ) => {
     try {
       if (!isServer) {
@@ -275,13 +275,13 @@ export const BookingUtilsServer = {
                     typeof booking.price === "number"
                       ? amountDisplay(
                           booking.price - booking.fee,
-                          booking.currency as any
+                          booking.currency as any,
                         )
                       : String(booking.price - booking.fee || ""),
                   quantity: booking.quantity,
                   unitType: booking.service?.unit_type,
                 },
-                true
+                true,
               );
               return; // Esci dopo aver inviato l'email di conferma al vigil
             }
@@ -328,7 +328,7 @@ export const BookingUtilsServer = {
                     ? amountDisplay(booking.price, booking.currency as any)
                     : String(booking.price || ""),
               },
-              true
+              true,
             );
             return; // Esci dalla funzione dopo aver inviato l'email di cancellazione
           } catch (error) {
@@ -365,7 +365,7 @@ export const BookingUtilsServer = {
       });
 
       console.log(
-        `Email di aggiornamento stato inviata per prenotazione ${booking?.id}`
+        `Email di aggiornamento stato inviata per prenotazione ${booking?.id}`,
       );
     } catch (emailError) {
       // Log dell'errore ma non interrompe l'aggiornamento della prenotazione

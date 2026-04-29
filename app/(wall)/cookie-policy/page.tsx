@@ -1,3 +1,4 @@
+import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
 import clsx from "clsx";
 import { Metadata } from "next";
@@ -11,12 +12,10 @@ export default function CookiePolicy() {
     <section className="py-4">
       <div
         className={clsx(
-          "relative mx-auto max-w-screen-xl space-y-6 mb-8 px-4 sm:px-6 lg:px-8"
+          "relative mx-auto max-w-screen-xl space-y-6 mb-8 px-4 sm:px-6 lg:px-8",
         )}
       >
-        <h1 className="text-3xl text-primary-900">
-          Cookie Policy
-        </h1>
+        <h1 className="text-3xl text-primary-900">Cookie Policy</h1>
         <span className="absolute right-1 -top-4 sm:top-0 text-xs">
           Ultimo Aggiornamento: 01/05/2025
         </span>
@@ -265,7 +264,9 @@ export default function CookiePolicy() {
           Vittorio Luigi Di Fraia - Via Solfatara, 25, 80078 Pozzuoli (NA)
           <br />
           Indirizzo email del Titolare:&nbsp;
-          <a href="mailto:vigila.direction@gmail.com">vigila.direction@gmail.com</a>
+          <a href={`mailto:${AppConstants.contact_email}`}>
+            {AppConstants.contact_email}
+          </a>
           <br />
           <br />
           Dal momento che l&apos;uso di Strumenti di Tracciamento di terza parte
