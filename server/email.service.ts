@@ -5,6 +5,7 @@ import {
   BookingCreationEmailTemplate,
   BookingConfirmationEmailTemplate,
   NotificationEmailTemplate,
+  WalletTopUpEmailTemplate,
 } from "@/components/email";
 import {
   WelcomeEmailDataI,
@@ -12,6 +13,7 @@ import {
   EmailNotificationDataI,
   EmailResponseI,
   EmailI,
+  WalletTopUpEmailDataI,
 } from "@/src/types/email.types";
 import { AppConstants } from "@/src/constants";
 import { UserDetailsType } from "@/src/types/user.types";
@@ -238,6 +240,29 @@ export const EmailService = {
         resolve(result);
       } catch (error) {
         console.error("EmailService sendNotificationEmail error:", error);
+        reject(error);
+      }
+    }),
+
+  sendWalletTopUpEmail: async (data: WalletTopUpEmailDataI) =>
+    new Promise<EmailResponseI>(async (resolve, reject) => {
+      try {
+        if (!SEND_EMAIL_ACTIVE) {
+          resolve(true as any);
+        }
+        const result = await ResendService.sendEmailWithTemplate({
+          to: data.to,
+          subject: `${EmailConstants.subjectPrefixes.wallet} - Ricarica completata`,
+          react: WalletTopUpEmailTemplate({
+            firstName: data.firstName,
+            amount: data.amount,
+            currency: data.currency,
+            appUrl: data.appUrl || AppConstants.hostUrl,
+          }),
+        });
+        resolve(result);
+      } catch (error) {
+        console.error("EmailService sendWalletTopUpEmail error:", error);
         reject(error);
       }
     }),
