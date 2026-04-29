@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {
-  CheckCircleIcon,
-} from "@heroicons/react/24/solid";
-import { ClockIcon, CalendarIcon, BellAlertIcon } from "@heroicons/react/24/outline";
+  ClockIcon,
+  CalendarIcon,
+  BellAlertIcon,
+} from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { dayNames } from "@/components/calendar/AvailabilityRules/Services";
 import { Avatar } from "@/components";
@@ -19,17 +21,16 @@ type MatchingResponse = {
 
 export default function MatchingTrialConfirmedPage() {
   const router = useRouter();
-  const [response, setResponse] = useState<MatchingResponse | null>(null);
-
-  useEffect(() => {
-    if (globalThis.window === undefined) return;
+  const [response] = useState<MatchingResponse | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
       const rawResp = sessionStorage.getItem("matching_response");
-      if (rawResp) setResponse(JSON.parse(rawResp));
+      return rawResp ? JSON.parse(rawResp) : null;
     } catch (e) {
       console.error(e);
+      return null;
     }
-  }, []);
+  });
 
   const best = useMemo(() => {
     if (!response?.data || response.data.length === 0) return null;
@@ -79,7 +80,7 @@ export default function MatchingTrialConfirmedPage() {
         <div className="bg-white rounded-3xl shadow ring-1 ring-slate-200 p-5">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-consumer-light-blue text-consumer-blue flex items-center justify-center font-semibold text-2xl">
-              <Avatar/>
+              <Avatar />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-slate-900 leading-tight">
@@ -114,14 +115,14 @@ export default function MatchingTrialConfirmedPage() {
           <div className="mt-4 rounded-2xl bg-consumer-light-blue p-5 text-center">
             <div className="text-slate-500 text-lg">Prezzo trial</div>
             <div className="text-consumer-blue text-4xl font-bold leading-tight mt-1">
-              €{response?.price || 120}
+              €{response?.data?.[0].totalPrice}
             </div>
           </div>
         </div>
 
         <div className="mt-4 rounded-2xl bg-white border-l-4 border-amber-400 p-4 flex gap-3 items-start">
           <div className="w-9 h-9 p-2 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
-              <BellAlertIcon/>
+            <BellAlertIcon />
           </div>
           <p className="text-slate-600 leading-snug">
             Stiamo cercando un caregiver anche per i giorni scoperti. Ti

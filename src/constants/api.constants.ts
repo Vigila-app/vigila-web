@@ -1,6 +1,5 @@
 import { isServer } from "@/src/utils/common.utils";
 import { isMocked, isReleased } from "@/src/utils/envs.utils";
-import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
