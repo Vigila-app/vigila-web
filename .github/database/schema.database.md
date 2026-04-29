@@ -249,6 +249,23 @@ Represents money movements within wallets.
 
 ---
 
+### 8. `partner_waitlist`
+
+Stores waitlist submissions from potential partners (CAF, clinics, etc.).
+
+**Primary Key**: `id`
+
+**Fields**:
+
+* `id` (uuid, PK, default: `gen_random_uuid()`)
+* `created_at` (timestamptz, default: `now()`)
+* `type` (text) — partner category, e.g. `caf` or `cliniche`
+* `data` (jsonb) — flexible JSON payload containing all form fields submitted by the partner
+
+**Notes**: No foreign keys. The `data` column stores all variable form fields (name, email, phone, org details, services, etc.) as a single JSONB object, providing flexibility as form fields are added or removed without schema migrations.
+
+---
+
 ## Notes for AI Agents
 
 * UUIDs are used universally as identifiers

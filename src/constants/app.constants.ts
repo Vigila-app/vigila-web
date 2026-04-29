@@ -3,7 +3,8 @@ import { isMocked } from "@/src/utils/envs.utils";
 
 export const AppConstants = {
   title: "Vigila",
-  description: "La piattaforma per trovare, organizzare e gestire l'assistenza domiciliare con famiglie e assistenti.",
+  description:
+    "La piattaforma per trovare, organizzare e gestire l'assistenza domiciliare con famiglie e assistenti.",
   hostUrl: isMocked ? "http://localhost:3000" : "https://vigila.org",
   publicUrl: "https://vigila.org",
   defaultUserRole: RolesEnum.CONSUMER,
@@ -15,4 +16,5 @@ export const AppConstants = {
   youtubeUrl: "https://www.youtube.com/@vigila",
   whatsappUrl:
     "https://wa.me/393292130529?text=Salve%2C%20ho%20bisogno%20di%20assistenza%20cliente%21",
+  contact_email: "vigila.direction@gmail.com",
 };

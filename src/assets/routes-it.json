@@ -563,5 +563,44 @@
     },
     "private": false,
     "roles": []
+  },
+  "partner": {
+    "url": "/partner",
+    "label": "Partnership",
+    "title": "Diventa partner Vigila",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
+  },
+  "partnerCaf": {
+    "url": "/partner/caf",
+    "label": "Partnership CAF",
+    "title": "Partnership CAF e Associazioni",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
+  },
+  "partnerCliniche": {
+    "url": "/partner/cliniche",
+    "label": "Partnership Cliniche",
+    "title": "Partnership Cliniche e Centri Diagnostici",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": false,
+    "roles": []
   }
 }

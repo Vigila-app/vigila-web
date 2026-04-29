@@ -157,7 +157,7 @@ export const BookingUtilsServer = {
               {
                 to: consumer.email,
                 subject:
-                  "Prenotazione annullata dal Vigil ❌ – troviamo una soluzione",
+                  "Prenotazione annullata dal Vigil ❌ - troviamo una soluzione",
                 customerName:
                   (consumer as any)?.user_metadata?.name ||
                   (consumer as any)?.user_metadata?.firstName ||
