@@ -59,6 +59,7 @@ export interface QuestionOption {
   value: string | number;
   icon?: ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
   description?: string;
+  fee?: number;
 }
 
 /**
@@ -72,6 +73,7 @@ export interface OnboardingQuestion {
   description?: string;
   options?: QuestionOption[];
   validation?: ValidationRules;
+  variation?: string;
   max?: number | string;
   min?: number | string;
   nextStep?:
@@ -138,6 +140,7 @@ export interface MultiStepOnboardingProps {
 export interface QuestionRendererProps {
   question: OnboardingQuestion;
   value: any;
+  variation?: string;
   onChange: (value: any) => void;
   error?: FieldError;
   role: RolesEnum;

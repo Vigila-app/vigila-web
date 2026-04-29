@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import {
-  ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
   FaceSmileIcon,
 } from "@heroicons/react/24/outline";
-import { ButtonLink, Logo } from "@/components";
+import { ButtonLink } from "@/components";
 import { Routes } from "@/src/routes";
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -18,13 +17,15 @@ const poppins = Poppins({
 export default function VigilOnboardingCompletePage() {
   return (
     <section
-      className={"min-h-[calc(100vh-4rem)] bg-gray-50 " + poppins.className}>
+      className={"min-h-[calc(100vh-4rem)] bg-gray-50 " + poppins.className}
+    >
       <div className="mx-auto w-full max-w-screen-sm px-4 py-8">
         <div className="flex items-center justify-end">
           <Link
             href={Routes.home.url}
             //TODO renderizzamento prenotazione
-            className="inline-flex items-center gap-2 text-sm font-medium text-vigil-orange">
+            className="inline-flex items-center gap-2 text-sm font-medium text-vigil-orange"
+          >
             Vai alla home
             <ArrowRightIcon className="size-4" />
           </Link>
