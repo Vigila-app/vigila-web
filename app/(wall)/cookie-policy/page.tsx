@@ -1,3 +1,4 @@
+import { AppConstants } from "@/src/constants";
 import { Routes } from "@/src/routes";
 import clsx from "clsx";
 import { Metadata } from "next";
@@ -265,7 +266,7 @@ export default function CookiePolicy() {
           Vittorio Luigi Di Fraia - Via Solfatara, 25, 80078 Pozzuoli (NA)
           <br />
           Indirizzo email del Titolare:&nbsp;
-          <a href="mailto:vigila.direction@gmail.com">vigila.direction@gmail.com</a>
+          <a href={`mailto:${AppConstants.contact_email}`}>{AppConstants.contact_email}</a>
           <br />
           <br />
           Dal momento che l&apos;uso di Strumenti di Tracciamento di terza parte

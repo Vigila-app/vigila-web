@@ -567,12 +567,12 @@
   "partner": {
     "url": "/partner",
     "label": "Partnership",
-    "title": "Lavora con Vigila",
+    "title": "Diventa partner Vigila",
     "menu": {
-      "mobile": false,
-      "desktop": false,
+      "mobile": true,
+      "desktop": true,
       "header": false,
-      "footer": false
+      "footer": true
     },
     "private": false,
     "roles": []

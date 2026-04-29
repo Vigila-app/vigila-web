@@ -309,7 +309,7 @@ const problems = [
   },
   {
     title: "Un mercato enorme ancora irregolare",
-    body: "In Italia il 50–60% delle collaboratrici domestiche lavora in nero. Ogni famiglia che regolarizza è un cliente potenziale che oggi non riesci a intercettare.",
+    body: "In Italia il 50-60% delle collaboratrici domestiche lavora in nero. Ogni famiglia che regolarizza è un cliente potenziale che oggi non riesci a intercettare.",
     icon: <MegaphoneIcon className="w-5 h-5" />,
   },
 ];
@@ -509,7 +509,7 @@ export default function PartnerCafPage() {
               Entra nella lista dei partner Vigila.
             </h2>
             <p className="mt-3 text-gray-600">
-              Compila il form. Ti contatteremo entro 2–3 giorni lavorativi per
+              Compila il form. Ti contatteremo entro 2-3 giorni lavorativi per
               una prima chiamata conoscitiva.
             </p>
           </div>

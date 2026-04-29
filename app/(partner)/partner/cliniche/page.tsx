@@ -530,7 +530,7 @@ export default function PartnerClinichePage() {
               Entra nella lista dei partner Vigila.
             </h2>
             <p className="mt-3 text-gray-600">
-              Compila il form. Ti contatteremo entro 2–3 giorni lavorativi per
+              Compila il form. Ti contatteremo entro 2-3 giorni lavorativi per
               una prima chiamata conoscitiva.
             </p>
           </div>

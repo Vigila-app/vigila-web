@@ -33,8 +33,8 @@ const orgTypeOptions = [
 
 const volumeOptions = [
   "Meno di 50",
-  "50–200",
-  "200–500",
+  "50-200",
+  "200-500",
   "Più di 500",
 ];
 
@@ -106,7 +106,7 @@ const PartnerWaitlistFormCaf = () => {
         <div className="text-4xl mb-3">✅</div>
         <h3 className="text-xl font-bold text-consumer-blue mb-2">Ricevuto.</h3>
         <p className="text-gray-600">
-          Ti contatteremo entro 2–3 giorni lavorativi per una prima chiamata
+          Ti contatteremo entro 2-3 giorni lavorativi per una prima chiamata
           conoscitiva.
         </p>
       </div>

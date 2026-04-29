@@ -5,11 +5,12 @@ import {
   BuildingOffice2Icon,
 } from "@heroicons/react/24/outline";
 import PartnerFooter from "@/components/partner/PartnerFooter";
+import { Routes } from "@/src/routes";
 
 export const metadata = {
-  title: "Lavora con Vigila — Partnership",
+  title: Routes.partner.title,
   description:
-    "Scegli il tipo di partnership più adatto alla tua organizzazione. CAF, patronati, cliniche e centri diagnostici.",
+    "Unisciti a Vigila con la partnership più adatta alla tua organizzazione. CAF, patronati, cliniche e centri diagnostici.",
 };
 
 export default function PartnerPage() {
@@ -29,13 +30,13 @@ export default function PartnerPage() {
           </Link>
           <nav className="flex items-center gap-4 md:gap-6">
             <Link
-              href="/"
+              href={Routes.registrationConsumer.url}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Per le famiglie
             </Link>
             <Link
-              href="/auth/registration/vigil"
+              href={Routes.registrationVigil.url}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Per i caregiver
@@ -49,7 +50,7 @@ export default function PartnerPage() {
         <section className="py-16 md:py-24 px-4 text-center bg-gradient-to-b from-gray-50 to-white">
           <div className="mx-auto max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-              Lavora con Vigila.
+              Diventa partner Vigila
             </h1>
             <p className="mt-4 text-lg md:text-xl text-gray-600 max-w-xl mx-auto">
               Scegli il tipo di partnership più adatto alla tua organizzazione.

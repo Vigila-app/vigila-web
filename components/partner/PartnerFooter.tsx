@@ -1,3 +1,5 @@
+import { AppConstants } from "@/src/constants";
+import { Routes } from "@/src/routes";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,12 +13,12 @@ type PartnerFooterProps = {
 };
 
 const defaultLinks: FooterLink[] = [
-  { label: "Per le famiglie", href: "/" },
-  { label: "Per i caregiver", href: "/auth/registration/vigil" },
-  { label: "Partner", href: "/partner" },
-  { label: "Privacy policy", href: "/privacy-policy" },
-  { label: "Cookie policy", href: "/cookie-policy" },
-  { label: "Contatti", href: "mailto:info@vigila.it" },
+  { label: "Per le famiglie", href: Routes.registrationConsumer.url },
+  { label: "Per i caregiver", href: Routes.registrationVigil.url },
+  { label: "Partner", href: Routes.partner.url },
+  { label: "Privacy policy", href: Routes.privacyPolicy.url },
+  { label: "Cookie policy", href: Routes.cookiePolicy.url },
+  { label: "Contatti", href: `mailto:${AppConstants.contact_email}` },
 ];
 
 const PartnerFooter = ({ links = defaultLinks }: PartnerFooterProps) => {
