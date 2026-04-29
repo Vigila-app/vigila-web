@@ -35,6 +35,7 @@ import {
 import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 import { AvailabilityRulesDemo } from "@/components/calendar-demo";
 import { ServicesService } from "@/src/services";
+import { ServiceCatalogTypeIcons } from "@/src/enums/services.enums";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -268,6 +269,7 @@ export const createVigilOnboardingConfig = (
         {
           id: "services",
           type: QuestionType.MULTI_CHECKBOX,
+          variation: "service",
           label: "",
           validation: {
             required: true,
@@ -275,9 +277,9 @@ export const createVigilOnboardingConfig = (
           options: ServicesService.getServicesCatalog().map((service) => ({
             value: service.type,
             label: service.name,
-            icon: VigilDailyServiceIcons[
-              service.type.toUpperCase() as VigilDailyServiceEnum
-            ],
+            description: service.description,
+            fee: service.recommended_hourly_rate,
+            icon: ServiceCatalogTypeIcons[service.type],
           })),
           // options: Object.values(VigilDailyServiceEnum).map((value) => ({
           //   value,
