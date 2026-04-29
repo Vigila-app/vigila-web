@@ -14,6 +14,17 @@ import {
 export function useMultiStepFlow(config: MultiStepOnboardingProps["config"]) {
   const { steps, initialStepId, onComplete } = config
 
+  const shallowEqual = (a: Record<string, any>, b: Record<string, any>) => {
+    if (a === b) return true
+    const aKeys = Object.keys(a)
+    const bKeys = Object.keys(b)
+    if (aKeys.length !== bKeys.length) return false
+    for (const key of aKeys) {
+      if (a[key] !== b[key]) return false
+    }
+    return true
+  }
+
   const [state, setState] = useState<OnboardingFlowState>({
     currentStepId: initialStepId,
     currentStepIndex: 0,
@@ -94,7 +105,8 @@ export function useMultiStepFlow(config: MultiStepOnboardingProps["config"]) {
     if (state.visitedSteps.length <= 1) return
     const newVisited = [...state.visitedSteps]
     newVisited.pop()
-    const previous = newVisited[newVisited.length - 1]
+    const previous = newVisited.at(-1)
+    if (!previous) return
     setState((prev) => ({
       ...prev,
       currentStepId: previous,
@@ -116,8 +128,9 @@ export function useMultiStepFlow(config: MultiStepOnboardingProps["config"]) {
     ) => {
       setState((prev) => {
         const nextAnswers = typeof updater === "function" ? updater(prev.answers) : updater
-        // Avoid updating state if answers didn't actually change (prevents unnecessary re-renders)
+        // Avoid updating state if answers didn't actually change (prevents render loops)
         if (nextAnswers === prev.answers) return prev
+        if (shallowEqual(nextAnswers || {}, prev.answers || {})) return prev
         return { ...prev, answers: nextAnswers }
       })
     },

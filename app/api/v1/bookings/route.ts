@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         vigil:vigils(*),
         service:services(*)
       `,
-      { count: "exact" }
+      { count: "exact" },
     );
 
     // Filter based on user role
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       db_query = db_query.eq("consumer_id", userObject.id);
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
       db_query = db_query.eq("vigil_id", userObject.id);
-      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID)
+      db_query = db_query.eq("payment_status", PaymentStatusEnum.PAID);
     }
 
     if (Object.keys(filters).length) {
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
           count,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -140,13 +140,23 @@ export async function POST(req: NextRequest) {
         success: false,
       });
     }
-    const serviceCatalog = ServicesService.getServiceCatalogById(
-      service.info.catalog_id
-    );
+    const catalogId = service.info?.catalog_id;
+    const serviceCatalog =
+      (catalogId
+        ? ServicesService.getServiceCatalogById(catalogId)
+        : undefined) ??
+      (service.type
+        ? ServicesService.getServicesByType(service.type)
+        : undefined);
 
     if (!serviceCatalog?.id) {
-      return jsonErrorResponse(500, {
-        code: ResponseCodesConstants.BOOKINGS_CREATE_ERROR.code,
+      console.error("API POST bookings: catalog not found for service", {
+        service_id: service.id,
+        catalog_id: catalogId,
+        type: service.type,
+      });
+      return jsonErrorResponse(400, {
+        code: ResponseCodesConstants.BOOKINGS_CREATE_BAD_REQUEST.code,
         success: false,
       });
     }
@@ -178,7 +188,7 @@ export async function POST(req: NextRequest) {
     };
 
     const startDateObj = new Date(
-      body.startDate.toString().replace("T", " ").replace("Z", "")
+      body.startDate.toString().replace("T", " ").replace("Z", ""),
     );
     const startDate = formatDate(startDateObj);
 
@@ -190,7 +200,7 @@ export async function POST(req: NextRequest) {
               ? body.quantity * 60 * 60 * 1000
               : service.unit_type === FrequencyEnum.DAYS
                 ? body.quantity * 24 * 60 * 60 * 1000
-                : body.quantity * 60 * 1000)
+                : body.quantity * 60 * 1000),
         );
     const endDate = formatDate(calculatedEndDateObj);
 
@@ -220,7 +230,7 @@ export async function POST(req: NextRequest) {
         data,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {

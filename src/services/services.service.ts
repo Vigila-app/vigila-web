@@ -4,11 +4,22 @@ import { ServiceI, ServiceCatalogItem } from "@/src/types/services.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 
+const validCatalogTypes = new Set<string>(
+  Object.values(ServiceCatalogTypeEnum),
+);
+
 const convertCatalogData = (jsonData: any): ServiceCatalogItem[] => {
-  return jsonData.services_catalog.map((item: any) => ({
-    ...item,
-    type: item.type as ServiceCatalogTypeEnum,
-  }));
+  return jsonData.services_catalog.map((item: any) => {
+    if (!validCatalogTypes.has(item.type)) {
+      throw new Error(
+        `Invalid services-catalog entry id=${item.id}: type "${item.type}" is not a member of ServiceCatalogTypeEnum`,
+      );
+    }
+    return {
+      ...item,
+      type: item.type as ServiceCatalogTypeEnum,
+    };
+  });
 };
 
 const servicesCatalogData: ServiceCatalogItem[] =

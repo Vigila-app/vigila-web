@@ -10,6 +10,7 @@ import { ReviewsService } from "./reviews.service";
 import { ServicesService } from "./services.service";
 import { TransactionsService } from "./transactions.service";
 import { UserService } from "./user.service";
+import { MatchingService } from "./matching.service";
 
 export {
   AdminService,
@@ -24,4 +25,5 @@ export {
   ServicesService,
   TransactionsService,
   UserService,
+  MatchingService,
 };

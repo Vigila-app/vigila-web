@@ -3,7 +3,10 @@ import { apiPayment, apiWallet } from "@/src/constants/api.constants";
 import { TransactionType } from "@/src/types/wallet.types";
 
 export type CreatePaymentIntentRequest = {
-  bookingId: string;
+  // accept single bookingId or multiple bookingIds so a single payment
+  // can be associated to many bookings
+  bookingId?: string;
+  bookingIds?: string[];
   user: string;
   amount: number;
   currency: string;

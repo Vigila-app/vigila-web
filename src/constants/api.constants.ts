@@ -17,9 +17,7 @@ const apiRoot = {
     ? isMocked
       ? "http://localhost:3000"
       : AppConstants.hostUrl
-    : typeof window !== "undefined"
-      ? window.location.origin
-      : AppConstants.hostUrl,
+    : `${window.location.origin}`,
 };
 
 const getEnv = (isMock: boolean) => {
@@ -148,6 +146,10 @@ const apiControllers = {
   // region CALENDAR
   CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
   // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
+  // endregion MATCHING
 };
 
 export const apiUser = {
@@ -180,6 +182,10 @@ export const apiAltcha = {
 export const apiOnboard = {
   ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
+};
+
+export const apiMatching = {
+  MATCH: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
 };
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
@@ -314,26 +320,7 @@ export const apiCalendar = {
   // Vigil Calendar APIs
   VIGIL_BOOKINGS: (isMock?: boolean): string =>
     `${apiControllers.CALENDAR(isMock)}/vigil/bookings`,
-  // Availability Rules APIs
-  VIGIL_AVAILABILITY_RULES: (isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/availability-rules`,
-  VIGIL_AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
 
-  CONSUMER_AVAILABILITY_RULES: (isMock?: boolean): string =>
-    `${apiControllers.CALENDAR(isMock)}/consumer/availability-rules`,
-  CONSUMER_AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
-    `${apiControllers.CALENDAR(isMock)}/consumer/availability-rules/${isMock ? "rule" : ruleId}`,
-
-  // Unavailabilities APIs
-  VIGIL_UNAVAILABILITIES: (isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/unavailabilities`,
-  VIGIL_UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
-
-  // Available Slots API
-  VIGIL_AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string =>
-    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
   // Availability Rules APIs
   AVAILABILITY_RULES: (isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/availability-rules`,

@@ -275,26 +275,47 @@ export async function PUT(
         case BookingStatusEnum.PENDING:
         case BookingStatusEnum.PENDING_NOTICE_PROPOSAL:
           {
-            const service = ServicesService.getServicesByType(booking.service_type || updatedBooking.service_type);
-            const price = service ? ((service?.min_hourly_rate + service?.fee) * updatedBooking.quantity +
-              (updatedBooking.extras?.length
-                ? service.extra
-                    .filter((extra) => (updatedBooking.extras || []).includes(extra.id))
-                    .map((extra) => extra.fixed_price)
-                    .reduce((acc, price) => acc + price, 0)
-                : 0)) : updatedBooking.price;
+            const service = ServicesService.getServicesByType(
+              booking.service_type || updatedBooking.service_type,
+            );
+            const extrasTotal = updatedBooking.extras?.length
+              ? (service?.extra
+                  ?.filter((extra) =>
+                    (updatedBooking.extras || []).includes(extra.id),
+                  )
+                  .map((extra) => extra.fixed_price)
+                  .reduce((acc, price) => acc + price, 0) ?? 0)
+              : 0;
+            const price = service
+              ? (service?.min_hourly_rate + (service?.fee || 0)) *
+                  (updatedBooking.quantity || 0) +
+                extrasTotal
+              : updatedBooking.price;
+
+            // compute fee safely — fallback to existing booking.fee when computation is invalid
+            const computedFee =
+              (service?.fee ?? 2) * (updatedBooking.quantity || 0);
+            const feeToSet =
+              Number.isFinite(computedFee) && !Number.isNaN(computedFee)
+                ? computedFee
+                : undefined;
+
             allowedUpdates = {
               address: updatedBooking.address,
               startDate: updatedBooking.startDate,
               endDate: updatedBooking.endDate,
               quantity: updatedBooking.quantity,
               price: price,
-              fee: (service?.fee || 2) * updatedBooking.quantity,
               service_date: updatedBooking.service_date,
               duration_hours: updatedBooking.duration_hours,
               notes: updatedBooking.notes,
               status: updatedBooking.status,
             };
+
+            if (feeToSet !== undefined) {
+              // only include fee when we have a valid computed value
+              (allowedUpdates as any).fee = feeToSet;
+            }
           }
           break;
         case BookingStatusEnum.CONFIRMED:

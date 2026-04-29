@@ -11,6 +11,7 @@ import { BookingsService, ServicesService } from "@/src/services";
 import { useServicesStore } from "@/src/store/services/services.store";
 import React, { useEffect, useMemo, useState } from "react";
 import { ServiceCatalogItem, ServiceI } from "@/src/types/services.types";
+import { AddressI } from "@/src/types/maps.types";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { ServicesUtils } from "@/src/utils/services.utils";
@@ -19,15 +20,6 @@ import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import dynamic from "next/dynamic";
 
-const SearchAddress = dynamic(
-  () => import("@/components/maps/searchAddress.component"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
-    ),
-  },
-);
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDiff, dateDisplay } from "@/src/utils/date.utils";
 import { CurrencyEnum, FrequencyEnum } from "@/src/enums/common.enums";
@@ -39,25 +31,32 @@ import { NoticeBoardService } from "@/src/services/notice-board.service";
 import { NoticeBoardI } from "@/src/types/notice-board.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 
-const calcStartDate = (startDate?: Date | string, delta = 0) => {
-  const date = new Date(
-    Date.UTC(
-      new Date(startDate || "").getFullYear(),
-      new Date(startDate || "").getMonth(),
-      new Date(startDate || "").getDate(),
-      new Date(startDate || "").getHours() + delta,
-      new Date(startDate || "").getMinutes(),
+const SearchAddress = dynamic(
+  () => import("@/components/maps/searchAddress.component"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-12 bg-gray-100 rounded-lg animate-pulse" />
     ),
-  );
-  const minutes = date.getMinutes();
-  const roundedMinutes = Math.round(minutes / 5) * 5;
-  date.setMinutes(roundedMinutes);
-  return date.toISOString() as unknown as Date;
+  },
+);
+const calcStartDate = (startDate?: Date | string, delta = 0) => {
+  const base = startDate ? new Date(startDate) : new Date();
+  if (isNaN(base.getTime())) {
+    const ms = Math.round(Date.now() / (5 * 60000)) * (5 * 60000);
+    return new Date(ms).toISOString() as unknown as Date;
+  }
+  const ms = base.getTime() + delta * 60 * 60 * 1000;
+  const rounded = Math.round(ms / (5 * 60000)) * (5 * 60000);
+  return new Date(rounded).toISOString() as unknown as Date;
 };
-
 type BookingFormComponentI = {
   isModal?: boolean;
   onSubmit?: (newBooking: BookingI) => void;
+  onAddressSelect?: (address: AddressI) => void;
+  onFormChange?: (
+    values: Partial<BookingFormI> & { address_object?: AddressI | null },
+  ) => void;
   booking?: BookingI;
   bookingId?: BookingI["id"];
   text?: string;
@@ -71,6 +70,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const {
     isModal = false,
     onSubmit = () => ({}),
+    onAddressSelect,
+    onFormChange,
     booking: eBooking,
     text,
     title,
@@ -81,7 +82,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   } = props;
 
   const router = useRouter();
-
   const {
     loader: { isLoading },
     hideLoader,
@@ -108,6 +108,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   }, [eBooking, bookingId, bookings]);
 
   const [noticeProposal, setNoticeProposal] = useState<NoticeBoardI>();
+  const [selectedAddressObj, setSelectedAddressObj] = useState<AddressI | null>(
+    null,
+  );
 
   useEffect(() => {
     if (booking?.notice_id) {
@@ -171,8 +174,6 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   const watchedStartDate = watch("startDate");
   const watchedEndDate = watch("endDate");
 
-  console.log("dates", watchedDuration, watchedStartDate, watchedEndDate);
-
   const selectedService = useMemo(() => {
     if (noticeProposal?.service_type) {
       const service = ServicesService.getServicesByType(
@@ -180,7 +181,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       );
       if (service) return service;
     }
-    if (!(watchedServiceId && serviceId && booking?.service_id)) return;
+    if (!(watchedServiceId || serviceId || booking?.service_id)) return;
     if (services?.length && (serviceId || booking?.service_id)) {
       const found =
         services.find((s) => s.id === (serviceId || booking?.service_id)) ||
@@ -210,30 +211,64 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
   ]);
 
   useEffect(() => {
+    if (!onFormChange) return;
+    const selectedServiceType =
+      (selectedService as ServiceI)?.type ||
+      (selectedService as ServiceCatalogItem)?.type;
+    onFormChange({
+      service_id: watchedServiceId,
+      service_type: selectedServiceType,
+      quantity: watchedDuration,
+      address: watchedAddress,
+      extras: watchedExtras,
+      startDate: watchedStartDate,
+      endDate: watchedEndDate,
+      address_object: selectedAddressObj,
+    });
+  }, [
+    onFormChange,
+    selectedAddressObj,
+    selectedService,
+    watchedAddress,
+    watchedDuration,
+    watchedEndDate,
+    watchedExtras,
+    watchedServiceId,
+    watchedStartDate,
+  ]);
+
+  useEffect(() => {
     if (vigilId || booking?.vigil_id) {
       getServices(true, vigilId || booking?.vigil_id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vigilId, booking?.vigil_id]);
 
-  const serviceCatalog: ServiceCatalogItem = useMemo(() => {
-    if ((selectedService as ServiceI)?.info) {
-      return (
-        (selectedService as ServiceI)?.info?.catalog_id &&
-        ServicesService.getServiceCatalogById(
-          (selectedService as ServiceI).info?.catalog_id,
-        )
-      );
-    }
-    if (noticeProposal?.service_type) {
-      const service = ServicesService.getServicesByType(
-        noticeProposal.service_type as ServiceCatalogTypeEnum,
-      );
-      if (service) return service;
-    }
-    return;
-  }, [selectedService, noticeProposal?.service_type]);
+  const serviceCatalog: ServiceCatalogItem | undefined = useMemo(() => {
+    const service = selectedService as
+      | (ServiceI & { catalog_id?: number })
+      | ServiceCatalogItem
+      | undefined;
 
+    if (!service) return undefined;
+
+    if (service.type) {
+      const foundByType = ServicesService.getServicesByType(
+        service.type as ServiceCatalogTypeEnum,
+      );
+      if (foundByType) return foundByType;
+    }
+
+    const catId =
+      (service as ServiceI).info?.catalog_id ??
+      (service as { catalog_id?: number }).catalog_id;
+    if (catId) {
+      const foundById = ServicesService.getServiceCatalogById(Number(catId));
+      if (foundById) return foundById;
+    }
+
+    return undefined;
+  }, [selectedService]);
   useEffect(() => {
     if (
       ((selectedService as ServiceI)?.min_unit ||
@@ -250,12 +285,12 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       );
     }
     if (selectedService && watchedDuration) {
-      setTotalAmount(
-        (((selectedService as ServiceI)?.unit_price ||
-          (selectedService as ServiceCatalogItem)?.min_hourly_rate) +
-          (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0)) *
-          watchedDuration,
-      );
+      const unitPrice =
+        (selectedService as ServiceI)?.unit_price ||
+        (selectedService as ServiceCatalogItem)?.min_hourly_rate;
+      const consumerFee =
+        role === RolesEnum.CONSUMER ? (serviceCatalog?.fee ?? 0) : 0;
+      setTotalAmount((unitPrice + consumerFee) * watchedDuration);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService, watchedDuration, serviceCatalog, role]);
@@ -304,7 +339,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       try {
         showLoader();
 
-        const extras = serviceCatalog.extra
+        const extras = serviceCatalog?.extra
           .filter(
             (extra) =>
               Object.keys(formData.extras || {}).includes(extra.id) &&
@@ -375,7 +410,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       (selectedService as ServiceI)?.info?.extras?.length ||
       (selectedService as ServiceCatalogItem)?.extra?.length
     ) {
-      return serviceCatalog.extra.filter((extra) =>
+      return serviceCatalog?.extra.filter((extra) =>
         (
           (selectedService as ServiceI).info?.extras ||
           (selectedService as ServiceCatalogItem)?.extra
@@ -384,53 +419,62 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     }
     return undefined;
   }, [selectedService, serviceCatalog]);
-
   return (
     <div className="bg-white w-full mx-auto p-6 rounded-lg shadow-lg">
       <form onSubmit={handleSubmit(submitForm)} className="space-y-6">
         <div className="mb-4">
-          <h2 className="text-center font-medium text-xl">
-            {title || `Prenota con ${vigilDetails?.displayName}`}
-          </h2>
+          {vigilDetails ? (
+            <h2 className="text-center font-medium text-xl">
+              {title || `Prenota con ${vigilDetails?.displayName}`}
+            </h2>
+          ) : (
+            <h2 className="text-center font-medium text-xl">
+              {title || `Prenota`}
+            </h2>
+          )}
+
           <p className="text-center text-sm text-gray-500 mt-2">
             {text || "Compila i dettagli per la tua prenotazione"}
           </p>
         </div>
-
-        <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange/60  p-3">
-          <Avatar
-            size="big"
-            userId={vigilDetails?.id}
-            value={vigilDetails?.displayName}
-          />
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-[15px] text-gray-800">
-                {vigilDetails?.displayName}
-              </p>
-              <p className="font-medium text-xs text-gray-600">({age} anni)</p>
-            </div>
-            <div className="font-medium text-[12px] text-gray-600">
-              <span>
-                🗓️ Su Vigila da:&nbsp;
-                <span className="capitalize">
-                  {dateDisplay(
-                    vigilDetails?.created_at || "",
-                    "monthYearLiteral",
-                  )}
-                </span>
-              </span>
-            </div>
-            {averageRating ? (
-              <div className="flex items-center gap-1">
-                <StarIcon className="w-4 h-4 text-yellow-300" />
-                <p className="text-xs font-medium text-gray-600">
-                  Valutazione media: {averageRating}
+        {vigilDetails && (
+          <div className="w-full inline-flex flex-nowrap items-center gap-2 my-4 rounded-full bg-vigil-light-orange/60  p-3">
+            <Avatar
+              size="big"
+              userId={vigilDetails?.id}
+              value={vigilDetails?.displayName}
+            />
+            <div className="flex-1 flex flex-col">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-[15px] text-gray-800">
+                  {vigilDetails?.displayName}
+                </p>
+                <p className="font-medium text-xs text-gray-600">
+                  ({age} anni)
                 </p>
               </div>
-            ) : null}
+              <div className="font-medium text-[12px] text-gray-600">
+                <span>
+                  🗓️ Su Vigila da:&nbsp;
+                  <span className="capitalize">
+                    {dateDisplay(
+                      vigilDetails?.created_at || "",
+                      "monthYearLiteral",
+                    )}
+                  </span>
+                </span>
+              </div>
+              {averageRating ? (
+                <div className="flex items-center gap-1">
+                  <StarIcon className="w-4 h-4 text-yellow-300" />
+                  <p className="text-xs font-medium text-gray-600">
+                    Valutazione media: {averageRating}
+                  </p>
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
 
         <Controller
           name="service_id"
@@ -474,30 +518,18 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
               required
               role={RolesEnum.VIGIL}
               error={errors.startDate}
-              value={
-                field.value
-                  ? new Date(field.value).toISOString().slice(0, 16)
-                  : ""
-              }
+              value={(() => {
+                if (!field.value) return "";
+                const d = new Date(field.value);
+                const pad = (n: number) => String(n).padStart(2, "0");
+                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+              })()}
               onChange={(value) => {
-                const local = new Date(value as string);
-                const utc = new Date(
-                  Date.UTC(
-                    local.getFullYear(),
-                    local.getMonth(),
-                    local.getDate(),
-                    local.getHours(),
-                    local.getMinutes(),
-                  ),
-                );
-                field.onChange(utc.toISOString()); // salva in UTC
-                // aggiorna endDate in base alla nuova startDate
+                const utc = new Date(value as string).toISOString();
+                field.onChange(utc);
                 setValue(
                   "endDate",
-                  calcStartDate(
-                    utc.toISOString(),
-                    Math.max(1, Number(watchedDuration)),
-                  ),
+                  calcStartDate(utc, Math.max(1, Number(watchedDuration))),
                 );
               }}
               // set min to today and max to 3 months from today
@@ -548,10 +580,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 // aggiorna endDate in base alla nuova quantity
                 setValue(
                   "endDate",
-                  calcStartDate(
-                    watchedStartDate,
-                    Math.max(1, Number(newQty)),
-                  ),
+                  calcStartDate(watchedStartDate, Math.max(1, Number(newQty))),
                 );
               }}
               max={(selectedService as ServiceI)?.max_unit || 24}
@@ -585,6 +614,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 } else {
                   clearErrors("address");
                 }
+                setSelectedAddressObj(address);
+                onAddressSelect?.(address);
                 field.onChange(address?.display_name || "");
               }}
               label="Indirizzo"
@@ -697,7 +728,9 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                     ((selectedService as ServiceI)?.unit_price ||
                       (selectedService as ServiceCatalogItem)
                         ?.min_hourly_rate) +
-                      (role === RolesEnum.CONSUMER ? serviceCatalog.fee : 0),
+                      (role === RolesEnum.CONSUMER
+                        ? (serviceCatalog?.fee ?? 0)
+                        : 0),
                   )}
                 </p>
                 <p>
@@ -710,7 +743,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                 {extraOptions?.length ? (
                   <div>
                     Extra:&nbsp;
-                    {serviceCatalog.extra
+                    {(serviceCatalog?.extra ?? [])
                       .filter(
                         (extra) =>
                           Object.keys(watchedExtras || {}).includes(extra.id) &&
@@ -732,7 +765,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
                   {amountDisplay(
                     totalAmount +
                       (extraOptions?.length
-                        ? serviceCatalog.extra
+                        ? (serviceCatalog?.extra ?? [])
                             .filter(
                               (extra) =>
                                 Object.keys(watchedExtras || {}).includes(
@@ -748,27 +781,30 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             </div>
           </div>
         )}
-
-        <div className="flex gap-4">
-          {isModal && (
+        {vigilDetails && (
+          <div className="flex gap-4">
+            {isModal && (
+              <Button
+                type="button"
+                secondary
+                full
+                label="Annulla"
+                action={closeModal}
+              />
+            )}
             <Button
-              type="button"
-              secondary
+              type="submit"
+              role={RolesEnum.CONSUMER}
               full
-              label="Annulla"
-              action={closeModal}
+              label={
+                booking
+                  ? "Aggiorna Prenotazione"
+                  : "Conferma e vai al pagamento"
+              }
+              isLoading={isLoading}
             />
-          )}
-          <Button
-            type="submit"
-            role={RolesEnum.CONSUMER}
-            full
-            label={
-              booking ? "Aggiorna Prenotazione" : "Conferma e vai al pagamento"
-            }
-            isLoading={isLoading}
-          />
-        </div>
+          </div>
+        )}
       </form>
     </div>
   );

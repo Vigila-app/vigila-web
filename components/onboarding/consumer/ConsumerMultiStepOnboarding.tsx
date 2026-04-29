@@ -3,6 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { OnboardService } from "@/src/services/onboard.service";
+import { MatchingService, UserService } from "@/src/services";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
@@ -67,6 +68,23 @@ const ConsumerMultiStepOnboarding = () => {
           data: onboardData,
         });
 
+        try {
+          const user = await UserService.getUser();
+          if (user?.id) {
+            // Fire-and-forget matching call; do not block onboarding completion
+            MatchingService.match({
+              role: RolesEnum.CONSUMER,
+              data: onboardData,
+            }).catch((e) =>
+              console.warn("Matching API failed (non-blocking)", e),
+            );
+          }
+        } catch (e) {
+          console.warn(
+            "Unable to call matching API: could not retrieve user",
+            e,
+          );
+        }
         if (user?.id) trackQuestionnaireCompleted(user?.id, RolesEnum.CONSUMER);
 
         showToast({
