@@ -15,8 +15,9 @@ export type RouteI = {
   private: boolean;
   roles: string[];
   seo?: {
-    changeFrequency: string;
-    priority: number;
+    index?: boolean;
+    changeFrequency?: string;
+    priority?: number;
   };
 };
 
