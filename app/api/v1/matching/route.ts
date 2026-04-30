@@ -18,6 +18,7 @@ import {
 } from "@/src/types/calendar.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import { ServicesService } from "@/src/services";
+import { BookingStatusEnum } from "@/src/enums/booking.enums";
 
 /**
  * Parse a time string "HH:MM" or an integer hour to a numeric hour (0-23).
@@ -113,6 +114,32 @@ function unavailabilityBlocksSlot(
   const unavStart = new Date(unav.start_at);
   const unavEnd = new Date(unav.end_at);
   return unavStart < slotEnd && unavEnd > slotStart;
+}
+
+/**
+ * Check whether a confirmed booking overlaps with a requested time slot on a given date.
+ * Uses the same overlap logic as unavailabilityBlocksSlot: any partial overlap blocks the slot.
+ */
+function bookingBlocksSlot(
+  booking: { startDate: string | Date; endDate: string | Date },
+  date: string,
+  startHour: number,
+  endHour: number,
+): boolean {
+  const slotStart = new Date(
+    `${date}T${String(startHour).padStart(2, "0")}:00:00Z`,
+  );
+  let slotEnd: Date;
+  if (endHour >= 24) {
+    slotEnd = new Date(slotStart);
+    slotEnd.setUTCDate(slotEnd.getUTCDate() + 1);
+    slotEnd.setUTCHours(0, 0, 0, 0);
+  } else {
+    slotEnd = new Date(`${date}T${String(endHour).padStart(2, "0")}:00:00Z`);
+  }
+  const bookingStart = new Date(booking.startDate);
+  const bookingEnd = new Date(booking.endDate);
+  return bookingStart < slotEnd && bookingEnd > slotStart;
 }
 
 /**
@@ -481,9 +508,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Batch-fetch CONFIRMED bookings for all candidate vigils (overlapping the date range)
+    const { data: allConfirmedBookings, error: bookingsError } = await _admin
+      .from("bookings")
+      .select("vigil_id, startDate, endDate")
+      .in("vigil_id", vigilIds)
+      .eq("status", BookingStatusEnum.CONFIRMED)
+      .lte("startDate", `${dates.endDate}T23:59:59Z`)
+      .gte("endDate", `${dates.startDate}T00:00:00Z`);
+
+    if (bookingsError) {
+      throw new Error(
+        `Failed to fetch vigil confirmed bookings: ${bookingsError.message}`,
+      );
+    }
+
     // Index rules and unavailabilities by vigil ID for O(1) lookup
     const rulesByVigilId = new Map<string, VigilAvailabilityRuleI[]>();
     const unavByVigilId = new Map<string, VigilUnavailabilityI[]>();
+    const bookingsByVigilId = new Map<
+      string,
+      Array<{ startDate: string | Date; endDate: string | Date }>
+    >();
 
     for (const rule of (allRules || []) as VigilAvailabilityRuleI[]) {
       if (!rulesByVigilId.has(rule.vigil_id)) {
@@ -497,6 +543,13 @@ export async function POST(req: NextRequest) {
         unavByVigilId.set(unav.vigil_id, []);
       }
       unavByVigilId.get(unav.vigil_id)!.push(unav);
+    }
+
+    for (const booking of allConfirmedBookings || []) {
+      if (!bookingsByVigilId.has(booking.vigil_id)) {
+        bookingsByVigilId.set(booking.vigil_id, []);
+      }
+      bookingsByVigilId.get(booking.vigil_id)!.push(booking);
     }
 
     // Count compatible slots per vigil; detect perfect matches early
@@ -516,6 +569,7 @@ export async function POST(req: NextRequest) {
     for (const vigil of vigils) {
       const rules = rulesByVigilId.get(vigil.id) || [];
       const unavs = unavByVigilId.get(vigil.id) || [];
+      const confirmedBookings = bookingsByVigilId.get(vigil.id) || [];
       let compatibleSlots = 0;
       const compatibleSlotDetails: CompatibleSlotI[] = [];
 
@@ -534,9 +588,13 @@ export async function POST(req: NextRequest) {
           );
           if (!hasCompatibleRule) continue;
 
-          const isBlocked = unavs.some((unav) =>
-            unavailabilityBlocksSlot(unav, date, startHour, endHour),
-          );
+          const isBlocked =
+            unavs.some((unav) =>
+              unavailabilityBlocksSlot(unav, date, startHour, endHour),
+            ) ||
+            confirmedBookings.some((booking) =>
+              bookingBlocksSlot(booking, date, startHour, endHour),
+            );
           if (!isBlocked) {
             compatibleSlots++;
             compatibleSlotDetails.push({
