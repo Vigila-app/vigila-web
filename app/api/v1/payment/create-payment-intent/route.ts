@@ -97,6 +97,18 @@ export async function POST(req: NextRequest) {
       description: `Pagamento per prenotazioni ${bookingIds.join(",")}`,
     });
 
+    // Debug: log created PaymentIntent id and key info so we can trace it in Stripe dashboard
+    try {
+      console.log("Created Stripe PaymentIntent:", {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        metadata: paymentIntent.metadata,
+      });
+    } catch (e) {
+      console.warn("Unable to log paymentIntent details", e);
+    }
+
     // Aggiorna le prenotazioni con l'ID del Payment Intent e setta payment_status=PENDING
     await _admin
       .from("bookings")

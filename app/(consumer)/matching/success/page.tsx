@@ -93,7 +93,7 @@ export default function MatchingSuccessPage() {
           console.warn("No service_id found for slot, skipping booking", slot);
           continue;
         }
-
+        console.log(bookingPayload);
         try {
           const created = await BookingsService.createBooking(bookingPayload);
           if (created?.id) createdBookings.push(created);
@@ -108,15 +108,28 @@ export default function MatchingSuccessPage() {
 
       const createdIds = createdBookings.map((b) => b.id);
       setBookingIds(createdIds);
+      console.log(createdBookings);
+      // Prefer the matching service totalPrice (from server) for the payment amount.
+      // totalPrice is in euros (e.g. 12.34) — convert to cents. Fall back to summing
+      // created booking prices if totalPrice is not available.
+      const matchingTotalEur =
+        typeof vigilSlots?.totalPrice === "number"
+          ? vigilSlots.totalPrice
+          : Number(vigilSlots?.totalPrice || 0);
 
-      // sum server-calculated prices to get a reliable amount
-      const sumCents = createdBookings.reduce((acc, b) => {
-        // booking.price is numeric in euros (e.g. 12.34) — convert to cents
-        const p = typeof b.price === "number" ? b.price : Number(b.price || 0);
-        return acc + Math.round(p * 100);
-      }, 0);
+      let amountCents = 0;
+      if (matchingTotalEur && matchingTotalEur > 0) {
+        amountCents = Math.round(matchingTotalEur * 100);
+      } else {
+        // fallback: sum server-calculated booking prices
+        amountCents = createdBookings.reduce((acc, b) => {
+          const p =
+            typeof b.price === "number" ? b.price : Number(b.price || 0);
+          return acc + Math.round(p * 100);
+        }, 0);
+      }
 
-      if (!sumCents || sumCents <= 0) {
+      if (!amountCents || amountCents <= 0) {
         setError("Importo non valido per il pagamento");
         return;
       }
@@ -124,7 +137,7 @@ export default function MatchingSuccessPage() {
       const paymentReq = {
         bookingIds: createdIds,
         user: user.id,
-        amount: sumCents,
+        amount: amountCents,
         currency: (vigilSlots?.currency || "eur").toLowerCase(),
       };
 
