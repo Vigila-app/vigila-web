@@ -3,6 +3,7 @@ export type RouteI = {
   title?: string;
   id?: string;
   url: string;
+  href?: string;
   target?: "_blank" | "_self" | string;
   matchingUrl?: string;
   parents?: string[];

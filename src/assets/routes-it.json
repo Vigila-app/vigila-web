@@ -556,7 +556,8 @@
     }
   },
   "accessibility": {
-    "url": "#",
+    "url": "/accessibility",
+    "href": "#",
     "label": "Accessibilità",
     "title": "Accessibilità",
     "id": "accessibility-link",

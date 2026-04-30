@@ -40,8 +40,8 @@ const FooterLight = () => {
             >
               <Link
                 className="text-gray-700 transition hover:text-gray-500"
-                href={route.url}
-                target="_blank"
+                href={route.href || route.url}
+                target={route.target || "_self"}
               >
                 {route.label}
               </Link>

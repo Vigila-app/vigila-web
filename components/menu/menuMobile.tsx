@@ -51,7 +51,7 @@ const MenuMobile = () => {
     return internal ? (
       <Link
         className={className}
-        href={route?.url || ""}
+        href={route?.href || route?.url || ""}
         id={
           route.id ||
           route.label.toLowerCase().replace(/\s+/g, "-") + "-mobile-link"
@@ -64,7 +64,7 @@ const MenuMobile = () => {
     ) : (
       <a
         className={className}
-        href={route?.url || ""}
+        href={route?.href || route?.url || ""}
         id={
           route.id ||
           route.label.toLowerCase().replace(/\s+/g, "-") + "-mobile-link"

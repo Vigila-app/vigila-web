@@ -45,7 +45,7 @@ const Footer = () => {
             >
               <Link
                 className="transition hover:text-vigil-orange"
-                href={route.url}
+                href={route.href || route.url}
                 id={route.id || route.label.toLowerCase().replace(/\s+/g, "-") + "-footer-link"}
                 target={route.target || "_self"}
               >
