@@ -3,7 +3,7 @@ export type RouteI = {
   title?: string;
   id?: string;
   url: string;
-  target?: "_blank" | "_self";
+  target?: "_blank" | "_self" | string;
   matchingUrl?: string;
   parents?: string[];
   menu?: {
