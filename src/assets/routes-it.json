@@ -507,7 +507,10 @@
       "footer": true
     },
     "private": false,
-    "roles": []
+    "roles": [],
+    "seo": {
+      "index": false
+    }
   },
   "termsConditions": {
     "url": "/termini-e-condizioni",
