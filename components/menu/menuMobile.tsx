@@ -32,6 +32,7 @@ const MenuMobile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const role: RolesEnum = user?.user_metadata?.role as RolesEnum;
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
 
@@ -40,20 +41,36 @@ const MenuMobile = () => {
   const MenuLinkItem = (
     route: RouteI,
     Icon?: React.ElementType,
-    internal = true
+    internal = true,
   ) => {
     const className = clsx(
       "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
       pathname === route?.url &&
-        "active bg-gray-100 text-primary-500 hover:text-primary-600"
+        "active bg-gray-100 text-primary-500 hover:text-primary-600",
     );
     return internal ? (
-      <Link className={className} href={route?.url || ""}>
+      <Link
+        className={className}
+        href={route?.url || ""}
+        id={
+          route.id ||
+          route.label.toLowerCase().replace(/\s+/g, "-") + "-mobile-link"
+        }
+        target={route.target || "_self"}
+      >
         {Icon && <Icon className=" w-6 h-6 text-current" />}
         {route?.label}
       </Link>
     ) : (
-      <a className={className} href={route?.url || ""}>
+      <a
+        className={className}
+        href={route?.url || ""}
+        id={
+          route.id ||
+          route.label.toLowerCase().replace(/\s+/g, "-") + "-mobile-link"
+        }
+        target={route.target || "_self"}
+      >
         {" "}
         {Icon && <Icon className=" w-6 h-6 text-current" />}
         {route?.label}
@@ -91,7 +108,8 @@ const MenuMobile = () => {
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="rounded bg-transparent p-2">
+        className="rounded bg-transparent p-2"
+      >
         {isOpen ? (
           <XMarkIcon className="h-6 w-6 text-consumer-blue transition hover:text-gray-600/75" />
         ) : (
@@ -104,8 +122,9 @@ const MenuMobile = () => {
         style={!isOpen ? { right: "-100vw" } : {}}
         className={clsx(
           "absolute flex flex-col gap-6  transition-all mt-2 w-full h-screen p-4 bg-white z-40 shadow",
-          isOpen ? "block right-0" : "hidden"
-        )}>
+          isOpen ? "block right-0" : "hidden",
+        )}
+      >
         {isUserLogged ? (
           <>
             <section className=" flex flex-col gap-2 justify-center items-center">
@@ -142,7 +161,7 @@ const MenuMobile = () => {
                       : user.user_metadata?.role === RolesEnum.ADMIN
                         ? Routes.profileAdmin
                         : Routes.home,
-                  UserIcon
+                  UserIcon,
                 )}
               </li>
               <li className="block">
@@ -161,7 +180,7 @@ const MenuMobile = () => {
                         }),
                   },
                   CalendarDaysIcon,
-                  false
+                  false,
                 )}
               </li>
               {user?.user_metadata?.role === RolesEnum.CONSUMER && (
@@ -174,7 +193,7 @@ const MenuMobile = () => {
                         url: `${Routes.profileConsumer.url}?tab=wallet`,
                         label: "Wallet",
                       },
-                      WalletIcon
+                      WalletIcon,
                     )}
                   </li>
                   <li className="block ">
@@ -184,7 +203,7 @@ const MenuMobile = () => {
                         url: `${Routes.wallet.url}`,
                         label: "Pacchetti",
                       },
-                      GiftIcon
+                      GiftIcon,
                     )}
                   </li>
                 </>
@@ -208,7 +227,7 @@ const MenuMobile = () => {
                   user.user_metadata?.role === RolesEnum.CONSUMER
                     ? UserGroupIcon
                     : BriefcaseIcon,
-                  false
+                  false,
                 )}
               </li>
               {user?.user_metadata?.role === RolesEnum.VIGIL ? (
@@ -220,7 +239,7 @@ const MenuMobile = () => {
                       label: "Recensioni",
                     },
                     StarIcon,
-                    false
+                    false,
                   )}
                 </li>
               ) : null}
@@ -245,7 +264,8 @@ const MenuMobile = () => {
                   AuthService.logout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-4 w-full rounded mb-2 px-4 pt-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700">
+                className="flex items-center gap-4 w-full rounded mb-2 px-4 pt-2 text-lg font-medium text-red-500 [text-align:_inherit] transition hover:bg-red-100 hover:text-blue-700"
+              >
                 <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
                 Logout
               </button>

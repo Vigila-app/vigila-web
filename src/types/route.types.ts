@@ -1,7 +1,9 @@
 export type RouteI = {
   label: string;
   title?: string;
+  id?: string;
   url: string;
+  target?: "_blank" | "_self" | string;
   matchingUrl?: string;
   parents?: string[];
   menu?: {
@@ -13,8 +15,9 @@ export type RouteI = {
   private: boolean;
   roles: string[];
   seo?: {
-    changeFrequency: string;
-    priority: number;
+    index?: boolean;
+    changeFrequency?: string;
+    priority?: number;
   };
 };
 
