@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 const SkipContentComponent = dynamic(
   () => import("@/components/@core/skipContent/skipContent.component"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 
 type HtmlDocumentI = {
@@ -29,7 +29,8 @@ const HtmlDocument = (props: HtmlDocumentI) => {
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
-          <link rel="manifest" href="/manifest.json"/>
+          <link rel="manifest" href="/manifest.json" />
+          {/* Temporary remove Leaflet import
           <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -40,7 +41,13 @@ const HtmlDocument = (props: HtmlDocumentI) => {
             src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossOrigin=""
-          ></script>
+          ></script> */}
+          {process.env.NEXT_PUBLIC_USERWAY_ID && (
+            <script
+              src="https://cdn.userway.org/widget.js"
+              data-account={process.env.NEXT_PUBLIC_USERWAY_ID}
+            ></script>
+          )}
           {otherHead}
         </head>
         <body className={clsx(inter.className, "overflow-x-hidden")}>

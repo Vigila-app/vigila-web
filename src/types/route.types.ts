@@ -1,7 +1,9 @@
 export type RouteI = {
   label: string;
   title?: string;
+  id?: string;
   url: string;
+  target?: "_blank" | "_self";
   matchingUrl?: string;
   parents?: string[];
   menu?: {
