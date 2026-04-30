@@ -48,23 +48,25 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const {
-      data: { totalDeposited, totalSpent },
-    } = await supabase.functions.invoke("wallet-totals", {
+    const { data } = await supabase.functions.invoke("wallet-totals", {
       body: { userId: userObject.id },
     });
+    const { totalDeposited, totalSpent } = data || {
+      totalDeposited: 0,
+      totalSpent: 0,
+    };
 
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("balance_cents")
       .eq("user_id", userObject.id)
-      .single();
+      .maybeSingle();
 
-    if (walletError) {
+    if (walletError || !wallet) {
       return jsonErrorResponse(500, {
         code: ResponseCodesConstants.WALLET_NOT_FOUND.code,
         success: false,
-        message: "Failed to fetch wallet",
+        message: `Failed to fetch wallet: ${!wallet ? "Wallet not found" : (walletError as any)?.message || "generic error"}`,
       });
     }
 
