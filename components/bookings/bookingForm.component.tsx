@@ -63,6 +63,7 @@ type BookingFormComponentI = {
   title?: string;
   serviceId?: ServiceI["id"];
   vigilId?: ServiceI["vigil_id"];
+  catalogServiceType?: ServiceCatalogTypeEnum;
   edit?: boolean;
 };
 
@@ -77,6 +78,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     title,
     serviceId,
     vigilId,
+    catalogServiceType,
     bookingId,
     edit = false,
   } = props;
@@ -181,7 +183,13 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       );
       if (service) return service;
     }
-    if (!(watchedServiceId || serviceId || booking?.service_id)) return;
+    if (!(watchedServiceId || serviceId || booking?.service_id)) {
+      if (catalogServiceType) {
+        const service = ServicesService.getServicesByType(catalogServiceType);
+        if (service) return service;
+      }
+      return;
+    }
     if (services?.length && (serviceId || booking?.service_id)) {
       const found =
         services.find((s) => s.id === (serviceId || booking?.service_id)) ||
@@ -208,6 +216,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     vigilId,
     booking,
     noticeProposal?.service_type,
+    catalogServiceType,
   ]);
 
   useEffect(() => {
@@ -479,9 +488,15 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
         <Controller
           name="service_id"
           control={control}
-          rules={{ required: !(edit && booking?.notice_id && noticeProposal) }}
+          rules={{
+            required:
+              !catalogServiceType &&
+              !(edit && booking?.notice_id && noticeProposal),
+          }}
           render={({ field }) =>
-            serviceOptions && serviceOptions?.length > 1 ? (
+            serviceOptions &&
+            serviceOptions?.length > 1 &&
+            !catalogServiceType ? (
               <Select
                 {...field}
                 label="Servizio richiesto"

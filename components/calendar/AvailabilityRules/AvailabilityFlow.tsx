@@ -20,6 +20,7 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
 import { BookingFormComponent } from "@/components/bookings";
 import { SingleBooking } from "./SingleBooking";
+import { SingleBookingService } from "./SingleBookingService";
 
 let gtmTracked = false; // Global variable to track if GTM event has been sent
 
@@ -42,7 +43,7 @@ export default function AvailabilityFlow({
             answers["booking-type"] == BookingTypeEnum.OCCASIONAL ||
             answers["booking-type"] == BookingTypeEnum.TRIAL
           ) {
-            return "single-booking";
+            return "single-service";
           }
           return "availabilities";
         },
@@ -59,6 +60,14 @@ export default function AvailabilityFlow({
             ],
           },
         ],
+      },
+      {
+        id: "single-service",
+        title: "",
+        description: "",
+        questions: [],
+        component: SingleBookingService,
+        nextStep: "single-booking",
       },
       {
         id: "single-booking",

@@ -24,16 +24,19 @@ const toValidDate = (value: unknown) => {
   return d;
 };
 
-const toDateOnly = (date: Date) => date.toISOString().slice(0, 10);
-
-const toTimeUtc = (date: Date) =>
-  `${String(date.getUTCHours()).padStart(2, "0")}:${String(
-    date.getUTCMinutes(),
+const toDateOnly = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
   ).padStart(2, "0")}`;
 
-const addHoursUtc = (date: Date, hours: number) => {
+const toTimeLocal = (date: Date) =>
+  `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
+  ).padStart(2, "0")}`;
+
+const addHoursLocal = (date: Date, hours: number) => {
   const next = new Date(date);
-  next.setUTCHours(next.getUTCHours() + hours);
+  next.setHours(next.getHours() + hours);
   return next;
 };
 
@@ -98,6 +101,9 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
   const startDateAnswer = answers?.["start-date"];
   const startDateDirect = answers?.startDate;
   const startDateFromDates = answers?.dates?.startDate;
+  const catalogServiceType = answers?.service_type as
+    | ServiceCatalogTypeEnum
+    | undefined;
   const bookingPrefill = useMemo(
     () => ({
       // map onboarding question ids to booking fields used by BookingFormComponent
@@ -146,7 +152,7 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
 
         const startDateObj = toValidDate(form?.startDate);
         if (startDateObj) {
-          const fallbackEnd = addHoursUtc(
+          const fallbackEnd = addHoursLocal(
             startDateObj,
             Math.max(1, Number(form?.quantity || 1)),
           );
@@ -154,9 +160,9 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
 
           const startDateStr = toDateOnly(startDateObj);
           const endDateStr = toDateOnly(endDateObj);
-          const weekday = startDateObj.getUTCDay();
-          const startTime = toTimeUtc(startDateObj);
-          const endTime = toTimeUtc(endDateObj);
+          const weekday = startDateObj.getDay();
+          const startTime = toTimeLocal(startDateObj);
+          const endTime = toTimeLocal(endDateObj);
           let safeEndTime = endTime;
           if (
             endDateStr !== startDateStr &&
@@ -216,6 +222,7 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
           }
 
           const serviceType =
+            (prev?.service_type as ServiceCatalogTypeEnum | undefined) ||
             form?.service_type ||
             (form as any)?.service?.type ||
             (form as any)?.serviceType;
@@ -233,16 +240,22 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
           }
 
           if (serviceLabel) {
-            const prevServiceLabel = prev?.services?.[weekday]?.services;
-            if (prevServiceLabel !== serviceLabel) {
+            const prevDay = prev?.services?.[weekday];
+            const prevCar = prevDay?.car ?? prev?.car ?? false;
+            const prevNotes = prevDay?.notes ?? prev?.notes ?? "";
+            if (
+              prevDay?.services !== serviceLabel ||
+              prevDay?.car !== prevCar ||
+              prevDay?.notes !== prevNotes
+            ) {
               ensureNext();
               next.services = {
                 ...(prev?.services || {}),
                 [weekday]: {
                   weekday,
                   services: serviceLabel,
-                  car: prev?.services?.[weekday]?.car ?? false,
-                  notes: prev?.services?.[weekday]?.notes ?? "",
+                  car: prevCar,
+                  notes: prevNotes,
                 },
               };
             }
@@ -278,6 +291,7 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
   return (
     <BookingFormComponent
       booking={bookingPrefill as any}
+      catalogServiceType={catalogServiceType}
       onSubmit={handleOnSubmit}
       onFormChange={updateAnswersFromForm}
     />
