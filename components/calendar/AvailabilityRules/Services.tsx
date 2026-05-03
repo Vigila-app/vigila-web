@@ -1,21 +1,10 @@
-import {
-  ComponentType,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
-import { SingleService } from "./SingleService";
-import { HeartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-import Caffe from "@/components/svg/Caffe";
-import Vasca from "@/components/svg/Vasca";
-import { Car } from "@/components/svg";
 import { CurrentDay } from "./CurrentDay";
 import { SelectedDays } from "./SelectedDays";
-import { ServicesService } from "@/src/services";
+import { ServiceDayForm } from "./ServiceDayForm";
+
 export const dayNames = [
   "Domenica",
   "Lunedì",
@@ -25,18 +14,6 @@ export const dayNames = [
   "Venerdì",
   "Sabato",
 ];
-
-const SERVICE_ICON_MAP: Record<
-  string,
-  ComponentType<{ className?: string }>
-> = {
-  "Compagnia e conversazione": Caffe as ComponentType<{ className?: string }>,
-  "Assistenza leggera": HeartIcon as ComponentType<{ className?: string }>,
-  "Assistenza alla persona": UserGroupIcon as ComponentType<{
-    className?: string;
-  }>,
-  "Igiene personale": Vasca as ComponentType<{ className?: string }>,
-};
 
 export const Services = ({
   answers,
@@ -53,7 +30,6 @@ export const Services = ({
   role?: RolesEnum;
   isLastStep?: boolean;
 }) => {
-  // derive unique ordered weekdays from answers.availabilityRules
   const selectedDays = useMemo(
     () =>
       Array.from(
@@ -68,28 +44,12 @@ export const Services = ({
   const isLastDay = currentDayIdx === selectedDays.length - 1;
 
   useEffect(() => {
-    // reset to first day when availabilities change
-
     setCurrentDayIdx(0);
   }, [selectedDays.length]);
 
-  // per-day local selections
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [car, setCar] = useState(false);
   const [notes, setNotes] = useState("");
-
-  const services = useMemo(() => {
-    return ServicesService.getServicesCatalog().map((service) => ({
-      name: service.name,
-      desc: service.description,
-      price:
-        service.recommended_hourly_rate ??
-        service.min_hourly_rate ??
-        service.max_hourly_rate ??
-        0,
-      Icon: SERVICE_ICON_MAP[service.name] || HeartIcon,
-    }));
-  }, []);
 
   const colorClasses = useMemo(() => {
     const vigil = {
@@ -111,7 +71,6 @@ export const Services = ({
     return role === RolesEnum.CONSUMER ? consumer : vigil;
   }, [role]);
 
-  // load per-day values when current day changes
   useEffect(() => {
     const day = selectedDays[currentDayIdx];
     const saved = answers?.services?.[day];
@@ -127,10 +86,8 @@ export const Services = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDayIdx, selectedDays.join("-")]);
 
-  // avoid repeated auto-saving when component re-renders
   const hasAutoSavedRef = useRef(false);
 
-  // reset auto-save flag when entering/leaving the services step or when selected days change
   useEffect(() => {
     hasAutoSavedRef.current = false;
   }, [isLastStep, selectedDays.join("-")]);
@@ -142,7 +99,6 @@ export const Services = ({
     setAnswers((prev: Record<string, any>) => {
       const next = { ...prev };
       next.services = { ...next.services };
-
       next.services[day] = {
         weekday: Number(day),
         services: selectedService,
@@ -185,7 +141,6 @@ export const Services = ({
         </div>
       )}
 
-      {/* Service checkboxes with icons */}
       <div className="bg-white p-4 rounded-2xl">
         <CurrentDay
           answers={answers}
@@ -194,63 +149,19 @@ export const Services = ({
         />
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
-          <div className="grid grid-cols-2 gap-3">
-            {services.map((srv) => (
-              <SingleService
-                key={srv.name}
-                {...srv}
-                checked={selectedService === srv.name}
-                onChange={(next: boolean) => setSelectedService(srv.name)}
-              />
-            ))}
-          </div>
         </div>
 
-        {/* Accompagnamento in auto */}
-        <div className="mb-4">
-          <label
-            className={clsx(
-              "block cursor-pointer w-full p-3 rounded-2xl",
-              car
-                ? clsx(colorClasses.border, colorClasses.bgLight)
-                : "border-zinc-200 bg-white",
-            )}
-          >
-            <input
-              type="checkbox"
-              checked={car}
-              onChange={() => setCar((v) => !v)}
-              className="hidden"
-            />
-            <h3 className="flex items-center gap-2 w-full font-bold text-lg">
-              <Car className={clsx("w-5 h-5", colorClasses.text)} />
-              <span>Accompagnamento in auto</span>
-            </h3>
-            <p className="text-md text-zinc-400">
-              L&apos;operatore accompagna con la sua propria auto
-            </p>
-            <p className={clsx("text-xs", colorClasses.text)}>
-              +5 EUR rimborso carburante per visita
-            </p>
-          </label>
-        </div>
+        <ServiceDayForm
+          selectedServiceName={selectedService}
+          car={car}
+          notes={notes}
+          onServiceChange={setSelectedService}
+          onCarChange={setCar}
+          onNotesChange={setNotes}
+          role={role}
+          notesInputId="service-notes"
+        />
 
-        {/* Notes */}
-        <div className="mb-4">
-          <label htmlFor="service-notes" className="block font-semibold mb-1">
-            Note
-          </label>
-          <textarea
-            id="service-notes"
-            className="w-full border rounded-md p-2"
-            rows={2}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Aggiungi note opzionali..."
-          />
-        </div>
-
-        {/* Navigation */}
         <div className="flex justify-between mt-6">
           <div className="flex gap-2">
             {(!isLastStep || !isLastDay) && (
@@ -258,17 +169,12 @@ export const Services = ({
                 type="button"
                 onClick={async () => {
                   saveCurrentDaySelections();
-
-                  // move to next day or finalize
                   if (currentDayIdx < selectedDays.length - 1) {
                     const nextIdx = currentDayIdx + 1;
                     const nextDay = selectedDays[nextIdx];
-                    // load saved values for next day (if any) so UI reflects them immediately
-                    const savedNext = answers?.services?.[nextDay];
-                    loadDaySelections(savedNext);
+                    loadDaySelections(answers?.services?.[nextDay]);
                     setCurrentDayIdx(nextIdx);
                   } else {
-                    // last day: finalize / salva ricorrenza
                     console.log("All days filled, salva ricorrenza");
                     console.log(answers);
                   }

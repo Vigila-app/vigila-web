@@ -5,14 +5,13 @@ import {
   CalendarIcon,
   ChevronRightIcon,
   HeartIcon,
-  MagnifyingGlassIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { AgendaItem } from "@/components/calendar-demo/AgendaItem";
 import Card from "@/components/card/card";
 import { useEffect, useMemo, useState } from "react";
 import BookingCounterComponent from "@/components/bookings/bookingCounter.component";
-import { ServicesComponent } from "@/components/services";
 import { Routes } from "@/src/routes";
 import WalletBalanceCard from "@/components/wallet/walletBalanceCard";
 import { EurConverter } from "@/src/utils/common.utils";
@@ -24,6 +23,7 @@ import { CalendarService } from "@/src/services/calendar.service";
 import { CalendarEventI } from "@/src/types/calendar.types";
 import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
 import ModalBase from "@/components/@core/modal/modalBase.component";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export default function HomeConsumer() {
   const { user } = useUserStore();
@@ -105,6 +105,21 @@ export default function HomeConsumer() {
         }
         icon={false}
       />
+      <div className="flex flex-row  p-4 bg-white my-6 border-1 border-gray-200 rounded-2xl items-center justify-between">
+        <div className="flex flex-col  ">
+          {" "}
+          <p className=" text-base font-semibold">Richiedi assistenza </p>
+          <p className="text-sm  font-normal text-gray-500">
+            Prenota visite per date specifiche
+          </p>{" "}
+        </div>
+        <ButtonLink
+          role={RolesEnum.VIGIL}
+          label="Richiedi"
+          href="booking/inizialization"
+          icon={<PlusIcon height={24} width={24} />}
+        />
+      </div>
       <BookingCounterComponent />
 
       <Card>

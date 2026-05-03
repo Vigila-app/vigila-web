@@ -176,20 +176,22 @@ function buildMatchedVigil(
 
 /**
  * Calculate the minimum estimated total price for all compatible slot occurrences.
- * For each slot: service min_hourly_rate * slot duration in hours.
+ * For each slot: (service min_hourly_rate + fee) * slot duration in hours.
  */
 function calculateTotalPriceFromCompatibleSlots(
   compatibleSlotDetails: CompatibleSlotI[],
 ): number {
   const total = compatibleSlotDetails.reduce((acc, slot) => {
     const serviceCatalogItem = ServicesService?.getServicesByType(slot.service);
-    const minHourlyRate = serviceCatalogItem?.min_hourly_rate ?? 0;
+    const hourlyRate =
+      (serviceCatalogItem?.min_hourly_rate ?? 0) +
+      (serviceCatalogItem?.fee ?? 0);
     const slotDurationHours = Math.max(
-      8,
+      serviceCatalogItem?.minimum_duration_hours ?? 1,
       parseTimeToHour(slot.endTime) - parseTimeToHour(slot.startTime),
     );
 
-    return acc + minHourlyRate * slotDurationHours;
+    return acc + hourlyRate * slotDurationHours;
   }, 0);
 
   return Number(total.toFixed(2));

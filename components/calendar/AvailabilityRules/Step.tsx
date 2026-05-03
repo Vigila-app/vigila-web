@@ -52,7 +52,7 @@ export const Step = ({
             <div className="flex gap-2 items-center mb-5">
               <div
                 className={clsx(
-                  "w-10 h-10 rounded rounded-full p-2 ",
+                  "w-10 h-10  rounded-full p-2 ",
                   config.role == RolesEnum.VIGIL
                     ? "text-vigil-orange bg-vigil-light-orange"
                     : "text-consumer-blue bg-consumer-light-blue",

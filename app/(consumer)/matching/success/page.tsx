@@ -256,7 +256,7 @@ export default function MatchingSuccessPage() {
         </div>
       );
     }
-
+    console.log(response);
     return (
       <>
         <div className="flex items-center gap-4 bg-white rounded-xl shadow ring-1 ring-slate-200 overflow-hidden p-5">
@@ -359,10 +359,10 @@ export default function MatchingSuccessPage() {
             </div>
           )}
 
-          <div className="mt-4 p-4 bg-consumer-light-blue rounded border-2 border-[#c2e8f6]">
+          <div className="mt-4 p-4 bg-consumer-light-blue rounded border-2 border-consumer-light-blue">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs text-slate-500">Prezzo del trial</div>
+                <div className="text-xs text-slate-500">Prezzo totale</div>
                 <div className="font-semibold text-consumer-blue text-2xl">
                   €{response.data[0].totalPrice || "-"}
                 </div>
