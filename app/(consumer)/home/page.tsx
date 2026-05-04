@@ -105,7 +105,7 @@ export default function HomeConsumer() {
         }
         icon={false}
       />
-      <div className="flex flex-row  p-4 bg-white my-6 border-1 border-gray-200 rounded-2xl items-center justify-between">
+      <div className="flex flex-row  p-4 bg-pureWhite shadow my-6 border-1 border-gray-200 rounded-2xl items-center justify-between">
         <div className="flex flex-col  ">
           {" "}
           <p className=" text-base font-semibold">Richiedi assistenza </p>

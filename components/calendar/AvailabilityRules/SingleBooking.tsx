@@ -262,6 +262,11 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
           }
         }
 
+        if (form?.note !== undefined && form.note !== prev?.notes) {
+          ensureNext();
+          next.notes = form.note;
+        }
+
         if ((form as any)?.id) {
           const bookingId = (form as any).id as string;
           if (
@@ -288,12 +293,20 @@ export const SingleBooking = ({ answers, setAnswers }: SingleBookingProps) => {
     [updateAnswersFromForm],
   );
 
+  const initialNote =
+    typeof answers?.notes === "string" ? answers.notes : undefined;
+  const initialExtras: Record<string, boolean> | undefined = answers?.car
+    ? { transport: true }
+    : undefined;
+
   return (
     <BookingFormComponent
       booking={bookingPrefill as any}
       catalogServiceType={catalogServiceType}
       onSubmit={handleOnSubmit}
       onFormChange={updateAnswersFromForm}
+      initialNote={initialNote}
+      initialExtras={initialExtras}
     />
   );
 };

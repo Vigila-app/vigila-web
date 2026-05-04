@@ -44,7 +44,7 @@ export default function CalendarioTab() {
       <CalendarStrip
         days={daysToShow}
         selectedDate={selectedDate}
-        eventsDates={activeEventDates} 
+        eventsDates={activeEventDates}
         onDateClick={setSelectedDate}
         onNextWeek={handleNextWeek}
         onPrevWeek={handlePrevWeek}
@@ -53,7 +53,8 @@ export default function CalendarioTab() {
 
       {/* 3. Aggiunto effetto visivo quando isLoading è true */}
       <div
-        className={`flex-1 overflow-y-auto transition-opacity duration-300 ${isLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+        className={`flex-1 overflow-y-auto transition-opacity duration-300 ${isLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}
+      >
         {groupedWeeks.map((week, index) => (
           <div key={index} className="mb-6">
             <div className="flex justify-between items-center px-4 py-2 bg-gray-100 text-sm">
@@ -79,22 +80,26 @@ export default function CalendarioTab() {
             </div>
           </div>
         ))}
-        <div className="flex flex-row gap-1 border-t mt-6 pt-6"> 
+        <div className="flex flex-row gap-1 border-t mt-6 pt-6">
           <InformationCircleIcon className="w-7 h-7 text-gray-400 inline-block mr-2" />
           <div>
-          <span className="text-gray-400 text-base">Puoi modificare o cancellare le visite in quasiasi momento.</span>
-          <span className="text-gray-400 text-base block">Hai sempre il pieno controllo del tuo programma.</span>
+            <span className="text-gray-400 text-base">
+              Puoi modificare o cancellare le visite in quasiasi momento.
+            </span>
+            <span className="text-gray-400 text-base block">
+              Hai sempre il pieno controllo del tuo programma.
+            </span>
           </div>
         </div>
-        <CalendarActionButtons
-          onAddVisit={() => {}}
-          onEditRecurrence={() => {}}
-        />
+        <CalendarActionButtons />
       </div>
 
       {selectedBookingId && (
         <ModalBase modalId={modalId} closable title="Dettagli Prenotazione">
-          <BookingDetailsComponent bookingId={selectedBookingId} isModal={true} />
+          <BookingDetailsComponent
+            bookingId={selectedBookingId}
+            isModal={true}
+          />
         </ModalBase>
       )}
     </>

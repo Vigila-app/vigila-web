@@ -40,6 +40,10 @@ const SearchAddress = dynamic(
     ),
   },
 );
+const PRESET_EXTRA_LABELS: Record<string, string> = {
+  car: "Accompagnamento in auto",
+};
+
 const calcStartDate = (startDate?: Date | string, delta = 0) => {
   const base = startDate ? new Date(startDate) : new Date();
   if (isNaN(base.getTime())) {
@@ -65,6 +69,8 @@ type BookingFormComponentI = {
   vigilId?: ServiceI["vigil_id"];
   catalogServiceType?: ServiceCatalogTypeEnum;
   edit?: boolean;
+  initialNote?: string;
+  initialExtras?: Record<string, boolean>;
 };
 
 const BookingFormComponent = (props: BookingFormComponentI) => {
@@ -81,6 +87,8 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
     catalogServiceType,
     bookingId,
     edit = false,
+    initialNote,
+    initialExtras,
   } = props;
 
   const router = useRouter();
@@ -161,9 +169,14 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       service_id: booking?.service_id || serviceId,
       consumer_id: booking?.consumer_id || user?.id,
       quantity: booking?.quantity || booking?.min_unit || 1,
-      startDate: calcStartDate(booking?.startDate),
+      note: booking?.note ?? initialNote ?? "",
+      extras: {
+        ...(initialExtras || {}),
+        ...((booking?.extras as Record<string, boolean>) || {}),
+      },
+      startDate: calcStartDate(booking?.startDate, booking?.startDate ? 0 : 36),
       endDate: calcStartDate(
-        calcStartDate(booking?.startDate),
+        calcStartDate(booking?.startDate, booking?.startDate ? 0 : 36),
         booking?.quantity || booking?.min_unit || 1,
       ),
     },
@@ -348,13 +361,20 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
       try {
         showLoader();
 
-        const extras = serviceCatalog?.extra
+        const catalogExtraIds = new Set(
+          (serviceCatalog?.extra ?? []).map((e) => e.id),
+        );
+        const catalogExtras = (serviceCatalog?.extra ?? [])
           .filter(
             (extra) =>
               Object.keys(formData.extras || {}).includes(extra.id) &&
               (formData.extras || {})[extra.id],
           )
           .map((extra) => extra.id);
+        const presetExtras = Object.entries(initialExtras || {})
+          .filter(([k, v]) => v && !catalogExtraIds.has(k))
+          .map(([k]) => k);
+        const extras = [...catalogExtras, ...presetExtras];
 
         let newBooking: BookingI;
 
@@ -658,6 +678,24 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
             />
           )}
         />
+
+        {Object.entries(initialExtras || {}).some(([, v]) => v) && (
+          <div className="space-y-2">
+            <h3 className="text-vigil-orange">Extra selezionati</h3>
+            <div className="flex flex-col gap-2">
+              {Object.entries(initialExtras || {})
+                .filter(([, v]) => v)
+                .map(([key]) => (
+                  <div
+                    key={key}
+                    className="flex items-center gap-2 border border-vigil-orange bg-vigil-light-orange/60 rounded-lg p-3 text-sm font-medium"
+                  >
+                    <span>{PRESET_EXTRA_LABELS[key] ?? key}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
 
         {extraOptions?.length ? (
           <>
