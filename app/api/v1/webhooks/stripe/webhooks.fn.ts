@@ -1,4 +1,4 @@
-import { getAdminClient, jsonErrorResponse } from "@/server/api.utils.server"
+import { getAdminClient, getUserByIdAdmin, jsonErrorResponse } from "@/server/api.utils.server"
 import { ResponseCodesConstants } from "@/src/constants"
 import {
   TRANSACTION_STATUS,
@@ -6,6 +6,7 @@ import {
 } from "@/src/types/transactions.types"
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
+import { EmailService } from "@/server/email.service"
 
 export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
   const { user_id, wallet_id, transaction_type, credit_amount } =
@@ -149,6 +150,29 @@ export const handleTopUp = async (paymentIntent: Stripe.PaymentIntent) => {
   console.log(
     `Successfully processed top-up: ${amountToCredit} ${currency} for wallet ${wallet_id}`
   )
+
+  // Send wallet top-up confirmation email (best-effort, non-blocking)
+  try {
+    const userRecord = await getUserByIdAdmin(user_id)
+    if (userRecord?.email) {
+      const firstName =
+        userRecord.user_metadata?.first_name ||
+        userRecord.user_metadata?.full_name ||
+        userRecord.email
+      // amountToCredit is stored in cents; divide by 100 to get the display amount
+      const amountDisplay = (amountToCredit / 100).toFixed(2)
+      const currencySymbols: Record<string, string> = { EUR: "€", USD: "$", GBP: "£" }
+      const currencySymbol = currencySymbols[currency] || currency
+      await EmailService.sendWalletTopUpEmail({
+        to: userRecord.email,
+        firstName,
+        amount: amountDisplay,
+        currency: currencySymbol,
+      })
+    }
+  } catch (emailError) {
+    console.error("Failed to send wallet top-up confirmation email:", emailError)
+  }
 
   return NextResponse.json(
     {
