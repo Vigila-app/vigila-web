@@ -16,7 +16,7 @@ export const CalendarActionButtons = ({}) => {
       /> */}
 
       <ButtonLink
-        href="booking/initialization"
+        href="/booking/inizialization"
         full
         role={RolesEnum.VIGIL}
         label="Aggiungi visita"
