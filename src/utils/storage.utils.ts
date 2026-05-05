@@ -89,7 +89,7 @@ export const StorageUtils = {
         reject(error);
       }
     }),
-  getSessionValues: (key: string) => localStorage.getItem(key) || "{}",
+  getSessionValues: (key: string) => localStorage.getItem(key),
   setSessionValues: (key: string, data: string | Record<string, unknown>) => {
     const value =
       typeof data === "string"
