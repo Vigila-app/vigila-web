@@ -61,7 +61,7 @@ export const ServiceDayForm = ({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid sm:grid-cols-2 grid-cols-1 gap-3 mb-4">
         {catalog.map((service) => {
           const Icon = SERVICE_ICON_MAP[service.name] || HeartIcon;
           const price =

@@ -18,7 +18,6 @@ import { ApiService, UserService } from "@/src/services";
 import { apiConsumer } from "@/src/constants/api.constants";
 import { useUserStore } from "@/src/store/user/user.store";
 import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
-import { BookingFormComponent } from "@/components/bookings";
 import { SingleBooking } from "./SingleBooking";
 import { SingleBookingService } from "./SingleBookingService";
 

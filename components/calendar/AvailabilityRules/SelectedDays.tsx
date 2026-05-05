@@ -32,7 +32,7 @@ export const SelectedDays = ({
           onClick={() => setCurrentDayIdx(idx)}
           className={clsx(
             "font-bold text-sm px-4 py-2 rounded-full",
-            isActive || hasEdited
+            isActive
               ? clsx("text-white", classes.bg)
               : "text-zinc-700 bg-white border",
           )}
