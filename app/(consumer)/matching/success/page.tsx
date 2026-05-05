@@ -24,6 +24,7 @@ import { CheckoutForm } from "@/components/checkout";
 import { Avatar } from "@/components";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { amountDisplay } from "@/src/utils/common.utils";
+import { calculateSlotDurationHours } from "@/src/utils/calendar.utils";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
 import { useAppStore } from "@/src/store/app/app.store";
@@ -165,12 +166,16 @@ export default function MatchingSuccessPage() {
           answers?.services?.[weekday]?.notes ||
           answers?.services?.[String(weekday)]?.notes ||
           undefined;
+        const slotQuantity = calculateSlotDurationHours(
+          slot.startTime,
+          slot.endTime,
+        );
         const bookingPayload: any = {
           service_id: serviceMatch?.id,
           service_type: serviceMatch?.type || slot.service,
           startDate: startIso,
           endDate: endIso,
-          quantity: 1,
+          quantity: slotQuantity,
           address: addressStr,
           ...(dayNote ? { note: dayNote } : {}),
           extras: [],
