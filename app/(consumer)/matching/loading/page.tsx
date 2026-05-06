@@ -80,7 +80,7 @@ export default function MatchingLoadingPage() {
         if (hasNoMatches(resp)) {
           // keep the original answers (and request) available for the no-match page
           persistStoredAnswers(answers, matchingRequest);
-          router.replace(Routes.matchingNoMatch?.url || "/matching/no-match");
+          router.replace(Routes.matchingNoMatch.url);
           return;
         }
 
@@ -88,7 +88,7 @@ export default function MatchingLoadingPage() {
         if (hasMatches(resp)) {
           // ensure answers (and request) are also available
           persistStoredAnswers(answers, matchingRequest);
-          router.replace(Routes.matchingSuccess?.url || "/matching/success");
+          router.replace(Routes.matchingSuccess.url);
           return;
         }
       } catch (err: any) {
@@ -129,7 +129,7 @@ export default function MatchingLoadingPage() {
 
           <div className="w-full">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push(Routes.home.url)}
               className="w-full px-4 py-3 rounded-full bg-consumer-blue text-white font-semibold"
             >
               Vai al mio annuncio

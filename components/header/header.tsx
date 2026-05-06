@@ -10,7 +10,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 const HeaderProfile = dynamic(
   () => import("@/components/header/headerProfile"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 const MenuMobile = dynamic(() => import("@/components/menu/menuMobile"), {
   ssr: !!false,
@@ -34,8 +34,9 @@ const Header = (props: HeaderI) => {
         <div
           className={clsx(
             "flex h-16 items-center",
-            withLogo ? "justify-between" : "justify-end"
-          )}>
+            withLogo ? "justify-between" : "justify-end",
+          )}
+        >
           {withLogo && (
             <Link className="mr-12" href={Routes.home.url}>
               <span className="sr-only">{Routes.home.label}</span>
@@ -55,7 +56,7 @@ const Header = (props: HeaderI) => {
                   label="Registrati"
                   role={RolesEnum.CONSUMER}
                   customClass="!px-3 !py-1"
-                  href="/auth/registration"
+                  href={Routes.registration.url}
                 />
               )}
             </div>

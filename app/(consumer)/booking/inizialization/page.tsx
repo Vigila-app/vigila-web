@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { Routes } from "@/src/routes";
 
 const AvailabilityFlow = dynamic(
   () => import("@/components/calendar/AvailabilityRules/AvailabilityFlow"),
@@ -20,9 +21,7 @@ const FirstBookingSelection = () => {
       if (typeof window !== "undefined") {
         sessionStorage.setItem("matching_answers", JSON.stringify(answers));
       }
-      // use Routes constant so navigation respects app standards
-      const { Routes } = await import("@/src/routes");
-      router.push(Routes.matchingLoading?.url || "/matching/loading");
+      router.push(Routes.matchingLoading.url);
     } catch (err) {
       console.error("Failed to start matching flow", err);
     }

@@ -123,7 +123,7 @@ export default function MatchingSuccessPage() {
 
   const redirectToConfirmed = (ids: string[]) => {
     router.push(
-      `${Routes.matchingTrialConfirmed?.url || "/matching/trial-confirmed"}?bookingIds=${ids.join(",")}`,
+      `${Routes.matchingTrialConfirmed.url}?bookingIds=${ids.join(",")}`,
     );
   };
 
@@ -304,7 +304,7 @@ export default function MatchingSuccessPage() {
             )}
             <CheckoutForm
               clientSecret={clientSecret}
-              returnUrl={`${globalThis.window?.location.origin || ""}/matching/trial-confirmed`}
+              returnUrl={`${globalThis.window?.location.origin || ""}${Routes.matchingTrialConfirmed.url}`}
               onSuccess={handlePaymentSuccess}
               onError={(err) => {
                 console.error("Payment error:", err);

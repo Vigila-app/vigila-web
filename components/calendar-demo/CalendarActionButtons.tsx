@@ -3,6 +3,7 @@ import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import ButtonLink from "../button/buttonLink";
+import { Routes } from "@/src/routes";
 
 export const CalendarActionButtons = ({}) => {
   return (
@@ -16,7 +17,7 @@ export const CalendarActionButtons = ({}) => {
       /> */}
 
       <ButtonLink
-        href="/booking/inizialization"
+        href={Routes.inizializationBooking.url}
         full
         role={RolesEnum.VIGIL}
         label="Aggiungi visita"

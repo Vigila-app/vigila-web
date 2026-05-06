@@ -2,8 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import { Footer, Header } from "@/components";
+import { Routes } from "@/src/routes";
 
-const HIDDEN_NAV_ROUTES = ["/onboard", "/vigil/onboard"];
+const HIDDEN_NAV_ROUTES = [Routes.onBoard.url, Routes.onBoardVigil.url];
 
 const shouldHideNav = (pathname: string) =>
   HIDDEN_NAV_ROUTES.some((route) => pathname.startsWith(route));
