@@ -530,9 +530,6 @@ export const createVigilOnboardingConfig = (
           id: "propic",
           type: QuestionType.FILE,
           label: "",
-          validation: {
-            required: true,
-          },
         },
       ],
     },
