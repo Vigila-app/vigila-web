@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -18,13 +18,15 @@ import { ApiService, UserService } from "@/src/services";
 import { apiConsumer } from "@/src/constants/api.constants";
 import { useUserStore } from "@/src/store/user/user.store";
 import { trackOdBookingStarted, trackRecTrialStarted } from "@/lib/tracking";
+import { SingleBooking } from "./SingleBooking";
+import { SingleBookingService } from "./SingleBookingService";
 
 let gtmTracked = false; // Global variable to track if GTM event has been sent
 
 export default function AvailabilityFlow({
   onComplete,
 }: Readonly<{
-  onComplete: () => void;
+  onComplete?: (answers: Record<string, any>) => void;
 }>) {
   const { user } = useUserStore();
   const config: MultiStepOnboardingProps["config"] = {
@@ -40,7 +42,7 @@ export default function AvailabilityFlow({
             answers["booking-type"] == BookingTypeEnum.OCCASIONAL ||
             answers["booking-type"] == BookingTypeEnum.TRIAL
           ) {
-            return "single-booking";
+            return "single-service";
           }
           return "availabilities";
         },
@@ -53,51 +55,25 @@ export default function AvailabilityFlow({
             options: [
               { label: "Una volta", value: BookingTypeEnum.OCCASIONAL },
               { label: "Ricorrente", value: BookingTypeEnum.RECURRING },
-              { label: "Non lo so", value: BookingTypeEnum.TRIAL },
+              // { label: "Non lo so", value: BookingTypeEnum.TRIAL },
             ],
           },
         ],
       },
       {
+        id: "single-service",
+        title: "",
+        description: "",
+        questions: [],
+        component: SingleBookingService,
+        nextStep: "single-booking",
+      },
+      {
         id: "single-booking",
         title: "",
         description: "",
-        questions: [
-          {
-            id: "start-date",
-            type: QuestionType.DATE,
-            label: "Data del servizio",
-            placeholder: "",
-            validation: {
-              required: true,
-              min: new Date(new Date().setDate(new Date().getDate() + 1))
-                .toISOString()
-                .split("T")[0],
-              max: new Date(new Date().setMonth(new Date().getMonth() + 3))
-                .toISOString()
-                .split("T")[0],
-            },
-            min: new Date(new Date().setDate(new Date().getDate() + 1))
-              .toISOString()
-              .split("T")[0],
-            max: new Date(new Date().setMonth(new Date().getMonth() + 3))
-              .toISOString()
-              .split("T")[0],
-            autoFocus: true,
-          },
-          {
-            id: "address",
-            type: QuestionType.ADDRESS,
-            label: "Indirizzo",
-            placeholder: "Via Napoli 123",
-            description: "Dove si svolgerà l'assistenza",
-            autoFocus: false,
-            validation: {
-              required: true,
-            },
-          },
-        ],
-        nextStep: "services",
+        questions: [],
+        component: SingleBooking,
       },
       {
         id: "availabilities",
@@ -154,22 +130,19 @@ export default function AvailabilityFlow({
       },
     ],
     initialStepId: "welcome",
-    onComplete: async () => {
+    onComplete: async (answers: Record<string, any>) => {
       console.log("Availability flow completed");
-      onComplete();
+      if (onComplete) onComplete(answers);
     },
   };
-  const { setAnswers, state, currentStep, next, back } = useMultiStepFlow({
-    role: config.role,
-    steps: config.steps,
-    initialStepId: config.initialStepId,
-    onComplete,
-  } as any);
-  const [address, setAddress] = useState<any>(undefined);
-  const { handleSubmit, reset, getValues } = useForm({
-    defaultValues: { ...state.answers },
-  });
-
+  const { setAnswers, state, currentStep, next, back, isLastStep } =
+    useMultiStepFlow({
+      role: config.role,
+      steps: config.steps,
+      initialStepId: config.initialStepId,
+      onComplete: config.onComplete,
+    } as any);
+  const { handleSubmit } = useForm();
   const getAddress = async () => {
     try {
       const id = (await UserService.getUser())?.id;
@@ -180,12 +153,9 @@ export default function AvailabilityFlow({
         data: any;
       };
       const addr = details?.address;
-      setAddress(addr);
-      // Preserve any current form values (so user input like date isn't overwritten)
-      const current = getValues();
-      reset({ ...(current || {}), address: addr });
-      // Keep the multi-step flow answers in sync using current values
-      setAnswers({ ...(current || {}), address: addr });
+      if (!addr) return;
+      // Merge address into existing answers to avoid clearing user selections
+      setAnswers((prev) => ({ ...prev, address: addr }));
     } catch (error) {
       console.error(error);
     }
@@ -222,6 +192,7 @@ export default function AvailabilityFlow({
           currentStep={currentStep}
           state={state}
           config={config}
+          isLastStep={isLastStep}
           setAnswers={(...args) => {
             setAnswers(...args);
           }}
@@ -241,7 +212,7 @@ export default function AvailabilityFlow({
                 : "border-consumer-blue",
             )}
             type="button"
-            onClick={back}
+            action={back}
             label="Indietro"
           ></Button>
           <Button

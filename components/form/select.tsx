@@ -7,7 +7,7 @@ import { FormUtils } from "@/src/utils/form.utils";
 import { FieldError } from "react-hook-form";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-type Option = {
+export type OptionI = {
   label: string;
   value: string | number;
   disabled?: boolean;
@@ -18,7 +18,7 @@ type SelectProps = {
   id?: string;
   placeholder?: string;
   error?: FieldError;
-  options: Option[];
+  options: OptionI[];
   onChange?: (value: string) => void;
   value?: string;
   role?: RolesEnum;

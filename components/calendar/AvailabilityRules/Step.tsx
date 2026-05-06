@@ -20,6 +20,7 @@ export const Step = ({
   state,
   config,
   setAnswers,
+  isLastStep,
 }: {
   currentStep: OnboardingStep;
   state: OnboardingFlowState;
@@ -29,6 +30,7 @@ export const Step = ({
       | Record<string, any>
       | ((prev: Record<string, any>) => Record<string, any>),
   ) => void;
+  isLastStep?: boolean;
 }) => {
   // local tick forces this component to re-render when answers are mutated in-place
   const [, setTick] = useState(0);
@@ -38,6 +40,7 @@ export const Step = ({
         <currentStep.component
           answers={state.answers}
           setAnswers={setAnswers}
+          isLastStep={isLastStep}
         />
       )}
       {currentStep.questions?.map((q) => (
@@ -49,7 +52,7 @@ export const Step = ({
             <div className="flex gap-2 items-center mb-5">
               <div
                 className={clsx(
-                  "w-10 h-10 rounded rounded-full p-2 ",
+                  "w-10 h-10  rounded-full p-2 ",
                   config.role == RolesEnum.VIGIL
                     ? "text-vigil-orange bg-vigil-light-orange"
                     : "text-consumer-blue bg-consumer-light-blue",

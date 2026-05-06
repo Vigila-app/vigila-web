@@ -5,14 +5,13 @@ import {
   CalendarIcon,
   ChevronRightIcon,
   HeartIcon,
-  MagnifyingGlassIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { AgendaItem } from "@/components/calendar-demo/AgendaItem";
 import Card from "@/components/card/card";
 import { useEffect, useMemo, useState } from "react";
 import BookingCounterComponent from "@/components/bookings/bookingCounter.component";
-import { ServicesComponent } from "@/components/services";
 import { Routes } from "@/src/routes";
 import WalletBalanceCard from "@/components/wallet/walletBalanceCard";
 import { EurConverter } from "@/src/utils/common.utils";
@@ -24,6 +23,7 @@ import { CalendarService } from "@/src/services/calendar.service";
 import { CalendarEventI } from "@/src/types/calendar.types";
 import BookingDetailsComponent from "@/components/bookings/bookingDetails.component";
 import ModalBase from "@/components/@core/modal/modalBase.component";
+import { RolesEnum } from "@/src/enums/roles.enums";
 
 export default function HomeConsumer() {
   const { user } = useUserStore();
@@ -32,7 +32,9 @@ export default function HomeConsumer() {
 
   const [todayEvents, setTodayEvents] = useState<CalendarEventI[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null,
+  );
 
   const BOOKING_MODAL_ID = "home-booking-details-modal";
 
@@ -52,7 +54,10 @@ export default function HomeConsumer() {
       try {
         setIsLoadingEvents(true);
         const today = new Date();
-        const response = await CalendarService.getConsumerCalendar(today, today);
+        const response = await CalendarService.getConsumerCalendar(
+          today,
+          today,
+        );
         setTodayEvents(response.bookings ?? []);
       } catch (err) {
         console.error("Error fetching today's calendar events:", err);
@@ -81,7 +86,7 @@ export default function HomeConsumer() {
         <p>Benvenuto su Vigila!</p>
       </div>
 
-      <section className="flex flex-col">
+      {/* <section className="flex flex-col">
         <div className="flex items-center gap-1 mb-4">
           <MagnifyingGlassIcon className="w-6 h-6 text-vigil-orange" />
           <span className="text-lg font-semibold">
@@ -89,7 +94,7 @@ export default function HomeConsumer() {
           </span>
         </div>
         <ServicesComponent />
-      </section>
+      </section> */}
 
       <WalletBalanceCard
         balance={balance}
@@ -100,6 +105,21 @@ export default function HomeConsumer() {
         }
         icon={false}
       />
+      <div className="flex flex-row  p-4 bg-pureWhite shadow my-6 border-1 border-gray-200 rounded-2xl items-center justify-between">
+        <div className="flex flex-col  ">
+          {" "}
+          <p className=" text-base font-semibold">Richiedi assistenza </p>
+          <p className="text-sm  font-normal text-gray-500">
+            Prenota visite per date specifiche
+          </p>{" "}
+        </div>
+        <ButtonLink
+          role={RolesEnum.VIGIL}
+          label="Richiedi"
+          href="booking/inizialization"
+          icon={<PlusIcon height={24} width={24} />}
+        />
+      </div>
       <BookingCounterComponent />
 
       <Card>
@@ -134,7 +154,8 @@ export default function HomeConsumer() {
           </div>
           <Link
             href={`${Routes.profileConsumer.url}?tab=calendario`}
-            className="text-vigil-orange flex items-center gap-0.5 text-sm font-semibold">
+            className="text-vigil-orange flex items-center gap-0.5 text-sm font-semibold"
+          >
             Calendario
             <ChevronRightIcon className="size-4 text-vigil-orange" />
           </Link>
@@ -164,7 +185,8 @@ export default function HomeConsumer() {
             </p>
             <Link
               href={`${Routes.profileConsumer.url}?tab=calendario`}
-              className="text-vigil-orange text-sm font-bold mt-2 inline-block hover:opacity-70 transition-opacity">
+              className="text-vigil-orange text-sm font-bold mt-2 inline-block hover:opacity-70 transition-opacity"
+            >
               Vedi tutte le prenotazioni →
             </Link>
           </div>
@@ -172,8 +194,15 @@ export default function HomeConsumer() {
       </section>
 
       {selectedBookingId && (
-        <ModalBase modalId={BOOKING_MODAL_ID} closable title="Dettagli Prenotazione">
-          <BookingDetailsComponent bookingId={selectedBookingId} isModal={true} />
+        <ModalBase
+          modalId={BOOKING_MODAL_ID}
+          closable
+          title="Dettagli Prenotazione"
+        >
+          <BookingDetailsComponent
+            bookingId={selectedBookingId}
+            isModal={true}
+          />
         </ModalBase>
       )}
     </div>

@@ -48,11 +48,27 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const {
-      data: { totalDeposited, totalSpent },
-    } = await supabase.functions.invoke("wallet-totals", {
+    // Call Supabase Edge Function to compute wallet totals. The function
+    // may return null data or an error (for example if the function is
+    // missing or the invocation fails). Handle both cases safely.
+    const totalsResult = await supabase.functions.invoke("wallet-totals", {
       body: { userId: userObject.id },
     });
+
+    if (totalsResult.error) {
+      console.error(
+        "Error invoking wallet-totals function:",
+        totalsResult.error,
+      );
+    }
+
+    const totalsData = totalsResult.data || {};
+    const totalDeposited =
+      typeof totalsData.totalDeposited === "number"
+        ? totalsData.totalDeposited
+        : 0;
+    const totalSpent =
+      typeof totalsData.totalSpent === "number" ? totalsData.totalSpent : 0;
 
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")

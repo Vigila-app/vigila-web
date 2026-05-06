@@ -345,23 +345,24 @@ export const CalendarService = {
   /**
    * Get vigil availability rules
    */
-  getCustomerAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
-    try {
-      const response = (await ApiService.get(
-        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
-      )) as any;
-      return response.data;
-    } catch (error) {
-      console.error("CalendarService.getVigilAvailabilityRules error", error);
-      throw error;
-    }
-  },
+  //momentaneamente disabilitato perchè non c'è ancora l'endpoint implementato nel backend
+  //  getCustomerAvailabilityRules: async (): Promise<VigilAvailabilityRuleI[]> => {
+  //   try {
+  //     const response = (await ApiService.get(
+  //       apiCalendar.CONSUMER_AVAILABILITY_RULES(),
+  //     )) as any;
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("CalendarService.getVigilAvailabilityRules error", error);
+  //     throw error;
+  //   }
+  // },
   createVigilAvailabilityRule: async (
     rule: VigilAvailabilityRuleFormI,
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.VIGIL_AVAILABILITY_RULES(),
+        apiCalendar.AVAILABILITY_RULES(),
         rule,
       )) as any;
       return response.data;
@@ -373,32 +374,32 @@ export const CalendarService = {
   /**
    * Create vigil availability rule
    */
-  createCustomerAvailabilityRule: async (
-    rule: VigilAvailabilityRuleFormI,
-  ): Promise<VigilAvailabilityRuleI> => {
-    try {
-      const response = (await ApiService.post(
-        apiCalendar.CONSUMER_AVAILABILITY_RULES(),
-        rule,
-      )) as any;
-      return response.data;
-    } catch (error) {
-      console.error("CalendarService.createVigilAvailabilityRule error", error);
-      throw error;
-    }
-  },
+  // createCustomerAvailabilityRule: async (
+  //   rule: VigilAvailabilityRuleFormI,
+  // ): Promise<VigilAvailabilityRuleI> => {
+  //   try {
+  //     const response = (await ApiService.post(
+  //       apiCalendar.CONSUMER_AVAILABILITY_RULES(),
+  //       rule,
+  //     )) as any;
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("CalendarService.createVigilAvailabilityRule error", error);
+  //     throw error;
+  //   }
+  // },
 
   /**
    * Delete vigil availability rule
    */
-  deleteCustomerAvailabilityRule: async (ruleId: string): Promise<void> => {
-    try {
-      await ApiService.delete(apiCalendar.CONSUMER_AVAILABILITY_RULE(ruleId));
-    } catch (error) {
-      console.error("CalendarService.deleteVigilAvailabilityRule error", error);
-      throw error;
-    }
-  },
+  // deleteCustomerAvailabilityRule: async (ruleId: string): Promise<void> => {
+  //   try {
+  //     await ApiService.delete(apiCalendar.CONSUMER_AVAILABILITY_RULE(ruleId));
+  //   } catch (error) {
+  //     console.error("CalendarService.deleteVigilAvailabilityRule error", error);
+  //     throw error;
+  //   }
+  // },
 
   // ============================================
   // VIGIL APIS - Unavailabilities
@@ -410,7 +411,7 @@ export const CalendarService = {
   getVigilUnavailabilities: async (): Promise<VigilUnavailabilityI[]> => {
     try {
       const response = (await ApiService.get(
-        apiCalendar.VIGIL_UNAVAILABILITIES(),
+        apiCalendar.UNAVAILABILITIES(),
       )) as any;
       return response.data;
     } catch (error) {
@@ -427,7 +428,7 @@ export const CalendarService = {
   ): Promise<VigilUnavailabilityI> => {
     try {
       const response = (await ApiService.post(
-        apiCalendar.VIGIL_UNAVAILABILITIES(),
+        apiCalendar.UNAVAILABILITIES(),
         unavailability,
       )) as any;
       return response.data;
@@ -444,9 +445,7 @@ export const CalendarService = {
     unavailabilityId: string,
   ): Promise<void> => {
     try {
-      await ApiService.delete(
-        apiCalendar.VIGIL_UNAVAILABILITY(unavailabilityId),
-      );
+      await ApiService.delete(apiCalendar.UNAVAILABILITY(unavailabilityId));
     } catch (error) {
       console.error("CalendarService.deleteVigilUnavailability error", error);
       throw error;
@@ -494,7 +493,7 @@ export const CalendarService = {
       const { vigil_id, ...queryParams } = params;
       const query = new URLSearchParams(queryParams as any).toString();
       const response = (await ApiService.get(
-        `${apiCalendar.VIGIL_AVAILABLE_SLOTS(vigil_id)}?${query}`,
+        `${apiCalendar.AVAILABLE_SLOTS(vigil_id)}?${query}`,
       )) as any;
       return response.data;
     } catch (error) {
@@ -512,7 +511,7 @@ export const CalendarService = {
   ): Promise<VigilAvailabilityRuleI> => {
     try {
       const response = (await ApiService.put(
-        apiCalendar.VIGIL_AVAILABILITY_RULE(ruleId),
+        apiCalendar.AVAILABILITY_RULE(ruleId),
         rule,
       )) as any;
       return response.data;
