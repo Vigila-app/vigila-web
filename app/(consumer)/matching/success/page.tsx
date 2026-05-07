@@ -22,6 +22,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckoutForm } from "@/components/checkout";
 import { Avatar } from "@/components";
+import { ModalPortalComponent } from "@/components/@core";
+import VigilInfoModal from "@/components/matching/VigilInfoModal";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { calculateSlotDurationHours } from "@/src/utils/calendar.utils";
@@ -29,6 +31,7 @@ import { useUserStore } from "@/src/store/user/user.store";
 import { useTransactionsStore } from "@/src/store/transactions/transactions.store";
 import { useAppStore } from "@/src/store/app/app.store";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
+import { useModalStore } from "@/src/store/modal/modal.store";
 import Button from "@/components/button/button";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import clsx from "clsx";
@@ -79,6 +82,7 @@ export default function MatchingSuccessPage() {
   const { balance, getTransactions } = useTransactionsStore();
   const { showLoader, hideLoader } = useAppStore();
   const { getBookingDetails } = useBookingsStore();
+  const { openModal, payload } = useModalStore();
 
   const [answers, setAnswers] = useState<any>(null);
   const [response, setResponse] = useState<any>(null);
@@ -125,6 +129,25 @@ export default function MatchingSuccessPage() {
     router.push(
       `${Routes.matchingTrialConfirmed.url}?bookingIds=${ids.join(",")}`,
     );
+  };
+
+  const openVigilModal = (vigilSlots: any) => {
+    if (!vigilSlots?.id) return;
+    openModal("vigil-info", {
+      vigilId: vigilSlots.id,
+      displayName: vigilSlots.displayName,
+      averageRating: vigilSlots.averageRating,
+      reviewCount: vigilSlots.reviewCount,
+      activeFrom: vigilSlots.activeFrom,
+    });
+  };
+
+  const vigilModalPayload = payload as {
+    vigilId?: string;
+    displayName?: string;
+    averageRating?: number;
+    reviewCount?: number;
+    activeFrom?: string;
   };
 
   const handleConfirm = async () => {
@@ -541,7 +564,12 @@ export default function MatchingSuccessPage() {
 
     return (
       <>
-        <div className="flex items-center gap-4 bg-white rounded-xl shadow ring-1 ring-slate-200 overflow-hidden p-5">
+        <button
+          type="button"
+          onClick={() => openVigilModal(vigilSlots)}
+          aria-label={`Apri profilo vigil ${vigilSlots.displayName || ""}`}
+          className="w-full flex items-center gap-4 bg-white rounded-xl shadow ring-1 ring-slate-200 overflow-hidden p-5 text-left transition hover:shadow-md"
+        >
           <div className="w-16 h-16 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center">
             <Avatar userId={vigilSlots.id} size="big" />
           </div>
@@ -552,7 +580,7 @@ export default function MatchingSuccessPage() {
             {metaContent}
             <div className="flex items-center gap-2 mt-2"></div>
           </div>
-        </div>
+        </button>
 
         <div className="mt-6 bg-slate-50 rounded-lg p-4">
           <div className="bg-consumer-light-blue text-center p-5 mb-3 rounded-lg">
@@ -676,6 +704,14 @@ export default function MatchingSuccessPage() {
           </div>
         </div>
       </div>
+
+      <ModalPortalComponent
+        modalId="vigil-info"
+        closable
+        customClass="md:max-w-2xl"
+      >
+        <VigilInfoModal {...vigilModalPayload} />
+      </ModalPortalComponent>
     </div>
   );
 }
