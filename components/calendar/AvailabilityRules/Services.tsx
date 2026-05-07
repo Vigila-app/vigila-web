@@ -118,7 +118,7 @@ export const Services = ({
       {!isSingleDate && (
         <div className="bg-white rounded-xl  mb-4">
           <div className="px-4 pt-3 text-sm text-zinc-500">
-            Questi sono i giorni della tua disponibilita. Compila i servizi uno
+            Questi sono i giorni della tua disponibilità. Compila i servizi uno
             alla volta. Puoi andare avanti nei giorni premendo &quot;Prossimo
             giorno&quot; in fondo alla pagina.
           </div>
