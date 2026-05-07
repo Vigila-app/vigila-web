@@ -141,7 +141,7 @@ const VigilInfoModal = ({
       return parseDisplayName(displayName || normalized?.display_name);
     };
 
-    const primary = vigil?.addresses?.[0];
+    const primary = vigil?.addresses?.[0] as any;
     const primaryLocation = formatLocation(primary, primary?.display_name);
     if (primaryLocation) return primaryLocation;
 
