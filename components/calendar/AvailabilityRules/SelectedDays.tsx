@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { dayNames } from "./Services";
-import { RolesEnum } from "@/src/enums/roles.enums";
 
 export const SelectedDays = ({
   selectedDays,
