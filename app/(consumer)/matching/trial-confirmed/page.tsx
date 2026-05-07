@@ -37,6 +37,9 @@ export default function MatchingTrialConfirmedPage() {
     return response.data[0];
   }, [response]);
 
+  const isRecurring = (best?.totalSlots ?? 1) > 1;
+  const hasUncoveredSlots = (response?.unmatchedSlots?.length ?? 0) > 0;
+
   const covered = useMemo(() => {
     if (!best?.compatibleSlotDetails) return { days: "-", range: "-" };
     const slots = best.compatibleSlotDetails as Array<any>;
@@ -73,8 +76,12 @@ export default function MatchingTrialConfirmedPage() {
             <CheckCircleIcon className="w-12 h-12" />
           </div>
           <h1 className="mt-6 text-2xl text-center font-semibold text-slate-900 tracking-tight">
-            Il tuo trial è confermato
+            La tua prenotazione è stata creata con successo!
           </h1>
+          <h5 className="text-center mt-1 px-5 ">
+            Aspetta che il vigil confermi la sua disponibilità. Ti avviseremo
+            appena sarà data conferma.
+          </h5>
         </div>
 
         <div className="bg-white rounded-3xl shadow ring-1 ring-slate-200 p-5">
@@ -120,15 +127,17 @@ export default function MatchingTrialConfirmedPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl bg-white border-l-4 border-amber-400 p-4 flex gap-3 items-start">
-          <div className="w-9 h-9 p-2 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
-            <BellAlertIcon />
+        {isRecurring && hasUncoveredSlots && (
+          <div className="mt-4 rounded-2xl bg-white border-l-4 border-amber-400 p-4 flex gap-3 items-start">
+            <div className="w-9 h-9 p-2 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
+              <BellAlertIcon />
+            </div>
+            <p className="text-slate-600 leading-snug">
+              Stiamo cercando un caregiver anche per i giorni scoperti. Ti
+              avviseremo se troviamo qualcuno.
+            </p>
           </div>
-          <p className="text-slate-600 leading-snug">
-            Stiamo cercando un caregiver anche per i giorni scoperti. Ti
-            avviseremo se troviamo qualcuno.
-          </p>
-        </div>
+        )}
 
         <button
           onClick={() => router.push(Routes.homeConsumer?.url || "/")}
