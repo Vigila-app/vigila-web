@@ -36,7 +36,7 @@ export const SingleService = ({
       bg: "bg-vigil-orange",
     };
     const consumer = {
-      border: "border-consumer-light-blue",
+      border: "border-consumer-blue",
       bgLight: "bg-consumer-light-blue",
       text: "text-consumer-blue",
       bg: "bg-consumer-blue",

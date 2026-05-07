@@ -51,26 +51,14 @@ export const Services = ({
   const [car, setCar] = useState(false);
   const [notes, setNotes] = useState("");
 
-  const colorClasses = useMemo(() => {
-    const vigil = {
-      bg: "bg-vigil-orange",
-      bgLight: "bg-vigil-light-orange",
-      text: "text-vigil-orange",
-      border: "border-vigil-orange",
-      hoverBorder: "hover:border-vigil-light-orange",
-      hoverText: "hover:text-vigil-orange",
-    };
-    const consumer = {
-      bg: "bg-consumer-blue",
-      bgLight: "bg-consumer-light-blue",
-      text: "text-consumer-blue",
-      border: "border-consumer-light-blue",
-      hoverBorder: "hover:border-consumer-light-blue",
-      hoverText: "hover:text-consumer-blue",
-    };
-    return role === RolesEnum.CONSUMER ? consumer : vigil;
-  }, [role]);
-
+  const colorClasses = {
+    bg: "bg-consumer-blue",
+    bgLight: "bg-consumer-light-blue",
+    text: "text-consumer-blue",
+    border: "border-consumer-light-blue",
+    hoverBorder: "hover:border-consumer-light-blue",
+    hoverText: "hover:text-consumer-blue",
+  };
   useEffect(() => {
     const day = selectedDays[currentDayIdx];
     const saved = answers?.services?.[day];
@@ -129,12 +117,18 @@ export const Services = ({
     <div className="bg-zinc-200 p-4">
       {!isSingleDate && (
         <div className="bg-white rounded-xl  mb-4">
-          <div className="flex gap-2 flex-wrap p-3">
+          <div className="px-4 pt-3 text-sm text-zinc-500">
+            Questi sono i giorni della tua disponibilità. Compila i servizi uno
+            alla volta. Puoi andare avanti nei giorni premendo &quot;Prossimo
+            giorno&quot; in fondo alla pagina.
+          </div>
+          <div className="flex gap-2 flex-wrap p-3 pt-2">
             <SelectedDays
               answers={answers}
               selectedDays={selectedDays}
               currentDayIdx={currentDayIdx}
               setCurrentDayIdx={setCurrentDayIdx}
+              isInteractive={false}
               classes={colorClasses}
             />
           </div>
@@ -149,6 +143,10 @@ export const Services = ({
         />
         <div className="mb-4">
           <div className="font-semibold mb-2">Servizi</div>
+          <p className="text-sm text-zinc-500">
+            Scegli il servizio principale per questo giorno. Puoi aggiungere
+            accompagnamento in auto e note opzionali.
+          </p>
         </div>
 
         <ServiceDayForm
@@ -164,6 +162,9 @@ export const Services = ({
 
         <div className="flex justify-between mt-6">
           <div className="flex gap-2">
+            <p className="text-xs text-zinc-500 self-center">
+              Le scelte vengono salvate quando passi al giorno successivo.
+            </p>
             {(!isLastStep || !isLastDay) && (
               <button
                 type="button"

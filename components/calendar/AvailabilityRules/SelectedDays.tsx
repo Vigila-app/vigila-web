@@ -7,11 +7,13 @@ export const SelectedDays = ({
   currentDayIdx,
   setCurrentDayIdx,
   classes,
+  isInteractive = true,
 }: {
   selectedDays: number[];
   answers?: Record<string, any>;
   currentDayIdx: number;
   setCurrentDayIdx: (arg: number) => void;
+  isInteractive?: boolean;
   classes: {
     bg: string;
     bgLight: string;
@@ -29,9 +31,12 @@ export const SelectedDays = ({
       <div key={"rule_" + day} className="flex items-center">
         <button
           type="button"
-          onClick={() => setCurrentDayIdx(idx)}
+          onClick={isInteractive ? () => setCurrentDayIdx(idx) : undefined}
+          disabled={!isInteractive}
+          aria-disabled={!isInteractive}
           className={clsx(
             "font-bold text-sm px-4 py-2 rounded-full",
+            !isInteractive && "cursor-default",
             isActive
               ? clsx("text-white", classes.bg)
               : "text-zinc-700 bg-white border",

@@ -155,27 +155,15 @@ export const AvailabilityRulesDemo = ({
     return grouped;
   }, [rules, weekdays]);
 
-  const colorClasses = useMemo(() => {
-    const vigil = {
-      bgLight: "bg-vigil-light-orange",
-      text: "text-vigil-orange",
-      border: "border-vigil-light-orange",
-      hoverBorder: "hover:border-vigil-light-orange",
-      hoverText: "hover:text-vigil-orange",
-      peerCheckedBg: "peer-checked:bg-vigil-orange",
-      textMuted: "text-vigil-orange",
-    };
-    const consumer = {
-      bgLight: "bg-consumer-light-blue",
-      text: "text-consumer-blue",
-      border: "border-consumer-light-blue",
-      hoverBorder: "hover:border-consumer-light-blue",
-      hoverText: "hover:text-consumer-blue",
-      peerCheckedBg: "peer-checked:bg-consumer-blue",
-      textMuted: "text-consumer-blue",
-    };
-    return role === RolesEnum.CONSUMER ? consumer : vigil;
-  }, [role]);
+  const colorClasses = {
+    bgLight: "bg-consumer-light-blue",
+    text: "text-consumer-blue",
+    border: "border-consumer-light-blue",
+    hoverBorder: "hover:border-consumer-light-blue",
+    hoverText: "hover:text-consumer-blue",
+    peerCheckedBg: "peer-checked:bg-consumer-blue",
+    textMuted: "text-consumer-blue",
+  };
 
   const handleDelete = async (ruleId: string) => {
     setLoading(true);
