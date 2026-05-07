@@ -1,29 +1,14 @@
-import { AdminService } from "./admin.service";
-import { ApiService } from "./api.service";
-import { AuthService } from "./auth.service";
-import { BookingsService } from "./bookings.service";
-import { CalendarService } from "./calendar.service";
-import { CmsService } from "./cms.service";
-import { MapsService } from "./maps.service";
-import { PaymentService } from "./payment.service";
-import { ReviewsService } from "./reviews.service";
-import { ServicesService } from "./services.service";
-import { TransactionsService } from "./transactions.service";
-import { UserService } from "./user.service";
-import { MatchingService } from "./matching.service";
-
-export {
-  AdminService,
-  ApiService,
-  AuthService,
-  BookingsService,
-  CalendarService,
-  CmsService,
-  MapsService,
-  PaymentService,
-  ReviewsService,
-  ServicesService,
-  TransactionsService,
-  UserService,
-  MatchingService,
-};
+export { AdminService } from "./admin.service";
+export { ApiService } from "./api.service";
+export { AuthService } from "./auth.service";
+export { BookingsService } from "./bookings.service";
+export { CalendarService } from "./calendar.service";
+export { CmsService } from "./cms.service";
+export { MapsService } from "./maps.service";
+export { PaymentService } from "./payment.service";
+export { ReviewsService } from "./reviews.service";
+export { ServicesService } from "./services.service";
+export { TransactionsService } from "./transactions.service";
+export { UserService } from "./user.service";
+export { MatchingService } from "./matching.service";
+export { VigilService } from "./vigil.service";
