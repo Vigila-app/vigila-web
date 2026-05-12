@@ -19,6 +19,7 @@ import {
   trackQuestionnaireCompleted,
   trackQuestionnaireStarted,
 } from "@/lib/tracking";
+import { ZONE_POSTAL_CODES, VigilZoneEnum } from "@/src/enums/onboarding.enums";
 /**
  * New multi-step onboarding component for VIGIL users
  */
@@ -41,12 +42,11 @@ const VigilMultiStepOnboarding = () => {
           data.availabilities = data.availabilityRules;
         }
 
-        // Extract postal code from address
-        const caps = addresses?.map(
-          (a: { address: { postcode: string } }) => a.address.postcode,
+        // Derive postal codes from the zones selected during onboarding
+        const zones: VigilZoneEnum[] = data.zones || [];
+        const caps = Array.from(
+          new Set(zones.flatMap((z) => ZONE_POSTAL_CODES[z] ?? [])),
         );
-
-        // Prepare addresses array (for now, single address)
 
         // Prepare data for API
         const onboardData: any = {

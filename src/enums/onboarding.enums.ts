@@ -44,6 +44,18 @@ export const VigilZoneLabels: Record<VigilZoneEnum, string> = {
   [VigilZoneEnum.ARENELLA]: "Arenella",
 };
 
+export const ZONE_POSTAL_CODES: Record<VigilZoneEnum, string[]> = {
+  [VigilZoneEnum.CENTRO_STORICO]: ["80134", "80138", "80139"],
+  [VigilZoneEnum.VOMERO]: ["80129"],
+  [VigilZoneEnum.CHIAIA]: ["80121", "80122"],
+  [VigilZoneEnum.POSILIPPO]: ["80123"],
+  [VigilZoneEnum.FUORIGROTTA]: ["80125"],
+  [VigilZoneEnum.BAGNOLI]: ["80124"],
+  [VigilZoneEnum.PIANURA]: ["80128"],
+  [VigilZoneEnum.SOCCAVO]: ["80126"],
+  [VigilZoneEnum.ARENELLA]: ["80127"],
+};
+
 export enum VigilTransportationEnum {
   AUTO = "auto",
   MOTO = "moto",
