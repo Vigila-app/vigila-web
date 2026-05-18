@@ -70,22 +70,32 @@ const VigilMultiStepOnboarding = () => {
           }
         }
 
-        const activityKeys = [
-          "hygene_services",
-          "outdoor_services",
-          "services",
-        ];
+        // Resolve service IDs from top-level service selections (e.g. "companionship")
+        const directServiceTypes: string[] = data.services ?? [];
+        const directServiceIds = directServiceTypes
+          .map(
+            (type) =>
+              services_catalog.services_catalog.find((s) => s.type === type)
+                ?.id,
+          )
+          .filter((id): id is number => id !== undefined);
+
+        // Resolve service IDs from specific activity selections (hygiene, outdoor)
+        const activityKeys = ["hygene_services", "outdoor_services"];
         const selectedActivity = Object.keys(data)
           .flatMap((k) => (activityKeys.includes(k) ? data[k] : null))
           .filter(Boolean);
-        console.log(selectedActivity);
         const selectedActivitiesRaw = selectedActivity
           .map((type) =>
             activities_catalog.activities_catalog.find((a) => a.type === type),
           )
           .filter(Boolean);
+        const activityServiceIds = selectedActivitiesRaw.map(
+          (a) => a!.service_id,
+        );
+
         const uniqueParentServiceIds = Array.from(
-          new Set(selectedActivitiesRaw.map((a) => a!.service_id)),
+          new Set([...directServiceIds, ...activityServiceIds]),
         );
         for (const parentId of uniqueParentServiceIds) {
           const parentServiceRaw = services_catalog.services_catalog.find(
