@@ -22,6 +22,7 @@ import { useVigilStore } from "@/src/store/vigil/vigil.store";
 import {
   BriefcaseIcon,
   CalendarDaysIcon,
+  CurrencyEuroIcon,
   DocumentIcon,
   MapPinIcon,
   MegaphoneIcon,
@@ -64,7 +65,7 @@ const ProfileComponent = () => {
     },
     {
       label: (
-        <CalendarDaysIcon
+        <CurrencyEuroIcon
           className={clsx(
             "size-6",
             pendingBookings.length > 0 && "text-red-500",
@@ -75,9 +76,9 @@ const ProfileComponent = () => {
       id: "prenotazioni",
     },
     {
-            label: <CalendarDaysIcon className="size-6" />,
-            id: "calendario",
-          },
+      label: <CalendarDaysIcon className="size-6" />,
+      id: "calendario",
+    },
     ...(isVigil
       ? [
           {
