@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
-import { Button, Badge, Avatar } from "@/components";
+import { Button, Badge, Avatar, ButtonLink } from "@/components";
 import { ReviewButtonComponent } from "@/components/reviews";
 import {
   MapPinIcon,
@@ -148,7 +148,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
       }
     };
     noticeProposal();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking]);
 
   const handleStatusUpdate = async (status: BookingStatusEnum) => {
@@ -334,9 +334,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {/* PROFILO CONTROPARTE */}
         <div
-          className={`rounded-3xl p-5 border ${isConsumer ? "bg-blue-50 border-blue-100" : "bg-purple-50 border-purple-100"}`}>
+          className={`rounded-3xl p-5 border ${isConsumer ? "bg-blue-50 border-blue-100" : "bg-purple-50 border-purple-100"}`}
+        >
           <p
-            className={`font-bold text-xs uppercase tracking-wider mb-4 ${isConsumer ? "text-consumer-blue" : "text-purple-500"}`}>
+            className={`font-bold text-xs uppercase tracking-wider mb-4 ${isConsumer ? "text-consumer-blue" : "text-purple-500"}`}
+          >
             {isConsumer ? "Operatore assegnato" : "Cliente da assistere"}
           </p>
           <div className="flex items-center justify-between">
@@ -364,8 +366,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           {isConsumer && (
             <div className="mt-2 text-sm text-gray-600">
               <p>
-                L&apos;operatore confermerà la disponibilità dopo la tua richiesta.
-                Ti avviseremo non appena sarà confermata.
+                L&apos;operatore confermerà la disponibilità dopo la tua
+                richiesta. Ti avviseremo non appena sarà confermata.
               </p>
             </div>
           )}
@@ -444,7 +446,17 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               icon={<XMarkIcon className="w-5 h-5" />}
             />
           )}
-
+          {booking.status === BookingStatusEnum.CONFIRMED &&
+            booking.payment_status === PaymentStatusEnum.PAID && (
+              <div className="mt-4 items-center border-gray-100">
+                <ButtonLink
+                  full
+                  href={vigil?.phone ? `tel:${vigil.phone}` : undefined}
+                  icon={<PhoneIcon className="w-5 h-5" />}
+                  label={"Contatta il vigil"}
+                />
+              </div>
+            )}
           {/* AZIONI COMUNI */}
           <Button
             full

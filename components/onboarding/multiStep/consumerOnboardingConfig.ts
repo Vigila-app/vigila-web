@@ -325,24 +325,6 @@ export const createConsumerOnboardingConfig = (
     //   ],
     //   nextStep: "contact-info",
     // },
-    // {
-    //   id: "contact-info",
-    //   title: "Come possiamo contattare la persona cara?",
-    //   questions: [
-    //     {
-    //       id: "lovedOnePhone",
-    //       type: QuestionType.PHONE,
-    //       label: "Numero di telefono",
-    //       placeholder: "es. 3331234567",
-    //       validation: {
-    //         required: true,
-    //         ...FormFieldType.PHONE,
-    //       },
-    //       autoFocus: true,
-    //     },
-    //   ],
-    //   nextStep: "additional-info",
-    // },
 
     {
       id: "info",
