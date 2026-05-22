@@ -241,7 +241,8 @@ export const BookingUtilsServer = {
       let content = "";
 
       switch (booking.status) {
-        case BookingStatusEnum.PENDING: {
+        case BookingStatusEnum.PENDING:
+        case BookingStatusEnum.CONFIRMED: {
           try {
             if (booking.payment_status === PaymentStatusEnum.PAID) {
               // Invia email di conferma prenotazione al Vigil (simile al consumer)
