@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import useMultiStepFlow from "@/src/hooks/useMultiStepFlow";
 import {
@@ -143,6 +143,19 @@ export default function AvailabilityFlow({
       onComplete: config.onComplete,
     } as any);
   const { handleSubmit } = useForm();
+
+  const selectedAvailabilityDays = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (state.answers?.availabilityRules || []).map((r: any) =>
+            Number(r.weekday),
+          ),
+        ),
+      ),
+    [state.answers?.availabilityRules],
+  );
+
   const getAddress = async () => {
     try {
       const id = (await UserService.getUser())?.id;
@@ -181,8 +194,23 @@ export default function AvailabilityFlow({
   }, [currentStep, user?.id]);
 
   if (!currentStep) return null;
+  const scrollToTop = () => {
+    globalThis.window?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const onNext = async (values: { [key: string]: unknown }) => {
     // values are validated by react-hook-form
+    if (currentStep.id === "services" && selectedAvailabilityDays.length > 0) {
+      const currentDayIdx = Number(state.answers?.servicesCurrentDayIdx ?? 0);
+      if (currentDayIdx < selectedAvailabilityDays.length - 1) {
+        setAnswers((prev) => ({
+          ...prev,
+          servicesCurrentDayIdx: currentDayIdx + 1,
+        }));
+        scrollToTop();
+        return;
+      }
+    }
     await next(currentStep, values);
   };
   return (
