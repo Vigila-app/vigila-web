@@ -28,6 +28,7 @@ export type VigilDetailsType = {
   id: string;
   phone?: string;
   information?: string;
+  bio?: string;
   occupation?: string;
   transportation?: string;
   username?: string;
@@ -39,6 +40,7 @@ export type VigilDetailsType = {
   status: string;
   address?: AddressI;
   birthday?: string;
+  cap?: string[];
   addresses?: {
     id: string;
     name: string;
