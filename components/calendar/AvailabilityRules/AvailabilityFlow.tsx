@@ -152,9 +152,28 @@ export default function AvailabilityFlow({
             Number(r.weekday),
           ),
         ),
-      ),
+      ) as number[],
     [state.answers?.availabilityRules],
   );
+
+  const servicesCurrentDayIdx = Number(
+    state.answers?.servicesCurrentDayIdx ?? 0,
+  );
+  const isServicesStep = currentStep?.id === "services";
+  const isLastServiceDay =
+    !isServicesStep ||
+    selectedAvailabilityDays.length === 0 ||
+    servicesCurrentDayIdx >= selectedAvailabilityDays.length - 1;
+  const currentServiceDayKey = selectedAvailabilityDays[servicesCurrentDayIdx];
+  const currentDayServiceFilled = Boolean(
+    state.answers?.services?.[currentServiceDayKey]?.services,
+  );
+  const isPrimaryDisabled =
+    isServicesStep &&
+    selectedAvailabilityDays.length > 0 &&
+    !currentDayServiceFilled;
+  const primaryLabel =
+    isServicesStep && !isLastServiceDay ? "Prossimo giorno" : "Avanti";
 
   const getAddress = async () => {
     try {
@@ -199,13 +218,17 @@ export default function AvailabilityFlow({
   };
 
   const onNext = async (values: { [key: string]: unknown }) => {
-    // values are validated by react-hook-form
-    if (currentStep.id === "services" && selectedAvailabilityDays.length > 0) {
-      const currentDayIdx = Number(state.answers?.servicesCurrentDayIdx ?? 0);
-      if (currentDayIdx < selectedAvailabilityDays.length - 1) {
+    // Block submission on services step if current day is not filled in
+    if (isServicesStep && selectedAvailabilityDays.length > 0) {
+      const dayKey = selectedAvailabilityDays[servicesCurrentDayIdx];
+      const dayServices = state.answers?.services?.[dayKey]?.services;
+      if (!dayServices) {
+        return;
+      }
+      if (servicesCurrentDayIdx < selectedAvailabilityDays.length - 1) {
         setAnswers((prev) => ({
           ...prev,
-          servicesCurrentDayIdx: currentDayIdx + 1,
+          servicesCurrentDayIdx: servicesCurrentDayIdx + 1,
         }));
         scrollToTop();
         return;
@@ -221,9 +244,7 @@ export default function AvailabilityFlow({
           state={state}
           config={config}
           isLastStep={isLastStep}
-          setAnswers={(...args) => {
-            setAnswers(...args);
-          }}
+          setAnswers={setAnswers}
         />
         {currentStep.note && (
           <div className="text-zinc-500  text-sm flex items-start gap-3">
@@ -244,7 +265,8 @@ export default function AvailabilityFlow({
             label="Indietro"
           ></Button>
           <Button
-            label="Avanti"
+            label={primaryLabel}
+            disabled={isPrimaryDisabled}
             className={clsx(
               "flex-1 py-3 rounded-full",
               config.role === RolesEnum.VIGIL

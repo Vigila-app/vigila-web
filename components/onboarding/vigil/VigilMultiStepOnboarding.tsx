@@ -19,6 +19,7 @@ import {
   trackQuestionnaireCompleted,
   trackQuestionnaireStarted,
 } from "@/lib/tracking";
+import { ZONE_POSTAL_CODES, VigilZoneEnum } from "@/src/enums/onboarding.enums";
 /**
  * New multi-step onboarding component for VIGIL users
  */
@@ -41,12 +42,11 @@ const VigilMultiStepOnboarding = () => {
           data.availabilities = data.availabilityRules;
         }
 
-        // Extract postal code from address
-        const caps = addresses?.map(
-          (a: { address: { postcode: string } }) => a.address.postcode,
+        // Derive postal codes from the zones selected during onboarding
+        const zones: VigilZoneEnum[] = data.zones || [];
+        const caps = Array.from(
+          new Set(zones.flatMap((z) => ZONE_POSTAL_CODES[z] ?? [])),
         );
-
-        // Prepare addresses array (for now, single address)
 
         // Prepare data for API
         const onboardData: any = {
@@ -70,22 +70,32 @@ const VigilMultiStepOnboarding = () => {
           }
         }
 
-        const activityKeys = [
-          "hygene_services",
-          "outdoor_services",
-          "services",
-        ];
+        // Resolve service IDs from top-level service selections (e.g. "companionship")
+        const directServiceTypes: string[] = data.services ?? [];
+        const directServiceIds = directServiceTypes
+          .map(
+            (type) =>
+              services_catalog.services_catalog.find((s) => s.type === type)
+                ?.id,
+          )
+          .filter((id): id is number => id !== undefined);
+
+        // Resolve service IDs from specific activity selections (hygiene, outdoor)
+        const activityKeys = ["hygene_services", "outdoor_services"];
         const selectedActivity = Object.keys(data)
           .flatMap((k) => (activityKeys.includes(k) ? data[k] : null))
           .filter(Boolean);
-        console.log(selectedActivity);
         const selectedActivitiesRaw = selectedActivity
           .map((type) =>
             activities_catalog.activities_catalog.find((a) => a.type === type),
           )
           .filter(Boolean);
+        const activityServiceIds = selectedActivitiesRaw.map(
+          (a) => a!.service_id,
+        );
+
         const uniqueParentServiceIds = Array.from(
-          new Set(selectedActivitiesRaw.map((a) => a!.service_id)),
+          new Set([...directServiceIds, ...activityServiceIds]),
         );
         for (const parentId of uniqueParentServiceIds) {
           const parentServiceRaw = services_catalog.services_catalog.find(
