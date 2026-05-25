@@ -21,7 +21,11 @@ import { Controller, useForm } from "react-hook-form";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
 
-const PanoramicaTab = () => {
+interface PanoramicaTabProps {
+  vigilId?: string;
+}
+
+const PanoramicaTab = ({ vigilId: vigilIdProp }: PanoramicaTabProps = {}) => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { bookings, getBookings } = useBookingsStore();
   const { user, userDetails } = useUserStore();
@@ -33,8 +37,8 @@ const PanoramicaTab = () => {
     () =>
       user?.user_metadata?.role === RolesEnum.VIGIL
         ? user?.id
-        : vigilIdFromParams,
-    [user?.user_metadata?.role, user?.id, vigilIdFromParams],
+        : (vigilIdProp ?? vigilIdFromParams),
+    [user?.user_metadata?.role, user?.id, vigilIdProp, vigilIdFromParams],
   );
 
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
