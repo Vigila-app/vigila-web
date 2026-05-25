@@ -92,7 +92,7 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
       showLoader();
       const updatedBooking = await BookingUtils.handleStatusUpdate(
         booking,
-        status
+        status,
       );
       if (updatedBooking) {
         getBookingDetails(bookingId, true);
@@ -147,18 +147,21 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
   return (
     <Link
       href={BookingUtils.getBookingDetailsUrl(booking.id)}
-      className="no-underline w-full flex justify-center">
+      className="no-underline w-full flex justify-center"
+    >
       <Card customClass=" w-full max-w-4xl ">
         <div
           className={clsx(
             isVigil && "flex flex-col gap-1 ",
-            isConsumer && "flex gap-1 w-full   "
-          )}>
+            isConsumer && "flex gap-1 w-full   ",
+          )}
+        >
           <div
             className={clsx(
               isVigil && "flex items-start gap-2 ",
-              isConsumer && "inline-flex items-center flex-nowrap  gap-2 "
-            )}>
+              isConsumer && "inline-flex items-center flex-nowrap  gap-2 ",
+            )}
+          >
             <Avatar
               size="big"
               userId={getUserInfo()?.id}
@@ -243,11 +246,11 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                     BookingStatusEnum.COMPLETED,
                   ].includes(booking.status as BookingStatusEnum)
                     ? BookingUtils.getStatusText(
-                        booking.status as BookingStatusEnum
+                        booking.status as BookingStatusEnum,
                       )
                     : booking.payment_status === PaymentStatusEnum.PAID
                       ? BookingUtils.getStatusText(
-                          booking.status as BookingStatusEnum
+                          booking.status as BookingStatusEnum,
                         )
                       : "Da pagare"
                 }
@@ -259,11 +262,11 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
                     BookingStatusEnum.COMPLETED,
                   ].includes(booking.status as BookingStatusEnum)
                     ? BookingUtils.getStatusColor(
-                        booking.status as BookingStatusEnum
+                        booking.status as BookingStatusEnum,
                       )
                     : booking.payment_status === PaymentStatusEnum.PAID
                       ? BookingUtils.getStatusColor(
-                          booking.status as BookingStatusEnum
+                          booking.status as BookingStatusEnum,
                         )
                       : "yellow"
                 }
@@ -280,28 +283,23 @@ const BookingCardComponent = (props: BookingCardComponentI) => {
           )}
           {isVigil && (
             <div className="flex justify-center gap-3 mt-2">
-              {booking?.status === BookingStatusEnum.PENDING && (
+              {/* DEPRECATED: card vigil PENDING — booking ora nascono CONFIRMED. */}
+              {/* {booking?.status === BookingStatusEnum.PENDING && (
                 <>
                   <ButtonLink
                     customClass="!px-6 !py-2"
                     role={RolesEnum.CONSUMER}
                     label="Accetta"
-                    // action={() =>
-                    //   handleStatusUpdate(BookingStatusEnum.CONFIRMED)
-                    // }
                     href={BookingUtils.getBookingDetailsUrl(booking.id)}
                   />
                   <ButtonLink
                     customClass="!px-6 !py-2"
                     role={RolesEnum.VIGIL}
-                    // action={() =>
-                    //   handleStatusUpdate(BookingStatusEnum.REJECTED)
-                    // }
                     href={BookingUtils.getBookingDetailsUrl(booking.id)}
                     label="Rifiuta"
                   />
                 </>
-              )}
+              )} */}
               {booking?.status === BookingStatusEnum.CONFIRMED && (
                 <div>
                   <ButtonLink
