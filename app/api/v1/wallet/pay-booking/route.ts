@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   authenticateUser,
   getAdminClient,
+  getUserByIdAdmin,
   jsonErrorResponse,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
@@ -11,6 +12,7 @@ import {
   TRANSACTION_STATUS,
 } from "@/src/types/transactions.types";
 import { BookingUtils } from "@/src/utils/booking.utils";
+import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -155,14 +157,23 @@ export async function POST(req: NextRequest) {
     }
 
     // 7. Update Booking Status
-    const { error: updateError } = await supabase
+    const { data: updatedBooking, error: updateError } = await supabase
       .from("bookings")
       .update({
         payment_status: PaymentStatusEnum.PAID,
         payment_method: "WALLET",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", bookingId);
+      .eq("id", bookingId)
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `,
+      )
+      .single();
 
     if (updateError) {
       console.error("Error updating booking status:", updateError);
@@ -179,6 +190,34 @@ export async function POST(req: NextRequest) {
           message:
             "Critical error: payment deducted but failed to record transaction — manual reconciliation required.",
         });
+      }
+    }
+
+    // 8. Send email notifications (best effort — don't fail the request)
+    if (updatedBooking) {
+      try {
+        const consumerUser = await getUserByIdAdmin(userObject.id);
+        if (consumerUser?.email) {
+          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+            updatedBooking,
+            consumerUser,
+          );
+        }
+
+        if (updatedBooking.vigil_id) {
+          const vigilUser = await getUserByIdAdmin(updatedBooking.vigil_id);
+          if (vigilUser?.email) {
+            await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+              updatedBooking,
+              vigilUser,
+            );
+          }
+        }
+      } catch (emailError) {
+        console.error(
+          "Error sending wallet booking payment email notifications:",
+          emailError,
+        );
       }
     }
 
