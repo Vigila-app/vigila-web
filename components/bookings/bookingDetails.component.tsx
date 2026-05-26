@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
-import { Button, Badge, Avatar, ButtonLink } from "@/components";
+import { Button, Badge, Avatar } from "@/components";
+import { ButtonStyle } from "@/components/button/button.style";
+import clsx from "clsx";
 import { ReviewButtonComponent } from "@/components/reviews";
 import {
   MapPinIcon,
@@ -447,14 +449,23 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
             />
           )}
           {booking.status === BookingStatusEnum.CONFIRMED &&
-            booking.payment_status === PaymentStatusEnum.PAID && (
+            booking.payment_status === PaymentStatusEnum.PAID &&
+            vigil?.phone && (
               <div className="mt-4 items-center border-gray-100">
-                <ButtonLink
-                  full
-                  href={vigil?.phone ? `tel:${vigil.phone}` : undefined}
-                  icon={<PhoneIcon className="w-5 h-5" />}
-                  label={"Contatta il vigil"}
-                />
+                <a
+                  href={`tel:${vigil.phone}`}
+                  className={clsx(
+                    ButtonStyle.baseBtnStyle,
+                    ButtonStyle.primaryBtnStyle,
+                    ButtonStyle.fullBtnStyle,
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="mr-2">
+                    <PhoneIcon className="w-5 h-5" />
+                  </span>
+                  Contatta il vigil
+                </a>
               </div>
             )}
           {/* AZIONI COMUNI */}
