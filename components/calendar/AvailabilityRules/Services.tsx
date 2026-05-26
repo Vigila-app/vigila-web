@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { CurrentDay } from "./CurrentDay";
@@ -40,12 +40,18 @@ export const Services = ({
     [answers?.availabilityRules],
   ) as number[];
 
-  const [currentDayIdx, setCurrentDayIdx] = useState(0);
+  const isHydratingDayRef = useRef(false);
+
+  const [currentDayIdx, setCurrentDayIdx] = useState(() => {
+    const initialIdx = Number(answers?.servicesCurrentDayIdx ?? 0);
+    return Number.isFinite(initialIdx) && initialIdx >= 0 ? initialIdx : 0;
+  });
   const isLastDay = currentDayIdx === selectedDays.length - 1;
 
   useEffect(() => {
-    setCurrentDayIdx(0);
-  }, [selectedDays.length]);
+    const nextIdx = Number(answers?.servicesCurrentDayIdx ?? 0);
+    setCurrentDayIdx(Number.isFinite(nextIdx) && nextIdx >= 0 ? nextIdx : 0);
+  }, [answers?.servicesCurrentDayIdx]);
 
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [car, setCar] = useState(false);
@@ -61,6 +67,7 @@ export const Services = ({
   };
   useEffect(() => {
     const day = selectedDays[currentDayIdx];
+    isHydratingDayRef.current = true;
     const saved = answers?.services?.[day];
     if (saved) {
       setSelectedService(saved.services);
@@ -74,13 +81,11 @@ export const Services = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDayIdx, selectedDays.join("-")]);
 
-  const hasAutoSavedRef = useRef(false);
-
   useEffect(() => {
-    hasAutoSavedRef.current = false;
-  }, [isLastStep, selectedDays.join("-")]);
-
-  const saveCurrentDaySelections = useCallback(() => {
+    if (isHydratingDayRef.current) {
+      isHydratingDayRef.current = false;
+      return;
+    }
     const day = selectedDays[currentDayIdx];
     if (!setAnswers || day === undefined) return;
 
@@ -96,19 +101,6 @@ export const Services = ({
       return next;
     });
   }, [car, currentDayIdx, notes, selectedDays, selectedService, setAnswers]);
-
-  const loadDaySelections = (saved: Record<string, any> | undefined) => {
-    setSelectedService(saved?.services);
-    setCar(!!saved?.car);
-    setNotes(saved?.notes || "");
-  };
-
-  useEffect(() => {
-    if (!isLastStep || !isLastDay) return;
-    if (hasAutoSavedRef.current) return;
-    hasAutoSavedRef.current = true;
-    saveCurrentDaySelections();
-  }, [isLastDay, isLastStep, saveCurrentDaySelections]);
 
   const bookingType = answers?.["booking-type"];
   const isSingleDate = bookingType === "occasional" || bookingType === "trial";
@@ -160,36 +152,23 @@ export const Services = ({
           notesInputId="service-notes"
         />
 
-        <div className="flex justify-between mt-6">
-          <div className="flex gap-2">
-            <p className="text-xs text-zinc-500 self-center">
-              Le scelte vengono salvate quando passi al giorno successivo.
-            </p>
-            {(!isLastStep || !isLastDay) && (
-              <button
-                type="button"
-                onClick={async () => {
-                  saveCurrentDaySelections();
-                  if (currentDayIdx < selectedDays.length - 1) {
-                    const nextIdx = currentDayIdx + 1;
-                    const nextDay = selectedDays[nextIdx];
-                    loadDaySelections(answers?.services?.[nextDay]);
-                    setCurrentDayIdx(nextIdx);
-                  } else {
-                    console.log("All days filled, salva ricorrenza");
-                    console.log(answers);
-                  }
-                }}
-                className={clsx(
-                  "px-4 py-2 rounded text-white disabled:opacity-50",
-                  colorClasses.bg,
-                )}
-              >
-                {isLastDay ? "Salva ricorrenza" : "Prossimo giorno"}
-              </button>
-            )}
-          </div>
+        <div className="mt-6 flex items-center justify-between gap-3">
+          <p className="text-xs text-zinc-500 self-center">
+            {isLastStep && isLastDay
+              ? "Premi Avanti per avviare la ricerca del match."
+              : "Premi Prossimo giorno per salvare e passare al giorno successivo."}
+          </p>
+          {isLastStep && isLastDay && (
+            <span className="text-xs font-medium text-consumer-blue whitespace-nowrap">
+              Ultimo giorno
+            </span>
+          )}
         </div>
+        {!selectedService && (
+          <p className="mt-3 text-xs text-amber-600">
+            Seleziona almeno un servizio per proseguire.
+          </p>
+        )}
       </div>
     </div>
   );
