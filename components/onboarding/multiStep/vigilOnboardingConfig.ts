@@ -86,14 +86,16 @@ export const createVigilOnboardingConfig = (
           },
         },
       ],
-      nextStep: "address",
+      nextStep: "contact-info",
     },
     {
       id: "contact-info",
-      title: "Come possiamo contattare la persona cara?",
+      title: "Come possiamo contattarti?",
+      description:
+        "Il numero verrà mostrato alle famiglie solo dopo la conferma di una prenotazione.",
       questions: [
         {
-          id: "lovedOnePhone",
+          id: "phone",
           type: QuestionType.PHONE,
           label: "Numero di telefono",
           placeholder: "es. 3331234567",
@@ -104,7 +106,7 @@ export const createVigilOnboardingConfig = (
           autoFocus: true,
         },
       ],
-      nextStep: "additional-info",
+      nextStep: "address",
     },
     {
       id: "address",
