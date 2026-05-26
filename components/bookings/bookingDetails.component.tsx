@@ -389,7 +389,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {/* AZIONI DINAMICHE IN BASE AL RUOLO */}
         <div className="space-y-3 pt-4 border-t">
-          {isVigil && booking.status === BookingStatusEnum.PENDING && (
+          {/* DEPRECATED: approvazione manuale vigil disattivata — i nuovi booking
+              nascono CONFIRMED in seguito al pagamento. Codice tenuto per riferimento. */}
+          {/* {isVigil && booking.status === BookingStatusEnum.PENDING && (
             <div className="grid grid-cols-2 gap-4">
               <Button
                 full
@@ -406,7 +408,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 icon={<XMarkIcon className="w-5 h-5" />}
               />
             </div>
-          )}
+          )} */}
 
           {isVigil &&
             booking.status === BookingStatusEnum.CONFIRMED &&
