@@ -210,7 +210,7 @@ export async function POST(req: NextRequest) {
       endDate,
       consumer_id: userObject.id,
       vigil_id: service.vigil_id,
-      status: BookingStatusEnum.PENDING,
+      status: BookingStatusEnum.CONFIRMED,
       payment_status: PaymentStatusEnum.PENDING,
       price,
       fee: serviceCatalog.fee * body.quantity,

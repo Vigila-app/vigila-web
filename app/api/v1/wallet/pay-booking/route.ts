@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   authenticateUser,
   getAdminClient,
+  getUserByIdAdmin,
   jsonErrorResponse,
 } from "@/server/api.utils.server";
 import { ResponseCodesConstants } from "@/src/constants";
-import {
-  BookingStatusEnum,
-  PaymentStatusEnum,
-} from "@/src/enums/booking.enums";
+import { PaymentStatusEnum } from "@/src/enums/booking.enums";
 import {
   EXPENSE_TYPE,
   TRANSACTION_STATUS,
 } from "@/src/types/transactions.types";
 import { BookingUtils } from "@/src/utils/booking.utils";
+import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -70,10 +69,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (
-      booking.status !== BookingStatusEnum.PENDING ||
-      booking.payment_status === PaymentStatusEnum.PAID
-    ) {
+    if (booking.payment_status === PaymentStatusEnum.PAID) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.GENERIC_ERROR.code,
         success: false,
@@ -114,7 +110,7 @@ export async function POST(req: NextRequest) {
       {
         wallet_id: wallet.id,
         amount: -priceCents,
-      }
+      },
     );
 
     if (rpcError) {
@@ -137,10 +133,10 @@ export async function POST(req: NextRequest) {
         description: `Pagamento prenotazione #${booking.id}`,
         created_at: new Date().toISOString(),
         user_id: userObject.id,
-      })
+      });
 
     if (txError) {
-      console.error("Error recording transaction:", txError)
+      console.error("Error recording transaction:", txError);
 
       //Solving: since this is a wallet situation, the money have already been spent.
       //This means we don't need to work with Stripe, but just reset the balance on the wallet.
@@ -148,44 +144,80 @@ export async function POST(req: NextRequest) {
         wallet.id,
         priceCents,
         booking.id,
-        userObject.id
-      ) //logging handled in the utils function
+        userObject.id,
+      ); //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.INTERNAL_SERVER_ERROR.code,
           success: false,
           message:
             "Critical error: payment deducted but failed to record transaction — manual reconciliation required.",
-        })
+        });
       }
     }
 
     // 7. Update Booking Status
-    const { error: updateError } = await supabase
+    const { data: updatedBooking, error: updateError } = await supabase
       .from("bookings")
       .update({
         payment_status: PaymentStatusEnum.PAID,
-        status: BookingStatusEnum.PENDING,
         payment_method: "WALLET",
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId)
+      .select(
+        `
+        *,
+        consumer:consumers(*),
+        vigil:vigils(*),
+        service:services(*)
+      `,
+      )
+      .single();
 
     if (updateError) {
-      console.error("Error updating booking status:", updateError)
+      console.error("Error updating booking status:", updateError);
       const refundError = await BookingUtils.refundByWalletId(
         wallet.id,
         priceCents,
         booking.id,
-        userObject.id
-      ) //logging handled in the utils function
+        userObject.id,
+      ); //logging handled in the utils function
       if (refundError) {
         return jsonErrorResponse(500, {
           code: ResponseCodesConstants.INTERNAL_SERVER_ERROR.code,
           success: false,
           message:
             "Critical error: payment deducted but failed to record transaction — manual reconciliation required.",
-        })
+        });
+      }
+    }
+
+    // 8. Send email notifications (best effort — don't fail the request)
+    if (updatedBooking) {
+      try {
+        const consumerUser = await getUserByIdAdmin(userObject.id);
+        if (consumerUser?.email) {
+          await BookingUtilsServer.sendConsumerBookingStatusUpdateNotification(
+            updatedBooking,
+            consumerUser,
+          );
+        }
+
+        if (updatedBooking.vigil_id) {
+          const vigilUser = await getUserByIdAdmin(updatedBooking.vigil_id);
+          if (vigilUser?.email) {
+            await BookingUtilsServer.sendVigilBookingStatusUpdateNotification(
+              updatedBooking,
+              vigilUser,
+            );
+          }
+        }
+      } catch (emailError) {
+        console.error(
+          "Error sending wallet booking payment email notifications:",
+          emailError,
+        );
       }
     }
 
