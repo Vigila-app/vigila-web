@@ -502,6 +502,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "paymentBookingReview": {
+    "url": "/booking/payment/review",
+    "label": "Riepilogo pagamento",
+    "title": "Riepilogo pagamento",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "paymentBookingConfirm": {
     "url": "/booking/payment/result",
     "label": "Conferma Prenotazione",

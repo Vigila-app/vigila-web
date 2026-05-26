@@ -30,12 +30,15 @@ const verifyBookingAccess = async (
     .eq("id", bookingId)
     .single();
 
-  if (error)
+  if (error) {
+    console.log(error);
     throw jsonErrorResponse(500, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
       success: false,
       error,
     });
+  }
+  console.log(userId, data.vigil_id);
 
   if (!data)
     throw jsonErrorResponse(404, {
@@ -50,6 +53,8 @@ const verifyBookingAccess = async (
       data.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
       (!data.consumer_id || data.consumer_id === userId);
     if (!isNoticeProposal) {
+      console.log(userId, data.vigil_id);
+
       throw jsonErrorResponse(403, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
         success: false,
@@ -141,6 +146,7 @@ export async function GET(
     }
 
     const userObject = await authenticateUser(req);
+    console.log(req);
     if (!userObject?.id)
       return jsonErrorResponse(403, {
         code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
