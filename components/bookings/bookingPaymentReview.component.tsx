@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowRightIcon,
   CalendarDaysIcon,
@@ -13,13 +13,13 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
 import { Routes } from "@/src/routes";
 import { ServicesService } from "@/src/services";
-import { ServiceI } from "@/src/types/services.types";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { ServiceCatalogItem } from "@/src/types/services.types";
 import { Avatar, Button, Card } from "@/components";
 import { ModalPortalComponent } from "@/components/@core";
 import VigilInfoModal from "@/components/matching/VigilInfoModal";
 import { useModalStore } from "@/src/store/modal/modal.store";
-import { useAppStore } from "@/src/store/app/app.store";
-import { amountDisplay, capitalize } from "@/src/utils/common.utils";
+import { amountDisplay } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { calculateSlotDurationHours } from "@/src/utils/calendar.utils";
 import { dayNames } from "@/components/calendar/AvailabilityRules/Services";
@@ -40,8 +40,9 @@ type CompatibleSlot = {
 type SlotPricing = {
   slot: CompatibleSlot;
   hours: number;
-  matched?: ServiceI;
+  matched?: ServiceCatalogItem;
   unitPrice: number;
+  fee: number;
   subtotal: number;
   weekday: number;
   note?: string;
@@ -108,6 +109,9 @@ const resolveDayNote = (answers: any, weekday: number): string | undefined =>
   answers?.services?.[String(weekday)]?.notes ||
   undefined;
 
+const resolveServiceCatalog = (serviceType: string) =>
+  ServicesService.getServicesByType(serviceType as ServiceCatalogTypeEnum);
+
 const buildMatchingSummary = (slots: SlotPricing[]): SummaryRow[] => {
   const grouped = new Map<number, string[]>();
 
@@ -128,60 +132,35 @@ const buildMatchingSummary = (slots: SlotPricing[]): SummaryRow[] => {
 
 const BookingPaymentReviewComponent = () => {
   const router = useRouter();
-  const { showLoader, hideLoader } = useAppStore();
   const { openModal, payload } = useModalStore();
 
   const [flowSnapshot] = useState<MatchingFlowSnapshot>(() =>
     readMatchingFlowSnapshot(),
   );
-  const [vigilServices, setVigilServices] = useState<ServiceI[]>([]);
 
   const answers = flowSnapshot.answers;
   const response = flowSnapshot.response;
   const best = response?.data?.[0];
 
-  const slotDetails = useMemo<CompatibleSlot[]>(
-    () =>
-      Array.isArray(best?.compatibleSlotDetails)
-        ? best.compatibleSlotDetails
-        : [],
-    [best?.compatibleSlotDetails],
-  );
+  const slotDetails = useMemo<CompatibleSlot[]>(() => {
+    if (!Array.isArray(best?.compatibleSlotDetails)) return [];
+    return best.compatibleSlotDetails;
+  }, [best]);
 
   const hasMatchingData = Boolean(best?.id) && slotDetails.length > 0;
-
-  useEffect(() => {
-    if (!best?.id) return;
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        showLoader();
-        const services = await ServicesService.getServices(best.id);
-        if (!cancelled) setVigilServices(services || []);
-      } catch (error) {
-        console.warn("Could not fetch vigil services", error);
-      } finally {
-        hideLoader();
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [best?.id, hideLoader, showLoader]);
 
   const slotsWithPricing = useMemo<SlotPricing[]>(() => {
     if (!hasMatchingData) return [];
 
     return slotDetails.map((slot) => {
       const weekday = toUtcDate(slot.date).getUTCDay();
-      const matched = vigilServices.find(
-        (service) => service.type === slot.service,
-      );
+      const matched = resolveServiceCatalog(slot.service);
       const unitPrice =
-        typeof matched?.unit_price === "number" ? matched.unit_price : 0;
+        typeof matched?.recommended_hourly_rate === "number"
+          ? matched.recommended_hourly_rate
+          : 0;
+      const fee = typeof matched?.fee === "number" ? matched.fee : 0;
+      console.log(fee);
       const hours = calculateSlotDurationHours(slot.startTime, slot.endTime);
 
       return {
@@ -189,12 +168,13 @@ const BookingPaymentReviewComponent = () => {
         hours,
         matched,
         unitPrice,
-        subtotal: unitPrice * hours,
+        fee,
+        subtotal: (unitPrice + fee) * hours,
         weekday,
         note: resolveDayNote(answers, weekday),
       };
     });
-  }, [answers, hasMatchingData, slotDetails, vigilServices]);
+  }, [answers, hasMatchingData, slotDetails]);
 
   const topSummary = useMemo<SummaryRow[]>(() => {
     if (hasMatchingData) {
@@ -205,16 +185,10 @@ const BookingPaymentReviewComponent = () => {
 
   const address =
     resolveAddress(answers?.matchingRequest) || "Indirizzo non disponibile";
-  let totalPrice = 0;
-  if (hasMatchingData) {
-    totalPrice =
-      typeof best?.totalPrice === "number"
-        ? best.totalPrice
-        : slotsWithPricing.reduce((acc, item) => acc + item.subtotal, 0);
-  }
+  const totalPrice = hasMatchingData
+    ? slotsWithPricing.reduce((acc, item) => acc + item.subtotal, 0)
+    : 0;
 
-  const firstSlot = slotsWithPricing[0];
-  const plannedSlots = slotsWithPricing.slice(1);
   const dateRangeLabel = hasMatchingData
     ? formatSlotDateRange(slotDetails)
     : "-";
@@ -224,10 +198,6 @@ const BookingPaymentReviewComponent = () => {
   const activeFromNode = activeFromLabel ? (
     <span className="text-xs text-gray-500">Attivo da {activeFromLabel}</span>
   ) : null;
-  const firstSlotDateLabel = firstSlot?.slot
-    ? formatCompactDate(toUtcDate(firstSlot.slot.date))
-    : null;
-
   const openVigilModal = () => {
     if (!best?.id) return;
 
@@ -374,6 +344,10 @@ const BookingPaymentReviewComponent = () => {
                   {slot?.matched?.name && (
                     <p className="text-xs text-gray-500">{slot.matched.name}</p>
                   )}
+                  <p className="text-xs text-gray-500">
+                    {amountDisplay(slot.unitPrice)} EUR/h +{" "}
+                    {amountDisplay(slot.fee)} EUR fee
+                  </p>
                   {slot?.note && (
                     <p className="text-xs text-gray-500">{slot.note}</p>
                   )}
