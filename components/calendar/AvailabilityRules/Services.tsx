@@ -178,14 +178,21 @@ export const Services = ({
 
         <div className="mt-6 flex items-center justify-between gap-3">
           <p className="text-xs text-zinc-500 self-center">
-            Premi Avanti per salvare questo giorno e passare al successivo.
+            {isLastStep && isLastDay
+              ? "Premi Avanti per avviare la ricerca del match."
+              : "Premi Prossimo giorno per salvare e passare al giorno successivo."}
           </p>
           {isLastStep && isLastDay && (
-            <span className="text-xs font-medium text-consumer-blue">
-              Ultimo giorno disponibile
+            <span className="text-xs font-medium text-consumer-blue whitespace-nowrap">
+              Ultimo giorno
             </span>
           )}
         </div>
+        {!selectedService && (
+          <p className="mt-3 text-xs text-amber-600">
+            Seleziona almeno un servizio per proseguire.
+          </p>
+        )}
       </div>
     </div>
   );

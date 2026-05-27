@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { BookingI } from "@/src/types/booking.types";
 import { Button, Badge, Avatar } from "@/components";
+import { ButtonStyle } from "@/components/button/button.style";
+import clsx from "clsx";
 import { ReviewButtonComponent } from "@/components/reviews";
 import {
   MapPinIcon,
@@ -387,7 +389,9 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
 
         {/* AZIONI DINAMICHE IN BASE AL RUOLO */}
         <div className="space-y-3 pt-4 border-t">
-          {isVigil && booking.status === BookingStatusEnum.PENDING && (
+          {/* DEPRECATED: approvazione manuale vigil disattivata — i nuovi booking
+              nascono CONFIRMED in seguito al pagamento. Codice tenuto per riferimento. */}
+          {/* {isVigil && booking.status === BookingStatusEnum.PENDING && (
             <div className="grid grid-cols-2 gap-4">
               <Button
                 full
@@ -404,7 +408,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 icon={<XMarkIcon className="w-5 h-5" />}
               />
             </div>
-          )}
+          )} */}
 
           {isVigil &&
             booking.status === BookingStatusEnum.CONFIRMED &&
@@ -446,7 +450,26 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               icon={<XMarkIcon className="w-5 h-5" />}
             />
           )}
-
+          {booking.status === BookingStatusEnum.CONFIRMED &&
+            booking.payment_status === PaymentStatusEnum.PAID &&
+            vigil?.phone && (
+              <div className="mt-4 items-center border-gray-100">
+                <a
+                  href={`tel:${vigil.phone}`}
+                  className={clsx(
+                    ButtonStyle.baseBtnStyle,
+                    ButtonStyle.primaryBtnStyle,
+                    ButtonStyle.fullBtnStyle,
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="mr-2">
+                    <PhoneIcon className="w-5 h-5" />
+                  </span>
+                  Contatta il vigil
+                </a>
+              </div>
+            )}
           {/* AZIONI COMUNI */}
           <Button
             full

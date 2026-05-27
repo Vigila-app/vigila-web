@@ -10,9 +10,6 @@ import {
   OccupationLabels,
   VigilCharacterTraitEnum,
   VigilCharacterTraitLabels,
-  VigilDailyServiceEnum,
-  VigilDailyServiceIcons,
-  VigilDailyServiceLabels,
   VigilExperienceLabels,
   VigilExperienceYearsEnum,
   VigilHygieneServiceEnum,
@@ -36,6 +33,7 @@ import { GenderEnum, GenderLabels } from "@/src/enums/common.enums";
 import { AvailabilityRulesDemo } from "@/components/calendar-demo";
 import { ServicesService } from "@/src/services";
 import { ServiceCatalogTypeIcons } from "@/src/enums/services.enums";
+import { FormFieldType } from "@/src/constants/form.constants";
 
 /**
  * Multi-step onboarding flow configuration for VIGIL users
@@ -88,6 +86,26 @@ export const createVigilOnboardingConfig = (
           },
         },
       ],
+      nextStep: "contact-info",
+    },
+    {
+      id: "contact-info",
+      title: "Come possiamo contattarti?",
+      description:
+        "Il numero verrà mostrato alle famiglie solo dopo la conferma di una prenotazione.",
+      questions: [
+        {
+          id: "phone",
+          type: QuestionType.PHONE,
+          label: "Numero di telefono",
+          placeholder: "es. 3331234567",
+          validation: {
+            required: true,
+            ...FormFieldType.PHONE,
+          },
+          autoFocus: true,
+        },
+      ],
       nextStep: "address",
     },
     {
@@ -109,7 +127,7 @@ export const createVigilOnboardingConfig = (
       nextStep: "zones",
     },
     {
-      id: "zones", //non salvare per ora
+      id: "zones",
       title: "In quali zone sei disponibile a lavorare?",
       description:
         "Seleziona tutte le zone di Napoli in cui puoi offrire i tuoi servizi",

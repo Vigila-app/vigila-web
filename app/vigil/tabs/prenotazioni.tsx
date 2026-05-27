@@ -2,7 +2,8 @@ import { TabItem } from "@/components/tabGroup/tabGroup";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { useUserStore } from "@/src/store/user/user.store";
 import { useEffect, useState } from "react";
-import TabInattesa from "@/app/vigil/tabs/TabsPrenotazioni/TabInAttesa";
+// DEPRECATED: TabInattesa non più usata — i nuovi booking sono già CONFIRMED.
+// import TabInattesa from "@/app/vigil/tabs/TabsPrenotazioni/TabInAttesa";
 import TabConfirmed from "@/app/vigil/tabs/TabsPrenotazioni/TabConfirmed";
 import TabCompletati from "@/app/vigil/tabs/TabsPrenotazioni/TabCompletati";
 import { useBookingsStore } from "@/src/store/bookings/bookings.store";
@@ -13,27 +14,29 @@ const PrenotationTabs = () => {
   const { bookings, getBookings } = useBookingsStore();
 
   const confirmedBookings = bookings.filter((b) => b.status === "confirmed");
-  const pendingBookings = bookings.filter((b) => b.status === "pending");
+  // DEPRECATED: i nuovi booking nascono CONFIRMED, non esistono più PENDING per il vigil.
+  // const pendingBookings = bookings.filter((b) => b.status === "pending");
   const completedBookings = bookings.filter((b) => b.status === "completed");
 
-  const [selectedTab, setSelectedTab] = useState<string>("In attesa");
+  const [selectedTab, setSelectedTab] = useState<string>("Accettate");
 
   const tabs: TabItem[] = [
-    {
-      id: "In attesa",
-      label: (
-        <span className="flex">
-          <span className="">
-            In attesa&nbsp;
-            {pendingBookings.length !== 0 && (
-              <span className="tab-buttons bg-vigil-orange animate-pulse">
-                {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
-              </span>
-            )}
-          </span>
-        </span>
-      ),
-    },
+    // DEPRECATED: tab "In attesa" disattivata — i nuovi booking arrivano già CONFIRMED.
+    // {
+    //   id: "In attesa",
+    //   label: (
+    //     <span className="flex">
+    //       <span className="">
+    //         In attesa&nbsp;
+    //         {pendingBookings.length !== 0 && (
+    //           <span className="tab-buttons bg-vigil-orange animate-pulse">
+    //             {pendingBookings.length <= 99 ? pendingBookings.length : "99+"}
+    //           </span>
+    //         )}
+    //       </span>
+    //     </span>
+    //   ),
+    // },
     {
       id: "Accettate",
       label: (
@@ -87,7 +90,8 @@ const PrenotationTabs = () => {
       />
 
       <div className="mt-4">
-        {selectedTab === "In attesa" && <TabInattesa />}
+        {/* DEPRECATED: tab "In attesa" disattivata — booking ora sono già CONFIRMED. */}
+        {/* {selectedTab === "In attesa" && <TabInattesa />} */}
         {selectedTab === "Accettate" && <TabConfirmed />}
         {selectedTab === "Completate" && <TabCompletati />}
       </div>
