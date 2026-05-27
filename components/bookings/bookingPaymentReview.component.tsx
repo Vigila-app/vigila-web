@@ -156,8 +156,8 @@ const BookingPaymentReviewComponent = () => {
       const weekday = toUtcDate(slot.date).getUTCDay();
       const matched = resolveServiceCatalog(slot.service);
       const unitPrice =
-        typeof matched?.recommended_hourly_rate === "number"
-          ? matched.recommended_hourly_rate
+        typeof matched?.min_hourly_rate === "number"
+          ? matched.min_hourly_rate
           : 0;
       const fee = typeof matched?.fee === "number" ? matched.fee : 0;
       const hours = calculateSlotDurationHours(slot.startTime, slot.endTime);
