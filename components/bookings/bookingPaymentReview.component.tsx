@@ -160,7 +160,6 @@ const BookingPaymentReviewComponent = () => {
           ? matched.recommended_hourly_rate
           : 0;
       const fee = typeof matched?.fee === "number" ? matched.fee : 0;
-      console.log(fee);
       const hours = calculateSlotDurationHours(slot.startTime, slot.endTime);
 
       return {
