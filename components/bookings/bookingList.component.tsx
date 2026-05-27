@@ -203,7 +203,7 @@ const BookingListComponent = () => {
                 label="Paga ora"
                 action={() =>
                   router.push(
-                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`,
+                    `${Routes.paymentBookingReview.url}?bookingId=${booking.id}`,
                   )
                 }
               />

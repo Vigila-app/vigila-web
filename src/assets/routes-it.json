@@ -179,6 +179,19 @@
     "private": true,
     "roles": ["CONSUMER"]
   },
+  "matchingDetails": {
+    "url": "/matching/details",
+    "label": "Riepilogo prenotazione",
+    "title": "Riepilogo prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
   "matchingTrialConfirmed": {
     "url": "/matching/trial-confirmed",
     "label": "Trial confermato",
@@ -480,6 +493,19 @@
     "url": "/booking/payment",
     "label": "Paga Prenotazione",
     "title": "Pagamento Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "paymentBookingReview": {
+    "url": "/booking/payment/review",
+    "label": "Riepilogo pagamento",
+    "title": "Riepilogo pagamento",
     "menu": {
       "mobile": false,
       "desktop": false,

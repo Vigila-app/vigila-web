@@ -428,7 +428,7 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
                 full
                 action={() =>
                   router.push(
-                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`,
+                    `${Routes.paymentBookingReview.url}?bookingId=${booking.id}`,
                   )
                 }
               />

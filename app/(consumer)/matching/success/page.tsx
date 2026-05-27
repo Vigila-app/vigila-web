@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Routes } from "@/src/routes";
 import {
   BookingsService,
@@ -76,13 +76,15 @@ const ToggleSwitch = ({
 
 type PaymentStage = "idle" | "selecting" | "checkout";
 
-export default function MatchingSuccessPage() {
+function MatchingSuccessContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useUserStore();
   const { balance, getTransactions } = useTransactionsStore();
   const { showLoader, hideLoader } = useAppStore();
   const { getBookingDetails } = useBookingsStore();
   const { openModal, payload } = useModalStore();
+  const confirmTriggeredRef = useRef(false);
 
   const [answers, setAnswers] = useState<any>(null);
   const [response, setResponse] = useState<any>(null);
@@ -117,6 +119,16 @@ export default function MatchingSuccessPage() {
       console.error(e);
     }
   }, []);
+
+  useEffect(() => {
+    if (confirmTriggeredRef.current) return;
+    if (searchParams.get("confirm") !== "true") return;
+    if (!response) return;
+    confirmTriggeredRef.current = true;
+    router.replace(Routes.matchingSuccess.url);
+    handleConfirm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [response, searchParams]);
 
   const totalPriceEur: number = response?.data?.[0]?.totalPrice ?? 0;
 
@@ -688,7 +700,7 @@ export default function MatchingSuccessPage() {
 
           <div className="mt-6">
             <button
-              onClick={handleConfirm}
+              onClick={() => router.push(Routes.matchingDetails.url)}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-consumer-blue text-white font-semibold"
             >
               Procedi con questo caregiver <ArrowRightIcon className="w-4" />
@@ -713,5 +725,19 @@ export default function MatchingSuccessPage() {
         <VigilInfoModal {...vigilModalPayload} />
       </ModalPortalComponent>
     </div>
+  );
+}
+
+export default function MatchingSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
+          <div className="text-slate-600">Caricamento risultato matching…</div>
+        </div>
+      }
+    >
+      <MatchingSuccessContent />
+    </Suspense>
   );
 }
