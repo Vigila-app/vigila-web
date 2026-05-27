@@ -19,16 +19,11 @@ import { ModalPortalComponent } from "@/components/@core";
 import VigilInfoModal from "@/components/matching/VigilInfoModal";
 import { useModalStore } from "@/src/store/modal/modal.store";
 import { useAppStore } from "@/src/store/app/app.store";
-import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { amountDisplay, capitalize } from "@/src/utils/common.utils";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { calculateSlotDurationHours } from "@/src/utils/calendar.utils";
 import { dayNames } from "@/components/calendar/AvailabilityRules/Services";
 import { RolesEnum } from "@/src/enums/roles.enums";
-
-type BookingPaymentReviewComponentProps = {
-  bookingId?: string;
-};
 
 type MatchingFlowSnapshot = {
   answers?: Record<string, any>;
@@ -65,6 +60,20 @@ const formatCompactDate = (date: Date) =>
 
 const formatTime = (value: string) => value.slice(0, 5);
 
+const toUtcDate = (date: string) => new Date(`${date}T00:00:00Z`);
+
+const formatSlotLabel = (slot: CompatibleSlot) =>
+  `${formatCompactDate(toUtcDate(slot.date))} • ${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}`;
+
+const formatSlotDateRange = (slots: CompatibleSlot[]) => {
+  const firstSlot = slots[0];
+  const lastSlot = slots.at(-1);
+
+  if (!firstSlot || !lastSlot) return "Da pianificare";
+
+  return `${formatCompactDate(toUtcDate(firstSlot.date))} - ${formatCompactDate(toUtcDate(lastSlot.date))}`;
+};
+
 const readMatchingFlowSnapshot = (): MatchingFlowSnapshot => {
   if (!globalThis.window) return {};
 
@@ -82,17 +91,16 @@ const readMatchingFlowSnapshot = (): MatchingFlowSnapshot => {
   }
 };
 
-const resolveAddress = (answers: any): string => {
-  if (!answers) return "";
-  if (typeof answers.address === "string") return answers.address;
-  return (
-    answers?.address?.display_name ||
-    answers?.address?.address?.display_name ||
-    answers?.matchingRequest?.address?.display_name ||
-    answers?.matchingRequest?.address?.address ||
-    answers?.matchingRequest?.address?.formatted ||
-    ""
-  );
+const resolveAddress = (request: any): string => {
+  if (!request) return "";
+  if (typeof request.address === "string") return request.address;
+  return [
+    request?.address?.road,
+    request?.address?.number ?? "",
+    request?.address?.neighbourhood ?? "",
+    request?.address?.city ?? "",
+    request?.address?.postcode,
+  ].join(" ");
 };
 
 const resolveDayNote = (answers: any, weekday: number): string | undefined =>
@@ -104,11 +112,9 @@ const buildMatchingSummary = (slots: SlotPricing[]): SummaryRow[] => {
   const grouped = new Map<number, string[]>();
 
   slots.forEach(({ slot }) => {
-    const weekday = new Date(`${slot.date}T00:00:00Z`).getUTCDay();
+    const weekday = toUtcDate(slot.date).getUTCDay();
     const current = grouped.get(weekday) ?? [];
-    current.push(
-      `${formatCompactDate(new Date(`${slot.date}T00:00:00Z`))} • ${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}`,
-    );
+    current.push(formatSlotLabel(slot));
     grouped.set(weekday, current);
   });
 
@@ -120,23 +126,15 @@ const buildMatchingSummary = (slots: SlotPricing[]): SummaryRow[] => {
     }));
 };
 
-const BookingPaymentReviewComponent = ({
-  bookingId,
-}: BookingPaymentReviewComponentProps) => {
+const BookingPaymentReviewComponent = () => {
   const router = useRouter();
   const { showLoader, hideLoader } = useAppStore();
   const { openModal, payload } = useModalStore();
-  const { bookings } = useBookingsStore();
 
   const [flowSnapshot] = useState<MatchingFlowSnapshot>(() =>
     readMatchingFlowSnapshot(),
   );
   const [vigilServices, setVigilServices] = useState<ServiceI[]>([]);
-
-  const booking = useMemo(
-    () => bookings.find((item) => item.id === bookingId),
-    [bookings, bookingId],
-  );
 
   const answers = flowSnapshot.answers;
   const response = flowSnapshot.response;
@@ -178,7 +176,7 @@ const BookingPaymentReviewComponent = ({
     if (!hasMatchingData) return [];
 
     return slotDetails.map((slot) => {
-      const weekday = new Date(`${slot.date}T00:00:00Z`).getUTCDay();
+      const weekday = toUtcDate(slot.date).getUTCDay();
       const matched = vigilServices.find(
         (service) => service.type === slot.service,
       );
@@ -202,39 +200,33 @@ const BookingPaymentReviewComponent = ({
     if (hasMatchingData) {
       return buildMatchingSummary(slotsWithPricing);
     }
-
-    const startDate = booking?.startDate ? new Date(booking.startDate) : null;
-    const endDate = booking?.endDate ? new Date(booking.endDate) : null;
-
-    if (!startDate) return [];
-
-    return [
-      {
-        weekdayLabel: "Data servizio",
-        ranges: endDate
-          ? `${dateDisplay(startDate, "dateTime")} - ${dateDisplay(endDate, "dateTime")}`
-          : dateDisplay(startDate, "dateTime"),
-      },
-    ];
-  }, [booking?.endDate, booking?.startDate, hasMatchingData, slotsWithPricing]);
+    return [];
+  }, [hasMatchingData, slotsWithPricing]);
 
   const address =
-    resolveAddress(answers) || booking?.address || "Indirizzo non disponibile";
-  const totalPrice = hasMatchingData
-    ? typeof best?.totalPrice === "number"
-      ? best.totalPrice
-      : slotsWithPricing.reduce((acc, item) => acc + item.subtotal, 0)
-    : booking?.price || 0;
+    resolveAddress(answers?.matchingRequest) || "Indirizzo non disponibile";
+  let totalPrice = 0;
+  if (hasMatchingData) {
+    totalPrice =
+      typeof best?.totalPrice === "number"
+        ? best.totalPrice
+        : slotsWithPricing.reduce((acc, item) => acc + item.subtotal, 0);
+  }
 
   const firstSlot = slotsWithPricing[0];
   const plannedSlots = slotsWithPricing.slice(1);
   const dateRangeLabel = hasMatchingData
-    ? slotDetails.length > 0
-      ? `${formatCompactDate(new Date(`${slotDetails[0].date}T00:00:00Z`))} - ${formatCompactDate(new Date(`${slotDetails[slotDetails.length - 1].date}T00:00:00Z`))}`
-      : "Da pianificare"
-    : booking?.startDate
-      ? dateDisplay(booking.startDate, "dateTime")
-      : "-";
+    ? formatSlotDateRange(slotDetails)
+    : "-";
+  const activeFromLabel = best?.activeFrom
+    ? dateDisplay(best.activeFrom, "monthYearLiteral")
+    : null;
+  const activeFromNode = activeFromLabel ? (
+    <span className="text-xs text-gray-500">Attivo da {activeFromLabel}</span>
+  ) : null;
+  const firstSlotDateLabel = firstSlot?.slot
+    ? formatCompactDate(toUtcDate(firstSlot.slot.date))
+    : null;
 
   const openVigilModal = () => {
     if (!best?.id) return;
@@ -256,7 +248,7 @@ const BookingPaymentReviewComponent = ({
     activeFrom?: string;
   };
 
-  if (!best && !booking) {
+  if (!best) {
     return <div className="h-12 rounded-lg bg-gray-100 animate-pulse" />;
   }
 
@@ -294,17 +286,12 @@ const BookingPaymentReviewComponent = ({
                 className="flex w-full items-start gap-3 text-left"
               >
                 <div className="w-16 h-16 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
-                  <Avatar
-                    userId={best?.id || booking?.vigil_id || bookingId}
-                    size="big"
-                  />
+                  <Avatar userId={best?.id} size="big" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-medium text-gray-900">
-                      {best?.displayName ||
-                        booking?.vigil?.displayName ||
-                        "Caregiver assegnato"}
+                      {best?.displayName || "Caregiver assegnato"}
                     </p>
                     {best?.reviewCount ? (
                       <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -314,12 +301,9 @@ const BookingPaymentReviewComponent = ({
                         </span>
                         <span>| {best.reviewCount} recensioni</span>
                       </div>
-                    ) : best?.activeFrom ? (
-                      <span className="text-xs text-gray-500">
-                        Attivo da{" "}
-                        {dateDisplay(best.activeFrom, "monthYearLiteral")}
-                      </span>
-                    ) : null}
+                    ) : (
+                      activeFromNode
+                    )}
                   </div>
                 </div>
               </button>
@@ -345,8 +329,8 @@ const BookingPaymentReviewComponent = ({
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <MapPinIcon className="h-8 w-8 text-consumer-blue" />
-                <span className="text-sm">{capitalize(address)}</span>
+                <MapPinIcon className="h-5 w-5 text-consumer-blue" />
+                <span className="text-sm">{address}</span>
               </div>
             </div>
           </div>
@@ -373,31 +357,32 @@ const BookingPaymentReviewComponent = ({
           </div>
 
           <div className="space-y-3 px-3 py-4 text-sm text-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-gray-900">
-                  {firstSlot?.slot
-                    ? `${formatCompactDate(new Date(`${firstSlot.slot.date}T00:00:00Z`))}`
-                    : "Prima disponibilità"}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {firstSlot?.slot
-                    ? `${formatTime(firstSlot.slot.startTime)} - ${formatTime(firstSlot.slot.endTime)}`
-                    : dateRangeLabel}
-                </p>
-                {firstSlot?.matched?.name && (
-                  <p className="text-xs text-gray-500">
-                    {firstSlot.matched.name}
+            {slotsWithPricing.map((slot, index) => (
+              <div
+                key={"slot_" + index}
+                className="flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-gray-900">
+                    {formatCompactDate(toUtcDate(slot.slot.date))}
                   </p>
-                )}
-                {firstSlot?.note && (
-                  <p className="text-xs text-gray-500">{firstSlot.note}</p>
-                )}
+                  <p className="text-xs text-gray-500">
+                    {slot?.slot
+                      ? `${formatTime(slot.slot.startTime)} - ${formatTime(slot.slot.endTime)}`
+                      : dateRangeLabel}
+                  </p>
+                  {slot?.matched?.name && (
+                    <p className="text-xs text-gray-500">{slot.matched.name}</p>
+                  )}
+                  {slot?.note && (
+                    <p className="text-xs text-gray-500">{slot.note}</p>
+                  )}
+                </div>
+                <p className="text-base font-bold text-gray-900">
+                  {amountDisplay(slot?.subtotal ?? totalPrice)} EUR
+                </p>
               </div>
-              <p className="text-base font-bold text-gray-900">
-                {amountDisplay(firstSlot?.subtotal ?? totalPrice)} EUR
-              </p>
-            </div>
+            ))}
 
             <div className="flex items-center justify-between border-t border-consumer-blue/20 pt-3">
               <span className="font-semibold text-gray-900">
@@ -434,7 +419,7 @@ const BookingPaymentReviewComponent = ({
         </ul>
       </Card>
 
-      <Card customClass="rounded-3xl p-4 shadow-sm">
+      {/* <Card customClass="rounded-3xl p-4 shadow-sm">
         <div className="rounded-2xl border border-amber-200 bg-amber-50">
           <div className="flex items-center justify-between rounded-t-2xl bg-amber-100 px-3 py-2 text-amber-800">
             <div className="flex items-center gap-2 text-sm font-semibold">
@@ -492,7 +477,7 @@ const BookingPaymentReviewComponent = ({
             </div>
           </div>
         </div>
-      </Card>
+      </Card> */}
 
       <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-gray-100 bg-white/95 p-4 backdrop-blur-sm">
         <div className="mx-auto max-w-md">
@@ -503,14 +488,8 @@ const BookingPaymentReviewComponent = ({
             icon={<ArrowRightIcon className="h-4 w-4" />}
             label="Procedi con il pagamento"
             action={() => {
-              if (hasMatchingData) {
-                router.push(`${Routes.matchingSuccess.url}?confirm=true`);
-                return;
-              }
-
-              router.push(
-                `${Routes.paymentBooking.url}?bookingId=${booking?.id || bookingId || ""}`,
-              );
+              if (!hasMatchingData) return;
+              router.push(`${Routes.matchingSuccess.url}?confirm=true`);
             }}
           />
           <button
