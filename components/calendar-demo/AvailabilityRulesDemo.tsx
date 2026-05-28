@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import clsx from "clsx";
 import {
   VigilAvailabilityRuleI,
@@ -32,16 +32,36 @@ export const AvailabilityRulesDemo = ({
   const weekdays = getWeekdaysArray();
   const times = getTimeSlots(15); // 15-minute intervals
   const user = UserService.getUser();
+  const serializeRules = (nextRules: VigilAvailabilityRuleI[]) =>
+    nextRules
+      .map((rule) =>
+        [
+          rule.id,
+          rule.weekday,
+          rule.start_time,
+          rule.end_time,
+          rule.valid_from || "",
+          rule.valid_to || "",
+        ].join("|"),
+      )
+      .sort()
+      .join(";;");
+
   const [rules, setRules] = useState<VigilAvailabilityRuleI[]>(
     () => availabilityRules ?? [],
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastSyncedRulesSignatureRef = useRef<string>(
+    serializeRules(availabilityRules ?? []),
+  );
 
   // Propagate local rules to parent answers so the parent can decide
   // when to persist them (e.g. when user moves to next step).
   useEffect(() => {
-    if (setAnswers) {
+    const nextSignature = serializeRules(rules);
+    if (setAnswers && nextSignature !== lastSyncedRulesSignatureRef.current) {
+      lastSyncedRulesSignatureRef.current = nextSignature;
       setAnswers((prev) => ({ ...prev, availabilityRules: rules }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,6 +70,9 @@ export const AvailabilityRulesDemo = ({
   // If parent provides availabilityRules (e.g. from answers object), keep local state in sync
   useEffect(() => {
     if (availabilityRules) {
+      const nextSignature = serializeRules(availabilityRules);
+      if (nextSignature === lastSyncedRulesSignatureRef.current) return;
+      lastSyncedRulesSignatureRef.current = nextSignature;
       setRules(availabilityRules);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

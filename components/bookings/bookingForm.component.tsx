@@ -405,7 +405,7 @@ const BookingFormComponent = (props: BookingFormComponentI) => {
           closeModal();
         } else {
           router.push(
-            `${Routes.paymentBooking.url}?bookingId=${newBooking.id}`,
+            `${Routes.paymentBookingReview.url}?bookingId=${newBooking.id}`,
           );
         }
       } catch (error) {

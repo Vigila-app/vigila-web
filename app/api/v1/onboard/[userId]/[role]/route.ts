@@ -52,6 +52,7 @@ export async function POST(
         "bio",
         "propic",
         "transportation",
+        "phone",
       ]);
       const nonSavableKeys = new Set(["zones", "time_committment", "type"]);
 

@@ -56,7 +56,9 @@ const ProfileComponent = () => {
   const isVigil = role === RolesEnum.VIGIL;
   const vigil = vigils?.find((v) => v.id === user?.id);
 
-  const pendingBookings = bookings.filter((b) => b.status === "pending");
+  // DEPRECATED: counter pending booking — i nuovi booking nascono CONFIRMED,
+  // il vigil non ha più richieste in attesa di approvazione.
+  // const pendingBookings = bookings.filter((b) => b.status === "pending");
 
   const tabs: TabItem[] = [
     {
@@ -68,8 +70,9 @@ const ProfileComponent = () => {
         <CurrencyEuroIcon
           className={clsx(
             "size-6",
-            pendingBookings.length > 0 && "text-red-500",
-            isVigil && pendingBookings.length > 0 && "animate-bounce",
+            // DEPRECATED: badge/animazione per booking PENDING.
+            // pendingBookings.length > 0 && "text-red-500",
+            // isVigil && pendingBookings.length > 0 && "animate-bounce",
           )}
         />
       ),

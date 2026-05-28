@@ -41,12 +41,14 @@ export default function MatchingLoadingPage() {
         const stored = readStoredAnswers();
         if (!stored) {
           console.warn("No matching answers found in sessionStorage");
+          router.replace(Routes.matchingNoMatch.url);
           return;
         }
         const { answers } = stored;
         const user = await UserService.getUser();
         if (!user?.id) {
           console.warn("No authenticated user for matching");
+          if (mounted) setError("Devi essere autenticato per cercare un match");
           return;
         }
         // Ensure we have a built matchingRequest (includes `schedule`) and persist it.
@@ -91,9 +93,13 @@ export default function MatchingLoadingPage() {
           router.replace(Routes.matchingSuccess.url);
           return;
         }
+        console.warn("Unexpected matching response shape, falling back", resp);
+        persistStoredAnswers(answers, matchingRequest);
+        router.replace(Routes.matchingNoMatch.url);
       } catch (err: any) {
         console.error("Matching call failed in loading page", err);
         if (mounted) setError(err?.message || String(err));
+        router.replace(Routes.matchingNoMatch.url);
       }
     };
     run();

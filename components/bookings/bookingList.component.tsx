@@ -203,18 +203,20 @@ const BookingListComponent = () => {
                 label="Paga ora"
                 action={() =>
                   router.push(
-                    `${Routes.paymentBooking.url}?bookingId=${booking.id}`,
+                    `${Routes.paymentBookingReview.url}?bookingId=${booking.id}`,
                   )
                 }
               />
             )}
-          {booking.status === BookingStatusEnum.PENDING && isConsumer && (
+          {/* DEPRECATED: edit consumer su booking PENDING — i nuovi booking sono
+              CONFIRMED e si modificano con la regola endDate>24h dedicata. */}
+          {/* {booking.status === BookingStatusEnum.PENDING && isConsumer && (
             <Button
               text
               label="Edit"
               action={() => openModal("booking-form", { booking })}
             />
-          )}
+          )} */}
         </div>
         {/* Review button for completed bookings */}
         {booking.status === BookingStatusEnum.COMPLETED && isConsumer && (

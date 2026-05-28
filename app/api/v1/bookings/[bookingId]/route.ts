@@ -30,12 +30,14 @@ const verifyBookingAccess = async (
     .eq("id", bookingId)
     .single();
 
-  if (error)
+  if (error) {
+    console.log(error);
     throw jsonErrorResponse(500, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
       success: false,
       error,
     });
+  }
 
   if (!data)
     throw jsonErrorResponse(404, {

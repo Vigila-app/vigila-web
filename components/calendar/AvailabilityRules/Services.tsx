@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { CurrentDay } from "./CurrentDay";
 import { SelectedDays } from "./SelectedDays";
@@ -30,6 +29,24 @@ export const Services = ({
   role?: RolesEnum;
   isLastStep?: boolean;
 }) => {
+  const serializeDayService = (
+    value:
+      | {
+          weekday?: number;
+          services?: string | null;
+          car?: boolean;
+          notes?: string;
+        }
+      | null
+      | undefined,
+  ) =>
+    [
+      value?.weekday ?? "",
+      value?.services ?? "",
+      value?.car ? "1" : "0",
+      value?.notes ?? "",
+    ].join("|");
+
   const selectedDays = useMemo(
     () =>
       Array.from(
@@ -41,6 +58,7 @@ export const Services = ({
   ) as number[];
 
   const isHydratingDayRef = useRef(false);
+  const lastSyncedDayRef = useRef<string | null>(null);
 
   const [currentDayIdx, setCurrentDayIdx] = useState(() => {
     const initialIdx = Number(answers?.servicesCurrentDayIdx ?? 0);
@@ -69,6 +87,7 @@ export const Services = ({
     const day = selectedDays[currentDayIdx];
     isHydratingDayRef.current = true;
     const saved = answers?.services?.[day];
+    lastSyncedDayRef.current = serializeDayService(saved || null);
     if (saved) {
       setSelectedService(saved.services);
       setCar(!!saved.car);
@@ -89,15 +108,20 @@ export const Services = ({
     const day = selectedDays[currentDayIdx];
     if (!setAnswers || day === undefined) return;
 
+    const nextDayValue = {
+      weekday: Number(day),
+      services: selectedService,
+      car: !!car,
+      notes: notes || "",
+    };
+    const nextSignature = serializeDayService(nextDayValue);
+    if (nextSignature === lastSyncedDayRef.current) return;
+    lastSyncedDayRef.current = nextSignature;
+
     setAnswers((prev: Record<string, any>) => {
       const next = { ...prev };
       next.services = { ...next.services };
-      next.services[day] = {
-        weekday: Number(day),
-        services: selectedService,
-        car: !!car,
-        notes: notes || "",
-      };
+      next.services[day] = nextDayValue;
       return next;
     });
   }, [car, currentDayIdx, notes, selectedDays, selectedService, setAnswers]);
@@ -154,14 +178,21 @@ export const Services = ({
 
         <div className="mt-6 flex items-center justify-between gap-3">
           <p className="text-xs text-zinc-500 self-center">
-            Premi Avanti per salvare questo giorno e passare al successivo.
+            {isLastStep && isLastDay
+              ? "Premi Avanti per avviare la ricerca del match."
+              : "Premi Prossimo giorno per salvare e passare al giorno successivo."}
           </p>
           {isLastStep && isLastDay && (
-            <span className="text-xs font-medium text-consumer-blue">
-              Ultimo giorno disponibile
+            <span className="text-xs font-medium text-consumer-blue whitespace-nowrap">
+              Ultimo giorno
             </span>
           )}
         </div>
+        {!selectedService && (
+          <p className="mt-3 text-xs text-amber-600">
+            Seleziona almeno un servizio per proseguire.
+          </p>
+        )}
       </div>
     </div>
   );
