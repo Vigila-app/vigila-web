@@ -23,7 +23,7 @@ import {
 import { CheckoutForm } from "@/components/checkout";
 import { Avatar } from "@/components";
 import { ModalPortalComponent } from "@/components/@core";
-import VigilInfoModal from "@/components/matching/VigilInfoModal";
+import VigilProfileModal from "@/components/matching/VigilProfileModal";
 import { dateDisplay } from "@/src/utils/date.utils";
 import { amountDisplay } from "@/src/utils/common.utils";
 import { calculateSlotDurationHours } from "@/src/utils/calendar.utils";
@@ -145,22 +145,10 @@ function MatchingSuccessContent() {
 
   const openVigilModal = (vigilSlots: any) => {
     if (!vigilSlots?.id) return;
-    openModal("vigil-info", {
-      vigilId: vigilSlots.id,
-      displayName: vigilSlots.displayName,
-      averageRating: vigilSlots.averageRating,
-      reviewCount: vigilSlots.reviewCount,
-      activeFrom: vigilSlots.activeFrom,
-    });
+    openModal("vigil-profile", { vigilId: vigilSlots.id });
   };
 
-  const vigilModalPayload = payload as {
-    vigilId?: string;
-    displayName?: string;
-    averageRating?: number;
-    reviewCount?: number;
-    activeFrom?: string;
-  };
+  const vigilModalPayload = payload as { vigilId?: string };
 
   const handleConfirm = async () => {
     setError("");
@@ -718,11 +706,11 @@ function MatchingSuccessContent() {
       </div>
 
       <ModalPortalComponent
-        modalId="vigil-info"
+        modalId="vigil-profile"
         closable
-        customClass="md:max-w-2xl"
+        customClass="md:max-w-3xl"
       >
-        <VigilInfoModal {...vigilModalPayload} />
+        <VigilProfileModal vigilId={vigilModalPayload?.vigilId} />
       </ModalPortalComponent>
     </div>
   );

@@ -3,13 +3,32 @@ import { useAppStore } from "@/src/store/app/app.store";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { ToastI } from "@/src/types/toast.type";
 import { AccessLevelsEnum, UserStatusEnum } from "../enums/roles.enums";
+import {
+  VigilZoneCaps,
+  VigilZoneEnum,
+  VigilZoneLabels,
+} from "../enums/onboarding.enums";
+
+export const getVigilZoneLabelsFromCaps = (
+  caps?: string[] | null,
+): string[] => {
+  if (!caps?.length) return [];
+  const capSet = new Set(caps);
+  const labels: string[] = [];
+  (Object.keys(VigilZoneCaps) as VigilZoneEnum[]).forEach((zone) => {
+    if (VigilZoneCaps[zone].some((cap) => capSet.has(cap))) {
+      labels.push(VigilZoneLabels[zone]);
+    }
+  });
+  return labels;
+};
 
 export const isServer = typeof window === "undefined";
 
 export const downloadFile = (
   file: string,
   fileName: string,
-  target = "file-target"
+  target = "file-target",
 ) => {
   const link = document.createElement("a");
   link.setAttribute("href", file);
@@ -95,7 +114,7 @@ export const encodeFile = (base64: string) => {
 export const resizeImage = (
   base64: string,
   height: number = 250,
-  width: number = 250
+  width: number = 250,
 ) =>
   new Promise(function (resolve) {
     var img = new Image();
@@ -116,7 +135,7 @@ export const copyToClipboard = async (
   customToast: ToastI = {
     message: "Content copied succesfully!",
     type: ToastStatusEnum.SUCCESS,
-  }
+  },
 ) => {
   try {
     if (!isServer) await navigator.clipboard.writeText(text);
@@ -131,7 +150,7 @@ export const copyToClipboard = async (
 export const replaceDynamicUrl = (
   url: string,
   valueToReplace: string,
-  dynamicValue: string | number
+  dynamicValue: string | number,
 ) => url.replace(valueToReplace, (dynamicValue || "").toString());
 
 export const shareContent = ({
@@ -182,7 +201,7 @@ export const timestampToDate = (timestamp: any) => {
       // @ts-ignore
       (timestamp.seconds || timestamp["_seconds"]) * 1000 +
         // @ts-ignore
-        (timestamp.nanoseconds || timestamp["_nanoseconds"]) / 1000000
+        (timestamp.nanoseconds || timestamp["_nanoseconds"]) / 1000000,
     );
   } catch (error) {
     console.error("transformTimestamp error:", error);
@@ -200,14 +219,15 @@ export const formatBookingDate = (dateString: string): string => {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
-  
+
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 export const toPascalCase = (text: string): string => {
   return text
-    .replace(/(\w)(\w*)/g, (_, firstChar, rest) => 
-      firstChar.toUpperCase() + rest.toLowerCase()
+    .replace(
+      /(\w)(\w*)/g,
+      (_, firstChar, rest) => firstChar.toUpperCase() + rest.toLowerCase(),
     )
     .replace(/\s+/g, "");
 };
@@ -250,7 +270,7 @@ const timeouts = new Map<string, NodeJS.Timeout>();
 export const debounce = (
   key: string,
   callback: (...args: any) => void,
-  delay = 500
+  delay = 500,
 ) => {
   // Cancella il timeout precedente per questa chiave specifica
   const existingTimeout = timeouts.get(key);
@@ -318,6 +338,6 @@ export function mergeGoogleAndFormData(googleRawData: any, formData: any) {
     status: UserStatusEnum.PENDING,
     displayName: sourceName,
     terms: formData.terms,
-    email_verified: true, 
+    email_verified: true,
   };
 }

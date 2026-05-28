@@ -6,8 +6,10 @@ import { useBookingsStore } from "@/src/store/bookings/bookings.store";
 import { useUserStore } from "@/src/store/user/user.store";
 import { UserService } from "@/src/services";
 import { useVigilStore } from "@/src/store/vigil/vigil.store";
+import { getVigilZoneLabelsFromCaps } from "@/src/utils/common.utils";
 import {
   EnvelopeIcon,
+  GlobeEuropeAfricaIcon,
   HeartIcon,
   MapPinIcon,
   PhoneIcon,
@@ -19,7 +21,11 @@ import { Controller, useForm } from "react-hook-form";
 import { ToastStatusEnum } from "@/src/enums/toast.enum";
 import { useAppStore } from "@/src/store/app/app.store";
 
-const PanoramicaTab = () => {
+interface PanoramicaTabProps {
+  vigilId?: string;
+}
+
+const PanoramicaTab = ({ vigilId: vigilIdProp }: PanoramicaTabProps = {}) => {
   const { vigils, getVigilsDetails } = useVigilStore();
   const { bookings, getBookings } = useBookingsStore();
   const { user, userDetails } = useUserStore();
@@ -31,8 +37,8 @@ const PanoramicaTab = () => {
     () =>
       user?.user_metadata?.role === RolesEnum.VIGIL
         ? user?.id
-        : vigilIdFromParams,
-    [user?.user_metadata?.role, user?.id, vigilIdFromParams]
+        : (vigilIdProp ?? vigilIdFromParams),
+    [user?.user_metadata?.role, user?.id, vigilIdProp, vigilIdFromParams],
   );
 
   const isVigil = user?.user_metadata?.role === RolesEnum.VIGIL;
@@ -48,7 +54,7 @@ const PanoramicaTab = () => {
   const vigil = vigils.find((v) => v.id === vigilId);
 
   type ProfileFormI = {
-    information: string;
+    bio: string;
   };
   const {
     control,
@@ -58,27 +64,23 @@ const PanoramicaTab = () => {
     reset,
   } = useForm<ProfileFormI>({
     defaultValues: {
-      information: userDetails?.information || "",
+      bio: userDetails?.bio || "",
     },
   });
   useEffect(() => {
     if (userDetails && isEditing) {
       reset({
-        information: userDetails.information || "",
+        bio: userDetails.bio || "",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userDetails, isEditing, reset]);
 
   const onSubmit = async (formData: ProfileFormI) => {
     if (isValid) {
       try {
-        const { information } = formData;
-        if (
-          information !== userDetails?.information &&
-          information.length > 0
-        ) {
-          await UserService.updateUser({}, { information });
+        const { bio } = formData;
+        if (bio !== userDetails?.bio && bio.length > 0) {
+          await UserService.updateUser({}, { bio });
           if (vigilId) {
             await getVigilsDetails([vigilId], true);
           }
@@ -87,13 +89,13 @@ const PanoramicaTab = () => {
             message: "Profile updated successfully",
             type: ToastStatusEnum.SUCCESS,
           });
-        } else if (information === userDetails?.information) {
-          setError("information", {
+        } else if (bio === userDetails?.bio) {
+          setError("bio", {
             type: "custom",
             message: "Must insert different new info to update profile",
           });
-        } else if (information.length === 0) {
-          setError("information", {
+        } else if (bio.length === 0) {
+          setError("bio", {
             type: "custom",
             message: "Must insert info to update profile",
           });
@@ -111,10 +113,15 @@ const PanoramicaTab = () => {
   const completedBookings = bookings.filter((b) => b.status === "completed");
   const numberCompletedBookings = completedBookings.length;
 
+  const servedZones = useMemo(
+    () => getVigilZoneLabelsFromCaps(vigil?.cap),
+    [vigil?.cap],
+  );
+
   // parte da 0 e per ogni elemento di completedBookings somma il risultato di prezzo- vigila fee. Se .leght=0 allora reduce usa default 0
   const totalEarnings = completedBookings.reduce(
     (total, booking) => total + (booking.price - booking.fee),
-    0
+    0,
   );
   return (
     <section className="py-4 bg-gray-100 w-full flex flex-col gap-6 rounded-b-2xl">
@@ -138,20 +145,20 @@ const PanoramicaTab = () => {
         {!isEditing ? (
           <div>
             <p className="font-medium leading-relaxed break-words text-sm">
-              {vigil?.information}
+              {vigil?.bio}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
-              name="information"
+              name="bio"
               control={control}
               rules={{ maxLength: 650 }}
               render={({ field }) => (
                 <TextArea
                   type="text"
-                  aria-invalid={!!errors.information}
-                  error={errors.information}
+                  aria-invalid={!!errors.bio}
+                  error={errors.bio}
                   {...field}
                   label=""
                 />
@@ -235,6 +242,30 @@ const PanoramicaTab = () => {
             </span>
           </div>
         </div>
+      </Card>
+      <Card>
+        <div className="flex flex-row items-center gap-2 pb-3">
+          <GlobeEuropeAfricaIcon className="size-6 text-consumer-blue" />
+          <h3 className="text-lg font-semibold">Zone servite</h3>
+        </div>
+        {servedZones.length > 0 ? (
+          <ul className="flex flex-wrap gap-2">
+            {servedZones.map((zone) => (
+              <li
+                key={zone}
+                className="inline-flex items-center text-sm font-medium rounded-full px-3 py-1 bg-orange-50 border border-orange-200 text-orange-800"
+              >
+                {zone}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {isVigil
+              ? "Non hai ancora indicato le zone in cui sei disponibile."
+              : "Nessuna zona indicata."}
+          </p>
+        )}
       </Card>
     </section>
   );
