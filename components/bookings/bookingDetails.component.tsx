@@ -452,7 +452,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               icon={<XMarkIcon className="w-5 h-5" />}
             />
           )}
-          {booking.status === BookingStatusEnum.CONFIRMED &&
+          {isConsumer &&
+            booking.status === BookingStatusEnum.CONFIRMED &&
             booking.payment_status === PaymentStatusEnum.PAID &&
             vigil?.phone && (
               <div className="mt-4 items-center border-gray-100">
