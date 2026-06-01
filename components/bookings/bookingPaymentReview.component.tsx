@@ -376,18 +376,18 @@ const BookingPaymentReviewComponent = () => {
         <ul className="space-y-1 text-xs text-red-700">
           <li className="flex items-start gap-2">
             <ExclamationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" />
-            Riceverai la conferma della prenotazione appena il pagamento sarà
-            completato.
+            Inviamo la richiesta al vigil selezionato.
           </li>
           <li className="flex items-start gap-2 text-red-700">
             <ExclamationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" />
-            Se il pagamento non va a buon fine, potrai riprovare senza perdere i
-            dati del flusso.
+            Dopo il pagamento, potrai visualizzare il numero del vigil cliccando
+            sulla prenotazione dal tuo profilo.
           </li>
           <li className="flex items-start gap-2 text-red-700">
             <ExclamationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" />
-            Le settimane successive resteranno pianificate in base alle tue
-            risposte di disponibilità.
+            Se l&apos;assistente annulla la prenotazione, riceverai un rimborso
+            completo oppure contatta l&apos;assistenza per un&apos;alternativa
+            compatibile.
           </li>
         </ul>
       </Card>
