@@ -380,9 +380,11 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
           <div className="bg-yellow-50 rounded-2xl p-4 border border-yellow-100 flex gap-3">
             <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500 flex-shrink-0" />
             <p className="text-xs text-yellow-800 leading-relaxed font-normal">
-              <span className="font-bold">Policy:</span> Cancellazione gratuita
-              entro 24 ore prima. Dopo tale termine verrà applicata una penale
-              del 50% a conpenso dell&apos;operatore. Hai sempre il controllo!
+              <span className="font-bold">Policy:</span>Puoi cancellare
+              gratuitamente entro 24 ore dalla prenotazione. Dal momento in cui
+              avvii la chiamata con il tuo Vigil, la fee di servizio non è
+              rimborsabile — il resto dell&apos;importo ti verrà restituito
+              integralmente.
             </p>
           </div>
         )}
@@ -450,7 +452,8 @@ const BookingDetailsComponent = (props: BookingDetailsComponentI) => {
               icon={<XMarkIcon className="w-5 h-5" />}
             />
           )}
-          {booking.status === BookingStatusEnum.CONFIRMED &&
+          {isConsumer &&
+            booking.status === BookingStatusEnum.CONFIRMED &&
             booking.payment_status === PaymentStatusEnum.PAID &&
             vigil?.phone && (
               <div className="mt-4 items-center border-gray-100">
