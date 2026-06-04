@@ -613,6 +613,7 @@
     "url": "https://wa.me/393292130529?text=Salve%2C%20ho%20bisogno%20di%20assistenza%20cliente%21",
     "label": "Servizio Clienti",
     "title": "Servizio Clienti",
+    "target": "_blank",
     "menu": {
       "mobile": true,
       "desktop": true,
@@ -620,7 +621,10 @@
       "footer": true
     },
     "private": false,
-    "roles": []
+    "roles": [],
+    "seo": {
+      "index": false
+    }
   },
   "termsConditions": {
     "url": "/termini-e-condizioni",
@@ -664,6 +668,21 @@
       "changeFrequency": "monthly",
       "priority": 0.8
     }
+  },
+  "accessibility": {
+    "url": "/accessibility",
+    "href": "#",
+    "label": "Accessibilità",
+    "title": "Accessibilità",
+    "id": "accessibility-link",
+    "menu": {
+      "mobile": true,
+      "desktop": true,
+      "header": false,
+      "footer": true
+    },
+    "private": false,
+    "roles": []
   },
   "playground": {
     "url": "/playground",

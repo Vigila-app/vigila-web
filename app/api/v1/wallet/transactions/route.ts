@@ -74,13 +74,13 @@ export async function GET(req: NextRequest) {
       .from("wallets")
       .select("balance_cents")
       .eq("user_id", userObject.id)
-      .single();
+      .maybeSingle();
 
-    if (walletError) {
+    if (walletError || !wallet) {
       return jsonErrorResponse(500, {
         code: ResponseCodesConstants.WALLET_NOT_FOUND.code,
         success: false,
-        message: "Failed to fetch wallet",
+        message: `Failed to fetch wallet: ${!wallet ? "Wallet not found" : (walletError as any)?.message || "generic error"}`,
       });
     }
 

@@ -36,6 +36,7 @@ const HtmlDocument = (props: HtmlDocumentI) => {
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
           <link rel="manifest" href="/manifest.json" />
+          {/* Temporary remove Leaflet import
           <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -46,7 +47,7 @@ const HtmlDocument = (props: HtmlDocumentI) => {
             src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossOrigin=""
-          ></script>
+          ></script> */}
           {GTM_ID && (
             <Script
               id="gtm-script"
@@ -61,6 +62,12 @@ const HtmlDocument = (props: HtmlDocumentI) => {
               `,
               }}
             />
+          )}
+          {process.env.NEXT_PUBLIC_USERWAY_ID && (
+            <script
+              src="https://cdn.userway.org/widget.js"
+              data-account={process.env.NEXT_PUBLIC_USERWAY_ID}
+            ></script>
           )}
           {otherHead}
         </head>
