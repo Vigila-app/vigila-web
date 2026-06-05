@@ -43,7 +43,7 @@ const MenuMobile = () => {
     Icon?: React.ElementType,
     internal = true,
   ) => {
-    if (!route.url && !route.href) {
+    if (!route?.url && !route?.href) {
       return null;
     }
     const className = clsx(
