@@ -516,6 +516,24 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   CONSUMER_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7806,
   },
+  CONSUMER_DATA_SUCCESS: {
+    code: 7811,
+  },
+  CONSUMER_DATA_ERROR: {
+    code: 7812,
+  },
+  CONSUMER_DATA_BAD_REQUEST: {
+    code: 7813,
+  },
+  CONSUMER_DATA_UNAUTHORIZED: {
+    code: 7814,
+  },
+  CONSUMER_DATA_FORBIDDEN: {
+    code: 7815,
+  },
+  CONSUMER_DATA_NOT_FOUND: {
+    code: 7816,
+  },
   // endregion CONSUMER
 
   // region VIGIL
@@ -537,5 +555,243 @@ export const ResponseCodesConstants: { [key: string]: ErrorI } = {
   VIGIL_DETAILS_METHOD_NOT_ALLOWED: {
     code: 7906,
   },
+  VIGIL_DATA_SUCCESS: {
+    code: 7911,
+  },
+  VIGIL_DATA_ERROR: {
+    code: 7912,
+  },
+  VIGIL_DATA_BAD_REQUEST: {
+    code: 7913,
+  },
+  VIGIL_DATA_UNAUTHORIZED: {
+    code: 7914,
+  },
+  VIGIL_DATA_FORBIDDEN: {
+    code: 7915,
+  },
+  VIGIL_DATA_NOT_FOUND: {
+    code: 7916,
+  },
   // endregion VIGIL
-}
+
+  // region PUBLIC SEARCH
+  PUBLIC_SEARCH_SUCCESS: {
+    code: 8101,
+  },
+  PUBLIC_SEARCH_ERROR: {
+    code: 8102,
+  },
+  PUBLIC_SEARCH_BAD_REQUEST: {
+    code: 8103,
+  },
+  PUBLIC_SEARCH_METHOD_NOT_ALLOWED: {
+    code: 8106,
+  },
+  // endregion PUBLIC SEARCH
+
+  // region NOTICE BOARD
+  NOTICE_BOARD_SUCCESS: {
+    code: 8201,
+  },
+  NOTICE_BOARD_ERROR: {
+    code: 8202,
+  },
+  NOTICE_BOARD_BAD_REQUEST: {
+    code: 8203,
+  },
+  NOTICE_BOARD_UNAUTHORIZED: {
+    code: 8204,
+  },
+  NOTICE_BOARD_METHOD_NOT_ALLOWED: {
+    code: 8206,
+  },
+  // endregion NOTICE BOARD
+
+  // region CALENDAR
+  // Consumer Calendar
+  CONSUMER_CALENDAR_SUCCESS: {
+    code: 10001,
+  },
+  CONSUMER_CALENDAR_ERROR: {
+    code: 10002,
+  },
+  CONSUMER_CALENDAR_UNAUTHORIZED: {
+    code: 10003,
+  },
+  CONSUMER_CALENDAR_FORBIDDEN: {
+    code: 10004,
+  },
+
+  // Vigil Calendar
+  VIGIL_CALENDAR_SUCCESS: {
+    code: 10101,
+  },
+  VIGIL_CALENDAR_ERROR: {
+    code: 10102,
+  },
+  VIGIL_CALENDAR_UNAUTHORIZED: {
+    code: 10103,
+  },
+  VIGIL_CALENDAR_FORBIDDEN: {
+    code: 10104,
+  },
+
+  // Availability Rules - List
+  AVAILABILITY_RULES_LIST_SUCCESS: {
+    code: 10201,
+  },
+  AVAILABILITY_RULES_LIST_ERROR: {
+    code: 10202,
+  },
+  AVAILABILITY_RULES_LIST_UNAUTHORIZED: {
+    code: 10203,
+  },
+  AVAILABILITY_RULES_LIST_FORBIDDEN: {
+    code: 10204,
+  },
+
+  // Availability Rules - Create
+  AVAILABILITY_RULES_CREATE_SUCCESS: {
+    code: 10211,
+  },
+  AVAILABILITY_RULES_CREATE_ERROR: {
+    code: 10212,
+  },
+  AVAILABILITY_RULES_CREATE_BAD_REQUEST: {
+    code: 10213,
+  },
+  AVAILABILITY_RULES_CREATE_UNAUTHORIZED: {
+    code: 10214,
+  },
+  AVAILABILITY_RULES_CREATE_FORBIDDEN: {
+    code: 10215,
+  },
+  AVAILABILITY_RULES_MIN_DURATION_ERROR: {
+    code: 10216,
+  },
+  AVAILABILITY_RULES_OVERLAP_ERROR: {
+    code: 10217,
+  },
+
+  // Availability Rules - Update
+  AVAILABILITY_RULES_UPDATE_SUCCESS: {
+    code: 10221,
+  },
+  AVAILABILITY_RULES_UPDATE_ERROR: {
+    code: 10222,
+  },
+  AVAILABILITY_RULES_UPDATE_BAD_REQUEST: {
+    code: 10223,
+  },
+  AVAILABILITY_RULES_UPDATE_UNAUTHORIZED: {
+    code: 10224,
+  },
+  AVAILABILITY_RULES_UPDATE_FORBIDDEN: {
+    code: 10225,
+  },
+  AVAILABILITY_RULES_UPDATE_NOT_FOUND: {
+    code: 10226,
+  },
+
+  // Availability Rules - Delete
+  AVAILABILITY_RULES_DELETE_SUCCESS: {
+    code: 10231,
+  },
+  AVAILABILITY_RULES_DELETE_ERROR: {
+    code: 10232,
+  },
+  AVAILABILITY_RULES_DELETE_BAD_REQUEST: {
+    code: 10233,
+  },
+  AVAILABILITY_RULES_DELETE_UNAUTHORIZED: {
+    code: 10234,
+  },
+  AVAILABILITY_RULES_DELETE_FORBIDDEN: {
+    code: 10235,
+  },
+
+  // Unavailabilities - List
+  UNAVAILABILITIES_LIST_SUCCESS: {
+    code: 10301,
+  },
+  UNAVAILABILITIES_LIST_ERROR: {
+    code: 10302,
+  },
+  UNAVAILABILITIES_LIST_UNAUTHORIZED: {
+    code: 10303,
+  },
+  UNAVAILABILITIES_LIST_FORBIDDEN: {
+    code: 10304,
+  },
+
+  // Unavailabilities - Create
+  UNAVAILABILITIES_CREATE_SUCCESS: {
+    code: 10311,
+  },
+  UNAVAILABILITIES_CREATE_ERROR: {
+    code: 10312,
+  },
+  UNAVAILABILITIES_CREATE_BAD_REQUEST: {
+    code: 10313,
+  },
+  UNAVAILABILITIES_CREATE_UNAUTHORIZED: {
+    code: 10314,
+  },
+  UNAVAILABILITIES_CREATE_FORBIDDEN: {
+    code: 10315,
+  },
+  UNAVAILABILITIES_CREATE_OVERLAP: {
+    code: 10316,
+  },
+
+  // Unavailabilities - Delete
+  UNAVAILABILITY_DELETE_SUCCESS: {
+    code: 10321,
+  },
+  UNAVAILABILITY_DELETE_ERROR: {
+    code: 10322,
+  },
+  UNAVAILABILITY_DELETE_BAD_REQUEST: {
+    code: 10323,
+  },
+  UNAVAILABILITY_DELETE_UNAUTHORIZED: {
+    code: 10324,
+  },
+  UNAVAILABILITY_DELETE_FORBIDDEN: {
+    code: 10325,
+  },
+
+  // Available Slots
+  AVAILABLE_SLOTS_SUCCESS: {
+    code: 10401,
+  },
+  AVAILABLE_SLOTS_ERROR: {
+    code: 10402,
+  },
+  AVAILABLE_SLOTS_BAD_REQUEST: {
+    code: 10403,
+  },
+  AVAILABLE_SLOTS_UNAUTHORIZED: {
+    code: 10404,
+  },
+  // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING_SUCCESS: {
+    code: 11001,
+  },
+  MATCHING_ERROR: {
+    code: 11002,
+  },
+  MATCHING_BAD_REQUEST: {
+    code: 11003,
+  },
+  MATCHING_UNAUTHORIZED: {
+    code: 11004,
+  },
+  MATCHING_FORBIDDEN: {
+    code: 11005,
+  },
+  // endregion MATCHING
+};

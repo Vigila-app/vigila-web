@@ -1,7 +1,15 @@
 import { FrequencyEnum } from "@/src/enums/common.enums";
 
-export const isValidDate = (dateToValidate: string | Date) =>
-  !isNaN(new Date(dateToValidate) as unknown as number);
+export const isValidDate = (dateToValidate: string | Date) => {
+  if (
+    dateToValidate === undefined ||
+    dateToValidate === null ||
+    dateToValidate === ""
+  )
+    return false;
+  const d = new Date(dateToValidate as any);
+  return !isNaN(d.getTime());
+};
 
 export const timestampToDate = (timestamp: any) => {
   try {
@@ -9,64 +17,69 @@ export const timestampToDate = (timestamp: any) => {
       // @ts-ignore
       (timestamp.seconds || timestamp["_seconds"]) * 1000 +
         // @ts-ignore
-        (timestamp.nanoseconds || timestamp["_nanoseconds"]) / 1000000
+        (timestamp.nanoseconds || timestamp["_nanoseconds"]) / 1000000,
     );
   } catch (error) {
     console.error("transformTimestamp error:", error);
   }
 };
 
-export const dateDisplay = (
-  dateToDisplay: string | Date,
-  format = "locale"
-): string => {
-  const date = isValidDate(dateToDisplay as unknown as string)
-    ? new Date(
+export const dateDisplay = (dateToDisplay: any, format = "locale"): string => {
+  if (!dateToDisplay) return "";
+
+  let date: Date | undefined;
+  // Try common cases: ISO string / Date / timestamp object
+  if (isValidDate(dateToDisplay)) {
+    try {
+      date = new Date(
         dateToDisplay
           .toString()
           .replace("T", " ")
           .replace("Z", "")
-          .replace(/(.+\+.*)$/, (str) => str.slice(0, -6))
-      )
-    : timestampToDate(dateToDisplay);
+          .replace(/(.+\+.*)$/, (str: string) => str.slice(0, -6)),
+      );
+    } catch (e) {
+      date = undefined;
+    }
+  } else {
+    date = timestampToDate(dateToDisplay) as unknown as Date | undefined;
+  }
+
+  if (!date || isNaN(date.getTime())) return "";
+
   switch (format) {
     case "locale":
     default:
-      return date?.toLocaleString() as string;
+      return date.toLocaleString();
     case "date":
-      return date?.toLocaleDateString() as unknown as string;
+      return date.toLocaleDateString();
     case "dateType":
-      return date as unknown as string;
+      return date.toString();
     case "dateTime":
-      return date
-        ? new Intl.DateTimeFormat("it-IT", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          }).format(date)
-        : "";
+      return new Intl.DateTimeFormat("it-IT", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date);
     case "time":
-      // Show only hours and minutes
-      return date
-        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : "";
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     case "monthYearLiteral":
-      // Show month and year in a more readable format
-      return date
-        ? new Intl.DateTimeFormat("it-IT", {
-            year: "numeric",
-            month: "long",
-          }).format(date)
-        : "";
+      return new Intl.DateTimeFormat("it-IT", {
+        year: "numeric",
+        month: "long",
+      }).format(date);
   }
 };
 
 export const dateDiff = (
   firstDate = new Date(),
   secondDate = new Date(),
-  unit = FrequencyEnum.MINUTES
+  unit = FrequencyEnum.MINUTES,
 ) => {
   let divider = 1000;
   switch (unit) {
@@ -85,14 +98,14 @@ export const dateDiff = (
       break;
   }
   return Math.round(
-    (new Date(firstDate).getTime() - new Date(secondDate).getTime()) / divider
+    (new Date(firstDate).getTime() - new Date(secondDate).getTime()) / divider,
   );
 };
 
 export const isDateInRange = (
   from: Date,
   to: Date,
-  dateToCheck: Date = new Date()
+  dateToCheck: Date = new Date(),
 ) => {
   let fDate, lDate, cDate;
   fDate = from.getTime();

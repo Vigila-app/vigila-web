@@ -8,6 +8,7 @@ import {
 import { ResponseCodesConstants } from "@/src/constants";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { PaymentStatusEnum } from "@/src/enums/booking.enums";
+import { TRANSACTION_TYPE } from "@/src/types/transactions.types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-04-10",
@@ -16,20 +17,39 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { bookingId, amount, currency = "eur" } = body;
+    const {
+      bookingId,
+      bookingIds: rawBookingIds,
+      amount,
+      currency = "eur",
+    } = body;
+    const bookingIds: string[] = Array.isArray(rawBookingIds)
+      ? rawBookingIds
+      : bookingId
+        ? [bookingId]
+        : [];
 
-    console.log(`API POST payment/create-payment-intent`, { bookingId, amount, currency });
+    console.log(`API POST payment/create-payment-intent`, {
+      bookingId,
+      bookingIds,
+      amount,
+      currency,
+      body,
+    });
 
     // Verifica autenticazione utente
     const userObject = await authenticateUser(req);
-    if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.CONSUMER) {
+    if (
+      !userObject?.id ||
+      userObject.user_metadata?.role !== RolesEnum.CONSUMER
+    ) {
       return jsonErrorResponse(401, {
         code: ResponseCodesConstants.PAYMENT_INTENT_UNAUTHORIZED.code,
         success: false,
       });
     }
 
-    if (!bookingId || !amount || amount <= 0) {
+    if (!bookingIds.length || !amount || amount <= 0) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.PAYMENT_INTENT_BAD_REQUEST.code,
         success: false,
@@ -38,27 +58,28 @@ export async function POST(req: NextRequest) {
 
     const _admin = getAdminClient();
 
-    // Verifica che la prenotazione appartenga all'utente
-    const { data: booking, error: bookingError } = await _admin
+    // Fetch only bookings that belong to the authenticated user.
+    // Filtering by consumer_id at the DB level means a booking that exists
+    const { data: bookings, error: bookingsError } = await _admin
       .from("bookings")
       .select("*")
-      .eq("id", bookingId)
-      .eq("consumer_id", userObject.id)
-      .single();
+      .in("id", bookingIds as any)
+      .eq("consumer_id", userObject.id);
 
-    if (bookingError || !booking) {
+    if (bookingsError || !bookings || bookings.length !== bookingIds.length) {
       return jsonErrorResponse(404, {
         code: ResponseCodesConstants.PAYMENT_INTENT_NOT_FOUND.code,
         success: false,
       });
     }
 
-    // Verifica che la prenotazione non sia già stata pagata
-    if (booking.payment_status === PaymentStatusEnum.PAID) {
-      return jsonErrorResponse(400, {
-        code: ResponseCodesConstants.PAYMENT_INTENT_ALREADY_PAID.code,
-        success: false,
-      });
+    for (const b of bookings) {
+      if (b.payment_status === PaymentStatusEnum.PAID) {
+        return jsonErrorResponse(400, {
+          code: ResponseCodesConstants.PAYMENT_INTENT_ALREADY_PAID.code,
+          success: false,
+        });
+      }
     }
 
     // Crea il Payment Intent con Stripe
@@ -69,20 +90,34 @@ export async function POST(req: NextRequest) {
         enabled: true,
       },
       metadata: {
-        bookingId,
-        userId: userObject.id,
+        bookingIds: bookingIds.join(","),
+        user_id: userObject.id,
+        transaction_type: TRANSACTION_TYPE.BOOKING_PAYMENT,
       },
-      description: `Pagamento per prenotazione ${bookingId}`,
+      description: `Pagamento per prenotazioni ${bookingIds.join(",")}`,
     });
 
-    // Aggiorna la prenotazione con l'ID del Payment Intent
+    // Debug: log created PaymentIntent id and key info so we can trace it in Stripe dashboard
+    try {
+      console.log("Created Stripe PaymentIntent:", {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        metadata: paymentIntent.metadata,
+      });
+    } catch (e) {
+      console.warn("Unable to log paymentIntent details", e);
+    }
+
+    // Aggiorna le prenotazioni con l'ID del Payment Intent e setta payment_status=PENDING
     await _admin
       .from("bookings")
       .update({
         payment_id: paymentIntent.id,
+        payment_status: PaymentStatusEnum.PENDING,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", bookingId);
+      .in("id", bookingIds as any);
 
     return NextResponse.json(
       {
@@ -90,7 +125,7 @@ export async function POST(req: NextRequest) {
         clientSecret: paymentIntent.client_secret,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error creating payment intent:", error);

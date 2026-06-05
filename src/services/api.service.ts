@@ -12,14 +12,14 @@ export class ApiService {
 
   public static delete = async <T>(
     url: string,
-    optInit?: RequestInit
+    optInit?: RequestInit,
   ): Promise<T | undefined> => {
     try {
       optInit = await ApiService.requestMiddlewares(url, optInit);
 
       const urlWithQuery = new URL(
         url,
-        !isServer ? window.location.origin : undefined
+        !isServer ? window.location.origin : undefined,
       );
 
       return ApiService.responseMiddlewares<T>(
@@ -27,7 +27,7 @@ export class ApiService {
           ...ApiService.init,
           ...optInit,
           method: "DELETE",
-        })
+        }),
       );
     } catch (error) {
       // TODO: add logger
@@ -38,14 +38,14 @@ export class ApiService {
   public static get = async <T>(
     url: string,
     queryParams?: Record<string, string>,
-    optInit?: RequestInit
+    optInit?: RequestInit,
   ): Promise<T | undefined> => {
     try {
       optInit = await ApiService.requestMiddlewares(url, optInit);
 
       const urlWithQuery = new URL(
         url,
-        !isServer ? window.location.origin : undefined
+        !isServer ? window.location.origin : undefined,
       );
 
       if (queryParams) {
@@ -57,7 +57,7 @@ export class ApiService {
           ...ApiService.init,
           ...optInit,
           method: "GET",
-        })
+        }),
       );
     } catch (error) {
       // TODO: add logger
@@ -68,14 +68,14 @@ export class ApiService {
   public static put = async <T>(
     url: string,
     body?: Record<string, any>,
-    optInit?: RequestInit
+    optInit?: RequestInit,
   ): Promise<T | undefined> => {
     try {
       optInit = await ApiService.requestMiddlewares(url, optInit);
 
       const urlWithQuery = new URL(
         url,
-        !isServer ? window.location.origin : undefined
+        !isServer ? window.location.origin : undefined,
       );
 
       if (body) {
@@ -87,7 +87,7 @@ export class ApiService {
           ...ApiService.init,
           ...optInit,
           method: "PUT",
-        })
+        }),
       );
     } catch (error) {
       // TODO: add logger
@@ -98,14 +98,14 @@ export class ApiService {
   public static post = async <T>(
     url: string,
     body?: Record<string, any>,
-    optInit?: RequestInit
+    optInit?: RequestInit,
   ): Promise<T | undefined> => {
     try {
       optInit = await ApiService.requestMiddlewares(url, optInit);
 
       const urlWithQuery = new URL(
         url,
-        !isServer ? window.location.origin : undefined
+        !isServer ? window.location.origin : undefined,
       );
 
       if (body) {
@@ -117,7 +117,7 @@ export class ApiService {
           ...ApiService.init,
           ...optInit,
           method: "POST",
-        })
+        }),
       );
     } catch (error) {
       console.error(error);
@@ -126,7 +126,7 @@ export class ApiService {
 
   private static requestMiddlewares = async (
     url: string,
-    optInit: RequestInit = {}
+    optInit: RequestInit = {},
   ) => {
     const { id: user = "" } = (await UserService.getUser()) || {};
     let authToken: any = "";
@@ -138,7 +138,7 @@ export class ApiService {
       const fulfilledValues = results
         .filter(
           <T>(p: PromiseSettledResult<T>): p is PromiseFulfilledResult<T> =>
-            p.status === "fulfilled"
+            p.status === "fulfilled",
         )
         .map((p) => p.value);
 
@@ -160,15 +160,20 @@ export class ApiService {
   };
 
   private static responseMiddlewares = <T>(
-    response: Promise<Response>
+    response: Promise<Response>,
   ): Promise<T> =>
     response
       .then(async (res: Response) => {
         try {
           if (!res.ok || Number(res.status) < 200 || Number(res.status) > 299) {
-            const error = await res?.json();
+            const error = await res?.json().catch(() => null);
+            // store error in app store for UI
             useAppStore.getState().setError(error);
-            throw new Error(`${res.status} ${res.statusText}`);
+            // throw with server error body when available for better debugging
+            const errPayload = error
+              ? JSON.stringify(error)
+              : `${res.status} ${res.statusText}`;
+            throw new Error(errPayload);
           } else {
             const parsed = await res?.json();
             return parsed;

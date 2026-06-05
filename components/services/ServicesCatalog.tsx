@@ -11,14 +11,19 @@ import clsx from "clsx";
 import {
   XCircleIcon,
   ShieldCheckIcon,
-  // PlusIcon,
-  // MinusIcon,
   ShoppingCartIcon,
   UsersIcon,
   UserIcon,
   ExclamationTriangleIcon,
   CheckIcon,
 } from "@heroicons/react/24/outline";
+import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
+import { VigilDataType } from "@/src/types/vigil.types";
+import {
+  VigilHygieneServiceEnum,
+  VigilOutdoorServiceEnum,
+  VigilTransportationEnum,
+} from "@/src/enums/onboarding.enums";
 
 type SelectedService = {
   active: boolean;
@@ -31,12 +36,13 @@ type SelectedService = {
   max_unit?: number;
   currency: CurrencyEnum;
   selectedExtras: string[];
-  type: string;
+  type: ServiceCatalogTypeEnum;
 };
 
 interface ServicesCatalogProps {
   role: RolesEnum;
   occupation?: string;
+  vigilData?: VigilDataType;
   selectedServices?: ServiceI[];
   onServicesChange: (services: ServiceI[]) => void;
 }
@@ -45,14 +51,54 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
   role,
   occupation,
   onServicesChange,
+  vigilData,
   // selectedServices = [],
 }) => {
   const [internalSelectedServices, setInternalSelectedServices] = useState<
     SelectedService[]
   >([]);
   const [servicesCatalog, setServicesCatalog] = useState<ServiceCatalogItem[]>(
-    []
+    [],
   );
+
+  const vigilCapabilities = useMemo(() => {
+    if (!vigilData) return { hasTransport: false, hygieneServices: [] };
+    return {
+      hasTransport:
+        !!vigilData.outdoor_services?.length &&
+        !vigilData.outdoor_services.every(
+          (s) => s === VigilOutdoorServiceEnum.NONE,
+        ),
+      hygieneServices:
+        vigilData.hygene_services?.filter(
+          (s) => s !== VigilHygieneServiceEnum.NONE,
+        ) ?? [],
+    };
+  }, [vigilData]);
+
+  const EXTRA_CAPABILITY_MAP: Record<string, boolean> = {
+    transport: vigilCapabilities.hasTransport,
+    bed_help: vigilCapabilities.hygieneServices.includes(
+      VigilHygieneServiceEnum.BED_HELP,
+    ),
+    bathroom_help: vigilCapabilities.hygieneServices.includes(
+      VigilHygieneServiceEnum.BATHROOM_HELP,
+    ),
+    diaper_help: vigilCapabilities.hygieneServices.includes(
+      VigilHygieneServiceEnum.DIAPER_HELP,
+    ),
+  };
+
+  const EXTRA_UNAVAILABLE_REASON: Record<string, string> = {
+    transport: "Non hai dichiarato un mezzo di trasporto",
+    bed_help: "Non hai dichiarato il servizio di igiene a letto",
+    bathroom_help: "Non hai dichiarato il servizio di aiuto in bagno",
+    diaper_help: "Non hai dichiarato il servizio di cambio pannolone",
+  };
+
+  const isExtraAvailable = (extraId: string): boolean =>
+    EXTRA_CAPABILITY_MAP[extraId] ?? true; // se non mappato, disponibile
+
   const iconMap: Record<string, React.ReactNode> = {
     "Compagnia e conversazione": (
       <div className=" bg-red-300 w-14 h-14 rounded-full p-1 flex items-center justify-center">
@@ -94,8 +140,8 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           catalog_id: service.catalogId,
           extras: service.selectedExtras,
         },
-        type: service.type,
-      })
+        type: service.type as ServiceCatalogTypeEnum,
+      }),
     );
     onServicesChange(convertedServices as ServiceI[]);
   }, [internalSelectedServices, onServicesChange]);
@@ -119,21 +165,21 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
 
   const removeService = (catalogId: SelectedService["catalogId"]) => {
     setInternalSelectedServices((prev) =>
-      prev.filter((service) => service.catalogId !== catalogId)
+      prev.filter((service) => service.catalogId !== catalogId),
     );
   };
 
-  const updateServicePrice = (index: number, newPrice: number) => {
-    setInternalSelectedServices((prev) =>
-      prev.map((service, i) =>
-        i === index ? { ...service, unit_price: newPrice } : service
-      )
-    );
-  };
+  // const updateServicePrice = (index: number, newPrice: number) => {
+  //   setInternalSelectedServices((prev) =>
+  //     prev.map((service, i) =>
+  //       i === index ? { ...service, unit_price: newPrice } : service,
+  //     ),
+  //   );
+  // };
 
   const toggleExtra = (
     catalogId: SelectedService["catalogId"],
-    extraId: string
+    extraId: string,
   ) => {
     setInternalSelectedServices((prev) =>
       prev.map((service, i) => {
@@ -144,19 +190,19 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           return { ...service, selectedExtras };
         }
         return service;
-      })
+      }),
     );
   };
 
   const isServiceSelected = (catalogId: number) => {
     return internalSelectedServices.some(
-      (service) => service.catalogId === catalogId
+      (service) => service.catalogId === catalogId,
     );
   };
 
   const getCatalogService = (catalogId: number) => {
     return servicesCatalog.find(
-      (service: ServiceCatalogItem) => service.id === catalogId
+      (service: ServiceCatalogItem) => service.id === catalogId,
     );
   };
 
@@ -177,7 +223,6 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
       return service.occupation.includes(occupation);
     });
   }, [occupation, servicesCatalog]);
-
   return (
     <div className="space-y-8">
       <div>
@@ -185,7 +230,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
           className={clsx(
             "block font-semibold mb- text-xl mb-4",
             role === RolesEnum.VIGIL && "text-vigil-orange",
-            role === RolesEnum.CONSUMER && "text-consumer-blue"
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
           )}
         >
           Scegli i servizi che vuoi offrire
@@ -216,7 +261,7 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                 key={catalogService.id}
                 customClass={clsx(
                   isServiceSelected(catalogService.id) &&
-                    "!bg-green-50 !border-green-300"
+                    "!bg-green-50 !border-green-300",
                 )}
               >
                 <div className="relative flex flex-col justify-between">
@@ -279,43 +324,64 @@ const ServicesCatalog: React.FC<ServicesCatalogProps> = ({
                               Aggiungi opzioni extra:
                             </label>
                             <div className="space-y-2">
-                              {catalogService.extra.map((extra: any) => (
-                                <label
-                                  key={extra.id}
-                                  className="flex items-center gap-2 text-sm"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={internalSelectedServices
-                                      .find(
-                                        (service) =>
-                                          service.catalogId ===
-                                          catalogService.id
-                                      )
-                                      ?.selectedExtras.includes(extra.id)}
-                                    onChange={() =>
-                                      toggleExtra(catalogService.id, extra.id)
+                              {catalogService.extra.map((extra: any) => {
+                                const available = isExtraAvailable(extra.id);
+                                return (
+                                  <label
+                                    key={extra.id}
+                                    className={clsx(
+                                      "flex items-center gap-2 text-sm",
+                                      !available &&
+                                        "opacity-50 cursor-not-allowed",
+                                    )}
+                                    title={
+                                      !available
+                                        ? EXTRA_UNAVAILABLE_REASON[extra.id]
+                                        : undefined
                                     }
-                                    className="rounded"
-                                  />
-                                  <span>
-                                    {extra.name} (+€{extra.fixed_price})
-                                  </span>
-                                  {extra.note && (
-                                    <span className="text-gray-500 text-xs">
-                                      ({extra.note})
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      disabled={!available}
+                                      checked={internalSelectedServices
+                                        .find(
+                                          (service) =>
+                                            service.catalogId ===
+                                            catalogService.id,
+                                        )
+                                        ?.selectedExtras.includes(extra.id)}
+                                      onChange={() =>
+                                        available &&
+                                        toggleExtra(catalogService.id, extra.id)
+                                      }
+                                      className="rounded disabled:cursor-not-allowed"
+                                    />
+                                    <span>
+                                      {extra.name} (+€{extra.fixed_price})
                                     </span>
-                                  )}
-                                </label>
-                              ))}
+                                    {extra.note && (
+                                      <span className="text-gray-500 text-xs">
+                                        ({extra.note})
+                                      </span>
+                                    )}
+                                    {!available && (
+                                      <span className="text-xs text-amber-600 ml-1">
+                                        ⚠ {EXTRA_UNAVAILABLE_REASON[extra.id]}
+                                      </span>
+                                    )}
+                                  </label>
+                                );
+                              })}
                             </div>
                           </>
                         ) : (
+                          // preview quando il servizio NON è ancora selezionato
                           <span className="text-sm text-gray-500">
                             Opzioni extra disponibili:&nbsp;
                             {catalogService.extra
                               .map(
-                                (extra) => `${extra.name} €${extra.fixed_price}`
+                                (extra) =>
+                                  `${extra.name} €${extra.fixed_price}`,
                               )
                               .join(", ")}
                           </span>

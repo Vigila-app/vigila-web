@@ -5,8 +5,9 @@ import clsx from "clsx";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { FormUtils } from "@/src/utils/form.utils";
 import { FieldError } from "react-hook-form";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-type Option = {
+export type OptionI = {
   label: string;
   value: string | number;
   disabled?: boolean;
@@ -17,7 +18,7 @@ type SelectProps = {
   id?: string;
   placeholder?: string;
   error?: FieldError;
-  options: Option[];
+  options: OptionI[];
   onChange?: (value: string) => void;
   value?: string;
   role?: RolesEnum;
@@ -64,7 +65,7 @@ const Select = ({
             role === RolesEnum.CONSUMER && "text-consumer-blue",
             role === RolesEnum.VIGIL && "text-vigil-orange",
             error && "text-red-500",
-            disabled && "!bg-gray-100"
+            disabled && "!bg-gray-100",
           )}
         >
           {label}
@@ -80,7 +81,7 @@ const Select = ({
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={clsx(
-          "w-full p-3 text-left rounded-4xl border bg-white shadow-sm",
+          "w-full pl-5 pr-3 py-3 text-left rounded-4xl border bg-white shadow-sm",
           "focus:outline-none",
           role === RolesEnum.CONSUMER &&
             "border-consumer-blue focus:ring-1 focus:ring-consumer-blue",
@@ -88,23 +89,38 @@ const Select = ({
             "border-vigil-orange focus:ring-1 focus:ring-vigil-orange",
           error && "border-red-500",
           disabled && "!bg-gray-100 cursor-not-allowed",
-          "scroll-m-12"
+          "scroll-m-12",
         )}
       >
-        {selected ? selected.label : placeholder || "Seleziona..."}
+        {/* {selected ? selected.label : placeholder || "Seleziona..."} */}
+        <span className={clsx(!selected && "text-gray-500")}>
+          {selected ? selected.label : placeholder || "Seleziona..."}
+        </span>
+        <ChevronDownIcon
+          className={clsx(
+            "w-5 h-5 transition-transform duration-200 float-right",
+            role === RolesEnum.CONSUMER && "text-consumer-blue",
+            role === RolesEnum.VIGIL && "text-vigil-orange",
+            open && "rotate-180",
+          )}
+        />
       </button>
 
       {/* Dropdown Options */}
       {open && (
-        <ul className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md max-h-64 overflow-auto">
+        <ul
+          className={clsx(
+            "absolute z-10 mt-2 w-full rounded-2xl border bg-white shadow-md max-h-64 overflow-auto",
+            role === RolesEnum.CONSUMER && "border-consumer-blue ",
+            role === RolesEnum.VIGIL && "border-vigil-orange ",
+          )}
+        >
           {options.map((option) => (
             <li
               key={option.value}
               className={clsx(
-                "cursor-pointer px-4 py-2 text-sm hover:bg-gray-100",
+                " flex justify-between cursor-pointer px-4 py-2 text-sm hover:bg-gray-100",
                 option.disabled && "text-gray-400 cursor-not-allowed",
-                option.value === value &&
-                  "font-semibold underline underline-offset-2"
               )}
               onClick={() => {
                 if (option.disabled) return;
@@ -113,6 +129,25 @@ const Select = ({
               }}
             >
               {option.label}
+              <div
+                className={clsx(
+                  "w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200",
+
+                  option.value === value
+                    ? ` border-2 ${role === RolesEnum.CONSUMER ? "border-consumer-blue" : "border-vigil-orange"}`
+                    : "border-gray-300 border-1",
+                )}
+              >
+                <div
+                  className={clsx(
+                    "w-2.5 h-2.5 rounded-full  transition-transform duration-200",
+
+                    option.value === value
+                      ? `scale-100 ${role === RolesEnum.CONSUMER ? "bg-consumer-blue" : "bg-vigil-orange"}`
+                      : "scale-0",
+                  )}
+                />
+              </div>
             </li>
           ))}
         </ul>

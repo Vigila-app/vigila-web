@@ -41,7 +41,9 @@ const DashboardMockup = () => (
             key={m.label}
             className="rounded-xl bg-consumer-light-blue p-3 text-center"
           >
-            <div className="text-xl font-bold text-consumer-blue">{m.value}</div>
+            <div className="text-xl font-bold text-consumer-blue">
+              {m.value}
+            </div>
             <div className="text-[10px] text-gray-500 mt-0.5">{m.label}</div>
           </div>
         ))}
@@ -206,7 +208,9 @@ const PayrollMockup = () => (
           className="rounded-xl border border-gray-100 bg-gray-50 p-3"
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-gray-900">{row.family}</span>
+            <span className="text-xs font-bold text-gray-900">
+              {row.family}
+            </span>
             <span className={`text-[10px] font-semibold ${row.color}`}>
               {row.state}
             </span>
@@ -242,9 +246,21 @@ const CobrandMockup = () => (
         CAF Esempio — Area Partner
       </div>
       {[
-        { label: "Nuove pratiche", count: 3, color: "bg-consumer-light-blue text-consumer-blue" },
-        { label: "Buste paga da caricare", count: 7, color: "bg-vigil-light-orange text-vigil-orange" },
-        { label: "Famiglie attive", count: 34, color: "bg-green-50 text-green-700" },
+        {
+          label: "Nuove pratiche",
+          count: 3,
+          color: "bg-consumer-light-blue text-consumer-blue",
+        },
+        {
+          label: "Buste paga da caricare",
+          count: 7,
+          color: "bg-vigil-light-orange text-vigil-orange",
+        },
+        {
+          label: "Famiglie attive",
+          count: 34,
+          color: "bg-green-50 text-green-700",
+        },
       ].map((row) => (
         <div
           key={row.label}
@@ -413,7 +429,9 @@ export default function PartnerCafPage() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {p.title}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{p.body}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {p.body}
+                </p>
               </div>
             ))}
           </div>
@@ -433,7 +451,10 @@ export default function PartnerCafPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step) => (
-              <div key={step.num} className="flex flex-col items-center text-center gap-4">
+              <div
+                key={step.num}
+                className="flex flex-col items-center text-center gap-4"
+              >
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full bg-consumer-blue text-white flex items-center justify-center shadow-lg">
                     {step.icon}

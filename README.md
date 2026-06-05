@@ -49,6 +49,16 @@ Vigila Web è una moderna applicazione web sviluppata con [Next.js](https://next
 - `dev`: Avvia il server di sviluppo Next.js.
 - `build`: Compila l'applicazione per la produzione.
 - `preview`: Avvia l'applicazione in modalità produzione.
+- `prepare`: Installa gli hook Git locali gestiti da Husky.
+- `lint`: Esegue ESLint sull'intero progetto.
+- `lint:fix`: Esegue ESLint con fix automatici dove possibile.
+- `format`: Applica la formattazione condivisa del progetto.
+- `format:check`: Verifica che i file rispettino la formattazione condivisa.
+
+## Hook pre-commit
+
+Il repository usa Husky e lint-staged per eseguire ESLint sui file JavaScript e TypeScript staged e Prettier sui file staged supportati prima di ogni commit.
+Dopo `npm install`, l'hook viene installato automaticamente tramite lo script `prepare`.
 
 ## Personalizzazione
 

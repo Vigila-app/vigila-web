@@ -1,11 +1,14 @@
-export default function Prenotazioni() {
+type PrenotazioniProps = { className?: string }
+export default function Prenotazioni({ className }: PrenotazioniProps) {
   return (
     <svg
       width="25"
       height="24"
       viewBox="0 0 25 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg">
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
       <path
         d="M8.33334 2V6"
         stroke="currentColor"
@@ -67,5 +70,5 @@ export default function Prenotazioni() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

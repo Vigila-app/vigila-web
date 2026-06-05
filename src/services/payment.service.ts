@@ -1,11 +1,12 @@
 import { ApiService } from "@/src/services";
 import { apiPayment, apiWallet } from "@/src/constants/api.constants";
-import { BookingI } from "@/src/types/booking.types";
-import { BookingsService, UpdateBookingPaymentRequest } from "./bookings.service";
 import { TransactionType } from "@/src/types/wallet.types";
 
 export type CreatePaymentIntentRequest = {
-  bookingId: string;
+  // accept single bookingId or multiple bookingIds so a single payment
+  // can be associated to many bookings
+  bookingId?: string;
+  bookingIds?: string[];
   user: string;
   amount: number;
   currency: string;
@@ -36,7 +37,7 @@ export type VerifyPaymentIntentResponse = {
     amount: number;
     currency: string;
     bookingId: string;
-    userId?:string;
+    userId?: string;
     created: number;
     succeeded: boolean;
   };
@@ -44,66 +45,73 @@ export type VerifyPaymentIntentResponse = {
 };
 
 export const PaymentService = {
-  createPaymentIntent: async (request: CreatePaymentIntentRequest): Promise<CreatePaymentIntentResponse> => {
+  createPaymentIntent: async (
+    request: CreatePaymentIntentRequest,
+  ): Promise<CreatePaymentIntentResponse> => {
     try {
       const response = (await ApiService.post(
         apiPayment.CREATE_INTENT(),
-        request
+        request,
       )) as CreatePaymentIntentResponse;
       return response;
     } catch (error) {
       console.error("PaymentService createPaymentIntent error", {
         error,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : null,
       });
       throw error;
     }
   },
 
-  createWalletTopUpIntent: async (request: CreateWalletTopUpRequest): Promise<CreatePaymentIntentResponse> => {
+  createWalletTopUpIntent: async (
+    request: CreateWalletTopUpRequest,
+  ): Promise<CreatePaymentIntentResponse> => {
     try {
       const response = (await ApiService.post(
         apiWallet.TOP_UP(),
-        request
+        request,
       )) as CreatePaymentIntentResponse;
       return response;
     } catch (error) {
       console.error("PaymentService createWalletTopUpIntent error", {
         error,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : null,
       });
       throw error;
     }
   },
 
-  payBookingWithWallet: async (bookingId: string): Promise<{ success: boolean; data?: any }> => {
+  payBookingWithWallet: async (
+    bookingId: string,
+  ): Promise<{ success: boolean; data?: any }> => {
     try {
-      const response = (await ApiService.post(
-        apiWallet.PAY_BOOKING(),
-        { bookingId }
-      )) as { success: boolean; data?: any };
+      const response = (await ApiService.post(apiWallet.PAY_BOOKING(), {
+        bookingId,
+      })) as { success: boolean; data?: any };
       return response;
     } catch (error) {
       console.error("PaymentService payBookingWithWallet error", {
         error,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
       });
       throw error;
     }
   },
 
-  verifyPaymentIntent: async (paymentIntentId: string): Promise<VerifyPaymentIntentResponse> => {
+  verifyPaymentIntent: async (
+    paymentIntentId: string,
+  ): Promise<VerifyPaymentIntentResponse> => {
     try {
       const response = (await ApiService.get(
-        `${apiPayment.VERIFY_INTENT()}?payment_intent=${encodeURIComponent(paymentIntentId)}`
+        `${apiPayment.VERIFY_INTENT()}?payment_intent=${encodeURIComponent(paymentIntentId)}`,
       )) as VerifyPaymentIntentResponse;
       return response;
     } catch (error) {
       console.error("PaymentService verifyPaymentIntent error", {
         error,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
       });
       throw error;
     }
@@ -111,14 +119,14 @@ export const PaymentService = {
 
   getWalletTransactions: async (): Promise<TransactionType[]> => {
     try {
-      const response = (await ApiService.get(
-        apiWallet.TRANSACTIONS()
-      )) as { data: TransactionType[] };
+      const response = (await ApiService.get(apiWallet.TRANSACTIONS())) as {
+        data: TransactionType[];
+      };
       return response.data || [];
     } catch (error) {
       console.error("PaymentService getWalletTransactions error", {
         error,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : "Unknown error",
       });
       return [];
     }

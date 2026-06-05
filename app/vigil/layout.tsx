@@ -1,7 +1,9 @@
-/* eslint-disable @next/next/no-sync-scripts */
 import "@/app/globals.css";
 import dynamic from "next/dynamic";
-import { Footer, Header } from "@/components";
+import {
+  ConditionalFooter,
+  ConditionalHeader,
+} from "@/components/@core/conditionalNav/conditionalNav.component";
 import {
   PermitGuardComponent,
   SessionManagerComponent,
@@ -18,15 +20,15 @@ import CommonScript from "@/components/@core/commonScript/common-script.componen
 
 const CookieBannerComponent = dynamic(
   () => import("@/components/@core/cookieBanner/cookie-banner.component"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 const GlobalLoaderManager = dynamic(
   () => import("@/components/@core/globalLoaderManager/globalLoaderManager"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 const ToastManagerComponent = dynamic(
   () => import("@/components/@core/toastManager/toastManager.component"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 
 export const metadata: Metadata = {
@@ -75,8 +77,8 @@ export default function RootLayout({
           ) : null}
         </>
       }
-      footer={<Footer />}
-      header={<Header />}
+      footer={<ConditionalFooter />}
+      header={<ConditionalHeader />}
     >
       <NuqsAdapter>{children}</NuqsAdapter>
     </HtmlDocument>

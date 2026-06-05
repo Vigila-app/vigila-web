@@ -87,8 +87,7 @@ const ReviewButtonComponent = (props: ReviewButtonComponentProps) => {
             key={star}
             className={`text-sm ${
               star <= rating ? "text-yellow-400" : "text-gray-300"
-            }`}
-          >
+            }`}>
             ★
           </span>
         ))}
@@ -107,9 +106,7 @@ const ReviewButtonComponent = (props: ReviewButtonComponentProps) => {
 
   if (loading) {
     return (
-      <div className="text-sm text-gray-500">
-        Verificando recensione...
-      </div>
+      <div className="text-sm text-gray-500">Verificando recensione...</div>
     );
   }
 
@@ -118,9 +115,7 @@ const ReviewButtonComponent = (props: ReviewButtonComponentProps) => {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           {renderStars(existingReview.rating)}
-          <span className="text-sm text-gray-600">
-            La tua recensione
-          </span>
+          <span className="text-sm text-gray-600">La tua recensione</span>
         </div>
         <Button
           text
@@ -134,11 +129,7 @@ const ReviewButtonComponent = (props: ReviewButtonComponentProps) => {
 
   if (canReviewBooking(booking.id)) {
     return (
-      <Button
-        label="Lascia una recensione"
-        action={handleReviewClick}
-        customClass="bg-blue-600 hover:bg-blue-700 text-white"
-      />
+      <Button full label="Lascia una recensione" action={handleReviewClick} />
     );
   }
 

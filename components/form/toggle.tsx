@@ -1,10 +1,14 @@
+import { RolesEnum } from "@/src/enums/roles.enums"
+import clsx from "clsx"
+
 type ToggleI = React.InputHTMLAttributes<HTMLInputElement> & {
-  label?: string;
-  withIcon?: boolean;
-};
+  label?: string
+  withIcon?: boolean
+  role?: RolesEnum
+}
 
 const Toggle = (props: ToggleI) => {
-  const { id, name, label, withIcon = false } = props;
+  const { id, name, label, withIcon = false, role } = props
   return (
     <label
       htmlFor={name || label}
@@ -18,7 +22,15 @@ const Toggle = (props: ToggleI) => {
       />
 
       {withIcon ? (
-        <span className="absolute inset-y-0 start-0 z-10 m-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-white text-gray-400 transition-all peer-checked:start-6 peer-checked:text-primary-600">
+        <span
+          className={clsx(
+            "absolute inset-y-0 start-0 z-10 m-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-white transition-all peer-checked:start-6",
+            role === RolesEnum.VIGIL && "peer-checked:text-vigil-orange",
+            role === RolesEnum.CONSUMER && "peer-checked:text-consumer-blue",
+            !role && "peer-checked:text-primary-600",
+            "text-gray-400",
+          )}
+        >
           <svg
             data-unchecked-icon
             xmlns="http://www.w3.org/2000/svg"
@@ -49,10 +61,17 @@ const Toggle = (props: ToggleI) => {
         </span>
       ) : null}
 
-      <span className="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-primary-500"></span>
+      <span
+        className={clsx(
+          "absolute inset-0 rounded-full bg-gray-300 transition",
+          role === RolesEnum.VIGIL && "peer-checked:bg-vigil-orange",
+          role === RolesEnum.CONSUMER && "peer-checked:bg-consumer-blue",
+          !role && "peer-checked:bg-primary-500",
+        )}
+      ></span>
       <span className="sr-only">{label}</span>
     </label>
-  );
-};
+  )
+}
 
-export default Toggle;
+export default Toggle

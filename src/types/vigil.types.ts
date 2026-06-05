@@ -1,5 +1,22 @@
 import { ReviewI } from "@/src/types/review.types";
 import { AddressI } from "./maps.types";
+import {
+  VigilHygieneServiceEnum,
+  VigilOutdoorServiceEnum,
+} from "../enums/onboarding.enums";
+
+export type VigilDataType = {
+  id: string;
+  vigil_id: string;
+  created_at?: string;
+  updated_at?: string;
+  transportation_mode?: string;
+  hygene_services?: VigilHygieneServiceEnum[];
+  outdoor_services?: VigilOutdoorServiceEnum[];
+  occupation?: string;
+  courses?: string;
+  experience_years?: string;
+};
 
 export type VigilDetailsType = {
   displayName?: string;
@@ -11,7 +28,9 @@ export type VigilDetailsType = {
   id: string;
   phone?: string;
   information?: string;
+  bio?: string;
   occupation?: string;
+  transportation?: string;
   username?: string;
   other?: { [key: string]: string | number };
   reviews?: ReviewI[];
@@ -21,6 +40,7 @@ export type VigilDetailsType = {
   status: string;
   address?: AddressI;
   birthday?: string;
+  cap?: string[];
   addresses?: {
     id: string;
     name: string;
@@ -35,10 +55,20 @@ export type VigilDetailsType = {
 
 export type ViglStoreType = {
   onLogout: () => void;
-  lastUpdate?: Date;
+  lastUpdateDetails?: Date;
+  lastUpdateData?: Date;
   vigils: VigilDetailsType[];
+  vigilsData: VigilDataType[];
   getVigilsDetails: (
     vigils: VigilDetailsType["id"][],
-    force?: boolean
+    force?: boolean,
   ) => Promise<VigilDetailsType[]>;
+  getVigilData: (
+    vigilId: VigilDetailsType["id"],
+    force?: boolean,
+  ) => Promise<VigilDataType | null>;
+};
+export type VigilCapabilities = {
+  hasTransport: boolean;
+  hygieneServices: VigilHygieneServiceEnum[];
 };

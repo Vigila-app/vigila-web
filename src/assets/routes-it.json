@@ -11,7 +11,6 @@
     "private": false,
     "roles": []
   },
-  
   "homeConsumer": {
     "url": "/home",
     "label": "Home",
@@ -22,9 +21,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "login": {
     "url": "/auth/login",
@@ -102,9 +99,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "onBoardVigil": {
     "url": "/vigil/onboard",
@@ -117,9 +112,98 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "VIGIL"
-    ]
+    "roles": ["VIGIL"]
+  },
+  "onBoardVigilComplete": {
+    "url": "/vigil/onboard/complete",
+    "label": "Registrazione completata",
+    "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["VIGIL"]
+  },
+  "onBoardConsumerComplete": {
+    "url": "/onboard/complete",
+    "label": "Registrazione completata",
+    "title": "Registrazione completata",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "matchingLoading": {
+    "url": "/matching/loading",
+    "label": "Stiamo cercando il vigil più adatto a te",
+    "title": "Stiamo cercando il vigil più adatto a te",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "matchingNoMatch": {
+    "url": "/matching/no-match",
+    "label": "Nessun vigil corrispondente trovato",
+    "title": "Nessun vigil corrispondente trovato",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "matchingSuccess": {
+    "url": "/matching/success",
+    "label": "Caregiver suggerito",
+    "title": "Caregiver suggerito",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "matchingDetails": {
+    "url": "/matching/details",
+    "label": "Riepilogo prenotazione",
+    "title": "Riepilogo prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "matchingTrialConfirmed": {
+    "url": "/matching/trial-confirmed",
+    "label": "Trial confermato",
+    "title": "Il tuo trial e confermato",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "resetPassword": {
     "url": "/auth/reset-password",
@@ -180,10 +264,7 @@
       "footer": true
     },
     "private": true,
-    "roles": [
-      "CONSUMER",
-      "VIGIL"
-    ]
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "bookingDetails": {
     "url": "/booking/:bookingId",
@@ -197,10 +278,21 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER",
-      "VIGIL"
-    ]
+    "roles": ["CONSUMER", "VIGIL"]
+  },
+  "bookingRecurring": {
+    "url": "/booking/recurrence",
+    "label": "Prenotazione ricorrente",
+    "title": "Prenotazione ricorrente",
+    "matchingUrl": "/booking/",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "wallet": {
     "url": "/wallet",
@@ -226,9 +318,7 @@
       "footer": true
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "admin": {
     "url": "/dashboard-admin",
@@ -241,9 +331,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminOverview": {
     "url": "/dashboard-admin/overview",
@@ -256,9 +344,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminBookings": {
     "url": "/dashboard-admin/bookings",
@@ -271,9 +357,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminPayments": {
     "url": "/dashboard-admin/payments",
@@ -286,9 +370,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminVigils": {
     "url": "/dashboard-admin/vigils",
@@ -301,9 +383,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminConsumers": {
     "url": "/dashboard-admin/consumers",
@@ -316,9 +396,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminServices": {
     "url": "/dashboard-admin/services",
@@ -331,9 +409,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminAnalytics": {
     "url": "/dashboard-admin/analytics",
@@ -346,9 +422,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
   },
   "adminReviews": {
     "url": "/dashboard-admin/reviews",
@@ -361,9 +435,20 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "ADMIN"
-    ]
+    "roles": ["ADMIN"]
+  },
+  "inizializationBooking": {
+    "url": "/booking/inizialization",
+    "label": "Prima Prenotazione",
+    "title": "Prima Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "createBooking": {
     "url": "/booking/create",
@@ -376,9 +461,33 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
+  },
+  "recurrenceBooking": {
+    "url": "/recurrence",
+    "label": "Prenotazione Ricorrente",
+    "title": "Prenotazione Ricorrente",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
+  },
+  "editBooking": {
+    "url": "/booking/edit",
+    "label": "Modifica Prenotazione",
+    "title": "Modifica Prenotazione",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "paymentBooking": {
     "url": "/booking/payment",
@@ -391,9 +500,20 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
+  },
+  "paymentBookingReview": {
+    "url": "/booking/payment/review",
+    "label": "Riepilogo pagamento",
+    "title": "Riepilogo pagamento",
+    "menu": {
+      "mobile": false,
+      "desktop": false,
+      "header": false,
+      "footer": false
+    },
+    "private": true,
+    "roles": ["CONSUMER"]
   },
   "paymentBookingConfirm": {
     "url": "/booking/payment/result",
@@ -406,27 +526,28 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "profileConsumer": {
     "url": "/user/profile",
     "label": "Profilo",
     "title": "Profilo",
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "profileVigil": {
     "url": "/vigil/user/profile",
     "label": "Profilo",
     "title": "Profilo",
     "private": true,
-    "roles": [
-      "VIGIL"
-    ]
+    "roles": ["VIGIL"]
+  },
+  "noticeBoardVigil": {
+    "url": "/vigil/user/bacheca",
+    "label": "Bacheca annunci",
+    "title": "Bacheca annunci",
+    "private": true,
+    "roles": ["VIGIL"]
   },
   "vigilDetails": {
     "url": "/vigil/:vigilId/profile",
@@ -434,9 +555,7 @@
     "title": "Dettagli Vigil",
     "matchingUrl": "/vigil/",
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "services": {
     "url": "/services",
@@ -449,9 +568,7 @@
       "footer": true
     },
     "private": true,
-    "roles": [
-      "CONSUMER"
-    ]
+    "roles": ["CONSUMER"]
   },
   "notifications": {
     "url": "/notifications",
@@ -464,10 +581,7 @@
       "footer": false
     },
     "private": true,
-    "roles": [
-      "CONSUMER",
-      "VIGIL"
-    ]
+    "roles": ["CONSUMER", "VIGIL"]
   },
   "about": {
     "url": "/about",

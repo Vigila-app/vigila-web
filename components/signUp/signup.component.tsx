@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { AltchaService } from "@/src/services/altcha.service";
 import clsx from "clsx";
 import { isReleased } from "@/src/utils/envs.utils";
+import { trackSignupCompleted, trackSignupStarted } from "@/lib/tracking";
 
 const Altcha = dynamic(() => import("@/components/@core/altcha/altcha"), {
   ssr: !!false,
@@ -69,7 +70,9 @@ const SignupComponent = (props: SignupComponentI) => {
 
   const redirectOnboard = () => {
     router.replace(
-      role === RolesEnum.CONSUMER ? Routes.onBoard.url : Routes.onBoardVigil.url
+      role === RolesEnum.CONSUMER
+        ? Routes.onBoard.url
+        : Routes.onBoardVigil.url,
     );
   };
 
@@ -111,16 +114,17 @@ const SignupComponent = (props: SignupComponentI) => {
         }
         if (challenge) {
           await AltchaService.verifyChallenge(challenge);
-          await AuthService.signup(
+          const result: any = await AuthService.signup(
             { email, password, name, surname, role },
-            terms
+            terms,
           );
+          trackSignupCompleted(result?.data?.user?.id, role);
           if (isReleased) {
             // redirect to confirmation page where user is told to check email
             router.replace(
               `${Routes.confirmRegistration.url}?email=${encodeURIComponent(
-                email
-              )}`
+                email,
+              )}`,
             );
           } else {
             redirectOnboard();
@@ -154,55 +158,79 @@ const SignupComponent = (props: SignupComponentI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVerified]);
 
+  useEffect(() => {
+    if (role) trackSignupStarted(role);
+  }, [role]);
+
   return (
     <div className="bg-white w-full mx-auto my-6 max-w-lg p-6 md:p-8 rounded-lg shadow-lg">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {title || text ? (
-          <div>
-            {title ? (
-              <h2 className="text-center font-medium">{title}</h2>
-            ) : null}
-            {text ? (
-              <p className="text-center text-sm text-gray-500 mt-2">{text}</p>
-            ) : null}
-          </div>
-        ) : null}
-        {/* <Undraw graphic="sign-up" /> */}
-        <div className="mt-4 mb-8 mx-auto max-w-56 text-center">
-          <div
-            className={clsx(
-              "mb-4 w-full inline-flex items-center justify-center gap-2 p-2 rounded-full shadow",
-              role === RolesEnum.CONSUMER
-                ? "text-consumer-blue bg-consumer-light-blue"
-                : "text-vigil-orange bg-vigil-light-orange"
-            )}>
-            {role === RolesEnum.CONSUMER ? (
-              <HeartIcon className="size-6" />
-            ) : (
-              <FaceSmileIcon className="size-6" />
-            )}
-            <span>
-              Registrazione&nbsp;
-              {role === RolesEnum.CONSUMER ? "Famiglia" : "Vigil"}
-            </span>
-          </div>
-          <div>
-            <Link
-              href={
-                role === RolesEnum.CONSUMER
-                  ? Routes.registrationVigil.url
-                  : Routes.registrationConsumer.url
-              }
-              className={clsx(
-                "hover:font-semibold transition",
-                role === RolesEnum.CONSUMER
-                  ? "text-vigil-orange"
-                  : "text-consumer-blue"
-              )}>
-              Cambia tipo di account
-            </Link>
-          </div>
+      {title || text ? (
+        <div>
+          {title ? <h2 className="text-center font-medium">{title}</h2> : null}
+          {text ? (
+            <p className="text-center text-sm text-gray-500 mt-2">{text}</p>
+          ) : null}
         </div>
+      ) : null}
+      {/* <Undraw graphic="sign-up" /> */}
+      <div className="mt-4 mb-8 mx-auto max-w-56 text-center">
+        <div
+          className={clsx(
+            "mb-4 w-full inline-flex items-center justify-center gap-2 p-2 rounded-full shadow",
+            role === RolesEnum.CONSUMER
+              ? "text-consumer-blue bg-consumer-light-blue"
+              : "text-vigil-orange bg-vigil-light-orange",
+          )}
+        >
+          {role === RolesEnum.CONSUMER ? (
+            <HeartIcon className="size-6" />
+          ) : (
+            <FaceSmileIcon className="size-6" />
+          )}
+          <span>
+            Registrazione&nbsp;
+            {role === RolesEnum.CONSUMER ? "Famiglia" : "Vigil"}
+          </span>
+        </div>
+        <div>
+          <Link
+            href={
+              role === RolesEnum.CONSUMER
+                ? Routes.registrationVigil.url
+                : Routes.registrationConsumer.url
+            }
+            className={clsx(
+              "hover:font-semibold transition",
+              role === RolesEnum.CONSUMER
+                ? "text-vigil-orange"
+                : "text-consumer-blue",
+            )}
+          >
+            Cambia tipo di account
+          </Link>
+        </div>
+      </div>
+
+      <div className="login-methods">
+        <div className="social-login space-y-4">
+          <ProviderButton
+            provider={ProviderEnum.GOOGLE}
+            full
+            action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
+            label="Continua con Google"
+            customClass="rounded-full shadow"
+          />
+          {/* <ProviderButton
+            provider={ProviderEnum.APPLE}
+            full
+            //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
+            label="Registrati con Apple"
+          />  */}
+        </div>
+        <Divider />
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Controller
           name="name"
           control={control}
@@ -277,7 +305,8 @@ const SignupComponent = (props: SignupComponentI) => {
               icon={
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  type="button">
+                  type="button"
+                >
                   <EyeIcon className="size-4 text-gray-500" />
                 </button>
               }
@@ -302,7 +331,8 @@ const SignupComponent = (props: SignupComponentI) => {
               icon={
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  type="button">
+                  type="button"
+                >
                   <EyeIcon className="size-4 text-gray-500" />
                 </button>
               }
@@ -336,7 +366,7 @@ const SignupComponent = (props: SignupComponentI) => {
                 </span>
               </label>
             </div>
-          ) : null
+          ) : null,
         )}
 
         {/* <div className="flex items-center justify-between">
@@ -388,25 +418,6 @@ const SignupComponent = (props: SignupComponentI) => {
         </div>
       </form>
 
-      <div className="login-methods">
-        <Divider />
-        <div className="social-login space-y-4">
-          <ProviderButton
-            provider={ProviderEnum.GOOGLE}
-            full
-            action={() => AuthService.providerLogin(ProviderEnum.GOOGLE)}
-            label="Continua con Google"
-            customClass="rounded-full shadow"
-          />
-          {/* <ProviderButton
-            provider={ProviderEnum.APPLE}
-            full
-            //action={() => AuthService.providerLogin(ProviderEnum.APPLE)}
-            label="Registrati con Apple"
-          />  */}
-        </div>
-      </div>
-
       <div className="space-y-2 mt-6">
         <p className="justify-center text-sm text-gray-500 inline-flex items-center w-full">
           Hai già un account?&nbsp;
@@ -415,8 +426,9 @@ const SignupComponent = (props: SignupComponentI) => {
             className={clsx(
               role === RolesEnum.CONSUMER
                 ? "text-consumer-blue"
-                : "text-vigil-orange"
-            )}>
+                : "text-vigil-orange",
+            )}
+          >
             {Routes.login.label}
           </Link>
         </p>

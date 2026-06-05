@@ -51,17 +51,25 @@ const ModalPortalComponent = (props: ModalPortalI) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, closable]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    document.body.classList.add("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [mounted]);
+
   return mounted
     ? createPortal(
         <div className="curtain fixed flex justify-center z-50 inset-0 w-full h-screen bg-black/25">
           <div
             className={clsx(
-              "absolute z-50 bg-white p-6",
-              "w-screen h-screen top-0 left-0",
-              "md:w-full md:h-auto md:max-w-2xl md:left-1/2 md:-translate-x-1/2 md:top-1/4 md:-translate-y-1/4 md:max-h-[calc(100vh-8rem)]",
+              "absolute z-50 bg-white",
+              "w-[calc(100%-2rem)] max-w-md max-h-[calc(100vh-2rem)] p-4 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+              "md:w-full md:max-w-2xl md:max-h-[calc(100vh-8rem)] md:top-1/4 md:-translate-y-1/4 md:p-6",
               "lg:max-w-5xl",
-              "rounded border border-gray-200 shadow-xl overflow-hidden",
-              customClass
+              "rounded border border-gray-200 shadow-xl overflow-y-auto overscroll-contain",
+              customClass,
             )}
           >
             {children}
@@ -69,7 +77,7 @@ const ModalPortalComponent = (props: ModalPortalI) => {
         </div>,
         target
           ? document.getElementById(target) || document.body
-          : document.body
+          : document.body,
       )
     : null;
 };

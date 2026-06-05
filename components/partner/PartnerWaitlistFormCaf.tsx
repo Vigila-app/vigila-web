@@ -31,12 +31,7 @@ const orgTypeOptions = [
   "Altro",
 ];
 
-const volumeOptions = [
-  "Meno di 50",
-  "50-200",
-  "200-500",
-  "Più di 500",
-];
+const volumeOptions = ["Meno di 50", "50-200", "200-500", "Più di 500"];
 
 const serviceOptions = [
   "Assunzione e contratto CCNL",
@@ -64,7 +59,7 @@ const PartnerWaitlistFormCaf = () => {
   const [state, setState] = useState<FormState>("idle");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -303,7 +298,7 @@ const PartnerWaitlistFormCaf = () => {
           "w-full rounded-full py-3 px-6 font-semibold text-white shadow transition",
           state === "submitting" || !isVerified
             ? "bg-gray-400 cursor-not-allowed"
-            : "bg-consumer-blue hover:bg-consumer-blue/90"
+            : "bg-consumer-blue hover:bg-consumer-blue/90",
         )}
       >
         {state === "submitting" ? "Invio in corso..." : "Entra in lista"}

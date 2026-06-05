@@ -47,7 +47,10 @@ const BookingMockup = () => (
       </div>
       <div className="grid grid-cols-7 gap-0.5">
         {["L", "M", "M", "G", "V", "S", "D"].map((d, i) => (
-          <div key={i} className="text-center text-[9px] text-gray-400 font-medium pb-0.5">
+          <div
+            key={i}
+            className="text-center text-[9px] text-gray-400 font-medium pb-0.5"
+          >
             {d}
           </div>
         ))}
@@ -58,8 +61,8 @@ const BookingMockup = () => (
               day === 8
                 ? "bg-vigil-orange text-white"
                 : day === 6 || day === 7
-                ? "text-gray-300"
-                : "text-gray-700 hover:bg-gray-100"
+                  ? "text-gray-300"
+                  : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             {day}
@@ -85,12 +88,8 @@ const BookingMockup = () => (
 const ReferralMockup = () => (
   <div className="rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
     <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-      <span className="text-sm font-semibold text-gray-700">
-        Area Referral
-      </span>
-      <span className="text-xs font-bold text-vigil-orange">
-        Totale: €320
-      </span>
+      <span className="text-sm font-semibold text-gray-700">Area Referral</span>
+      <span className="text-xs font-bold text-vigil-orange">Totale: €320</span>
     </div>
     <div className="p-4 space-y-2">
       {[
@@ -150,8 +149,8 @@ const LinkReferralMockup = () => (
     </div>
     <div className="p-5 space-y-4 text-center">
       <p className="text-xs text-gray-500 leading-relaxed">
-        Condividi questo link con la famiglia. Quando si iscrive e prenota,
-        la commissione viene assegnata automaticamente alla tua struttura.
+        Condividi questo link con la famiglia. Quando si iscrive e prenota, la
+        commissione viene assegnata automaticamente alla tua struttura.
       </p>
       <div className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 flex items-center gap-2">
         <LinkIcon className="w-4 h-4 text-gray-400 shrink-0" />
@@ -401,7 +400,7 @@ export default function PartnerClinichePage() {
                   "flex-1 py-3 text-sm font-semibold transition-colors",
                   activeTab === tab.key
                     ? "bg-vigil-orange text-white"
-                    : "text-gray-600 hover:bg-gray-50"
+                    : "text-gray-600 hover:bg-gray-50",
                 )}
               >
                 {tab.label}
@@ -412,7 +411,10 @@ export default function PartnerClinichePage() {
           {/* Steps — desktop */}
           <div className="hidden md:grid grid-cols-3 gap-8">
             {currentTab.steps.map((step, i) => (
-              <div key={step.title} className="flex flex-col items-center text-center gap-4">
+              <div
+                key={step.title}
+                className="flex flex-col items-center text-center gap-4"
+              >
                 <div className="relative">
                   <div className="w-14 h-14 rounded-full bg-vigil-orange text-white flex items-center justify-center text-xl font-bold shadow">
                     {i + 1}
@@ -443,7 +445,7 @@ export default function PartnerClinichePage() {
                     "w-full flex items-center justify-between px-4 py-3 text-left text-sm font-semibold transition",
                     activeTab === tab.key
                       ? "bg-vigil-orange text-white"
-                      : "text-gray-800 hover:bg-gray-50"
+                      : "text-gray-800 hover:bg-gray-50",
                   )}
                 >
                   {tab.label}
@@ -504,9 +506,18 @@ export default function PartnerClinichePage() {
       <section className="px-4 py-8 bg-gray-50 border-y border-gray-100">
         <div className="mx-auto max-w-4xl flex flex-wrap items-center justify-center gap-6">
           {[
-            { icon: <ShieldCheckIcon className="w-5 h-5" />, label: "Caregiver verificati" },
-            { icon: <CurrencyEuroIcon className="w-5 h-5" />, label: "Commissioni tracciabili" },
-            { icon: <BuildingOffice2Icon className="w-5 h-5" />, label: "Portale dedicato alla struttura" },
+            {
+              icon: <ShieldCheckIcon className="w-5 h-5" />,
+              label: "Caregiver verificati",
+            },
+            {
+              icon: <CurrencyEuroIcon className="w-5 h-5" />,
+              label: "Commissioni tracciabili",
+            },
+            {
+              icon: <BuildingOffice2Icon className="w-5 h-5" />,
+              label: "Portale dedicato alla struttura",
+            },
           ].map((b) => (
             <span
               key={b.label}

@@ -16,11 +16,12 @@ import {
   PaymentStatusEnum,
 } from "@/src/enums/booking.enums";
 import { BookingUtilsServer } from "@/server/utils/booking.utils.server";
+import { ServicesService } from "@/src/services";
 
 const verifyBookingAccess = async (
   bookingId: string,
   userId: string,
-  userRole: string
+  userRole: string,
 ) => {
   const _admin = getAdminClient();
   const { data, error } = await _admin
@@ -29,12 +30,14 @@ const verifyBookingAccess = async (
     .eq("id", bookingId)
     .single();
 
-  if (error)
+  if (error) {
+    console.log(error);
     throw jsonErrorResponse(500, {
       code: ResponseCodesConstants.BOOKINGS_DETAILS_ERROR.code,
       success: false,
       error,
     });
+  }
 
   if (!data)
     throw jsonErrorResponse(404, {
@@ -44,10 +47,16 @@ const verifyBookingAccess = async (
 
   // Check access based on role
   if (userRole === RolesEnum.CONSUMER && data.consumer_id !== userId) {
-    throw jsonErrorResponse(403, {
-      code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
-      success: false,
-    });
+    // Allow consumers to view notice-board proposal bookings with no consumer yet
+    const isNoticeProposal =
+      data.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
+      (!data.consumer_id || data.consumer_id === userId);
+    if (!isNoticeProposal) {
+      throw jsonErrorResponse(403, {
+        code: ResponseCodesConstants.BOOKINGS_DETAILS_FORBIDDEN.code,
+        success: false,
+      });
+    }
   }
 
   if (userRole === RolesEnum.VIGIL && data.vigil_id !== userId) {
@@ -62,7 +71,7 @@ const verifyBookingAccess = async (
 
 export async function DELETE(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -88,7 +97,7 @@ export async function DELETE(
     await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     );
     const _admin = getAdminClient();
 
@@ -105,7 +114,7 @@ export async function DELETE(
         data: bookingId,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -118,7 +127,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const { bookingId } = await context?.params;
@@ -143,7 +152,7 @@ export async function GET(
     await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     );
 
     const _admin = getAdminClient();
@@ -155,7 +164,7 @@ export async function GET(
         consumer:consumers(*),
         vigil:vigils(*),
         service:services(*)
-      `
+      `,
       )
       .eq("id", bookingId)
       .single<BookingI>();
@@ -168,7 +177,7 @@ export async function GET(
         data: booking,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -181,7 +190,7 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  context: { params: Promise<{ bookingId: string }> }
+  context: { params: Promise<{ bookingId: string }> },
 ) {
   try {
     const updatedBooking = await req.json();
@@ -212,7 +221,7 @@ export async function PUT(
     const booking = (await verifyBookingAccess(
       bookingId,
       userObject.id,
-      userObject.user_metadata?.role
+      userObject.user_metadata?.role,
     )) as BookingI;
 
     const _admin = getAdminClient();
@@ -225,24 +234,28 @@ export async function PUT(
     const requiresPaymentVerification =
       isPaymentStatusUpdate ||
       (isStatusUpdate && updatedBooking.status === BookingStatusEnum.CONFIRMED);
+    const isNoticeProposalAssociation =
+      booking.status === BookingStatusEnum.PENDING_NOTICE_PROPOSAL &&
+      !booking.consumer_id &&
+      userObject.id;
 
     if (requiresPaymentVerification && updatedBooking.payment_id) {
       try {
         console.log(
-          `Verifying payment for booking ${bookingId} with payment ID ${updatedBooking.payment_id}`
+          `Verifying payment for booking ${bookingId} with payment ID ${updatedBooking.payment_id}`,
         );
 
         await verifyPaymentWithStripe(
           updatedBooking.payment_id,
           userObject.id,
-          bookingId
+          bookingId,
         );
 
         console.log(`Payment verification successful for booking ${bookingId}`);
       } catch (paymentError) {
         console.error(
           `Payment verification failed for booking ${bookingId}:`,
-          paymentError
+          paymentError,
         );
         return jsonErrorResponse(400, {
           code: ResponseCodesConstants.BOOKINGS_UPDATE_BAD_REQUEST.code,
@@ -260,24 +273,65 @@ export async function PUT(
     let allowedUpdates = {};
     if (userObject.user_metadata?.role === RolesEnum.CONSUMER) {
       // Consumers can only update certain fields and only if booking is pending
-      if (booking.status === BookingStatusEnum.PENDING) {
-        allowedUpdates = {
-          service_date: updatedBooking.service_date,
-          duration_hours: updatedBooking.duration_hours,
-          notes: updatedBooking.notes,
-          status: updatedBooking.status,
-        };
-      }
-      if (
-        booking.status === BookingStatusEnum.CONFIRMED &&
-        dateDiff(booking.endDate, new Date()) > 24
-      ) {
-        allowedUpdates = {
-          service_date: updatedBooking.service_date,
-          duration_hours: updatedBooking.duration_hours,
-          notes: updatedBooking.notes,
-          status: updatedBooking.status,
-        };
+      switch (booking.status) {
+        case BookingStatusEnum.PENDING:
+        case BookingStatusEnum.PENDING_NOTICE_PROPOSAL:
+          {
+            const service = ServicesService.getServicesByType(
+              booking.service_type || updatedBooking.service_type,
+            );
+            const extrasTotal = updatedBooking.extras?.length
+              ? (service?.extra
+                  ?.filter((extra) =>
+                    (updatedBooking.extras || []).includes(extra.id),
+                  )
+                  .map((extra) => extra.fixed_price)
+                  .reduce((acc, price) => acc + price, 0) ?? 0)
+              : 0;
+            const price = service
+              ? (service?.min_hourly_rate + (service?.fee || 0)) *
+                  (updatedBooking.quantity || 0) +
+                extrasTotal
+              : updatedBooking.price;
+
+            // compute fee safely — fallback to existing booking.fee when computation is invalid
+            const computedFee =
+              (service?.fee ?? 2) * (updatedBooking.quantity || 0);
+            const feeToSet =
+              Number.isFinite(computedFee) && !Number.isNaN(computedFee)
+                ? computedFee
+                : undefined;
+
+            allowedUpdates = {
+              address: updatedBooking.address,
+              startDate: updatedBooking.startDate,
+              endDate: updatedBooking.endDate,
+              quantity: updatedBooking.quantity,
+              price: price,
+              service_date: updatedBooking.service_date,
+              duration_hours: updatedBooking.duration_hours,
+              notes: updatedBooking.notes,
+              status: updatedBooking.status,
+            };
+
+            if (feeToSet !== undefined) {
+              // only include fee when we have a valid computed value
+              (allowedUpdates as any).fee = feeToSet;
+            }
+          }
+          break;
+        case BookingStatusEnum.CONFIRMED:
+          {
+            if (dateDiff(booking.endDate, new Date()) > 24) {
+              allowedUpdates = {
+                service_date: updatedBooking.service_date,
+                duration_hours: updatedBooking.duration_hours,
+                notes: updatedBooking.notes,
+                status: updatedBooking.status,
+              };
+            }
+          }
+          break;
       }
 
       // Consumers can also update payment-related fields after payment completion
@@ -287,6 +341,13 @@ export async function PUT(
           payment_id: updatedBooking.payment_id,
           payment_status: updatedBooking.payment_status,
           status: updatedBooking.status || BookingStatusEnum.CONFIRMED,
+        };
+      }
+
+      if (isNoticeProposalAssociation) {
+        allowedUpdates = {
+          ...allowedUpdates,
+          consumer_id: userObject.id,
         };
       }
     } else if (userObject.user_metadata?.role === RolesEnum.VIGIL) {
@@ -310,15 +371,12 @@ export async function PUT(
         consumer:consumers(*),
         vigil:vigils(*),
         service:services(*)
-      `
+      `,
       )
       .single<BookingI>();
 
     if (error || !data) throw error;
 
-    console.log(1, updatedBooking);
-    console.log(2, booking);
-    console.log(3, isStatusUpdate);
     // Invia email di aggiornamento stato se lo stato è cambiato
     if (isStatusUpdate && updatedBooking.status !== booking.status) {
       try {
@@ -333,7 +391,7 @@ export async function PUT(
               vigil: data.vigil || updatedBooking.vigil,
               consumer: data.consumer || updatedBooking.consumer,
             },
-            consumer
+            consumer,
           );
         }
         if (vigil?.email) {
@@ -344,7 +402,7 @@ export async function PUT(
               vigil: data.vigil || updatedBooking.vigil,
               consumer: data.consumer || updatedBooking.consumer,
             },
-            vigil
+            vigil,
           );
         }
       } catch (emailError) {
@@ -359,7 +417,7 @@ export async function PUT(
         data,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {

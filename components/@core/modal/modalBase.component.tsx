@@ -60,15 +60,15 @@ const ModalBase = (props: ModalBaseI) => {
               aria-label="Close modal"
               className="absolute -top-2 -right-2 transition hover:text-gray-500"
             >
-              <XMarkIcon className="size-6 md:size-5" />
+              <XMarkIcon className="w-6 h-6 md:w-5 md:h-5" />
             </span>
           ) : null}
         </div>
         <div
           className={clsx(
-            "modal-body px-2 text-sm text-gray-500 pt-1 overflow-y-auto",
+            "modal-body px-2 pt-1 overflow-y-auto",
             "max-h-[calc(100vh-6rem)]",
-            "md:max-h-[calc(100vh-16rem)]"
+            "md:max-h-[calc(100vh-12rem)]"
           )}
         >
           {children}

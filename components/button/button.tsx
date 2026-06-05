@@ -7,7 +7,7 @@ import { RolesEnum } from "@/src/enums/roles.enums";
 
 const LoaderSpinner = dynamic(
   () => import("@/components/loaderSpinner/loaderSpinner"),
-  { ssr: !!false }
+  { ssr: !!false },
 );
 
 type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -16,6 +16,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   danger?: boolean;
   icon?: React.ReactNode;
   label: string | React.ReactNode;
+  onboard?: boolean;
   primary?: boolean;
   secondary?: boolean;
   small?: boolean;
@@ -24,6 +25,7 @@ type ButtonI = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isLoading?: boolean;
   full?: boolean;
   role?: RolesEnum;
+  iconPosition?: "left" | "right";
 };
 
 const Button = (props: ButtonI) => {
@@ -32,6 +34,7 @@ const Button = (props: ButtonI) => {
     customClass,
     label,
     icon,
+    onboard = false,
     primary = true,
     secondary = false,
     role,
@@ -41,25 +44,28 @@ const Button = (props: ButtonI) => {
     danger = false,
     isLoading = false,
     full = false,
+    iconPosition = "left",
   } = props;
 
   const btnClass = clsx(
     ButtonStyle.baseBtnStyle,
     danger
       ? ButtonStyle.dangerBtnStyle
-      : text
-        ? ButtonStyle.textBtnStyle
-        : secondary
-          ? ButtonStyle.secondaryBtnStyle
-          : tab
-            ? ButtonStyle.tabBtnStyle
-            : role === RolesEnum.VIGIL
-            ? ButtonStyle.vigilBtnStyle
-            : role === RolesEnum.CONSUMER
-            ? ButtonStyle.consumerBtnStyle
-            : primary
-              ? ButtonStyle.primaryBtnStyle
-                  : ""
+      : onboard
+        ? ButtonStyle.onboardingBtnStyle
+        : text
+          ? ButtonStyle.textBtnStyle
+          : secondary
+            ? ButtonStyle.secondaryBtnStyle
+            : tab
+              ? ButtonStyle.tabBtnStyle
+              : role === RolesEnum.VIGIL
+                ? ButtonStyle.vigilBtnStyle
+                : role === RolesEnum.CONSUMER
+                  ? ButtonStyle.consumerBtnStyle
+                  : primary
+                    ? ButtonStyle.primaryBtnStyle
+                    : "",
   );
   const isDisabled = isLoading || props.disabled;
 
@@ -72,12 +78,13 @@ const Button = (props: ButtonI) => {
         isLoading && ButtonStyle.loadingBtnStyle,
         full && ButtonStyle.fullBtnStyle,
         props.disabled && "cursor-not-allowed",
-        customClass
+        customClass,
       )}
       {...{
         ...props,
         action: undefined,
         customClass: undefined,
+        onboard: undefined,
         primary: undefined,
         secondary: undefined,
         danger: undefined,
@@ -90,15 +97,19 @@ const Button = (props: ButtonI) => {
         full: undefined,
       }}
       disabled={isDisabled}
-      onClick={action}>
+      onClick={action}
+    >
       {isLoading ? (
         <span className="mr-2">
           <LoaderSpinner size="small" />
         </span>
-      ) : icon ? (
+      ) : icon && iconPosition === "left" ? (
         <span className="mr-2">{icon}</span>
       ) : null}
       {label}
+      {icon && iconPosition === "right" ? (
+        <span className="ml-2">{icon}</span>
+      ) : null}
     </button>
   );
 };

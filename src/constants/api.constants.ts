@@ -1,6 +1,5 @@
 import { isServer } from "@/src/utils/common.utils";
 import { isMocked, isReleased } from "@/src/utils/envs.utils";
-import { SupabaseConstants } from "@/src/constants/supabase.constants";
 import { CmsContentType } from "@/src/enums/cms.enums";
 import { AppConstants } from "@/src/constants";
 import { ServiceI } from "@/src/types/services.types";
@@ -76,7 +75,7 @@ const apiControllers = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean
+    isMock?: boolean,
   ): string => `${apiBase.V1(isMock)}/cms/${contentType}/${contentId}`,
   // endregion CMS
 
@@ -136,15 +135,35 @@ const apiControllers = {
   // region EMAIL
   EMAIL: (isMock?: boolean): string => `${apiBase.V1(isMock)}/email`,
   // endregion EMAIL
+
+  // region PUBLIC
+  PUBLIC_SEARCH: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/public/search`,
+  NOTICE_BOARD: (isMock?: boolean): string =>
+    `${apiBase.V1(isMock)}/notice-board`,
+  // endregion PUBLIC
+
+  // region CALENDAR
+  CALENDAR: (isMock?: boolean): string => `${apiBase.V1(isMock)}/calendar`,
+  // endregion CALENDAR
+
+  // region MATCHING
+  MATCHING: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
+  // endregion MATCHING
 };
 
 export const apiUser = {
   SIGNUP: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/signup`,
-  COMPLETE_GOOGLE: (isMock?: boolean): string => `${apiControllers.USER(isMock)}/completeGoogle`,
+  COMPLETE_GOOGLE: (isMock?: boolean): string =>
+    `${apiControllers.USER(isMock)}/completeGoogle`,
   DETAILS: (id: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
       isMock ? "user" : id
     }`,
+  DATA: (id: string, role: RolesEnum, isMock?: boolean): string =>
+    `${apiControllers.USER(isMock)}/${role?.toLowerCase()}/${
+      isMock ? "user" : id
+    }/data`,
   DELETE: (id: string, isMock?: boolean): string =>
     `${apiControllers.USER(isMock)}/${isMock ? "user" : id}`,
   DEVICES: (id: string, isMock?: boolean): string =>
@@ -163,6 +182,10 @@ export const apiAltcha = {
 export const apiOnboard = {
   ONBOARD: (userId: string, role: RolesEnum, isMock?: boolean): string =>
     `${apiControllers.ONBOARD(isMock)}/${userId}/${role}`,
+};
+
+export const apiMatching = {
+  MATCH: (isMock?: boolean): string => `${apiBase.V1(isMock)}/matching`,
 };
 export const apiServices = {
   CREATE: (isMock?: boolean): string => apiControllers.SERVICES(isMock),
@@ -211,7 +234,7 @@ export const apiCms = {
   CONTENT: (
     contentType: CmsContentType,
     contentId: string,
-    isMock?: boolean
+    isMock?: boolean,
   ): string => apiControllers.CONTENT(contentType, contentId, isMock),
 };
 
@@ -230,11 +253,15 @@ export const apiCheckout = {
 export const apiConsumer = {
   DETAILS: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}`,
+  DATA: (consumerId: ConsumerDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.CONSUMER(isMock)}/${isMock ? "consumer" : consumerId}/data`,
 };
 
 export const apiVigil = {
   DETAILS: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
     `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}`,
+  DATA: (vigilId: VigilDetailsType["id"], isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/data`,
 };
 
 export const apiAdmin = {
@@ -271,4 +298,42 @@ export const apiReviews = {
 
 export const apiEmail = {
   SEND: (isMock?: boolean): string => apiControllers.EMAIL(isMock),
+};
+
+export const apiPublicSearch = {
+  SEARCH: (isMock?: boolean): string => apiControllers.PUBLIC_SEARCH(isMock),
+};
+
+export const apiNoticeBoard = {
+  CREATE: (isMock?: boolean): string => apiControllers.NOTICE_BOARD(isMock),
+  LIST: (isMock?: boolean): string => apiControllers.NOTICE_BOARD(isMock),
+  DETAILS: (id: string, isMock?: boolean): string =>
+    `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : id}`,
+  PROPOSE: (noticeId: string, isMock?: boolean): string =>
+    `${apiControllers.NOTICE_BOARD(isMock)}/${isMock ? "notice" : noticeId}`,
+};
+export const apiCalendar = {
+  // Consumer APIs
+  CONSUMER: (isMock?: boolean): string =>
+    `${apiControllers.CALENDAR(isMock)}/consumer`,
+
+  // Vigil Calendar APIs
+  VIGIL_BOOKINGS: (isMock?: boolean): string =>
+    `${apiControllers.CALENDAR(isMock)}/vigil/bookings`,
+
+  // Availability Rules APIs
+  AVAILABILITY_RULES: (isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/availability-rules`,
+  AVAILABILITY_RULE: (ruleId: string, isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/availability-rules/${isMock ? "rule" : ruleId}`,
+
+  // Unavailabilities APIs
+  UNAVAILABILITIES: (isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/unavailabilities`,
+  UNAVAILABILITY: (unavailabilityId: string, isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/unavailabilities/${isMock ? "unavailability" : unavailabilityId}`,
+
+  // Available Slots API
+  AVAILABLE_SLOTS: (vigilId: string, isMock?: boolean): string =>
+    `${apiControllers.VIGIL(isMock)}/${isMock ? "vigil" : vigilId}/available-slots`,
 };

@@ -32,12 +32,7 @@ const structureTypeOptions = [
   "Altro",
 ];
 
-const volumeOptions = [
-  "Meno di 100",
-  "100-500",
-  "500-1.000",
-  "Più di 1.000",
-];
+const volumeOptions = ["Meno di 100", "100-500", "500-1.000", "Più di 1.000"];
 
 const serviceOptions = [
   "Booking caregiver per i pazienti",
@@ -64,7 +59,7 @@ const PartnerWaitlistFormCliniche = () => {
   const [state, setState] = useState<FormState>("idle");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -318,7 +313,7 @@ const PartnerWaitlistFormCliniche = () => {
           "w-full rounded-full py-3 px-6 font-semibold text-white shadow transition",
           state === "submitting" || !isVerified
             ? "bg-gray-400 cursor-not-allowed"
-            : "bg-consumer-blue hover:bg-consumer-blue/90"
+            : "bg-consumer-blue hover:bg-consumer-blue/90",
         )}
       >
         {state === "submitting" ? "Invio in corso..." : "Entra in lista"}

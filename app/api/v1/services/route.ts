@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         *,
         vigil:vigils(*)
       `,
-      { count: "exact" }
+      { count: "exact" },
     );
 
     if (Object.keys(filters).length) {
@@ -163,7 +163,7 @@ export async function GET(req: NextRequest) {
           count,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {
@@ -181,15 +181,17 @@ export async function POST(req: NextRequest) {
 
     const userObject = await authenticateUser(req);
     if (!userObject?.id || userObject.user_metadata?.role !== RolesEnum.VIGIL)
-      return jsonErrorResponse(401, {
+      return jsonErrorResponse(403, {
         code: ResponseCodesConstants.SERVICES_CREATE_UNAUTHORIZED.code,
         success: false,
+        error: "Unauthorized",
       });
 
     if (!(body?.name && body?.unit_price && body?.unit_type)) {
       return jsonErrorResponse(400, {
         code: ResponseCodesConstants.SERVICES_CREATE_BAD_REQUEST.code,
         success: false,
+        error: "Missing required fields: name, unit_price, unit_type",
       });
     }
 
@@ -214,7 +216,7 @@ export async function POST(req: NextRequest) {
         data,
         success: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return jsonErrorResponse(500, {

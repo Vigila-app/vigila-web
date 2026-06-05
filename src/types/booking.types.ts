@@ -10,9 +10,11 @@ import { VigilDetailsType } from "@/src/types/vigil.types";
 export type BookingI = {
   id: string;
   active: boolean;
-  service_id: ServiceI["id"];
+  service_id?: ServiceI["id"];
+  service_type?: ServiceI["type"];
   consumer_id: UserType["id"];
   vigil_id: UserType["id"];
+  notice_id?: string;
   startDate: Date;
   endDate: Date;
   quantity: number;
@@ -40,16 +42,17 @@ export type BookingFormI = BookingI & {};
 export type BookingStoreType = {
   onLogout: () => void;
   bookings: BookingI[];
+  totalCount: number;
   lastUpdate?: Date;
   getBookings: (force?: boolean) => void;
   getBookingDetails: (
     bookingId: BookingI["id"],
-    force?: boolean
+    force?: boolean,
   ) => Promise<BookingI>;
   createBooking: (booking: BookingFormI) => Promise<BookingI>;
   updateBookingStatus: (
     bookingId: BookingI["id"],
-    status: BookingStatusEnum
+    status: BookingStatusEnum,
   ) => Promise<BookingI>;
   cancelBooking: (bookingId: BookingI["id"]) => Promise<boolean>;
   resetLastUpdate: () => void;

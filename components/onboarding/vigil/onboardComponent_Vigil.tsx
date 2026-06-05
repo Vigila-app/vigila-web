@@ -24,7 +24,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { AuthService } from "@/src/services";
-import { OccupationEnum, OccupationLabels } from "@/src/enums/common.enums";
+import { OccupationEnum, OccupationLabels } from "@/src/enums/onboarding.enums";
 
 type OnboardFormI = {
   birthday: string;
@@ -47,8 +47,7 @@ const transportationOptions = [
 
 // Occupazioni che richiedono documentazione
 const OCCUPATIONS_REQUIRING_DOCUMENTATION = [
-  OccupationEnum.OSA,
-  OccupationEnum.OSS,
+  OccupationEnum.PROFESSIONAL,
   OccupationEnum.NURSE,
 ];
 
@@ -81,7 +80,7 @@ const VigilOnboardComponent = () => {
     (services: ServiceI[]) => {
       setValue("services", services);
     },
-    [setValue]
+    [setValue],
   );
 
   useEffect(() => {
@@ -106,7 +105,9 @@ const VigilOnboardComponent = () => {
       } = formData;
 
       const caps = Array.from(
-        new Set(addresses.map((addr) => addr.address?.postcode).filter(Boolean))
+        new Set(
+          addresses.map((addr) => addr.address?.postcode).filter(Boolean),
+        ),
       );
 
       const servicesWithCaps = services.map((service) => ({
@@ -129,7 +130,7 @@ const VigilOnboardComponent = () => {
             phone,
           },
         },
-        servicesWithCaps as unknown as ServiceI[]
+        servicesWithCaps as unknown as ServiceI[],
       );
       showToast({
         message: "Profilo aggiornato con successo",
@@ -172,12 +173,12 @@ const VigilOnboardComponent = () => {
               rules={{
                 required: true,
                 min: new Date(
-                  new Date().setFullYear(new Date().getFullYear() - 80)
+                  new Date().setFullYear(new Date().getFullYear() - 80),
                 )
                   .toISOString()
                   .split("T")[0],
                 max: new Date(
-                  new Date().setFullYear(new Date().getFullYear() - 18)
+                  new Date().setFullYear(new Date().getFullYear() - 18),
                 )
                   .toISOString()
                   .split("T")[0],
@@ -190,14 +191,14 @@ const VigilOnboardComponent = () => {
                   autoFocus
                   min={
                     new Date(
-                      new Date().setFullYear(new Date().getFullYear() - 80)
+                      new Date().setFullYear(new Date().getFullYear() - 80),
                     )
                       .toISOString()
                       .split("T")[0]
                   }
                   max={
                     new Date(
-                      new Date().setFullYear(new Date().getFullYear() - 18)
+                      new Date().setFullYear(new Date().getFullYear() - 18),
                     )
                       .toISOString()
                       .split("T")[0]
@@ -250,7 +251,7 @@ const VigilOnboardComponent = () => {
                   />
                   {field.value &&
                     OCCUPATIONS_REQUIRING_DOCUMENTATION.includes(
-                      field.value as OccupationEnum
+                      field.value as OccupationEnum,
                     ) && (
                       <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                         <div className="flex gap-2 items-center">
@@ -302,7 +303,7 @@ const VigilOnboardComponent = () => {
                       setAddresses((prev) => {
                         if (
                           prev.some(
-                            (a) => a.display_name === address.display_name
+                            (a) => a.display_name === address.display_name,
                           )
                         )
                           return prev;
@@ -331,7 +332,7 @@ const VigilOnboardComponent = () => {
                               type="button"
                               onClick={() => {
                                 setAddresses((prev) =>
-                                  prev.filter((_, index) => index !== i)
+                                  prev.filter((_, index) => index !== i),
                                 );
                               }}
                               className="text-red-500 hover:text-red-700 font-bold"
@@ -344,7 +345,10 @@ const VigilOnboardComponent = () => {
                       </ul>
                     </div>
                   ) : (
-                    <a href="#search" className="inline-flex justify-center w-full my-2 items-center gap-1 text-sm animate-pulse">
+                    <a
+                      href="#search"
+                      className="inline-flex justify-center w-full my-2 items-center gap-1 text-sm animate-pulse"
+                    >
                       <ExclamationTriangleIcon className="size-5 min-w-4 text-vigil-orange" />
                       <span className="border-b border-vigil-orange">
                         Aggiungi almeno un&apos;area per continuare
@@ -371,7 +375,7 @@ const VigilOnboardComponent = () => {
                     className={clsx(
                       "block font-medium mb-1",
                       role === RolesEnum.VIGIL && "text-vigil-orange",
-                      role === RolesEnum.CONSUMER && "text-consumer-blue"
+                      role === RolesEnum.CONSUMER && "text-consumer-blue",
                     )}
                   >
                     Mezzo di trasporto

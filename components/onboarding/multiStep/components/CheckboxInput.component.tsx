@@ -1,0 +1,169 @@
+import { Checkbox } from "@/components/form";
+import { RolesEnum } from "@/src/enums/roles.enums";
+import { QuestionRendererProps } from "@/src/types/multiStepOnboard.types";
+import clsx from "clsx";
+
+export const CheckboxInput = ({
+  question,
+  onChange,
+  role,
+  error,
+  value,
+}: QuestionRendererProps) => {
+  return (
+    <Checkbox
+      label={question.label}
+      role={role}
+      checked={!!value}
+      onChange={(checked) => onChange(checked)}
+      error={error}
+    />
+  );
+};
+
+export const MulticheckboxInput = ({
+  question,
+  onChange,
+  role,
+  variation,
+  error,
+  value,
+}: QuestionRendererProps) => {
+  const currentValues = Array.isArray(value) ? value : [];
+  const noneValue = question.options?.find(
+    (option) => String(option.value).toLowerCase() === "none",
+  )?.value;
+  const reachedMax =
+    question.max && currentValues.length >= Number(question.max);
+  return (
+    <div>
+      <label
+        className={clsx(
+          "block font-semibold mb-2 text-center ",
+          role === RolesEnum.VIGIL && "text-vigil-orange",
+          role === RolesEnum.CONSUMER && "text-consumer-blue",
+        )}
+      >
+        {question.label}
+        {question.validation?.required}
+      </label>
+      {question.description && (
+        <p className="text-sm text-gray-600 mb-3">{question.description}</p>
+      )}
+      <div
+        className={clsx(
+          question.options?.[0].icon
+            ? "space-y-2"
+            : `flex flex-col align-center gap-2 justify-center`,
+        )}
+      >
+        {question.options?.map((option) => {
+          const isChecked = currentValues.includes(option.value);
+          const isNoneOption =
+            noneValue !== undefined && option.value === noneValue;
+          const isDisabled = !!(!isChecked && reachedMax && !isNoneOption);
+          return (
+            <div
+              key={option.value}
+              className={clsx(
+                option.icon ? "border-2 " : "border-1 ",
+                "p-2 border-grey-200 rounded-3xl",
+                isChecked &&
+                  role === RolesEnum.VIGIL &&
+                  "border-vigil-orange bg-vigil-light-orange",
+                isChecked &&
+                  role === RolesEnum.CONSUMER &&
+                  "border-consumer-blue bg-consumer-light-blue text-consumer-blue",
+                isDisabled && "opacity-50 pointer-events-none",
+              )}
+            >
+              <label
+                key={option.value}
+                htmlFor={option.label}
+                className="flex flex-col items-center gap-2 text-center text-balance font-normal text-lg"
+              >
+                {option.icon && (
+                  <option.icon
+                    className={`text-gray-400 w-7 h-7 ${
+                      isChecked
+                        ? clsx(
+                            role === RolesEnum.VIGIL && "text-vigil-orange",
+                            role === RolesEnum.CONSUMER && "text-consumer-blue",
+                          )
+                        : ""
+                    }`}
+                  />
+                )}
+                <span className="text-xl text-center font-normal">
+                  {" "}
+                  {option.label}
+                </span>
+                {variation === "service" && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-sm text-gray-500">
+                      {option.description}
+                    </span>
+                    <div>
+                      <span
+                        className={clsx(
+                          "text-lg font-bold rounded-4xl px-4 py-0.5 bg-gray-100 text-gray-700",
+                          isChecked && "bg-vigil-orange text-white",
+                        )}
+                      >
+                        {option.fee && `€${option.fee.toFixed(2)}/h`}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="hidden">
+                  <Checkbox
+                    id={option.label}
+                    label={option.label}
+                    role={role}
+                    checked={isChecked}
+                    disabled={isDisabled}
+                    onChange={(checked) => {
+                      let newValues: Array<string | number>;
+                      const isNoneOption =
+                        noneValue !== undefined && option.value === noneValue;
+                      if (checked) {
+                        if (isNoneOption) {
+                          newValues = [option.value];
+                          onChange(newValues);
+                          return;
+                        }
+
+                        if (noneValue !== undefined) {
+                          newValues = currentValues.filter(
+                            (v) => v !== noneValue,
+                          );
+                        } else {
+                          newValues = [...currentValues];
+                        }
+
+                        if (!reachedMax || isNoneOption) {
+                          newValues = [...newValues, option.value];
+                          onChange(newValues);
+                        }
+                      } else {
+                        newValues = currentValues.filter(
+                          (v) => v !== option.value,
+                        );
+                        onChange(newValues);
+                      }
+                    }}
+                    error={error}
+                  />
+                </div>
+              </label>
+            </div>
+          );
+        })}
+      </div>
+      {typeof question.max === "number" && (
+        <p className="text-xs text-gray-500 mt-2">{`Max selezionabili: ${question.max}`}</p>
+      )}
+    </div>
+  );
+};

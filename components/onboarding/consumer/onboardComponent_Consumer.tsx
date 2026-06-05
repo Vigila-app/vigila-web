@@ -17,6 +17,7 @@ import { FormFieldType } from "@/src/constants/form.constants";
 import SearchAddress from "@/components/maps/searchAddress.component";
 import { AddressI } from "@/src/types/maps.types";
 import { useState, useEffect } from "react";
+import { StorageUtils } from "@/src/utils/storage.utils";
 
 type OnboardFormI = {
   lovedOneName: string;
@@ -51,6 +52,14 @@ const ConsumerOnboardComponent = () => {
       setValue("address", address);
     }
   }, [address, setValue]);
+
+  const redirectHome = () => {
+    if (StorageUtils.getSessionValues("redirectAuthTo")) {
+      router.replace(StorageUtils.getSessionValues("redirectAuthTo") as string);
+    } else {
+      router.replace(Routes.home.url);
+    }
+  };
 
   const onSubmit = async (formdata: OnboardFormI) => {
     try {
@@ -91,7 +100,7 @@ const ConsumerOnboardComponent = () => {
       });
       await AuthService.renewAuthentication();
       await getUserDetails(true);
-      router.replace(Routes.home.url);
+      redirectHome();
     } catch (err) {
       console.error("Errore durante la registrazione dei dati", err);
       showToast({

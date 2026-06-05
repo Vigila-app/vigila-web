@@ -5,7 +5,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { InputFile } from "@/components/form";
 import { randomNumber } from "@/src/utils/common.utils";
 import { useUserStore } from "@/src/store/user/user.store";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { StorageUtils } from "@/src/utils/storage.utils";
 
 const BACKGROUND_COLORS = [
@@ -62,7 +62,7 @@ type AvatarI = {
   withUpload?: boolean;
   onFileUpload?: (
     file: string | ArrayBuffer | File,
-    metadata: { contentType: string }
+    metadata: { contentType: string },
   ) => void;
   value?: string;
   userId?: string;
@@ -76,6 +76,9 @@ const AvatarSize = {
   big: "size-16 text-lg",
   xxl: "size-25 text-xl",
 };
+
+const sessionID = new Date().getTime().toString();
+let profilePicRequested: boolean | string = false;
 
 const Avatar = (props: AvatarI) => {
   const {
@@ -93,24 +96,28 @@ const Avatar = (props: AvatarI) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [profilePic, setProfilePic] = useState<string | undefined>();
 
-  const getProfilePic = async (id: string) => {
-    if (id) {
-      const profilePicUrl = await StorageUtils.getURL("profile-pics", id);
+  const getProfilePic = useCallback(async () => {
+    if (userId || user?.id) {
+      profilePicRequested = sessionID;
+      const profilePicUrl = await StorageUtils.getURL(
+        "profile-pics",
+        (userId || user?.id) as string,
+      );
       if (profilePicUrl) {
         setProfilePic(profilePicUrl);
+        return profilePicUrl;
       }
     }
-  };
+  }, [userId, user?.id]);
 
   useEffect(() => {
-    const finalUserId = userId || user?.id;
-    if (!imgUrl && finalUserId) getProfilePic(finalUserId);
+    if (!imgUrl) getProfilePic();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgUrl, user?.id, userId, lastUserUpdate]);
 
   const imgStyle = clsx(
     "rounded-full object-cover font-normal",
-    AvatarSize[size]
+    AvatarSize[size],
   );
 
   const randomKey = useMemo(() => randomNumber(0, 19), []);
@@ -121,8 +128,9 @@ const Avatar = (props: AvatarI) => {
       className={clsx(
         "relative items-center cursor-pointer",
         inline ? "inline-flex gap-1" : "flex flex-col gap-1",
-        className
-      )}>
+        className,
+      )}
+    >
       {imgUrl || profilePic ? (
         <img alt="avatar" src={imgUrl || profilePic} className={imgStyle} />
       ) : value ? (
@@ -130,22 +138,24 @@ const Avatar = (props: AvatarI) => {
           className={clsx(
             "inline-flex items-center justify-center rounded-full select-none",
             AvatarSize[size],
-            size === "big" && "shadow"
+            size === "big" && "shadow",
           )}
           style={{
             backgroundColor: `#${BACKGROUND_COLORS[randomKey]}`,
-          }}>
+          }}
+        >
           <span className="sr-only">{value}</span>
           <span
             className="uppercase !no-underline"
-            style={{ color: `#${TEXT_COLORS[randomKey]}` }}>
+            style={{ color: `#${TEXT_COLORS[randomKey]}` }}
+          >
             {String(
               value.includes(" ")
                 ? value
                     .split(" ")
                     .map((s) => s.substring(0, 1))
                     .join("")
-                : value
+                : value,
             ).substring(0, 2)}
           </span>
         </div>
@@ -156,8 +166,9 @@ const Avatar = (props: AvatarI) => {
         <p
           className={clsx(
             "text-left text-ellipsis overflow-hidden text-nowrap select-all",
-            inline ? "max-w-40" : "max-w-60"
-          )}>
+            inline ? "max-w-40" : "max-w-60",
+          )}
+        >
           {label}
         </p>
       ) : null}

@@ -12,6 +12,7 @@ export type UserDetailsType = {
   username?: string;
   birthday?: string;
   information?: string;
+  bio?: string;
   gender?: GenderEnum;
   phone?: string;
   other?: { [key: string]: string | number };

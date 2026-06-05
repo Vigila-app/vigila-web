@@ -35,7 +35,7 @@ export type StripePaymentVerificationResult = {
 export const verifyPaymentWithStripe = async (
   paymentId: string,
   userId?: string,
-  bookingId?: string
+  bookingId?: string,
 ): Promise<StripePaymentVerificationResult> => {
   try {
     // Verifica lo stato del payment intent con Stripe
@@ -47,13 +47,21 @@ export const verifyPaymentWithStripe = async (
     // Verifica che il payment intent appartenga all'utente autenticato
     if (userId && paymentIntent.metadata?.user_id !== userId) {
       throw new Error(
-        "Payment intent does not belong to the authenticated user"
+        "Payment intent does not belong to the authenticated user",
       );
     }
 
-    // Verifica opzionale del booking ID se fornito
-    if (bookingId && paymentIntent.metadata?.bookingId !== bookingId) {
-      throw new Error("Payment intent booking ID mismatch");
+    // Verifica opzionale del booking ID se fornito (supporta sia singolo che multipli)
+    if (bookingId) {
+      const singleId = paymentIntent.metadata?.bookingId;
+      const multiIds =
+        paymentIntent.metadata?.bookingIds
+          ?.split(",")
+          .map((s: string) => s.trim())
+          .filter(Boolean) ?? [];
+      if (singleId !== bookingId && !multiIds.includes(bookingId)) {
+        throw new Error("Payment intent booking ID mismatch");
+      }
     }
 
     // Verifica che il pagamento sia stato completato con successo (solo per aggiornamenti)
@@ -100,12 +108,12 @@ export const getAdminClient = () => {
 export const getPagination = (
   nextUrl: NextURL,
   pageSize?: number,
-  limit = 25
+  limit = 25,
 ): PaginationI => {
   const page = parseInt(nextUrl?.searchParams?.get("page") || "") || 1;
   const itemPerPage = Math.min(
     pageSize || parseInt(nextUrl?.searchParams?.get("pageSize") || "") || 10,
-    limit
+    limit,
   );
 
   return {
@@ -118,7 +126,7 @@ export const getPagination = (
 
 export const getQueryParams = (
   url: string,
-  blacklist: string[] = []
+  blacklist: string[] = [],
 ): Record<string, any> => {
   const params = new URL(url).searchParams;
   const queryObject = Object.fromEntries(params.entries());

@@ -17,6 +17,7 @@ export { default as LandingVerticalSteps } from "./LandingVerticalSteps";
 export { default as LandingFaqCompact } from "./LandingFaqCompact";
 export { default as LandingFinalCTA } from "./LandingFinalCTA";
 export { default as LandingFooterAlt } from "./LandingFooterAlt";
+export { default as LandingSearchSection } from "./LandingSearchSection";
 
 export type { LandingHeroProps } from "./LandingHero";
 export type { LandingFeaturesProps, FeatureItem } from "./LandingFeatures";

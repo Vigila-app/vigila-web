@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+build
+coverage
+.vercel
+
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+public/assets
+
+next-env.d.ts
+*.tsbuildinfo

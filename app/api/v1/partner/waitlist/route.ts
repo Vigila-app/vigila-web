@@ -11,14 +11,14 @@ export async function POST(request: NextRequest) {
     if (!type || !fullName || !email || !phone || !consent) {
       return NextResponse.json(
         { error: "Parametri obbligatori mancanti." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!["caf", "cliniche"].includes(type)) {
       return NextResponse.json(
         { error: "Tipo di partner non valido." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -26,19 +26,19 @@ export async function POST(request: NextRequest) {
     if (!captcha) {
       return NextResponse.json(
         { error: "Verifica anti-bot richiesta." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const captchaOk = await altcha.verifySolution(
       captcha,
-      process.env.ALTCHA_HMAC_KEY as string
+      process.env.ALTCHA_HMAC_KEY as string,
     );
 
     if (!captchaOk) {
       return NextResponse.json(
         { error: "Verifica anti-bot non valida. Riprova." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       console.error("[Partner waitlist] DB error:", dbError);
       return NextResponse.json(
         { error: "Errore nel salvataggio dei dati." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     console.error("[Partner waitlist] Error:", error);
     return NextResponse.json(
       { error: "Errore interno del server." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

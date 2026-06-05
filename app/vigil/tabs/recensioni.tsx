@@ -14,10 +14,12 @@ import { useEffect, useMemo, useState } from "react";
 
 interface RecensioniTabProps {
   simplified?: boolean;
+  vigilId?: string;
 }
 
 export default function RecensioniTab({
   simplified = false,
+  vigilId: vigilIdProp,
 }: RecensioniTabProps) {
   const { user } = useUserStore();
   const { reviews, getReviews, getReviewsByVigil } = useReviewsStore();
@@ -28,16 +30,16 @@ export default function RecensioniTab({
   const vigilId =
     user?.user_metadata?.role === RolesEnum.VIGIL
       ? user?.id
-      : vigilIdFromParams;
+      : (vigilIdProp ?? vigilIdFromParams);
   const isConsumer = user?.user_metadata?.role === RolesEnum.CONSUMER;
 
   const filteredBookings = useMemo(
     () =>
       bookings.filter(
         (b) =>
-          b.vigil_id === vigilId && b.status === BookingStatusEnum.COMPLETED
+          b.vigil_id === vigilId && b.status === BookingStatusEnum.COMPLETED,
       ),
-    [bookings, vigilId]
+    [bookings, vigilId],
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);

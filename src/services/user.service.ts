@@ -21,7 +21,7 @@ export const UserService = {
         if (force) {
           if (id && role) {
             const { data } = (await ApiService.get(
-              apiUser.DETAILS(id as string, role as RolesEnum)
+              apiUser.DETAILS(id as string, role as RolesEnum),
             )) as { data: UserType };
             resolve(data);
           } else {
@@ -37,13 +37,25 @@ export const UserService = {
         reject(error);
       }
     }),
+  getUserData: async (id = "", role = "") =>
+    new Promise<UserType | null>(async (resolve, reject) => {
+      try {
+        const { data } = (await ApiService.get(
+          apiUser.DATA(id, role as RolesEnum),
+        )) as { data: UserType };
+        resolve(data);
+      } catch (error) {
+        console.error("UserService getUser error", error);
+        reject(error);
+      }
+    }),
   getUserDetails: async () =>
     new Promise<UserDetailsType>(async (resolve, reject) => {
       try {
         const user = await UserService.getUser();
         if (user?.id && user?.user_metadata?.role) {
           const { data: response } = (await ApiService.get(
-            apiUser.DETAILS(user?.id, user?.user_metadata?.role as RolesEnum)
+            apiUser.DETAILS(user?.id, user?.user_metadata?.role as RolesEnum),
           )) as { data: UserDetailsType };
           resolve(response);
         } else {
@@ -91,7 +103,7 @@ export const UserService = {
       displayName?: string;
       photoURL?: string;
     },
-    userDetails?: UserDetailsType
+    userDetails?: UserDetailsType,
   ) =>
     new Promise<{
       data?: { displayName?: string; photoURL?: string };
@@ -104,7 +116,7 @@ export const UserService = {
             apiUser.DETAILS(user.id, user.user_metadata?.role as RolesEnum),
             {
               data: { ...userData, ...userDetails },
-            }
+            },
           )) as any;
           resolve(response);
         } else {
@@ -114,13 +126,14 @@ export const UserService = {
         console.error("UserService updateUser error", error);
         reject(error);
       } finally {
-        const { user: storeUser, userDetails: storeUserDetails } = useUserStore.getState();
+        const { user: storeUser, userDetails: storeUserDetails } =
+          useUserStore.getState();
         const { data, error } = await AuthInstance.auth.refreshSession();
         const { user } = data;
         if (!error && storeUser) {
           useUserStore.getState().setUser({
-            user: {...storeUser, ...user},
-            userDetails: {...storeUserDetails, ...user?.user_metadata}
+            user: { ...storeUser, ...user },
+            userDetails: { ...storeUserDetails, ...user?.user_metadata },
           });
         }
         useUserStore.getState().getUserDetails();
@@ -133,7 +146,7 @@ export const UserService = {
         if (user?.id && Object.keys(terms)?.length) {
           const { data: response } = (await ApiService.put(
             apiUser.TERMS(user.id),
-            terms
+            terms,
           )) as { data: UserTermsType };
           resolve(response);
         } else {
@@ -152,7 +165,7 @@ export const UserService = {
         const user = await UserService.getUser();
         if (user?.id) {
           const { data: response } = (await ApiService.get(
-            apiUser.TERMS(user.id)
+            apiUser.TERMS(user.id),
           )) as { data: UserTermsType };
           resolve(response);
         } else {
@@ -170,7 +183,7 @@ export const UserService = {
         if (user?.id) {
           const { data: response } = (await ApiService.put(
             apiUser.DEVICES(user.id),
-            devices || []
+            devices || [],
           )) as { data: UserDevicesType };
           resolve(response);
         } else {
@@ -189,7 +202,7 @@ export const UserService = {
         const user = await UserService.getUser();
         if (user?.id) {
           const { data: response } = (await ApiService.get(
-            apiUser.DEVICES(user.id)
+            apiUser.DEVICES(user.id),
           )) as { data: UserDevicesType };
           resolve(response);
         } else {
@@ -231,7 +244,7 @@ export const UserService = {
           email,
           {
             redirectTo: `${window?.location?.origin || AppConstants.hostUrl}/${Routes.updatePassword.url}`,
-          }
+          },
         );
 
         if (error) {

@@ -15,6 +15,7 @@ type ButtonLinkI = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   inline?: boolean;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
+  onboard?: boolean;
 };
 
 const ButtonLink = (props: ButtonLinkI) => {
@@ -31,6 +32,7 @@ const ButtonLink = (props: ButtonLinkI) => {
     inline = false,
     icon,
     iconPosition = "left",
+    onboard = false,
   } = props;
 
   const btnClass = clsx(
@@ -40,13 +42,15 @@ const ButtonLink = (props: ButtonLinkI) => {
       ? ButtonStyle.textBtnStyle
       : secondary
         ? ButtonStyle.secondaryBtnStyle
-        : primary
-          ? ButtonStyle.primaryBtnStyle
-          : "",
+        : onboard
+          ? ButtonStyle.onboardingBtnStyle
+          : primary
+            ? ButtonStyle.primaryBtnStyle
+            : "",
     role === RolesEnum.VIGIL && ButtonStyle.vigilBtnStyle,
     role === RolesEnum.CONSUMER && ButtonStyle.consumerBtnStyle,
     full && ButtonStyle.fullBtnStyle,
-    small && ButtonStyle.smallBtnStyle
+    small && ButtonStyle.smallBtnStyle,
   );
 
   return (
@@ -62,8 +66,10 @@ const ButtonLink = (props: ButtonLinkI) => {
         full: undefined,
         inline: undefined,
         icon: undefined,
+        onboard: undefined,
       }}
-      href={href}>
+      href={href}
+    >
       {icon && iconPosition === "left" ? (
         <span className="mr-2">{icon}</span>
       ) : null}

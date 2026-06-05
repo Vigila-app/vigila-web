@@ -3,8 +3,8 @@
 import { FormFieldType } from "@/src/constants/form.constants";
 import { MapsService } from "@/src/services";
 import { useDebouncedSearch } from "@/src/hooks/useDebouncedSearch";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, FieldError, useForm } from "react-hook-form";
 import { Input } from "@/components/form";
 import { AddressI } from "@/src/types/maps.types";
 import { useCurrentLocation } from "@/src/hooks/useCurrentLocation";
@@ -29,6 +29,7 @@ const SearchAddress = (props: {
   debounce?: number;
   addressTypes?: string[];
   resetOnSubmit?: boolean;
+  error?: FieldError;
 }) => {
   const {
     onSubmit: eOnSubmit,
@@ -44,12 +45,17 @@ const SearchAddress = (props: {
     debounce = 1500,
     addressTypes,
     resetOnSubmit = false,
+    error: externalError,
   } = props;
+
+  const error = useMemo(() => {
+    return externalError;
+  }, [externalError]);
 
   const { searchTerm, debouncedSearchTerm, setSearchTerm } = useDebouncedSearch(
     "",
     debounce,
-    "searchAddress"
+    "searchAddress",
   );
 
   const { currentLocation } = useCurrentLocation({
@@ -88,7 +94,7 @@ const SearchAddress = (props: {
       throw new Error(
         `Error validating address: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setIsLoading(false);
@@ -136,8 +142,10 @@ const SearchAddress = (props: {
     try {
       if (debouncedSearchTerm?.length >= minLength) {
         setIsLoading(true);
-        const results =
-          await MapsService.autocompleteAddress(debouncedSearchTerm, addressTypes);
+        const results = await MapsService.autocompleteAddress(
+          debouncedSearchTerm,
+          addressTypes,
+        );
         setAutocompleteResults(results);
         if (results.length > 1) {
           setAutocompleteResults(results);
@@ -224,7 +232,7 @@ const SearchAddress = (props: {
         />
       </form>
       {!submitted && autocompleteResults?.length > 1 ? (
-        <div className="absolute left-1/2 -translate-x-1/2 top-12 w-[90%] bg-white p-2 border border-gray-200 shadow-sm rounded-2xl z-10 max-h-60 overflow-y-auto">
+        <div className="absolute left-1/2 -translate-x-1/2 top-18 w-[90%] bg-white p-2 border border-gray-200 shadow-sm rounded-2xl z-10 max-h-60 overflow-y-auto">
           <h6 className="text-black font-semibold mb-2">
             Seleziona un indirizzo
           </h6>
@@ -235,6 +243,7 @@ const SearchAddress = (props: {
                 className="bg-transparent hover:bg-gray-100 transition rounded"
               >
                 <button
+                  type="button"
                   onClick={() => {
                     const displayName =
                       result.display_name || result.name || "";
@@ -261,6 +270,12 @@ const SearchAddress = (props: {
           </ul>
         </div>
       ) : null}
+      {error && (
+        <div className="text-red-500">
+          {error.message ||
+            "Si è verificato un errore durante la ricerca dell'indirizzo. Per favore riprova."}
+        </div>
+      )}
       {submitted && !autocompleteResults.length ? (
         <div className="text-gray-500">Perfavore perfeziona la ricerca</div>
       ) : searchTerm && !autocompleteResults.length && !isLoading ? (

@@ -13,5 +13,6 @@ export const EmailConstants: EmailConfigI = {
     welcome: "[Vigila] Benvenuto",
     reset: "[Vigila] Reset Password",
     verification: "[Vigila] Verifica Account",
+    update: "[Vigila] Aggiornamento",
   },
 } as const;

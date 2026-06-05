@@ -1,10 +1,38 @@
-export enum GenderEnum {
-  FEMALE = "female",
-  MALE = "male",
-  OTHER = "other",
-  NOT_PROVIDED = "not-provided",
-}
+import { Asterisk, Couple, Man, NonBinary, Woman } from "@/components/svg";
+import { ComponentType, SVGProps } from "react";
 
+export enum GenderEnum {
+  MALE = "male",
+  FEMALE = "female",
+  NB = "non_binary",
+  OTHER = "other",
+  NA = "not-specified",
+}
+export const GenderLabels: Record<GenderEnum, string> = {
+  [GenderEnum.FEMALE]: "Donna",
+  [GenderEnum.MALE]: "Uomo",
+  [GenderEnum.NB]: "Non Binario",
+  [GenderEnum.OTHER]: "Altro",
+  [GenderEnum.NA]: "Preferisco non specificare",
+};
+
+export const GenderDescriptions: Record<GenderEnum, string> = {
+  [GenderEnum.FEMALE]: "Preferibilmente una donna",
+  [GenderEnum.MALE]: "Preferibilmente un uomo",
+  [GenderEnum.NB]: "Preferibilmente non binario",
+  [GenderEnum.OTHER]: "Preferibilmente altro",
+  [GenderEnum.NA]: "Preferisco non specificare",
+};
+export const GenderIcons: Record<
+  GenderEnum,
+  ComponentType<SVGProps<SVGSVGElement>>
+> = {
+  [GenderEnum.FEMALE]: Woman,
+  [GenderEnum.MALE]: Man,
+  [GenderEnum.NB]: NonBinary,
+  [GenderEnum.OTHER]: Asterisk,
+  [GenderEnum.NA]: Couple,
+};
 export enum FrequencyEnum {
   SECONDS = "seconds",
   MINUTES = "minutes",
@@ -30,27 +58,3 @@ export enum CurrencyEnum {
   US_DOLLAR = "$",
   GB_POUND = "£",
 }
-
-export enum OccupationEnum {
-  STUDENT = "studente",
-  UNEMPLOYED = "disoccupato",
-  OSA = "osa",
-  OSS = "oss",
-  NURSE = "infermiere",
-  EMPLOYEE = "impiegato",
-  PART_TIME_EMPLOYEE = "impiegato-part-time",
-  FAMILY_CAREGIVER = "assistente-familiare",
-  OTHER = "altro",
-}
-
-export const OccupationLabels: Record<OccupationEnum, string> = {
-  [OccupationEnum.STUDENT]: "Studente",
-  [OccupationEnum.UNEMPLOYED]: "Disoccupato",
-  [OccupationEnum.OSA]: "Operatore Socio Assistenziale (OSA)",
-  [OccupationEnum.OSS]: "Operatore Socio Sanitario (OSS)",
-  [OccupationEnum.NURSE]: "Infermiere",
-  [OccupationEnum.EMPLOYEE]: "Impiegato",
-  [OccupationEnum.PART_TIME_EMPLOYEE]: "Impiegato Part-Time",
-  [OccupationEnum.FAMILY_CAREGIVER]: "Assistente Familiare",
-  [OccupationEnum.OTHER]: "Altro",
-};

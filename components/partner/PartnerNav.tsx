@@ -25,7 +25,7 @@ const PartnerNav = ({
 }: PartnerNavProps) => {
   const handleAnchorClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string
+    href: string,
   ) => {
     if (href.startsWith("#")) {
       e.preventDefault();
@@ -40,7 +40,7 @@ const PartnerNav = ({
     <header
       className={clsx(
         "z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm",
-        sticky && "sticky top-0"
+        sticky && "sticky top-0",
       )}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">

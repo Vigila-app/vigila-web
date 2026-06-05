@@ -4,11 +4,22 @@ import { ServiceI, ServiceCatalogItem } from "@/src/types/services.types";
 import { ServiceCatalogTypeEnum } from "@/src/enums/services.enums";
 import servicesCatalogJson from "@/mock/cms/services-catalog.json";
 
+const validCatalogTypes = new Set<string>(
+  Object.values(ServiceCatalogTypeEnum),
+);
+
 const convertCatalogData = (jsonData: any): ServiceCatalogItem[] => {
-  return jsonData.services_catalog.map((item: any) => ({
-    ...item,
-    type: item.type as ServiceCatalogTypeEnum,
-  }));
+  return jsonData.services_catalog.map((item: any) => {
+    if (!validCatalogTypes.has(item.type)) {
+      throw new Error(
+        `Invalid services-catalog entry id=${item.id}: type "${item.type}" is not a member of ServiceCatalogTypeEnum`,
+      );
+    }
+    return {
+      ...item,
+      type: item.type as ServiceCatalogTypeEnum,
+    };
+  });
 };
 
 const servicesCatalogData: ServiceCatalogItem[] =
@@ -20,7 +31,7 @@ export const ServicesService = {
       try {
         const { data: service } = (await ApiService.post(
           apiServices.CREATE(),
-          newService
+          newService,
         )) as { data: ServiceI };
         resolve(service);
       } catch (error) {
@@ -34,7 +45,7 @@ export const ServicesService = {
         if (!service.id) reject();
         const { data: result } = (await ApiService.put(
           apiServices.DETAILS(service.id),
-          { ...service, lastUpdateDate: new Date() }
+          { ...service, lastUpdateDate: new Date() },
         )) as { data: ServiceI };
         resolve(result);
       } catch (error) {
@@ -55,13 +66,26 @@ export const ServicesService = {
     }),
   getServices: (
     vigil_id: ServiceI["vigil_id"],
-    filters: Record<string, any> = {}
+    filters: Record<string, any> = {},
   ) =>
     new Promise<ServiceI[]>(async (resolve, reject) => {
       try {
         const { data: response = [] } = (await ApiService.get(
           apiServices.LIST(),
-          { vigil_id, ...filters }
+          { vigil_id, ...filters },
+        )) as { data: ServiceI[] };
+        resolve(response);
+      } catch (error) {
+        console.error("ServicesService getServices error", error);
+        reject(error);
+      }
+    }),
+  getActiveServices: (vigil_id: ServiceI["vigil_id"]) =>
+    new Promise<ServiceI[]>(async (resolve, reject) => {
+      try {
+        const { data: response = [] } = (await ApiService.get(
+          apiServices.LIST(),
+          { vigil_id, active: "true" },
         )) as { data: ServiceI[] };
         resolve(response);
       } catch (error) {
@@ -73,7 +97,7 @@ export const ServicesService = {
     new Promise<ServiceI>(async (resolve, reject) => {
       try {
         const { data: serviceDetails } = (await ApiService.get(
-          apiServices.DETAILS(serviceId)
+          apiServices.DETAILS(serviceId),
         )) as { data: ServiceI };
         resolve(serviceDetails);
       } catch (error) {
@@ -90,16 +114,18 @@ export const ServicesService = {
     return servicesCatalogData.find((service) => service.id === id);
   },
 
-  getServicesByType: (type: ServiceCatalogTypeEnum): ServiceCatalogItem[] => {
-    return servicesCatalogData.filter((service) => service.type === type);
+  getServicesByType: (
+    type: ServiceCatalogTypeEnum,
+  ): ServiceCatalogItem | undefined => {
+    return servicesCatalogData.find((service) => service.type === type);
   },
 
   searchServicesByTag: (tag: string): ServiceCatalogItem[] => {
     const lowerCaseTag = tag.toLowerCase();
     return servicesCatalogData.filter((service) =>
       service.tags.some((serviceTag) =>
-        serviceTag.toLowerCase().includes(lowerCaseTag)
-      )
+        serviceTag.toLowerCase().includes(lowerCaseTag),
+      ),
     );
   },
 };

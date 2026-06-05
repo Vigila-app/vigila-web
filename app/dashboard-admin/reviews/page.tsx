@@ -8,6 +8,7 @@ import { Button, Badge } from "@/components";
 import { useUserStore } from "@/src/store/user/user.store";
 import { RolesEnum } from "@/src/enums/roles.enums";
 import { dateDisplay } from "@/src/utils/date.utils";
+import { Routes } from "@/src/routes";
 
 const AdminReviewsPage = () => {
   const [reviews, setReviews] = useState<ReviewI[]>([]);
@@ -20,7 +21,7 @@ const AdminReviewsPage = () => {
   // Redirect if not admin
   useEffect(() => {
     if (user && user.user_metadata?.role !== RolesEnum.ADMIN) {
-      window.location.href = "/";
+      window.location.href = Routes.home.url;
     }
   }, [user]);
 
@@ -41,7 +42,10 @@ const AdminReviewsPage = () => {
     }
   };
 
-  const handleToggleVisibility = async (reviewId: string, currentVisibility: boolean) => {
+  const handleToggleVisibility = async (
+    reviewId: string,
+    currentVisibility: boolean,
+  ) => {
     try {
       await updateReview(reviewId, { visible: !currentVisibility });
       await loadReviews(); // Refresh the list
@@ -52,7 +56,11 @@ const AdminReviewsPage = () => {
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questa recensione? L'azione non può essere annullata.")) {
+    if (
+      !window.confirm(
+        "Sei sicuro di voler eliminare questa recensione? L'azione non può essere annullata.",
+      )
+    ) {
       return;
     }
 
@@ -65,7 +73,7 @@ const AdminReviewsPage = () => {
     }
   };
 
-  const filteredReviews = reviews.filter(review => {
+  const filteredReviews = reviews.filter((review) => {
     switch (filter) {
       case "visible":
         return review.visible;
@@ -78,11 +86,14 @@ const AdminReviewsPage = () => {
 
   const stats = {
     total: reviews.length,
-    visible: reviews.filter(r => r.visible).length,
-    hidden: reviews.filter(r => !r.visible).length,
-    averageRating: reviews.length > 0 
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-      : "0",
+    visible: reviews.filter((r) => r.visible).length,
+    hidden: reviews.filter((r) => !r.visible).length,
+    averageRating:
+      reviews.length > 0
+        ? (
+            reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+          ).toFixed(1)
+        : "0",
   };
 
   if (loading) {
@@ -113,19 +124,27 @@ const AdminReviewsPage = () => {
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+            <div className="text-2xl font-bold text-gray-900">
+              {stats.total}
+            </div>
             <div className="text-sm text-gray-600">Recensioni totali</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-green-600">{stats.visible}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.visible}
+            </div>
             <div className="text-sm text-gray-600">Visibili</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-red-600">{stats.hidden}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.hidden}
+            </div>
             <div className="text-sm text-gray-600">Nascoste</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-yellow-600">{stats.averageRating}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.averageRating}
+            </div>
             <div className="text-sm text-gray-600">Voto medio</div>
           </div>
         </div>
@@ -137,23 +156,32 @@ const AdminReviewsPage = () => {
               <Button
                 label="Tutte"
                 action={() => setFilter("all")}
-                customClass={filter === "all" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}
+                customClass={
+                  filter === "all"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-700"
+                }
               />
               <Button
                 label="Visibili"
                 action={() => setFilter("visible")}
-                customClass={filter === "visible" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}
+                customClass={
+                  filter === "visible"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-700"
+                }
               />
               <Button
                 label="Nascoste"
                 action={() => setFilter("hidden")}
-                customClass={filter === "hidden" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}
+                customClass={
+                  filter === "hidden"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-700"
+                }
               />
             </div>
-            <Button
-              label="Aggiorna"
-              action={() => loadReviews()}
-            />
+            <Button label="Aggiorna" action={() => loadReviews()} />
           </div>
         </div>
 
@@ -164,7 +192,7 @@ const AdminReviewsPage = () => {
               Recensioni ({filteredReviews.length})
             </h3>
           </div>
-          
+
           {filteredReviews.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
               Nessuna recensione trovata per i filtri selezionati.
@@ -181,7 +209,9 @@ const AdminReviewsPage = () => {
                             <span
                               key={star}
                               className={`text-lg ${
-                                star <= review.rating ? "text-yellow-400" : "text-gray-300"
+                                star <= review.rating
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
                               }`}
                             >
                               ★
@@ -196,25 +226,31 @@ const AdminReviewsPage = () => {
                           {dateDisplay(review.created_at, "datetime")}
                         </span>
                       </div>
-                      
+
                       <p className="text-gray-800 mb-3">{review.comment}</p>
-                      
+
                       <div className="text-sm text-gray-600">
-                        <span>ID Recensione: {review.id.substring(0, 8)}...</span>
+                        <span>
+                          ID Recensione: {review.id.substring(0, 8)}...
+                        </span>
                         <span className="mx-2">•</span>
-                        <span>Booking: {review.booking_id.substring(0, 8)}...</span>
+                        <span>
+                          Booking: {review.booking_id.substring(0, 8)}...
+                        </span>
                         <span className="mx-2">•</span>
                         <span>Consumer: {review.consumer?.displayName}</span>
                         <span className="mx-2">•</span>
                         <span>Vigil: {review.vigil?.displayName}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex space-x-2 ml-4">
                       <Button
                         text
                         label={review.visible ? "Nascondi" : "Mostra"}
-                        action={() => handleToggleVisibility(review.id, review.visible)}
+                        action={() =>
+                          handleToggleVisibility(review.id, review.visible)
+                        }
                       />
                       <Button
                         text

@@ -50,6 +50,7 @@ export type ServiceI = {
   postalCode: string[];
   vigil?: Partial<VigilDetailsType>;
   duration?: string;
+  type: ServiceCatalogTypeEnum;
 };
 
 export type ServicesStoreType = {
@@ -59,8 +60,9 @@ export type ServicesStoreType = {
   getServices: (
     force?: boolean,
     vigilId?: ServiceI["vigil_id"],
-    filters?: Record<string, any>
+    filters?: Record<string, any>,
   ) => void;
+
   getServiceDetails: (serviceId: ServiceI["id"], force?: boolean) => void;
   deleteService: (serviceId: ServiceI["id"]) => void;
   resetLastUpdate: () => void;
