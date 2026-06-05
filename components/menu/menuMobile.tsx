@@ -43,6 +43,9 @@ const MenuMobile = () => {
     Icon?: React.ElementType,
     internal = true,
   ) => {
+    if (!route.url && !route.href) {
+      return null;
+    }
     const className = clsx(
       "flex items-center gap-4 rounded px-4 py-2 text-lg font-medium  transition hover:bg-gray-200 hover:text-gray-700",
       pathname === route?.url &&

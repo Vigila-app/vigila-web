@@ -35,24 +35,30 @@ const Footer = () => {
         </div>
 
         <ul className="mt-12 flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-12">
-          {NavigationUtils.getFooterMenu().map((route) => (
-            <li
-              key={route.label}
-              className={clsx(
-                route.menu?.mobile ? "block" : "hidden",
-                `sm:${route.menu?.desktop ? "block" : "hidden"}`,
-              )}
-            >
-              <Link
-                className="transition hover:text-vigil-orange"
-                href={route.href || route.url}
-                id={route.id || route.label.toLowerCase().replace(/\s+/g, "-") + "-footer-link"}
-                target={route.target || "_self"}
+          {NavigationUtils.getFooterMenu().map((route) =>
+            route ? (
+              <li
+                key={route.label}
+                className={clsx(
+                  route.menu?.mobile ? "block" : "hidden",
+                  `sm:${route.menu?.desktop ? "block" : "hidden"}`,
+                )}
               >
-                {route.label}
-              </Link>
-            </li>
-          ))}
+                <Link
+                  className="transition hover:text-vigil-orange"
+                  href={route.href || route.url}
+                  id={
+                    route.id ||
+                    route.label.toLowerCase().replace(/\s+/g, "-") +
+                      "-footer-link"
+                  }
+                  target={route.target || "_self"}
+                >
+                  {route.label}
+                </Link>
+              </li>
+            ) : null,
+          )}
         </ul>
 
         <ul className="mt-12 flex justify-center gap-6 md:gap-8">
